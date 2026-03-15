@@ -30,17 +30,29 @@ export default function Home() {
           </p>
           <div className="flex flex-col gap-4 w-full max-w-md">
 
+
 <input
   className="border border-zinc-300 rounded-lg px-4 py-3 text-black"
   placeholder="Describe the story you want..."
+  value={prompt}
+  onChange={(e) => setPrompt(e.target.value)}
 />
-
 <button
   className="bg-black text-white rounded-lg px-6 py-3 hover:bg-zinc-800"
+  onClick={() => setStory(prompt)}
 >
   Generate Story
 </button>
-
+{story && (
+  <div className="mt-4 max-w-md text-left">
+    <h2 className="mb-2 text-xl font-semibold text-black dark:text-zinc-50">
+      Your Story
+    </h2>
+    <p className="text-zinc-700 dark:text-zinc-300">
+      {story}
+    </p>
+  </div>
+)}
 </div>
         </div>
 
