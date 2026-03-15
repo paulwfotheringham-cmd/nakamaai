@@ -23,6 +23,20 @@ export default function Home() {
             AI-generated personalized audio stories created just for you.
             Choose your preferences, generate custom narratives, and listen instantly.
           </p>
+          <div className="flex flex-col gap-4 w-full max-w-md">
+
+<input
+  className="border border-zinc-300 rounded-lg px-4 py-3 text-black"
+  placeholder="Describe the story you want..."
+/>
+
+<button
+  className="bg-black text-white rounded-lg px-6 py-3 hover:bg-zinc-800"
+>
+  Generate Story
+</button>
+
+</div>
         </div>
 
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
