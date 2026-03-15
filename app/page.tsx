@@ -50,7 +50,7 @@ export default function Home() {
 />
 <button
   className="bg-black text-white rounded-lg px-6 py-3 hover:bg-zinc-800"
-  onClick={() => setStory(prompt)}
+  onClick={generateStory}
 >
   Generate Story
 </button>
