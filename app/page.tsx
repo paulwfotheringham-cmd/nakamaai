@@ -20,23 +20,44 @@ export default function Home() {
     setStory(data.story);
   }
 
-  function speakStory() {
-    const speech = new SpeechSynthesisUtterance(story);
+ function speakStory() {
+  const voices = window.speechSynthesis.getVoices()
 
-    const voices = window.speechSynthesis.getVoices();
+  const narratorVoice = voices[0]
+  const maleVoice = voices.find(v => v.name.toLowerCase().includes("male")) || voices[0]
+  const femaleVoice = voices.find(v => v.name.toLowerCase().includes("female")) || voices[1]
 
-    if (voiceType === "male") {
-      speech.voice = voices.find(v => v.name.toLowerCase().includes("male")) || voices[0];
-    } else {
-      speech.voice = voices.find(v => v.name.toLowerCase().includes("female")) || voices[1];
+  const lines = story.split("\n")
+
+  lines.forEach((line, index) => {
+    let text = line
+    let voice = narratorVoice
+
+    if (line.startsWith("MALE:")) {
+      text = line.replace("MALE:", "")
+      voice = maleVoice
     }
 
-    speech.rate = 0.95;
-    speech.pitch = 1;
-    speech.lang = "en-US";
+    if (line.startsWith("FEMALE:")) {
+      text = line.replace("FEMALE:", "")
+      voice = femaleVoice
+    }
 
-    window.speechSynthesis.speak(speech);
-  }
+    if (line.startsWith("NARRATOR:")) {
+      text = line.replace("NARRATOR:", "")
+      voice = narratorVoice
+    }
+
+    const speech = new SpeechSynthesisUtterance(text.trim())
+    speech.voice = voice
+    speech.rate = 0.95
+    speech.pitch = 1
+
+    setTimeout(() => {
+      window.speechSynthesis.speak(speech)
+    }, index * 1500)
+  })
+}
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
