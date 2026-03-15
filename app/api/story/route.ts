@@ -1,39 +1,14 @@
 export async function POST(req: Request) {
-  try {
-    const { prompt } = await req.json();
+  const { prompt } = await req.json()
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: "You are a creative storyteller who writes short engaging stories."
-          },
-          {
-            role: "user",
-            content: `Write a short story about: ${prompt}`
-          }
-        ],
-        max_tokens: 300
-      })
-    });
+  const story = `
+Once upon a time, ${prompt}.
+The adventure began in a small village where no one expected what would happen next.
 
-    const data = await response.json();
-console.log("OPENAI RESPONSE:", data);
-    console.log(data);
+As the journey unfolded, new friends appeared, strange problems had to be solved, and courage was tested.
 
-    const story = data.choices?.[0]?.message?.content || "No story generated.";
+In the end, the hero discovered something important — sometimes the greatest magic is believing in yourself.
+`
 
-    return Response.json({ story });
-
-  } catch (error) {
-    console.error(error);
-    return Response.json({ story: "Error generating story." });
-  }
+  return Response.json({ story })
 }
