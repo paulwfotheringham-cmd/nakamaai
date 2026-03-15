@@ -5,6 +5,7 @@ import { useState } from "react";
 export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [story, setStory] = useState("");
+  
   async function generateStory() {
   const response = await fetch("/api/story", {
     method: "POST",
