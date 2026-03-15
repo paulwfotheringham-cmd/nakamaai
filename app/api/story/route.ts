@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     });
 
     const data = await response.json();
-
+console.log("OPENAI RESPONSE:", data);
     console.log(data);
 
     const story = data.choices?.[0]?.message?.content || "No story generated.";
