@@ -5,7 +5,7 @@ import { useState } from "react";
 export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [story, setStory] = useState("");
-  
+  const [voiceType, setVoiceType] = useState("female");
   async function generateStory() {
   const response = await fetch("/api/story", {
     method: "POST",
