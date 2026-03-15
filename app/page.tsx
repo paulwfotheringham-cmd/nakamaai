@@ -59,9 +59,24 @@ export default function Home() {
     <h2 className="mb-2 text-xl font-semibold text-black dark:text-zinc-50">
       Your Story
     </h2>
+
     <p className="text-zinc-700 dark:text-zinc-300">
       {story}
     </p>
+
+    <button
+      className="mt-4 bg-black text-white px-4 py-2 rounded-lg hover:bg-zinc-800"
+      onClick={() => {
+        const speech = new SpeechSynthesisUtterance(story)
+        speech.rate = 0.95
+        speech.pitch = 1
+        speech.lang = "en-US"
+        window.speechSynthesis.speak(speech)
+      }}
+    >
+      🔊 Listen to Story
+    </button>
+
   </div>
 )}
 </div>
