@@ -1,31 +1,39 @@
 export async function POST(req: Request) {
-  const { prompt } = await req.json();
+  try {
+    const { prompt } = await req.json();
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "You are a creative storyteller who writes short engaging stories."
-        },
-        {
-          role: "user",
-          content: `Write a short story about: ${prompt}`
-        }
-      ],
-      max_tokens: 300
-    }),
-  });
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: "You are a creative storyteller who writes short engaging stories."
+          },
+          {
+            role: "user",
+            content: `Write a short story about: ${prompt}`
+          }
+        ],
+        max_tokens: 300
+      })
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  const story = data.choices?.[0]?.message?.content || "No story generated.";
+    console.log(data);
 
-  return Response.json({ story });
+    const story = data.choices?.[0]?.message?.content || "No story generated.";
+
+    return Response.json({ story });
+
+  } catch (error) {
+    console.error(error);
+    return Response.json({ story: "Error generating story." });
+  }
 }
