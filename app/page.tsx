@@ -5,10 +5,16 @@ import { useEffect, useMemo, useState } from "react";
 type BrowserVoice = SpeechSynthesisVoice;
 
 export default function Home() {
-  const [prompt, setPrompt] = useState("");
+  const [setting, setSetting] = useState("office");
+  const [mood, setMood] = useState("romantic");
+  const [buildUp, setBuildUp] = useState("slow burn");
+  const [maleRole, setMaleRole] = useState("boss");
+  const [femaleRole, setFemaleRole] = useState("assistant");
+  const [storyType, setStoryType] = useState("romantic encounter");
+  const [extraPrompt, setExtraPrompt] = useState("");
   const [story, setStory] = useState("");
-  const [voices, setVoices] = useState<BrowserVoice[]>([]);
 
+  const [voices, setVoices] = useState<BrowserVoice[]>([]);
   const [narratorVoice, setNarratorVoice] = useState("");
   const [maleVoice, setMaleVoice] = useState("");
   const [femaleVoice, setFemaleVoice] = useState("");
@@ -19,7 +25,15 @@ export default function Home() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify({
+        setting,
+        mood,
+        buildUp,
+        maleRole,
+        femaleRole,
+        storyType,
+        extraPrompt,
+      }),
     });
 
     const data = await response.json();
@@ -40,29 +54,18 @@ export default function Home() {
   }, [voices]);
 
   function pickBestVoice(list: BrowserVoice[], role: "narrator" | "male" | "female") {
-    const names = list.map((v) => v.name.toLowerCase());
-
     const findByTerms = (terms: string[]) =>
       list.find((v) => terms.some((t) => v.name.toLowerCase().includes(t)));
 
     if (role === "narrator") {
-      return (
-        findByTerms(["david", "guy", "mark", "james", "daniel", "male"]) ||
-        list[0]
-      );
+      return findByTerms(["david", "guy", "mark", "james", "daniel", "male"]) || list[0];
     }
 
     if (role === "male") {
-      return (
-        findByTerms(["david", "guy", "mark", "james", "daniel", "male"]) ||
-        list[0]
-      );
+      return findByTerms(["david", "guy", "mark", "james", "daniel", "male"]) || list[0];
     }
 
-    return (
-      findByTerms(["zira", "aria", "jenny", "samantha", "serena", "female"]) ||
-      list[0]
-    );
+    return findByTerms(["zira", "aria", "jenny", "samantha", "serena", "female"]) || list[0];
   }
 
   useEffect(() => {
@@ -150,15 +153,106 @@ export default function Home() {
         </h1>
 
         <p className="max-w-md text-zinc-600 dark:text-zinc-400">
-          AI-generated personalized audio stories created just for you.
+          Build a custom romance story with guided choices.
         </p>
 
         <div className="flex w-full max-w-md flex-col gap-4">
+          <label className="text-sm font-semibold text-black dark:text-white">
+            Setting
+          </label>
+          <select
+            className="rounded-lg border border-zinc-300 px-4 py-3 text-black"
+            value={setting}
+            onChange={(e) => setSetting(e.target.value)}
+          >
+            <option>office</option>
+            <option>café</option>
+            <option>beach resort</option>
+            <option>luxury hotel</option>
+            <option>city penthouse</option>
+          </select>
+
+          <label className="text-sm font-semibold text-black dark:text-white">
+            Mood
+          </label>
+          <select
+            className="rounded-lg border border-zinc-300 px-4 py-3 text-black"
+            value={mood}
+            onChange={(e) => setMood(e.target.value)}
+          >
+            <option>romantic</option>
+            <option>playful</option>
+            <option>dramatic</option>
+            <option>intense</option>
+            <option>tender</option>
+          </select>
+
+          <label className="text-sm font-semibold text-black dark:text-white">
+            Build-up
+          </label>
+          <select
+            className="rounded-lg border border-zinc-300 px-4 py-3 text-black"
+            value={buildUp}
+            onChange={(e) => setBuildUp(e.target.value)}
+          >
+            <option>slow burn</option>
+            <option>medium pace</option>
+            <option>instant spark</option>
+          </select>
+
+          <label className="text-sm font-semibold text-black dark:text-white">
+            Male Character
+          </label>
+          <select
+            className="rounded-lg border border-zinc-300 px-4 py-3 text-black"
+            value={maleRole}
+            onChange={(e) => setMaleRole(e.target.value)}
+          >
+            <option>boss</option>
+            <option>stranger</option>
+            <option>chef</option>
+            <option>artist</option>
+            <option>billionaire</option>
+          </select>
+
+          <label className="text-sm font-semibold text-black dark:text-white">
+            Female Character
+          </label>
+          <select
+            className="rounded-lg border border-zinc-300 px-4 py-3 text-black"
+            value={femaleRole}
+            onChange={(e) => setFemaleRole(e.target.value)}
+          >
+            <option>assistant</option>
+            <option>traveler</option>
+            <option>writer</option>
+            <option>singer</option>
+            <option>entrepreneur</option>
+          </select>
+
+          <label className="text-sm font-semibold text-black dark:text-white">
+            Story Type
+          </label>
+          <select
+            className="rounded-lg border border-zinc-300 px-4 py-3 text-black"
+            value={storyType}
+            onChange={(e) => setStoryType(e.target.value)}
+          >
+            <option>romantic encounter</option>
+            <option>forbidden romance</option>
+            <option>reunion</option>
+            <option>enemies to lovers</option>
+            <option>late night confession</option>
+          </select>
+
+          <label className="text-sm font-semibold text-black dark:text-white">
+            Extra Detail
+          </label>
           <input
             className="rounded-lg border border-zinc-300 px-4 py-3 text-black"
-            placeholder="Describe the story you want..."
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Optional custom detail..."
+            value={extraPrompt}
+            onChange={(e) => setExtraPrompt(e.target.value)}
           />
 
           <label className="text-sm font-semibold text-black dark:text-white">
