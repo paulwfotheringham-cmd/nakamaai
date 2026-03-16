@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 type BrowserVoice = SpeechSynthesisVoice;
 
 export default function Home() {
+
   const [prompt, setPrompt] = useState("");
   const [story, setStory] = useState("");
 
@@ -28,22 +29,40 @@ export default function Home() {
   }
 
   useEffect(() => {
-    function loadVoices() {
-      const availableVoices = window.speechSynthesis.getVoices();
-      setVoices(availableVoices);
 
-      if (availableVoices.length > 0) {
-        setNarratorVoice(availableVoices[0].name);
-        setMaleVoice(availableVoices[1]?.name || availableVoices[0].name);
-        setFemaleVoice(availableVoices[2]?.name || availableVoices[0].name);
+    function loadVoices() {
+
+      const allVoices = window.speechSynthesis.getVoices();
+
+      const englishVoices = allVoices.filter(
+        (v) => v.lang.startsWith("en")
+      );
+
+      setVoices(englishVoices);
+
+      if (englishVoices.length > 0) {
+
+        setNarratorVoice(englishVoices[0].name);
+
+        setMaleVoice(
+          englishVoices[1]?.name || englishVoices[0].name
+        );
+
+        setFemaleVoice(
+          englishVoices[2]?.name || englishVoices[0].name
+        );
+
       }
+
     }
 
     loadVoices();
     window.speechSynthesis.onvoiceschanged = loadVoices;
+
   }, []);
 
   function speakStory() {
+
     window.speechSynthesis.cancel();
 
     const lines = story
@@ -54,6 +73,7 @@ export default function Home() {
     let delay = 0;
 
     lines.forEach((line) => {
+
       let text = line;
       let voiceName = narratorVoice;
 
@@ -74,8 +94,13 @@ export default function Home() {
 
       const utterance = new SpeechSynthesisUtterance(text);
 
-      const matchedVoice = voices.find((v) => v.name === voiceName);
-      if (matchedVoice) utterance.voice = matchedVoice;
+      const matchedVoice = voices.find(
+        (v) => v.name === voiceName
+      );
+
+      if (matchedVoice) {
+        utterance.voice = matchedVoice;
+      }
 
       utterance.rate = 0.95;
 
@@ -84,15 +109,26 @@ export default function Home() {
       }, delay);
 
       delay += text.length * 60 + 1200;
+
     });
+
   }
 
   function stopStory() {
     window.speechSynthesis.cancel();
   }
 
+  function cleanVoiceName(name: string) {
+    return name
+      .replace("Microsoft ", "")
+      .replace("Google ", "")
+      .split(" - ")[0];
+  }
+
   return (
+
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
+
       <main className="flex w-full max-w-3xl flex-col items-center gap-6 py-24 px-10 bg-white dark:bg-black text-center">
 
         <Image
@@ -130,7 +166,7 @@ export default function Home() {
           >
             {voices.map((voice) => (
               <option key={voice.name} value={voice.name}>
-                {voice.name} ({voice.lang})
+                {cleanVoiceName(voice.name)}
               </option>
             ))}
           </select>
@@ -146,7 +182,7 @@ export default function Home() {
           >
             {voices.map((voice) => (
               <option key={voice.name} value={voice.name}>
-                {voice.name} ({voice.lang})
+                {cleanVoiceName(voice.name)}
               </option>
             ))}
           </select>
@@ -162,7 +198,7 @@ export default function Home() {
           >
             {voices.map((voice) => (
               <option key={voice.name} value={voice.name}>
-                {voice.name} ({voice.lang})
+                {cleanVoiceName(voice.name)}
               </option>
             ))}
           </select>
@@ -175,6 +211,7 @@ export default function Home() {
           </button>
 
           {story && (
+
             <div className="text-left mt-4">
 
               <h2 className="text-xl font-semibold mb-2">
@@ -204,11 +241,15 @@ export default function Home() {
               </div>
 
             </div>
+
           )}
 
         </div>
 
       </main>
+
     </div>
+
   );
+
 }
