@@ -1,309 +1,280 @@
 "use client";
-import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type BrowserVoice = SpeechSynthesisVoice;
 
 export default function Home() {
-  const [setting, setSetting] = useState("office");
-  const [mood, setMood] = useState("romantic");
-  const [buildUp, setBuildUp] = useState("slow burn");
-  const [maleRole, setMaleRole] = useState("boss");
-  const [femaleRole, setFemaleRole] = useState("assistant");
-  const [storyType, setStoryType] = useState("romantic encounter");
-  const [extraDetail, setExtraDetail] = useState("");
-  const [story, setStory] = useState("");
 
-  const [voices, setVoices] = useState<BrowserVoice[]>([]);
-  const [narratorVoice, setNarratorVoice] = useState("");
-  const [maleVoice, setMaleVoice] = useState("");
-  const [femaleVoice, setFemaleVoice] = useState("");
+const [setting,setSetting]=useState("office")
+const [mood,setMood]=useState("romantic")
+const [buildUp,setBuildUp]=useState("slow burn")
+const [maleRole,setMaleRole]=useState("boss")
+const [femaleRole,setFemaleRole]=useState("assistant")
+const [storyType,setStoryType]=useState("romantic encounter")
+const [extraDetail,setExtraDetail]=useState("")
+const [story,setStory]=useState("")
 
-  const speechTimeouts = useRef<number[]>([]);
+const [voices,setVoices]=useState<BrowserVoice[]>([])
+const [narratorVoice,setNarratorVoice]=useState("")
+const [maleVoice,setMaleVoice]=useState("")
+const [femaleVoice,setFemaleVoice]=useState("")
 
-  async function generateStory() {
-    const response = await fetch("/api/story", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        setting,
-        mood,
-        buildUp,
-        maleRole,
-        femaleRole,
-        storyType,
-        extraDetail,
-      }),
-    });
+const speechTimeouts=useRef<number[]>([])
 
-    const data = await response.json();
-    setStory(data.story);
-  }
+async function generateStory(){
 
-  function cleanVoiceName(name: string) {
-    return name
-      .replace("Microsoft ", "")
-      .replace("Google ", "")
-      .split(" - ")[0]
-      .trim();
-  }
+const response=await fetch("/api/story",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({
+setting,
+mood,
+buildUp,
+maleRole,
+femaleRole,
+storyType,
+extraDetail
+})
+})
 
-  const englishVoices = useMemo(() => {
-    return voices.filter((v) => v.lang.toLowerCase().startsWith("en"));
-  }, [voices]);
+const data=await response.json()
+setStory(data.story)
 
-  useEffect(() => {
-    function loadVoices() {
-      const all = window.speechSynthesis.getVoices();
-      setVoices(all);
+}
 
-      const english = all.filter((v) => v.lang.toLowerCase().startsWith("en"));
-      if (english.length === 0) return;
+function cleanVoiceName(name:string){
+return name.replace("Microsoft ","").replace("Google ","").split(" - ")[0].trim()
+}
 
-      setNarratorVoice(english[0].name);
-      setMaleVoice(english[1]?.name || english[0].name);
-      setFemaleVoice(english[2]?.name || english[0].name);
-    }
+const englishVoices=useMemo(()=>{
+return voices.filter(v=>v.lang.toLowerCase().startsWith("en"))
+},[voices])
 
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
+useEffect(()=>{
 
-    return () => {
-      window.speechSynthesis.onvoiceschanged = null;
-    };
-  }, []);
+function loadVoices(){
 
-  function speakStory() {
-    window.speechSynthesis.cancel();
+const all=window.speechSynthesis.getVoices()
+setVoices(all)
 
-    speechTimeouts.current.forEach((id) => clearTimeout(id));
-    speechTimeouts.current = [];
+const english=all.filter(v=>v.lang.toLowerCase().startsWith("en"))
+if(english.length===0)return
 
-    const lines = story
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
+setNarratorVoice(english[0].name)
+setMaleVoice(english[1]?.name||english[0].name)
+setFemaleVoice(english[2]?.name||english[0].name)
 
-    let delay = 0;
+}
 
-    lines.forEach((line) => {
-      let text = line;
-      let voiceName = narratorVoice;
+loadVoices()
+window.speechSynthesis.onvoiceschanged=loadVoices
 
-      if (line.startsWith("MALE:")) {
-        text = line.replace("MALE:", "").trim();
-        voiceName = maleVoice;
-      }
+return()=>{
+window.speechSynthesis.onvoiceschanged=null
+}
 
-      if (line.startsWith("FEMALE:")) {
-        text = line.replace("FEMALE:", "").trim();
-        voiceName = femaleVoice;
-      }
+},[])
 
-      if (line.startsWith("NARRATOR:")) {
-        text = line.replace("NARRATOR:", "").trim();
-        voiceName = narratorVoice;
-      }
+function speakStory(){
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      const matched = englishVoices.find((v) => v.name === voiceName);
+window.speechSynthesis.cancel()
 
-      if (matched) {
-        utterance.voice = matched;
-        utterance.lang = matched.lang;
-      } else {
-        utterance.lang = "en-US";
-      }
+speechTimeouts.current.forEach(id=>clearTimeout(id))
+speechTimeouts.current=[]
 
-      utterance.rate = 0.95;
+const lines=story.split("\n").map(l=>l.trim()).filter(Boolean)
 
-      const timeoutId = window.setTimeout(() => {
-        window.speechSynthesis.speak(utterance);
-      }, delay);
+let delay=0
 
-      speechTimeouts.current.push(timeoutId);
+lines.forEach(line=>{
 
-      delay += text.length * 60 + 1200;
-    });
-  }
+let text=line
+let voiceName=narratorVoice
 
-  function stopStory() {
-    window.speechSynthesis.cancel();
-    speechTimeouts.current.forEach((id) => clearTimeout(id));
-    speechTimeouts.current = [];
-  }
+if(line.startsWith("MALE:")){
+text=line.replace("MALE:","").trim()
+voiceName=maleVoice
+}
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
-      <main className="flex w-full max-w-3xl flex-col items-center gap-6 bg-white px-10 py-24 text-center dark:bg-black">
-        <Image src="/next.svg" alt="logo" width={100} height={20} />
+if(line.startsWith("FEMALE:")){
+text=line.replace("FEMALE:","").trim()
+voiceName=femaleVoice
+}
 
-        <h1 className="text-3xl font-semibold text-black dark:text-white">
-          Welcome to Nakama AI
-        </h1>
+if(line.startsWith("NARRATOR:")){
+text=line.replace("NARRATOR:","").trim()
+voiceName=narratorVoice
+}
 
-        <p className="text-zinc-600 dark:text-zinc-400">
-          Build a custom romance story with guided choices.
-        </p>
+const utterance=new SpeechSynthesisUtterance(text)
 
-        <div className="flex w-full max-w-md flex-col gap-4">
-          <label>Setting</label>
-          <select
-            className="rounded-lg border p-3 text-black"
-            value={setting}
-            onChange={(e) => setSetting(e.target.value)}
-          >
-            <option>office</option>
-            <option>café</option>
-            <option>beach</option>
-            <option>hotel</option>
-            <option>city penthouse</option>
-          </select>
+const matched=englishVoices.find(v=>v.name===voiceName)
 
-          <label>Mood</label>
-          <select
-            className="rounded-lg border p-3 text-black"
-            value={mood}
-            onChange={(e) => setMood(e.target.value)}
-          >
-            <option>romantic</option>
-            <option>playful</option>
-            <option>intense</option>
-            <option>dramatic</option>
-            <option>tender</option>
-          </select>
+if(matched){
+utterance.voice=matched
+utterance.lang=matched.lang
+}else{
+utterance.lang="en-US"
+}
 
-          <label>Build-up</label>
-          <select
-            className="rounded-lg border p-3 text-black"
-            value={buildUp}
-            onChange={(e) => setBuildUp(e.target.value)}
-          >
-            <option>slow burn</option>
-            <option>medium pace</option>
-            <option>instant spark</option>
-          </select>
+utterance.rate=0.95
 
-          <label>Male Character</label>
-          <select
-            className="rounded-lg border p-3 text-black"
-            value={maleRole}
-            onChange={(e) => setMaleRole(e.target.value)}
-          >
-            <option>boss</option>
-            <option>stranger</option>
-            <option>chef</option>
-            <option>artist</option>
-            <option>billionaire</option>
-          </select>
+const timeoutId=window.setTimeout(()=>{
+window.speechSynthesis.speak(utterance)
+},delay)
 
-          <label>Female Character</label>
-          <select
-            className="rounded-lg border p-3 text-black"
-            value={femaleRole}
-            onChange={(e) => setFemaleRole(e.target.value)}
-          >
-            <option>assistant</option>
-            <option>traveler</option>
-            <option>writer</option>
-            <option>singer</option>
-            <option>entrepreneur</option>
-          </select>
+speechTimeouts.current.push(timeoutId)
 
-          <label>Story Type</label>
-          <select
-            className="rounded-lg border p-3 text-black"
-            value={storyType}
-            onChange={(e) => setStoryType(e.target.value)}
-          >
-            <option>romantic encounter</option>
-            <option>forbidden romance</option>
-            <option>reunion</option>
-            <option>enemies to lovers</option>
-            <option>late night confession</option>
-          </select>
+delay+=text.length*60+1200
 
-          <label>Extra Detail</label>
-          <input
-            className="rounded-lg border p-3 text-black"
-            placeholder="Optional custom detail..."
-            value={extraDetail}
-            onChange={(e) => setExtraDetail(e.target.value)}
-          />
+})
 
-          <label>Narrator Voice</label>
-          <select
-            className="rounded-lg border p-3 text-black"
-            value={narratorVoice}
-            onChange={(e) => setNarratorVoice(e.target.value)}
-          >
-            {englishVoices.map((v) => (
-              <option key={`n-${v.name}`} value={v.name}>
-                {cleanVoiceName(v.name)}
-              </option>
-            ))}
-          </select>
+}
 
-          <label>Male Character Voice</label>
-          <select
-            className="rounded-lg border p-3 text-black"
-            value={maleVoice}
-            onChange={(e) => setMaleVoice(e.target.value)}
-          >
-            {englishVoices.map((v) => (
-              <option key={`m-${v.name}`} value={v.name}>
-                {cleanVoiceName(v.name)}
-              </option>
-            ))}
-          </select>
+function stopStory(){
+window.speechSynthesis.cancel()
+speechTimeouts.current.forEach(id=>clearTimeout(id))
+speechTimeouts.current=[]
+}
 
-          <label>Female Character Voice</label>
-          <select
-            className="rounded-lg border p-3 text-black"
-            value={femaleVoice}
-            onChange={(e) => setFemaleVoice(e.target.value)}
-          >
-            {englishVoices.map((v) => (
-              <option key={`f-${v.name}`} value={v.name}>
-                {cleanVoiceName(v.name)}
-              </option>
-            ))}
-          </select>
+return(
 
-          <button
-            className="rounded-lg bg-black p-3 text-white"
-            onClick={generateStory}
-          >
-            Generate Story
-          </button>
+<div className="min-h-screen bg-gradient-to-b from-[#120b12] via-[#1b1119] to-black text-white flex items-center justify-center">
 
-          {story && (
-            <div className="mt-4 text-left">
-              <h2 className="text-xl font-semibold">Your Story</h2>
+<div className="max-w-4xl w-full p-8">
 
-              <p className="whitespace-pre-line">{story}</p>
+<h1 className="text-4xl font-semibold mb-2 text-center">
+Nakama AI
+</h1>
 
-              <div className="mt-3 flex gap-3">
-                <button
-                  className="rounded-lg bg-black px-4 py-2 text-white"
-                  onClick={speakStory}
-                >
-                  🔊 Listen
-                </button>
+<p className="text-center text-white/60 mb-8">
+Create personalized romantic audio stories
+</p>
 
-                <button
-                  className="rounded-lg border px-4 py-2"
-                  onClick={stopStory}
-                >
-                  Stop
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
-    </div>
-  );
+<div className="grid gap-4 bg-white/5 border border-white/10 p-6 rounded-2xl">
+
+<label>Setting</label>
+<select className="nakama-input" value={setting} onChange={e=>setSetting(e.target.value)}>
+<option>office</option>
+<option>café</option>
+<option>beach</option>
+<option>hotel</option>
+<option>city penthouse</option>
+</select>
+
+<label>Mood</label>
+<select className="nakama-input" value={mood} onChange={e=>setMood(e.target.value)}>
+<option>romantic</option>
+<option>playful</option>
+<option>intense</option>
+<option>dramatic</option>
+<option>tender</option>
+</select>
+
+<label>Build Up</label>
+<select className="nakama-input" value={buildUp} onChange={e=>setBuildUp(e.target.value)}>
+<option>slow burn</option>
+<option>medium pace</option>
+<option>instant spark</option>
+</select>
+
+<label>Male Character</label>
+<select className="nakama-input" value={maleRole} onChange={e=>setMaleRole(e.target.value)}>
+<option>boss</option>
+<option>stranger</option>
+<option>chef</option>
+<option>artist</option>
+<option>billionaire</option>
+</select>
+
+<label>Female Character</label>
+<select className="nakama-input" value={femaleRole} onChange={e=>setFemaleRole(e.target.value)}>
+<option>assistant</option>
+<option>traveler</option>
+<option>writer</option>
+<option>singer</option>
+<option>entrepreneur</option>
+</select>
+
+<label>Story Type</label>
+<select className="nakama-input" value={storyType} onChange={e=>setStoryType(e.target.value)}>
+<option>romantic encounter</option>
+<option>forbidden romance</option>
+<option>reunion</option>
+<option>enemies to lovers</option>
+<option>late night confession</option>
+</select>
+
+<label>Extra Detail</label>
+<input
+className="nakama-input"
+placeholder="Optional custom detail"
+value={extraDetail}
+onChange={e=>setExtraDetail(e.target.value)}
+/>
+
+<button
+className="bg-[#d6b06b] text-black p-3 rounded-xl font-medium mt-2"
+onClick={generateStory}
+>
+Generate Story
+</button>
+
+{story &&(
+
+<div className="mt-6">
+
+<h2 className="text-xl font-semibold mb-3">Your Story</h2>
+
+<p className="whitespace-pre-line text-white/80 leading-7">
+{story}
+</p>
+
+<div className="flex gap-3 mt-4">
+
+<button
+className="bg-[#d6b06b] text-black px-4 py-2 rounded-lg"
+onClick={speakStory}
+>
+🔊 Listen
+</button>
+
+<button
+className="border border-white/20 px-4 py-2 rounded-lg"
+onClick={stopStory}
+>
+Stop
+</button>
+
+</div>
+
+</div>
+
+)}
+
+</div>
+
+</div>
+
+<style jsx global>{`
+
+.nakama-input{
+width:100%;
+padding:12px;
+border-radius:12px;
+background:rgba(255,255,255,0.06);
+border:1px solid rgba(255,255,255,0.1);
+color:white;
+}
+
+.nakama-input option{
+color:black;
+}
+
+`}</style>
+
+</div>
+
+)
+
 }
