@@ -29,6 +29,24 @@ export default function LoginPage() {
     router.push("/dashboard");
   }
 
+  async function handleForgotPassword() {
+    if (!email) {
+      alert("Enter your email address first.");
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "https://nakamaai.vercel.app/set-password",
+    });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("Check your email for your password reset link.");
+  }
+
   return (
     <div
       style={{
@@ -125,6 +143,21 @@ export default function LoginPage() {
             {loading ? "Signing in..." : "Login"}
           </button>
         </form>
+
+        <button
+          onClick={handleForgotPassword}
+          style={{
+            marginTop: "16px",
+            background: "transparent",
+            border: "none",
+            color: "#d8b26e",
+            cursor: "pointer",
+            padding: 0,
+            fontSize: "15px",
+          }}
+        >
+          Forgot Password?
+        </button>
       </div>
     </div>
   );
