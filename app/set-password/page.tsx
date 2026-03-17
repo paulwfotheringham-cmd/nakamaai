@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 
 export default function SetPasswordPage() {
+  const router = useRouter();
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("Create your password");
   const [ready, setReady] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const {
@@ -26,6 +29,7 @@ export default function SetPasswordPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setSaving(true);
 
     const { error } = await supabase.auth.updateUser({
       password,
@@ -33,10 +37,11 @@ export default function SetPasswordPage() {
 
     if (error) {
       setMessage(error.message);
+      setSaving(false);
       return;
     }
 
-    setMessage("Password created successfully.");
+    router.push("/dashboard");
   }
 
   return (
@@ -61,13 +66,27 @@ export default function SetPasswordPage() {
           border: "1px solid rgba(255,255,255,0.1)",
           borderRadius: "24px",
           padding: "32px",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
+          backdropFilter: "blur(12px)",
         }}
       >
-        <h1 style={{ fontSize: "40px", marginBottom: "16px" }}>
+        <h1
+          style={{
+            fontSize: "40px",
+            fontWeight: 700,
+            margin: "0 0 16px 0",
+          }}
+        >
           Create Password
         </h1>
 
-        <p style={{ color: "rgba(255,255,255,0.75)", marginBottom: "20px" }}>
+        <p
+          style={{
+            color: "rgba(255,255,255,0.75)",
+            marginBottom: "20px",
+            lineHeight: 1.6,
+          }}
+        >
           {message}
         </p>
 
@@ -93,6 +112,7 @@ export default function SetPasswordPage() {
 
             <button
               type="submit"
+              disabled={saving}
               style={{
                 width: "100%",
                 padding: "14px 16px",
@@ -102,10 +122,11 @@ export default function SetPasswordPage() {
                 color: "black",
                 fontWeight: 700,
                 fontSize: "16px",
-                cursor: "pointer",
+                cursor: saving ? "not-allowed" : "pointer",
+                opacity: saving ? 0.7 : 1,
               }}
             >
-              Save Password
+              {saving ? "Saving..." : "Save Password"}
             </button>
           </form>
         ) : (
