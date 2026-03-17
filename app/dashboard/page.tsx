@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function DashboardPage() {
   return (
     <div
@@ -18,14 +20,24 @@ export default function DashboardPage() {
         }}
       >
         <FeatureBox text="Choose fantasy Audio" />
-        <FeatureBox text="Customize your audio" />
+
+        <Link href="/create-audio" style={{ textDecoration: "none" }}>
+          <FeatureBox text="Customize your audio" clickable />
+        </Link>
+
         <FeatureBox text="Profile" />
       </div>
     </div>
   );
 }
 
-function FeatureBox({ text }: { text: string }) {
+function FeatureBox({
+  text,
+  clickable = false,
+}: {
+  text: string;
+  clickable?: boolean;
+}) {
   return (
     <div
       style={{
@@ -42,6 +54,7 @@ function FeatureBox({ text }: { text: string }) {
         textAlign: "center",
         padding: "20px",
         boxSizing: "border-box",
+        cursor: clickable ? "pointer" : "default",
       }}
     >
       {text}
