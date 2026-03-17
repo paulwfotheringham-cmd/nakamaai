@@ -16,7 +16,7 @@ export default function SignupPage() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: "https://nakamaai.vercel.app/auth/callback",
+        emailRedirectTo: "https://nakamaai.vercel.app/set-password",
         data: {
           full_name: name,
         },
@@ -88,7 +88,7 @@ export default function SignupPage() {
             lineHeight: 1.6,
           }}
         >
-          Enter your name and email to get your magic login link.
+          Enter your name and email to get your password setup link.
         </p>
 
         {!submitted ? (
@@ -140,7 +140,7 @@ export default function SignupPage() {
               lineHeight: 1.6,
             }}
           >
-            Check your email for your login link.
+            Check your email for your password setup link.
           </div>
         )}
       </div>
