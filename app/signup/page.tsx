@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-
 import { supabase } from "../../lib/supabase";
 
 export default function SignupPage() {
@@ -14,15 +13,12 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
 
-    const cleanName = name.trim();
-    const cleanEmail = email.trim().toLowerCase();
-
     const { error } = await supabase.auth.signInWithOtp({
-      email: cleanEmail,
+      email,
       options: {
         emailRedirectTo: "https://nakamaai.vercel.app/auth/callback",
         data: {
-          full_name: cleanName,
+          full_name: name,
         },
       },
     });
@@ -64,7 +60,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full p-3 rounded bg-yellow-500 text-black font-bold disabled:opacity-60"
+              className="w-full p-3 rounded bg-yellow-500 text-black font-bold"
             >
               {loading ? "Sending..." : "Sign Up"}
             </button>
