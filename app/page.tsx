@@ -1,39 +1,118 @@
 export default function Home() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-neutral-950 text-white">
+    <main
+      style={{
+        position: "relative",
+        minHeight: "100vh",
+        overflow: "hidden",
+        background: "#0a0710",
+        color: "white",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
       <img
         src="/images/sleeping-girl.png"
         alt=""
-        className="pointer-events-none absolute right-[-80px] top-[-40px] z-0 hidden w-[420px] select-none opacity-20 blur-md md:block"
+        style={{
+          position: "absolute",
+          right: "-80px",
+          top: "-40px",
+          width: "420px",
+          opacity: 0.2,
+          filter: "blur(6px)",
+          pointerEvents: "none",
+          userSelect: "none",
+          zIndex: 0,
+        }}
       />
 
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-neutral-950 via-neutral-950/85 to-transparent" />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 1,
+          background:
+            "linear-gradient(to right, rgba(10,7,16,1), rgba(10,7,16,0.85), rgba(10,7,16,0))",
+        }}
+      />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl items-center px-6 py-24">
-        <div className="max-w-2xl">
-          <p className="mb-4 text-sm uppercase tracking-[0.2em] text-neutral-400">
+      <div
+        style={{
+          position: "relative",
+          zIndex: 10,
+          maxWidth: "1200px",
+          minHeight: "100vh",
+          margin: "0 auto",
+          display: "flex",
+          alignItems: "center",
+          padding: "96px 24px",
+          boxSizing: "border-box",
+        }}
+      >
+        <div style={{ maxWidth: "640px" }}>
+          <p
+            style={{
+              marginBottom: "16px",
+              fontSize: "14px",
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: "#a3a3a3",
+            }}
+          >
             Nakama AI
           </p>
 
-          <h1 className="mb-6 text-5xl font-bold leading-tight sm:text-6xl">
+          <h1
+            style={{
+              marginBottom: "24px",
+              fontSize: "64px",
+              lineHeight: 1.05,
+              fontWeight: 700,
+            }}
+          >
             Build your circle.
           </h1>
 
-          <p className="mb-8 text-lg leading-8 text-neutral-300">
+          <p
+            style={{
+              marginBottom: "32px",
+              fontSize: "20px",
+              lineHeight: 1.6,
+              color: "#d4d4d8",
+            }}
+          >
             Nakama helps people connect, collaborate, and feel at home online.
           </p>
 
-          <div className="flex flex-wrap gap-4">
+          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
             <a
               href="/signup"
-              className="rounded-2xl bg-white px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+              style={{
+                display: "inline-block",
+                padding: "14px 24px",
+                borderRadius: "16px",
+                background: "white",
+                color: "black",
+                fontSize: "14px",
+                fontWeight: 600,
+                textDecoration: "none",
+              }}
             >
               Get started
             </a>
 
             <a
               href="#"
-              className="rounded-2xl border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+              style={{
+                display: "inline-block",
+                padding: "14px 24px",
+                borderRadius: "16px",
+                border: "1px solid rgba(255,255,255,0.2)",
+                color: "white",
+                fontSize: "14px",
+                fontWeight: 600,
+                textDecoration: "none",
+              }}
             >
               Learn more
             </a>
