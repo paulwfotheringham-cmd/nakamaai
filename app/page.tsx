@@ -1,17 +1,14 @@
 export default function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-neutral-950 text-white">
-      {/* Background image */}
       <img
         src="/images/sleeping-girl.png"
         alt=""
-        className="pointer-events-none absolute right-[-80px] top-[-40px] z-0 w-[420px] select-none opacity-20 blur-md"
+        className="pointer-events-none absolute right-[-80px] top-[-40px] z-0 hidden w-[420px] select-none opacity-20 blur-md md:block"
       />
 
-      {/* Gradient overlay */}
       <div className="absolute inset-0 z-[1] bg-gradient-to-r from-neutral-950 via-neutral-950/85 to-transparent" />
 
-      {/* Content */}
       <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl items-center px-6 py-24">
         <div className="max-w-2xl">
           <p className="mb-4 text-sm uppercase tracking-[0.2em] text-neutral-400">
