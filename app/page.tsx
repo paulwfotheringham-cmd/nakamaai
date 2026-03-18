@@ -1,97 +1,163 @@
-export default function Home() {
+"use client";
+
+import { useState } from "react";
+import { supabase } from "../lib/supabase";
+
+export default function SignupPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: "https://nakamaai.vercel.app/set-password",
+        data: {
+          full_name: name,
+        },
+      },
+    });
+
+    setLoading(false);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    setSubmitted(true);
+  }
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#07040d] text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(120,52,120,0.22),transparent_45%)]" />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-6 py-16 lg:px-12">
-        <div className="mb-10 flex items-start justify-between gap-6">
-          <div>
-            <p className="mb-4 text-sm uppercase tracking-[0.35em] text-[#c9a96a]">
-              Nakama
-            </p>
-            <h1 className="text-3xl font-semibold text-white md:text-5xl">
-              Nakama AI
-            </h1>
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-center justify-between gap-16 px-6 py-16 lg:px-12">
+        <section className="max-w-3xl">
+          <p className="mb-6 text-sm uppercase tracking-[0.35em] text-[#c9a96a]">
+            Nakama
+          </p>
+
+          <div className="mb-8 inline-flex rounded-full border border-[#6f5731]/50 bg-[#2a1d17]/60 px-5 py-2 text-sm text-[#e0c185]">
+            Premium fantasy audio experiences
           </div>
 
-          <div className="rounded-full border border-white/10 bg-white/[0.04] px-6 py-3 text-base text-white/80">
-            Welcome to your dashboard
+          <h1 className="max-w-4xl text-5xl font-semibold leading-[1.02] tracking-[-0.03em] text-white md:text-7xl">
+            Create immersive
+            <br />
+            romantic audio
+            <br />
+            stories with
+            <br />
+            <span className="text-[#d4b26e]">Nakama</span>
+          </h1>
+
+          <p className="mt-10 max-w-2xl text-2xl leading-8 text-white/80">
+            Choose the mood, shape the characters, customise the voices, and
+            generate a private audio fantasy built around your taste.
+          </p>
+
+          <div className="mt-10 grid max-w-3xl gap-4 sm:grid-cols-2">
+            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
+              <h3 className="mb-3 text-xl font-semibold text-white">
+                Guided story design
+              </h3>
+              <p className="text-base leading-7 text-white/65">
+                Pick the setting, tone, pacing, and story type.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
+              <h3 className="mb-3 text-xl font-semibold text-white">
+                Voice customization
+              </h3>
+              <p className="text-base leading-7 text-white/65">
+                Assign different voices to different characters.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
+              <h3 className="mb-3 text-xl font-semibold text-white">
+                Private audio scenes
+              </h3>
+              <p className="text-base leading-7 text-white/65">
+                Generate scenes made for listening, not just reading.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
+              <h3 className="mb-3 text-xl font-semibold text-white">
+                Fast iteration
+              </h3>
+              <p className="text-base leading-7 text-white/65">
+                Adjust one detail and instantly create a new version.
+              </p>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div className="mb-8 inline-flex rounded-full border border-[#6f5731]/50 bg-[#2a1d17]/60 px-5 py-2 text-sm text-[#e0c185]">
-          Your creative hub
-        </div>
-
-        <h2 className="max-w-5xl text-5xl font-semibold leading-[1.02] tracking-[-0.03em] text-white md:text-7xl">
-          Pick what you want to do in
-          <br />
-          <span className="text-[#d4b26e]">Nakama</span>
-        </h2>
-
-        <p className="mt-10 max-w-4xl text-2xl leading-8 text-white/80">
-          Choose fantasy audio, customize your story experience, or manage your
-          profile.
-        </p>
-
-        <div className="mt-16 grid gap-8 lg:grid-cols-3">
-          <a
-            href="/fantasy-audio"
-            className="rounded-[32px] border border-white/10 bg-white/[0.05] p-8 shadow-2xl backdrop-blur-md transition hover:bg-white/[0.07]"
-          >
-            <div className="mb-6 inline-flex rounded-full border border-[#6f5731]/50 bg-[#2a1d17]/60 px-5 py-2 text-sm uppercase tracking-[0.2em] text-[#d4b26e]">
-              Nakama
-            </div>
-
-            <h3 className="mb-6 text-5xl font-semibold tracking-[-0.03em] text-white">
-              Choose fantasy Audio
-            </h3>
-
-            <p className="mb-10 text-2xl leading-9 text-white/65">
-              Browse and begin your next immersive audio experience.
+        <aside className="w-full max-w-[520px]">
+          <div className="rounded-[32px] border border-white/10 bg-white/[0.05] p-8 shadow-2xl backdrop-blur-md md:p-10">
+            <p className="mb-6 text-sm uppercase tracking-[0.3em] text-[#c9a96a]">
+              Get started
             </p>
 
-            <div className="text-3xl font-semibold text-[#d4b26e]">Open →</div>
-          </a>
+            <h2 className="mb-4 text-5xl font-semibold tracking-[-0.03em] text-white">
+              Join Nakama
+            </h2>
 
-          <a
-            href="/custom"
-            className="rounded-[32px] border border-white/10 bg-white/[0.05] p-8 shadow-2xl backdrop-blur-md transition hover:bg-white/[0.07]"
-          >
-            <div className="mb-6 inline-flex rounded-full border border-[#6f5731]/50 bg-[#2a1d17]/60 px-5 py-2 text-sm uppercase tracking-[0.2em] text-[#d4b26e]">
-              Nakama
-            </div>
-
-            <h3 className="mb-6 text-5xl font-semibold tracking-[-0.03em] text-white">
-              Customize your audio
-            </h3>
-
-            <p className="mb-10 text-2xl leading-9 text-white/65">
-              Adjust mood, voices, characters, and generate your scene.
+            <p className="mb-8 text-2xl leading-8 text-white/70">
+              Create your account to set up your password and start building
+              your first audio experience.
             </p>
 
-            <div className="text-3xl font-semibold text-[#d4b26e]">Open →</div>
-          </a>
+            {submitted ? (
+              <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-5 py-4 text-base text-emerald-200">
+                Check your email for your magic login link.
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mb-4 h-14 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-5 text-white placeholder-white/40 outline-none"
+                  required
+                />
 
-          <a
-            href="/profile"
-            className="rounded-[32px] border border-white/10 bg-white/[0.05] p-8 shadow-2xl backdrop-blur-md transition hover:bg-white/[0.07]"
-          >
-            <div className="mb-6 inline-flex rounded-full border border-[#6f5731]/50 bg-[#2a1d17]/60 px-5 py-2 text-sm uppercase tracking-[0.2em] text-[#d4b26e]">
-              Nakama
-            </div>
+                <input
+                  type="email"
+                  placeholder="Email Address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mb-6 h-14 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-5 text-white placeholder-white/40 outline-none"
+                  required
+                />
 
-            <h3 className="mb-6 text-5xl font-semibold tracking-[-0.03em] text-white">
-              Profile
-            </h3>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="mb-4 h-14 w-full rounded-2xl bg-[#d4b26e] text-lg font-semibold text-black transition hover:brightness-105 disabled:opacity-60"
+                >
+                  {loading ? "Creating..." : "Create Account"}
+                </button>
+              </form>
+            )}
 
-            <p className="mb-10 text-2xl leading-9 text-white/65">
-              Manage your details, preferences, and account settings.
+            <p className="text-sm text-white/60">
+              Already have an account?{" "}
+              <a href="/login" className="text-[#d4b26e]">
+                Log in
+              </a>
             </p>
-
-            <div className="text-3xl font-semibold text-[#d4b26e]">Open →</div>
-          </a>
-        </div>
+          </div>
+        </aside>
       </div>
     </main>
   );
