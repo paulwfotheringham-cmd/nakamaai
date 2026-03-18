@@ -1,3 +1,4 @@
+"use client";
 export default function SignupPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#07040d] text-white">
