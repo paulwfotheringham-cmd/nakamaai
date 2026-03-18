@@ -1,123 +1,115 @@
 export default function Home() {
   return (
-    <main
-      style={{
-        position: "relative",
-        minHeight: "100vh",
-        overflow: "hidden",
-        background: "#0a0710",
-        color: "white",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
+    <main className="relative min-h-screen overflow-hidden bg-[#07040d] text-white">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(120,52,120,0.22),transparent_45%)]" />
+
       <img
         src="/images/sleeping-girl.png"
         alt=""
-        style={{
-          position: "absolute",
-          right: "-80px",
-          top: "-40px",
-          width: "420px",
-          opacity: 0.2,
-          filter: "blur(6px)",
-          pointerEvents: "none",
-          userSelect: "none",
-          zIndex: 0,
-        }}
+        className="pointer-events-none absolute right-0 top-0 hidden h-[420px] w-[320px] select-none object-cover opacity-[0.10] blur-sm lg:block"
       />
 
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 1,
-          background:
-            "linear-gradient(to right, rgba(10,7,16,1), rgba(10,7,16,0.85), rgba(10,7,16,0))",
-        }}
-      />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#07040d] via-[#07040d]/92 to-[#07040d]/75" />
 
-      <div
-        style={{
-          position: "relative",
-          zIndex: 10,
-          maxWidth: "1200px",
-          minHeight: "100vh",
-          margin: "0 auto",
-          display: "flex",
-          alignItems: "center",
-          padding: "96px 24px",
-          boxSizing: "border-box",
-        }}
-      >
-        <div style={{ maxWidth: "640px" }}>
-          <p
-            style={{
-              marginBottom: "16px",
-              fontSize: "14px",
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "#a3a3a3",
-            }}
-          >
-            Nakama AI
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-center justify-between gap-16 px-6 py-16 lg:px-12">
+        <section className="max-w-3xl">
+          <p className="mb-6 text-sm uppercase tracking-[0.35em] text-[#c9a96a]">
+            Nakama
           </p>
 
-          <h1
-            style={{
-              marginBottom: "24px",
-              fontSize: "64px",
-              lineHeight: 1.05,
-              fontWeight: 700,
-            }}
-          >
-            Build your circle.
+          <div className="mb-8 inline-flex rounded-full border border-[#6f5731]/50 bg-[#2a1d17]/60 px-5 py-2 text-sm text-[#e0c185]">
+            Premium fantasy audio experiences
+          </div>
+
+          <h1 className="max-w-4xl text-5xl font-semibold leading-[1.02] tracking-[-0.03em] text-white md:text-7xl">
+            Create immersive
+            <br />
+            romantic audio
+            <br />
+            stories with
+            <br />
+            <span className="text-[#d4b26e]">Nakama</span>
           </h1>
 
-          <p
-            style={{
-              marginBottom: "32px",
-              fontSize: "20px",
-              lineHeight: 1.6,
-              color: "#d4d4d8",
-            }}
-          >
-            Nakama helps people connect, collaborate, and feel at home online.
+          <p className="mt-10 max-w-2xl text-2xl leading-8 text-white/80">
+            Choose the mood, shape the characters, customise the voices, and
+            generate a private audio fantasy built around your taste.
           </p>
 
-          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+          <div className="mt-10 grid max-w-3xl gap-4 sm:grid-cols-2">
+            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
+              <h3 className="mb-3 text-xl font-semibold text-white">
+                Guided story design
+              </h3>
+              <p className="text-base leading-7 text-white/65">
+                Pick the setting, tone, pacing, and story type.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
+              <h3 className="mb-3 text-xl font-semibold text-white">
+                Voice customization
+              </h3>
+              <p className="text-base leading-7 text-white/65">
+                Assign different voices to different characters.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
+              <h3 className="mb-3 text-xl font-semibold text-white">
+                Private audio scenes
+              </h3>
+              <p className="text-base leading-7 text-white/65">
+                Generate scenes made for listening, not just reading.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
+              <h3 className="mb-3 text-xl font-semibold text-white">
+                Fast iteration
+              </h3>
+              <p className="text-base leading-7 text-white/65">
+                Adjust one detail and instantly create a new version.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <aside className="w-full max-w-[520px]">
+          <div className="rounded-[32px] border border-white/10 bg-white/[0.05] p-8 shadow-2xl backdrop-blur-md md:p-10">
+            <p className="mb-6 text-sm uppercase tracking-[0.3em] text-[#c9a96a]">
+              Get started
+            </p>
+
+            <h2 className="mb-4 text-5xl font-semibold tracking-[-0.03em] text-white">
+              Join Nakama
+            </h2>
+
+            <p className="mb-8 text-2xl leading-8 text-white/70">
+              Create your account to set up your password and start building
+              your first audio experience.
+            </p>
+
             <a
               href="/signup"
-              style={{
-                display: "inline-block",
-                padding: "14px 24px",
-                borderRadius: "16px",
-                background: "white",
-                color: "black",
-                fontSize: "14px",
-                fontWeight: 600,
-                textDecoration: "none",
-              }}
+              className="mb-4 flex h-16 w-full items-center justify-center rounded-2xl bg-[#d4b26e] text-xl font-semibold text-black transition hover:brightness-105"
             >
-              Get started
+              Create Account
             </a>
 
             <a
-              href="#"
-              style={{
-                display: "inline-block",
-                padding: "14px 24px",
-                borderRadius: "16px",
-                border: "1px solid rgba(255,255,255,0.2)",
-                color: "white",
-                fontSize: "14px",
-                fontWeight: 600,
-                textDecoration: "none",
-              }}
+              href="/login"
+              className="flex h-16 w-full items-center justify-center rounded-2xl border border-white/15 bg-white/[0.02] text-xl font-semibold text-white transition hover:bg-white/[0.06]"
             >
-              Learn more
+              Sign In
             </a>
+
+            <div className="mt-8 rounded-2xl border border-[#6f5731]/35 bg-[#211811]/60 p-5 text-base leading-7 text-[#e7d3a8]">
+              A softer, more intimate listening experience — now with a subtle
+              late-night visual atmosphere on the homepage.
+            </div>
           </div>
-        </div>
+        </aside>
       </div>
     </main>
   );
