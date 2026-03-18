@@ -4,19 +4,21 @@ export default function FantasyAudioPage() {
       title: "Stories + Fantasies",
       items: [
         "Anime/Hentai",
-        "Paranormal / supernatural",
+        "Paranormal",
+        "Supernatural",
         "Shapeshifter",
-        "Fairy tales",
+        "Fairy Tales",
         "Monsters",
         "Witch",
         "Magic",
-        "SciFi / Aliens",
-        "Dark / Erotic",
+        "Sci-Fi / Aliens",
+        "Dark",
+        "Erotic",
         "Historical",
         "Harem",
         "Modern",
         "Medieval",
-        "Power dynamics",
+        "Power Dynamics",
         "Sub / Dom",
       ],
     },
@@ -55,46 +57,108 @@ export default function FantasyAudioPage() {
       items: [
         "Castle",
         "Forest",
-        "Hidden village",
+        "Hidden Village",
         "Academy",
         "Dungeon",
-        "Royal court",
+        "Royal Court",
         "Battlefield",
-        "Space ship",
+        "Space Ship",
         "Temple",
-        "Moonlit garden",
+        "Moonlit Garden",
       ],
     },
   ];
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
-      <div className="mx-auto max-w-6xl px-6 py-10">
-        <div className="mb-10">
-          <div className="mb-3 inline-block rounded-full bg-white/10 px-4 py-1 text-sm text-white/80">
+    <main
+      style={{
+        minHeight: "100vh",
+        background: "#07040d",
+        color: "white",
+        padding: "40px 24px",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "1100px",
+          margin: "0 auto",
+        }}
+      >
+        <div style={{ marginBottom: "32px" }}>
+          <div
+            style={{
+              display: "inline-block",
+              padding: "8px 14px",
+              borderRadius: "999px",
+              background: "rgba(255,255,255,0.08)",
+              fontSize: "14px",
+              marginBottom: "14px",
+            }}
+          >
             Paul @ Insight
           </div>
-          <h1 className="text-4xl font-bold tracking-tight">
+
+          <h1
+            style={{
+              fontSize: "40px",
+              fontWeight: 700,
+              margin: "0 0 10px 0",
+            }}
+          >
             Choose Fantasy Audio
           </h1>
-          <p className="mt-3 max-w-2xl text-base text-white/70">
+
+          <p
+            style={{
+              color: "rgba(255,255,255,0.72)",
+              fontSize: "18px",
+              margin: 0,
+            }}
+          >
             Pick a fantasy theme by tapping the buttons below.
           </p>
         </div>
 
-        <div className="grid gap-6">
+        <div style={{ display: "grid", gap: "20px" }}>
           {sections.map((section) => (
             <section
               key={section.title}
-              className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg"
+              style={{
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: "20px",
+                background: "rgba(255,255,255,0.04)",
+                padding: "24px",
+              }}
             >
-              <h2 className="mb-4 text-xl font-semibold">{section.title}</h2>
+              <h2
+                style={{
+                  margin: "0 0 16px 0",
+                  fontSize: "22px",
+                  fontWeight: 600,
+                }}
+              >
+                {section.title}
+              </h2>
 
-              <div className="flex flex-wrap gap-3">
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "12px",
+                }}
+              >
                 {section.items.map((item) => (
                   <button
                     key={item}
-                    className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white hover:text-black"
+                    style={{
+                      borderRadius: "999px",
+                      border: "1px solid rgba(255,255,255,0.14)",
+                      background: "rgba(255,255,255,0.08)",
+                      color: "white",
+                      padding: "10px 16px",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                    }}
                   >
                     {item}
                   </button>
@@ -104,14 +168,44 @@ export default function FantasyAudioPage() {
           ))}
         </div>
 
-        <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-6">
-          <h3 className="mb-3 text-lg font-semibold">Next</h3>
-          <p className="mb-4 text-white/70">
+        <div
+          style={{
+            marginTop: "28px",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "20px",
+            background: "rgba(255,255,255,0.04)",
+            padding: "24px",
+          }}
+        >
+          <h3
+            style={{
+              margin: "0 0 10px 0",
+              fontSize: "20px",
+              fontWeight: 600,
+            }}
+          >
+            Next
+          </h3>
+
+          <p
+            style={{
+              margin: "0 0 16px 0",
+              color: "rgba(255,255,255,0.72)",
+            }}
+          >
             After this page looks right, we’ll connect the dashboard button to open it.
           </p>
+
           <a
             href="/dashboard"
-            className="inline-block rounded-xl bg-white px-5 py-3 font-semibold text-black transition hover:opacity-90"
+            style={{
+              display: "inline-block",
+              background: "white",
+              color: "black",
+              padding: "12px 18px",
+              borderRadius: "12px",
+              fontWeight: 600,
+            }}
           >
             Back to Dashboard
           </a>
