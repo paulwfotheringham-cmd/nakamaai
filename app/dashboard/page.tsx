@@ -55,24 +55,24 @@ const tiles: Tile[] = [
 function TileCard({ tile }: { tile: Tile }) {
   const content = (
     <div
-      className={`h-full rounded-3xl border p-6 shadow-sm transition-all duration-200 ${
+      className={`group h-full rounded-3xl border p-6 transition-all duration-200 ${
         tile.disabled
-          ? "cursor-not-allowed border-zinc-200 bg-zinc-50 opacity-80"
-          : "border-zinc-200 bg-white hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md"
+          ? "cursor-not-allowed border-white/10 bg-white/5 opacity-70"
+          : "border-white/10 bg-white/5 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10"
       }`}
     >
-      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-100 text-2xl">
+      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-2xl">
         <span aria-hidden="true">{tile.icon}</span>
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold tracking-tight text-zinc-900">
+        <h3 className="text-lg font-semibold tracking-tight text-white">
           {tile.title}
         </h3>
-        <p className="text-sm leading-6 text-zinc-600">{tile.description}</p>
+        <p className="text-sm leading-6 text-zinc-300">{tile.description}</p>
       </div>
 
-      <div className="mt-6 flex items-center text-sm font-medium text-zinc-900">
+      <div className="mt-6 flex items-center text-sm font-medium text-white">
         <span>{tile.cta}</span>
         {!tile.disabled && <span className="ml-2">→</span>}
       </div>
@@ -92,20 +92,20 @@ function TileCard({ tile }: { tile: Tile }) {
 
 export default function DashboardPage() {
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-[#07040d] text-white">
       <section className="mx-auto max-w-7xl px-6 py-12 sm:px-8 lg:px-10">
         <div className="mb-10">
-          <p className="text-sm font-medium text-zinc-500">
+          <p className="text-sm font-medium text-zinc-400">
             Welcome to your dashboard
           </p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-zinc-950 sm:text-5xl">
+          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
             Your creative hub
           </h1>
           <div className="mt-6 max-w-3xl">
-            <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">
+            <h2 className="text-2xl font-semibold tracking-tight text-white">
               Pick what you want to do in Nakama
             </h2>
-            <p className="mt-3 text-base leading-7 text-zinc-600">
+            <p className="mt-3 text-base leading-7 text-zinc-300">
               Choose fantasy audio, create your own fantasy audio, convert an
               ebook into fantasy audio, explore the marketplace, or manage your
               profile.
