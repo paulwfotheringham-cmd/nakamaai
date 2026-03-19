@@ -14,11 +14,14 @@ export default function ConvertEbookPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isLoadingFiles, setIsLoadingFiles] = useState(true);
   const [isConverting, setIsConverting] = useState(false);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const [message, setMessage] = useState("");
   const [uploadedPath, setUploadedPath] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [selectedForConversion, setSelectedForConversion] = useState("");
   const [audioReady, setAudioReady] = useState("");
+  const [currentAudioUrl, setCurrentAudioUrl] = useState("");
+  const [currentAudioPath, setCurrentAudioPath] = useState("");
 
   async function loadFiles() {
     setIsLoadingFiles(true);
@@ -121,6 +124,8 @@ export default function ConvertEbookPage() {
     setMessage("Starting conversion...");
     setIsConverting(true);
     setAudioReady("");
+    setCurrentAudioUrl("");
+    setCurrentAudioPath("");
 
     try {
       const res = await fetch("/api/convert-ebook", {
@@ -147,7 +152,32 @@ export default function ConvertEbookPage() {
   }
 
   function getExpectedAudioPath(path: string) {
-    return path.replace("ebooks", "audio").replace(".epub", ".mp3");
+    return path.replace(".epub", ".mp3").replace(".pdf", ".mp3");
+  }
+
+  async function handlePlayAudio(uploadedFile: UploadedFile) {
+    try {
+      setIsLoadingAudio(true);
+      setMessage("Loading audio...");
+
+      const audioPath = getExpectedAudioPath(uploadedFile.path);
+
+      const { data, error } = await supabase.storage
+        .from("audio")
+        .createSignedUrl(audioPath, 60 * 10);
+
+      if (error || !data?.signedUrl) {
+        throw new Error("Failed to load audio.");
+      }
+
+      setCurrentAudioUrl(data.signedUrl);
+      setCurrentAudioPath(audioPath);
+      setMessage("Audio ready ▶");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Failed to load audio.");
+    } finally {
+      setIsLoadingAudio(false);
+    }
   }
 
   return (
@@ -250,11 +280,25 @@ export default function ConvertEbookPage() {
                   {audioReady === getExpectedAudioPath(uploadedFile.path) && (
                     <button
                       type="button"
-                      className="mt-3 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500"
+                      onClick={() => handlePlayAudio(uploadedFile)}
+                      disabled={isLoadingAudio}
+                      className="mt-3 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      Play audio
+                      {isLoadingAudio && currentAudioPath === getExpectedAudioPath(uploadedFile.path)
+                        ? "Loading audio..."
+                        : "Play audio"}
                     </button>
                   )}
+
+                  {currentAudioUrl &&
+                    currentAudioPath === getExpectedAudioPath(uploadedFile.path) && (
+                      <div className="mt-4">
+                        <audio controls className="w-full">
+                          <source src={currentAudioUrl} type="audio/mpeg" />
+                          Your browser does not support the audio element.
+                        </audio>
+                      </div>
+                    )}
                 </li>
               ))}
             </ul>
