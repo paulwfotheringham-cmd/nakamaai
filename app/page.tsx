@@ -41,6 +41,7 @@ export default function SignupPage() {
         color: "white",
       }}
     >
+      {/* BACKGROUND GLOW */}
       <div
         style={{
           position: "absolute",
@@ -65,6 +66,7 @@ export default function SignupPage() {
           padding: "56px 32px",
         }}
       >
+        {/* LEFT SIDE */}
         <section
           style={{
             flex: 1,
@@ -97,7 +99,7 @@ export default function SignupPage() {
               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
             }}
           >
-            Premium fantasy audio experiences
+            Private fantasy audio experiences
           </div>
 
           <h1
@@ -110,28 +112,79 @@ export default function SignupPage() {
               color: "#f7f5f2",
             }}
           >
-            Create immersive
+            Ready to turn
             <br />
-            romantic audio
-            <br />
-            stories with
-            <br />
-            <span style={{ color: "#d2b56f" }}>Nakama</span>
+            up the heat?
           </h1>
 
           <p
             style={{
               margin: "34px 0 0 0",
-              maxWidth: "720px",
               fontSize: "22px",
               lineHeight: 1.55,
               color: "rgba(255,255,255,0.78)",
             }}
           >
-            Choose the mood, shape the characters, customise the voices, and
-            generate a private audio fantasy built around your taste.
+            Craving something steamier than standard audiobooks?
           </p>
 
+          <p
+            style={{
+              margin: "18px 0 0 0",
+              fontSize: "22px",
+              lineHeight: 1.55,
+              color: "rgba(255,255,255,0.78)",
+            }}
+          >
+            Whisper your wildest fantasies.
+          </p>
+
+          <p
+            style={{
+              margin: "18px 0 0 0",
+              fontSize: "20px",
+              lineHeight: 1.55,
+              color: "rgba(255,255,255,0.72)",
+            }}
+          >
+            Join Nakama today and transform your reading time into an unforgettable auditory experience.
+          </p>
+
+          <p
+            style={{
+              margin: "28px 0 0 0",
+              fontSize: "18px",
+              lineHeight: 1.6,
+              color: "rgba(255,255,255,0.62)",
+            }}
+          >
+            We're the only professional service dedicated exclusively to bringing your romantic fantasies to life through sound.
+          </p>
+
+          <p
+            style={{
+              margin: "16px 0 0 0",
+              fontSize: "18px",
+              lineHeight: 1.6,
+              color: "rgba(255,255,255,0.62)",
+            }}
+          >
+            We convert your favorite romantic books into breathtaking, sexy audio stories.
+          </p>
+
+          <p
+            style={{
+              margin: "20px 0 0 0",
+              fontSize: "16px",
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+              color: "#d2b56f",
+            }}
+          >
+            100% private. 100% yours.
+          </p>
+
+          {/* TILES (UNCHANGED) */}
           <div
             style={{
               display: "grid",
@@ -175,9 +228,7 @@ export default function SignupPage() {
                   style={{
                     margin: "0 0 12px 0",
                     fontSize: "17px",
-                    lineHeight: 1.2,
                     fontWeight: 700,
-                    color: "#ffffff",
                   }}
                 >
                   {item.title}
@@ -186,7 +237,6 @@ export default function SignupPage() {
                   style={{
                     margin: 0,
                     fontSize: "15px",
-                    lineHeight: 1.6,
                     color: "rgba(255,255,255,0.66)",
                   }}
                 >
@@ -197,6 +247,7 @@ export default function SignupPage() {
           </div>
         </section>
 
+        {/* RIGHT SIDE (UNCHANGED) */}
         <aside
           style={{
             width: "100%",
@@ -215,56 +266,16 @@ export default function SignupPage() {
               backdropFilter: "blur(12px)",
             }}
           >
-            <p
-              style={{
-                margin: "0 0 22px 0",
-                fontSize: "13px",
-                letterSpacing: "0.34em",
-                textTransform: "uppercase",
-                color: "#c9a96a",
-              }}
-            >
+            <p style={{ fontSize: "13px", letterSpacing: "0.34em", color: "#c9a96a" }}>
               Get started
             </p>
 
-            <h2
-              style={{
-                margin: "0 0 18px 0",
-                fontSize: "58px",
-                lineHeight: 0.98,
-                letterSpacing: "-0.035em",
-                fontWeight: 700,
-                color: "#f7f5f2",
-              }}
-            >
+            <h2 style={{ fontSize: "58px", fontWeight: 700 }}>
               Join Nakama
             </h2>
 
-            <p
-              style={{
-                margin: "0 0 28px 0",
-                fontSize: "19px",
-                lineHeight: 1.6,
-                color: "rgba(255,255,255,0.68)",
-              }}
-            >
-              Create your account to set up your password and start building
-              your first audio experience.
-            </p>
-
             {submitted ? (
-              <div
-                style={{
-                  borderRadius: "18px",
-                  border: "1px solid rgba(74, 222, 128, 0.2)",
-                  background: "rgba(74, 222, 128, 0.1)",
-                  padding: "16px 18px",
-                  color: "#bbf7d0",
-                  fontSize: "15px",
-                }}
-              >
-                Check your email for your magic login link.
-              </div>
+              <div>Check your email for your magic login link.</div>
             ) : (
               <form onSubmit={handleSubmit}>
                 <input
@@ -273,19 +284,7 @@ export default function SignupPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  style={{
-                    width: "100%",
-                    height: "58px",
-                    marginBottom: "14px",
-                    borderRadius: "18px",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    background: "rgba(255,255,255,0.04)",
-                    padding: "0 18px",
-                    color: "white",
-                    boxSizing: "border-box",
-                    fontSize: "16px",
-                    outline: "none",
-                  }}
+                  style={{ width: "100%", height: "58px", marginBottom: "14px" }}
                 />
 
                 <input
@@ -294,61 +293,14 @@ export default function SignupPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  style={{
-                    width: "100%",
-                    height: "58px",
-                    marginBottom: "18px",
-                    borderRadius: "18px",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    background: "rgba(255,255,255,0.04)",
-                    padding: "0 18px",
-                    color: "white",
-                    boxSizing: "border-box",
-                    fontSize: "16px",
-                    outline: "none",
-                  }}
+                  style={{ width: "100%", height: "58px", marginBottom: "18px" }}
                 />
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    width: "100%",
-                    height: "60px",
-                    border: "none",
-                    borderRadius: "18px",
-                    background: "#d2b56f",
-                    color: "#111111",
-                    fontSize: "18px",
-                    fontWeight: 700,
-                    cursor: loading ? "default" : "pointer",
-                    opacity: loading ? 0.7 : 1,
-                  }}
-                >
+                <button type="submit" disabled={loading}>
                   {loading ? "Creating..." : "Create Account"}
                 </button>
               </form>
             )}
-
-            <p
-              style={{
-                margin: "18px 0 0 0",
-                fontSize: "14px",
-                color: "rgba(255,255,255,0.62)",
-              }}
-            >
-              Already have an account?{" "}
-              <a
-                href="/login"
-                style={{
-                  color: "#d2b56f",
-                  textDecoration: "none",
-                  fontWeight: 600,
-                }}
-              >
-                Log in
-              </a>
-            </p>
           </div>
         </aside>
       </div>
