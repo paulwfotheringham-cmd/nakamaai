@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@supabase/supabase-js";
+import JSZip from "jszip";
 
 export async function POST(req: Request) {
   try {
@@ -28,7 +29,6 @@ export async function POST(req: Request) {
       throw new Error("Missing file path");
     }
 
-    // 1. Download ebook
     const { data: fileData, error: downloadError } = await supabase.storage
       .from("ebooks")
       .download(path);
@@ -37,10 +37,47 @@ export async function POST(req: Request) {
       throw new Error("Failed to download ebook");
     }
 
-    // 2. TEMP text
-    const text = "This is a sample audiobook narration from your ebook.";
+    let text = "";
 
-    // 3. Convert to audio
+    if (path.toLowerCase().endsWith(".epub")) {
+      const arrayBuffer = await fileData.arrayBuffer();
+      const zip = await JSZip.loadAsync(arrayBuffer);
+
+      const fileNames = Object.keys(zip.files);
+
+      const htmlFileName = fileNames.find(
+        (name) =>
+          !zip.files[name].dir &&
+          (name.endsWith(".xhtml") || name.endsWith(".html") || name.endsWith(".htm"))
+      );
+
+      if (!htmlFileName) {
+        throw new Error("No readable content found in EPUB");
+      }
+
+      const htmlContent = await zip.file(htmlFileName)?.async("text");
+
+      if (!htmlContent) {
+        throw new Error("Failed to read EPUB content");
+      }
+
+      text = htmlContent
+        .replace(/<script[\s\S]*?<\/script>/gi, " ")
+        .replace(/<style[\s\S]*?<\/style>/gi, " ")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 2000);
+    } else if (path.toLowerCase().endsWith(".pdf")) {
+      throw new Error("PDF text extraction is not set up yet. Please test with EPUB first.");
+    } else {
+      throw new Error("Unsupported file type");
+    }
+
+    if (!text) {
+      throw new Error("No text could be extracted from the ebook");
+    }
+
     const audioResponse = await openai.audio.speech.create({
       model: "gpt-4o-mini-tts",
       voice: "alloy",
@@ -49,7 +86,6 @@ export async function POST(req: Request) {
 
     const audioBuffer = Buffer.from(await audioResponse.arrayBuffer());
 
-    // 4. Save to audio bucket
     const audioPath = path
       .replace(".epub", ".mp3")
       .replace(".pdf", ".mp3");
