@@ -6,7 +6,7 @@ import { supabase } from "../../lib/supabase-browser";
 type UploadedFile = {
   name: string;
   path: string;
-  created_at?: string;
+  created_at: string | null;
 };
 
 export default function ConvertEbookPage() {
@@ -27,6 +27,7 @@ export default function ConvertEbookPage() {
       } = await supabase.auth.getUser();
 
       if (userError) throw userError;
+
       if (!user) {
         setUploadedFiles([]);
         return;
@@ -41,11 +42,11 @@ export default function ConvertEbookPage() {
 
       if (error) throw error;
 
-      const files =
+      const files: UploadedFile[] =
         data?.map((item) => ({
           name: item.name,
           path: `${user.id}/${item.name}`,
-          created_at: item.created_at,
+          created_at: item.created_at ?? null,
         })) ?? [];
 
       setUploadedFiles(files);
