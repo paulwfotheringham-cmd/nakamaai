@@ -34,135 +34,323 @@ export default function SignupPage() {
   return (
     <main
       style={{
+        position: "relative",
         minHeight: "100vh",
+        overflow: "hidden",
         background: "#07040d",
         color: "white",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
       }}
     >
       <div
         style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(circle at top center, rgba(120, 52, 120, 0.22), transparent 45%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        style={{
+          position: "relative",
+          zIndex: 10,
+          maxWidth: "1280px",
+          margin: "0 auto",
+          minHeight: "100vh",
           display: "flex",
-          width: "100%",
-          maxWidth: "1300px",
-          gap: "80px",
-          padding: "40px",
           alignItems: "center",
+          justifyContent: "space-between",
+          gap: "96px",
+          padding: "56px 32px",
         }}
       >
-        {/* LEFT */}
-        <div style={{ flex: 1 }}>
-          <h1 style={{ fontSize: "72px", lineHeight: 1.05 }}>
+        <section
+          style={{
+            flex: 1,
+            maxWidth: "700px",
+          }}
+        >
+          <p
+            style={{
+              margin: "0 0 24px 0",
+              fontSize: "13px",
+              letterSpacing: "0.42em",
+              textTransform: "uppercase",
+              color: "#c9a96a",
+            }}
+          >
+            Nakama
+          </p>
+
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              marginBottom: "28px",
+              borderRadius: "999px",
+              border: "1px solid rgba(201,169,106,0.28)",
+              background: "rgba(64, 43, 33, 0.45)",
+              padding: "12px 20px",
+              fontSize: "14px",
+              color: "#e5c888",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
+            }}
+          >
+            Premium fantasy audio experiences
+          </div>
+
+          <h1
+            style={{
+              margin: 0,
+              fontSize: "clamp(64px, 7vw, 98px)",
+              lineHeight: 0.98,
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              color: "#f7f5f2",
+            }}
+          >
             Create immersive
             <br />
             romantic audio
             <br />
             stories with
             <br />
-            <span style={{ color: "#d4b26e" }}>Nakama</span>
+            <span style={{ color: "#d2b56f" }}>Nakama</span>
           </h1>
 
-          <p style={{ marginTop: "24px", fontSize: "20px", color: "#ccc" }}>
+          <p
+            style={{
+              margin: "34px 0 0 0",
+              maxWidth: "720px",
+              fontSize: "22px",
+              lineHeight: 1.55,
+              color: "rgba(255,255,255,0.78)",
+            }}
+          >
             Choose the mood, shape the characters, customise the voices, and
             generate a private audio fantasy built around your taste.
           </p>
 
-          {/* 4 tiles in one row */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: "16px",
-              marginTop: "40px",
+              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+              gap: "18px",
+              marginTop: "42px",
+              maxWidth: "640px",
             }}
           >
             {[
-              "Guided story design",
-              "Voice customization",
-              "Private audio scenes",
-              "Fast iteration",
-            ].map((title) => (
+              {
+                title: "Guided story design",
+                text: "Pick the setting, tone, pacing, and story type.",
+              },
+              {
+                title: "Voice customization",
+                text: "Assign different voices to different characters.",
+              },
+              {
+                title: "Private audio scenes",
+                text: "Generate scenes made for listening, not just reading.",
+              },
+              {
+                title: "Fast iteration",
+                text: "Adjust one detail and instantly create a new version.",
+              },
+            ].map((item) => (
               <div
-                key={title}
+                key={item.title}
                 style={{
-                  background: "#111",
-                  padding: "16px",
-                  borderRadius: "12px",
+                  borderRadius: "22px",
+                  border: "1px solid rgba(255,255,255,0.09)",
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.03))",
+                  padding: "22px 20px",
+                  boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
+                  backdropFilter: "blur(6px)",
                 }}
               >
-                {title}
+                <h3
+                  style={{
+                    margin: "0 0 12px 0",
+                    fontSize: "17px",
+                    lineHeight: 1.2,
+                    fontWeight: 700,
+                    color: "#ffffff",
+                  }}
+                >
+                  {item.title}
+                </h3>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "15px",
+                    lineHeight: 1.6,
+                    color: "rgba(255,255,255,0.66)",
+                  }}
+                >
+                  {item.text}
+                </p>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* RIGHT */}
-        <div
+        <aside
           style={{
-            width: "420px",
-            background: "#111",
-            padding: "30px",
-            borderRadius: "20px",
+            width: "100%",
+            maxWidth: "520px",
+            flex: "0 0 520px",
           }}
         >
-          <h2 style={{ fontSize: "28px", marginBottom: "10px" }}>
-            Join Nakama
-          </h2>
+          <div
+            style={{
+              borderRadius: "34px",
+              border: "1px solid rgba(255,255,255,0.09)",
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.035))",
+              padding: "38px",
+              boxShadow: "0 22px 80px rgba(0,0,0,0.35)",
+              backdropFilter: "blur(12px)",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 22px 0",
+                fontSize: "13px",
+                letterSpacing: "0.34em",
+                textTransform: "uppercase",
+                color: "#c9a96a",
+              }}
+            >
+              Get started
+            </p>
 
-          <p style={{ marginBottom: "20px", color: "#aaa" }}>
-            Create your account to set up your password and start building your
-            first audio experience.
-          </p>
+            <h2
+              style={{
+                margin: "0 0 18px 0",
+                fontSize: "58px",
+                lineHeight: 0.98,
+                letterSpacing: "-0.035em",
+                fontWeight: 700,
+                color: "#f7f5f2",
+              }}
+            >
+              Join Nakama
+            </h2>
 
-          {submitted ? (
-            <p>Check your email.</p>
-          ) : (
-            <form onSubmit={handleSubmit}>
-              <input
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+            <p
+              style={{
+                margin: "0 0 28px 0",
+                fontSize: "19px",
+                lineHeight: 1.6,
+                color: "rgba(255,255,255,0.68)",
+              }}
+            >
+              Create your account to set up your password and start building
+              your first audio experience.
+            </p>
+
+            {submitted ? (
+              <div
                 style={{
-                  width: "100%",
-                  padding: "10px",
-                  marginBottom: "10px",
-                }}
-              />
-
-              <input
-                placeholder="Email Address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  marginBottom: "10px",
-                }}
-              />
-
-              <button
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  background: "#d4b26e",
-                  border: "none",
+                  borderRadius: "18px",
+                  border: "1px solid rgba(74, 222, 128, 0.2)",
+                  background: "rgba(74, 222, 128, 0.1)",
+                  padding: "16px 18px",
+                  color: "#bbf7d0",
+                  fontSize: "15px",
                 }}
               >
-                Create Account
-              </button>
-            </form>
-          )}
+                Check your email for your magic login link.
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  style={{
+                    width: "100%",
+                    height: "58px",
+                    marginBottom: "14px",
+                    borderRadius: "18px",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "rgba(255,255,255,0.04)",
+                    padding: "0 18px",
+                    color: "white",
+                    boxSizing: "border-box",
+                    fontSize: "16px",
+                    outline: "none",
+                  }}
+                />
 
-          {/* ✅ LOGIN LINK RESTORED */}
-          <p style={{ marginTop: "12px", fontSize: "14px", color: "#aaa" }}>
-            Already have an account?{" "}
-            <a href="/login" style={{ color: "#d4b26e" }}>
-              Log in
-            </a>
-          </p>
-        </div>
+                <input
+                  type="email"
+                  placeholder="Email Address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  style={{
+                    width: "100%",
+                    height: "58px",
+                    marginBottom: "18px",
+                    borderRadius: "18px",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "rgba(255,255,255,0.04)",
+                    padding: "0 18px",
+                    color: "white",
+                    boxSizing: "border-box",
+                    fontSize: "16px",
+                    outline: "none",
+                  }}
+                />
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    width: "100%",
+                    height: "60px",
+                    border: "none",
+                    borderRadius: "18px",
+                    background: "#d2b56f",
+                    color: "#111111",
+                    fontSize: "18px",
+                    fontWeight: 700,
+                    cursor: loading ? "default" : "pointer",
+                    opacity: loading ? 0.7 : 1,
+                  }}
+                >
+                  {loading ? "Creating..." : "Create Account"}
+                </button>
+              </form>
+            )}
+
+            <p
+              style={{
+                margin: "18px 0 0 0",
+                fontSize: "14px",
+                color: "rgba(255,255,255,0.62)",
+              }}
+            >
+              Already have an account?{" "}
+              <a
+                href="/login"
+                style={{
+                  color: "#d2b56f",
+                  textDecoration: "none",
+                  fontWeight: 600,
+                }}
+              >
+                Log in
+              </a>
+            </p>
+          </div>
+        </aside>
       </div>
     </main>
   );
