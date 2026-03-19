@@ -17,7 +17,7 @@ const rows: Row[] = [
     items: ["Werewolf", "Ghost", "Devil", "Angel"],
   },
   {
-    title: "Fairy tales & Monsters",
+    title: "Fairy Tales & Monsters",
     items: ["Dragon", "Witch", "Wizard", "Dwarf"],
   },
   {
@@ -30,7 +30,7 @@ const rows: Row[] = [
   },
   {
     title: "Modern",
-    items: ["Office", "Travel", "Outdoors", "Stranger encounter"],
+    items: ["Office", "Travel", "Outdoors", "Stranger Encounter"],
   },
   {
     title: "Dark & Erotic",
@@ -42,164 +42,438 @@ const rows: Row[] = [
   },
 ];
 
-const VISIBLE = 3;
+const visibleCount = 3;
+
+function ArrowButton({
+  direction,
+  onClick,
+}: {
+  direction: "left" | "right";
+  onClick: () => void;
+}) {
+  const isLeft = direction === "left";
+
+  return (
+    <button
+      onClick={onClick}
+      aria-label={isLeft ? "Previous options" : "Next options"}
+      type="button"
+      style={{
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        border: "1px solid rgba(255,255,255,0.12)",
+        background: "rgba(255,255,255,0.04)",
+        color: "#d8b26e",
+        cursor: "pointer",
+        fontSize: 22,
+        fontWeight: 700,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transition: "all 0.2s ease",
+        boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
+        backdropFilter: "blur(10px)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-1px)";
+        e.currentTarget.style.background = "rgba(216,178,110,0.12)";
+        e.currentTarget.style.border = "1px solid rgba(216,178,110,0.28)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+        e.currentTarget.style.border = "1px solid rgba(255,255,255,0.12)";
+      }}
+    >
+      {isLeft ? "←" : "→"}
+    </button>
+  );
+}
 
 export default function FantasyAudioPage() {
-  const [positions, setPositions] = useState(rows.map(() => 0));
+  const [positions, setPositions] = useState<number[]>(rows.map(() => 0));
 
-  function prev(rowIndex: number) {
+  function goPrev(rowIndex: number) {
     setPositions((prev) =>
-      prev.map((p, i) =>
+      prev.map((value, i) =>
         i === rowIndex
-          ? (p - 1 + rows[i].items.length) % rows[i].items.length
-          : p
+          ? (value - 1 + rows[i].items.length) % rows[i].items.length
+          : value
       )
     );
   }
 
-  function next(rowIndex: number) {
+  function goNext(rowIndex: number) {
     setPositions((prev) =>
-      prev.map((p, i) =>
-        i === rowIndex
-          ? (p + 1) % rows[i].items.length
-          : p
+      prev.map((value, i) =>
+        i === rowIndex ? (value + 1) % rows[i].items.length : value
       )
     );
   }
 
-  const visible = useMemo(() => {
-    return rows.map((row, i) => {
-      const start = positions[i];
-      return Array.from({ length: VISIBLE }, (_, j) => {
-        return row.items[(start + j) % row.items.length];
+  const visibleRows = useMemo(() => {
+    return rows.map((row, rowIndex) => {
+      const start = positions[rowIndex];
+      return Array.from({ length: visibleCount }, (_, offset) => {
+        return row.items[(start + offset) % row.items.length];
       });
     });
   }, [positions]);
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "#07040d",
-        color: "white",
-        padding: "40px 24px",
-      }}
-    >
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        {/* Header */}
-        <div style={{ marginBottom: "40px" }}>
-          <h1 style={{ fontSize: "40px", fontWeight: 700 }}>
-            Choose Fantasy Audio
-          </h1>
-          <p style={{ color: "rgba(255,255,255,0.7)" }}>
-            Browse categories and select your experience
+    <main className="fantasy-page">
+      <div className="fantasy-shell">
+        <div className="fantasy-header">
+          <div className="fantasy-badge">Fantasy Audio</div>
+
+          <h1>Choose Your Fantasy Audio</h1>
+
+          <p>
+            Explore themed story collections and scroll through each category to
+            find the mood, setting, and energy you want.
           </p>
         </div>
 
-        {/* Rows */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
-          {rows.map((row, rowIndex) => (
-            <div
-              key={row.title}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "180px 60px 1fr 60px",
-                alignItems: "center",
-                gap: "16px",
-              }}
-            >
-              {/* Category */}
-              <div
-                style={{
-                  background: "#15698a",
-                  border: "2px solid #0b3f56",
-                  height: "64px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: 600,
-                }}
-              >
-                {row.title}
-              </div>
+        <section className="fantasy-panel">
+          <div className="fantasy-panel-glow" />
 
-              {/* Left Arrow */}
-              <button
-                onClick={() => prev(rowIndex)}
-                style={{
-                  height: "50px",
-                  cursor: "pointer",
-                  background: "transparent",
-                  border: "none",
-                  fontSize: "28px",
-                  color: "#15698a",
-                }}
-              >
-                ←
-              </button>
-
-              {/* Tiles */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                  gap: "16px",
-                }}
-              >
-                {visible[rowIndex].map((item, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      background: "#15698a",
-                      border: "2px solid #0b3f56",
-                      height: "64px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-
-              {/* Right Arrow */}
-              <button
-                onClick={() => next(rowIndex)}
-                style={{
-                  height: "50px",
-                  cursor: "pointer",
-                  background: "transparent",
-                  border: "none",
-                  fontSize: "28px",
-                  color: "#15698a",
-                }}
-              >
-                →
-              </button>
+          <div className="fantasy-panel-top">
+            <div>
+              <h2>Story Categories</h2>
+              <p>
+                Each row has its own carousel. Three options are visible at a
+                time.
+              </p>
             </div>
-          ))}
-        </div>
 
-        {/* Back */}
-        <div style={{ marginTop: "40px" }}>
-          <a
-            href="/dashboard"
-            style={{
-              display: "inline-block",
-              background: "white",
-              color: "black",
-              padding: "12px 18px",
-              borderRadius: "12px",
-              fontWeight: 600,
-              textDecoration: "none",
-            }}
-          >
+            <div className="fantasy-note">
+              <span className="fantasy-note-dot" />
+              Browse by mood, setting, or dynamic
+            </div>
+          </div>
+
+          <div className="fantasy-rows">
+            {rows.map((row, rowIndex) => (
+              <div key={row.title} className="fantasy-row">
+                <div className="fantasy-category">{row.title}</div>
+
+                <div className="fantasy-arrow-wrap fantasy-arrow-left">
+                  <ArrowButton
+                    direction="left"
+                    onClick={() => goPrev(rowIndex)}
+                  />
+                </div>
+
+                <div className="fantasy-tiles">
+                  {visibleRows[rowIndex].map((item, itemIndex) => (
+                    <button
+                      key={`${row.title}-${item}-${itemIndex}`}
+                      type="button"
+                      className="fantasy-tile"
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="fantasy-arrow-wrap fantasy-arrow-right">
+                  <ArrowButton
+                    direction="right"
+                    onClick={() => goNext(rowIndex)}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <div className="fantasy-footer">
+          <a href="/dashboard" className="fantasy-back">
             Back to Dashboard
           </a>
+
+          <div className="fantasy-footer-copy">
+            Browse and refine your preferred fantasy style.
+          </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .fantasy-page {
+          min-height: 100vh;
+          background:
+            radial-gradient(
+              circle at top,
+              rgba(86, 49, 126, 0.22) 0%,
+              rgba(7, 4, 13, 1) 34%
+            ),
+            linear-gradient(180deg, #09050f 0%, #07040d 100%);
+          color: white;
+          padding: 40px 20px 56px;
+        }
+
+        .fantasy-shell {
+          max-width: 1240px;
+          margin: 0 auto;
+        }
+
+        .fantasy-header {
+          margin-bottom: 28px;
+        }
+
+        .fantasy-badge {
+          display: inline-block;
+          padding: 8px 14px;
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          color: rgba(255, 255, 255, 0.78);
+          font-size: 13px;
+          margin-bottom: 16px;
+          backdrop-filter: blur(10px);
+        }
+
+        .fantasy-header h1 {
+          font-size: clamp(36px, 6vw, 56px);
+          line-height: 1.02;
+          font-weight: 800;
+          letter-spacing: -0.03em;
+          margin: 0 0 14px 0;
+        }
+
+        .fantasy-header p {
+          margin: 0;
+          max-width: 760px;
+          font-size: 18px;
+          line-height: 1.65;
+          color: rgba(255, 255, 255, 0.72);
+        }
+
+        .fantasy-panel {
+          position: relative;
+          overflow: hidden;
+          border-radius: 30px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.05),
+            rgba(255, 255, 255, 0.025)
+          );
+          padding: 28px;
+          box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
+          backdrop-filter: blur(14px);
+        }
+
+        .fantasy-panel-glow {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background:
+            radial-gradient(
+              circle at top right,
+              rgba(216, 178, 110, 0.08),
+              transparent 30%
+            ),
+            radial-gradient(
+              circle at bottom left,
+              rgba(119, 90, 255, 0.08),
+              transparent 28%
+            );
+        }
+
+        .fantasy-panel-top {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 16px;
+          margin-bottom: 22px;
+          flex-wrap: wrap;
+        }
+
+        .fantasy-panel-top h2 {
+          margin: 0 0 8px 0;
+          font-size: 24px;
+          font-weight: 700;
+        }
+
+        .fantasy-panel-top p {
+          margin: 0;
+          color: rgba(255, 255, 255, 0.62);
+          font-size: 15px;
+        }
+
+        .fantasy-note {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 14px;
+          border-radius: 16px;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          color: rgba(255, 255, 255, 0.72);
+          font-size: 14px;
+        }
+
+        .fantasy-note-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #d8b26e;
+          display: inline-block;
+          box-shadow: 0 0 12px rgba(216, 178, 110, 0.6);
+        }
+
+        .fantasy-rows {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .fantasy-row {
+          display: grid;
+          grid-template-columns: 220px 56px minmax(0, 1fr) 56px;
+          gap: 14px;
+          align-items: stretch;
+        }
+
+        .fantasy-category {
+          min-height: 72px;
+          border-radius: 22px;
+          border: 1px solid rgba(216, 178, 110, 0.16);
+          background: linear-gradient(
+            180deg,
+            rgba(216, 178, 110, 0.12),
+            rgba(216, 178, 110, 0.06)
+          );
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 18px;
+          text-align: center;
+          font-size: 18px;
+          font-weight: 700;
+          color: #f4e6ca;
+          line-height: 1.25;
+        }
+
+        .fantasy-arrow-wrap {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .fantasy-tiles {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 14px;
+        }
+
+        .fantasy-tile {
+          min-height: 72px;
+          border-radius: 22px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.07),
+            rgba(255, 255, 255, 0.035)
+          );
+          color: white;
+          font-size: 18px;
+          font-weight: 600;
+          padding: 0 18px;
+          cursor: pointer;
+          box-shadow:
+            0 12px 28px rgba(0, 0, 0, 0.22),
+            inset 0 1px 0 rgba(255, 255, 255, 0.04);
+          transition:
+            transform 0.2s ease,
+            border-color 0.2s ease,
+            background 0.2s ease;
+        }
+
+        .fantasy-tile:hover {
+          transform: translateY(-2px);
+          border-color: rgba(216, 178, 110, 0.28);
+          background: linear-gradient(
+            180deg,
+            rgba(216, 178, 110, 0.16),
+            rgba(255, 255, 255, 0.05)
+          );
+        }
+
+        .fantasy-footer {
+          margin-top: 28px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 16px;
+          flex-wrap: wrap;
+        }
+
+        .fantasy-back {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: white;
+          color: black;
+          padding: 14px 20px;
+          border-radius: 14px;
+          font-weight: 700;
+          text-decoration: none;
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .fantasy-footer-copy {
+          color: rgba(255, 255, 255, 0.56);
+          font-size: 14px;
+        }
+
+        @media (max-width: 1080px) {
+          .fantasy-row {
+            grid-template-columns: 1fr;
+          }
+
+          .fantasy-arrow-wrap {
+            justify-content: space-between;
+          }
+
+          .fantasy-arrow-left,
+          .fantasy-arrow-right {
+            display: inline-flex;
+          }
+        }
+
+        @media (max-width: 760px) {
+          .fantasy-page {
+            padding: 28px 16px 48px;
+          }
+
+          .fantasy-panel {
+            padding: 20px;
+            border-radius: 24px;
+          }
+
+          .fantasy-header p {
+            font-size: 16px;
+          }
+
+          .fantasy-tiles {
+            grid-template-columns: 1fr;
+          }
+
+          .fantasy-category,
+          .fantasy-tile {
+            min-height: 64px;
+            font-size: 16px;
+          }
+        }
+      `}</style>
     </main>
   );
 }
