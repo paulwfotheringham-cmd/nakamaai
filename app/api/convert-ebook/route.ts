@@ -29,6 +29,7 @@ export async function POST(req: Request) {
       throw new Error("Missing file path");
     }
 
+    // 1. Download ebook
     const { data: fileData, error: downloadError } = await supabase.storage
       .from("ebooks")
       .download(path);
@@ -39,6 +40,7 @@ export async function POST(req: Request) {
 
     let text = "";
 
+    // 2. Extract text from EPUB
     if (path.toLowerCase().endsWith(".epub")) {
       const arrayBuffer = await fileData.arrayBuffer();
       const zip = await JSZip.loadAsync(arrayBuffer);
@@ -48,7 +50,9 @@ export async function POST(req: Request) {
       const htmlFileName = fileNames.find(
         (name) =>
           !zip.files[name].dir &&
-          (name.endsWith(".xhtml") || name.endsWith(".html") || name.endsWith(".htm"))
+          (name.endsWith(".xhtml") ||
+            name.endsWith(".html") ||
+            name.endsWith(".htm"))
       );
 
       if (!htmlFileName) {
@@ -68,27 +72,27 @@ export async function POST(req: Request) {
         .replace(/\s+/g, " ")
         .trim()
         .slice(0, 2000);
-    } else if (path.toLowerCase().endsWith(".pdf")) {
-      throw new Error("PDF text extraction is not set up yet. Please test with EPUB first.");
     } else {
-      throw new Error("Unsupported file type");
+      throw new Error("Only EPUB supported right now");
     }
 
     if (!text) {
-      throw new Error("No text could be extracted from the ebook");
+      throw new Error("No text extracted from ebook");
     }
 
+    // 3. Convert to audio (FIXED)
     const audioResponse = await openai.audio.speech.create({
       model: "gpt-4o-mini-tts",
       voice: "alloy",
       input: text,
+      format: "mp3",
     });
 
-    const audioBuffer = Buffer.from(await audioResponse.arrayBuffer());
+    const audioArrayBuffer = await audioResponse.arrayBuffer();
+    const audioBuffer = Buffer.from(audioArrayBuffer);
 
-    const audioPath = path
-      .replace(".epub", ".mp3")
-      .replace(".pdf", ".mp3");
+    // 4. Save to Supabase
+    const audioPath = path.replace(".epub", ".mp3");
 
     const { error: uploadError } = await supabase.storage
       .from("audio")
