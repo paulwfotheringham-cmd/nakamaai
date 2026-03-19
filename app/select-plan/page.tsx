@@ -3,63 +3,116 @@ export default function SelectPlanPage() {
     {
       name: "The Tease",
       subtitle: "Perfect for the casual listener testing the waters",
-      price: "$9.99 a month",
+      price: "$9.99 / month",
       features: ["Standard Voice", "Cancel anytime"],
       highlighted: false,
+      cta: "Select plan",
     },
     {
       name: "The Protagonist",
       subtitle: "Our most popular tier. Dive deep into your fantasies",
-      price: "$14.99 a month",
+      price: "$14.99 / month",
       features: ["Premier Voice", "Cancel anytime"],
       highlighted: true,
+      cta: "Select plan",
     },
     {
       name: "Starter",
-      subtitle: "Enjoy 7 days of the Platform",
-      price: "$0",
-      features: ["Standard Voice"],
+      subtitle: "Enjoy 7 days of the platform",
+      price: "Free for 7 days",
+      features: ["Standard Voice", "No charge today"],
       highlighted: false,
+      cta: "Start free trial",
     },
   ];
 
   return (
-    <main className="min-h-screen bg-white px-6 py-12 text-black">
-      <div className="mx-auto max-w-6xl">
-        <div className="grid gap-6 md:grid-cols-3">
-          {plans.map((plan) => (
-            <div key={plan.name} className="flex flex-col gap-3">
-              <div
-                className={`border-2 border-black px-8 py-10 text-center ${
-                  plan.highlighted ? "bg-[#8fd16f]" : "bg-[#135f82] text-white"
-                }`}
-              >
-                <h2 className="text-4xl font-light">{plan.name}</h2>
+    <main className="min-h-screen bg-[#07040d] text-white">
+      <section className="mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-sm font-medium text-zinc-400">
+            Choose your plan
+          </p>
+          <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">
+            Start your Nakama journey
+          </h1>
+          <p className="mt-4 text-base leading-7 text-zinc-300">
+            Pick the tier that fits how deeply you want to immerse yourself.
+          </p>
+        </div>
 
-                <p className="mx-auto mt-10 max-w-xs text-xl leading-8">
+        <div className="mt-12 grid gap-6 lg:grid-cols-3">
+          {plans.map((plan) => (
+            <div
+              key={plan.name}
+              className={`flex h-full flex-col rounded-3xl border p-6 transition-all ${
+                plan.highlighted
+                  ? "border-lime-300/40 bg-lime-300 text-black"
+                  : "border-white/10 bg-white/5 text-white"
+              }`}
+            >
+              {plan.highlighted && (
+                <div className="mb-4 inline-flex w-fit rounded-full bg-black/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                  Most popular
+                </div>
+              )}
+
+              <div className="flex-1">
+                <h2
+                  className={`text-3xl font-semibold tracking-tight ${
+                    plan.highlighted ? "text-black" : "text-white"
+                  }`}
+                >
+                  {plan.name}
+                </h2>
+
+                <p
+                  className={`mt-4 text-base leading-7 ${
+                    plan.highlighted ? "text-black/80" : "text-zinc-300"
+                  }`}
+                >
                   {plan.subtitle}
                 </p>
 
-                <p className="mt-10 text-2xl">{plan.price}</p>
+                <div className="mt-8">
+                  <p
+                    className={`text-3xl font-semibold ${
+                      plan.highlighted ? "text-black" : "text-white"
+                    }`}
+                  >
+                    {plan.price}
+                  </p>
+                </div>
 
-                <div className="mt-10 space-y-2 text-xl">
+                <div className="mt-8 space-y-3">
                   {plan.features.map((feature) => (
-                    <p key={feature}>{feature}</p>
+                    <div
+                      key={feature}
+                      className={`rounded-2xl px-4 py-3 text-sm ${
+                        plan.highlighted
+                          ? "bg-black/5 text-black"
+                          : "bg-white/5 text-zinc-200"
+                      }`}
+                    >
+                      {feature}
+                    </div>
                   ))}
                 </div>
               </div>
 
               <button
-                className={`border-2 border-black px-6 py-6 text-2xl ${
-                  plan.highlighted ? "bg-[#8fd16f]" : "bg-[#135f82] text-white"
+                className={`mt-8 rounded-2xl px-5 py-4 text-base font-medium transition ${
+                  plan.highlighted
+                    ? "bg-black text-white hover:bg-zinc-900"
+                    : "bg-white text-black hover:bg-zinc-200"
                 }`}
               >
-                Select plan
+                {plan.cta}
               </button>
             </div>
           ))}
         </div>
-      </div>
+      </section>
     </main>
   );
 }
