@@ -14,7 +14,7 @@ const tiles: Tile[] = [
     title: "Choose fantasy Audio",
     description:
       "Browse and begin your next immersive audio experience.",
-    href: "/choose-fantasy-audio",
+    href: "/fantasy-audio",
     icon: "📚",
     cta: "Open",
   },
@@ -22,7 +22,7 @@ const tiles: Tile[] = [
     title: "Create your own fantasy audio",
     description:
       "Adjust mood, voices, characters, and generate your scene.",
-    href: "/create-your-own-fantasy-audio",
+    href: "/create-audio",
     icon: "✨",
     cta: "Open",
   },
