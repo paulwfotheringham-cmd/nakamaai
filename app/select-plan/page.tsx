@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function SelectPlanPage() {
   const plans = [
     {
@@ -7,6 +9,7 @@ export default function SelectPlanPage() {
       features: ["Standard Voice", "Cancel anytime"],
       highlighted: false,
       cta: "Select plan",
+      href: "#",
     },
     {
       name: "The Protagonist",
@@ -15,6 +18,7 @@ export default function SelectPlanPage() {
       features: ["Premier Voice", "Cancel anytime"],
       highlighted: true,
       cta: "Select plan",
+      href: "#",
     },
     {
       name: "Starter",
@@ -23,6 +27,7 @@ export default function SelectPlanPage() {
       features: ["Standard Voice", "No charge today"],
       highlighted: false,
       cta: "Start free trial",
+      href: "/dashboard",
     },
   ];
 
@@ -100,15 +105,28 @@ export default function SelectPlanPage() {
                 </div>
               </div>
 
-              <button
-                className={`mt-8 rounded-2xl px-5 py-4 text-base font-medium transition ${
-                  plan.highlighted
-                    ? "bg-black text-white hover:bg-zinc-900"
-                    : "bg-white text-black hover:bg-zinc-200"
-                }`}
-              >
-                {plan.cta}
-              </button>
+              {plan.href === "#" ? (
+                <button
+                  className={`mt-8 rounded-2xl px-5 py-4 text-base font-medium transition ${
+                    plan.highlighted
+                      ? "bg-black text-white hover:bg-zinc-900"
+                      : "bg-white text-black hover:bg-zinc-200"
+                  }`}
+                >
+                  {plan.cta}
+                </button>
+              ) : (
+                <Link
+                  href={plan.href}
+                  className={`mt-8 rounded-2xl px-5 py-4 text-center text-base font-medium transition ${
+                    plan.highlighted
+                      ? "bg-black text-white hover:bg-zinc-900"
+                      : "bg-white text-black hover:bg-zinc-200"
+                  }`}
+                >
+                  {plan.cta}
+                </Link>
+              )}
             </div>
           ))}
         </div>
