@@ -1,18 +1,10 @@
 import Link from "next/link";
-import {
-  BookOpen,
-  Sparkles,
-  Wand2,
-  Store,
-  User,
-  ArrowRight,
-} from "lucide-react";
 
 type Tile = {
   title: string;
   description: string;
   href?: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: string;
   disabled?: boolean;
   cta?: string;
 };
@@ -23,7 +15,7 @@ const tiles: Tile[] = [
     description:
       "Browse and begin your next immersive audio experience.",
     href: "/choose-fantasy-audio",
-    icon: BookOpen,
+    icon: "📚",
     cta: "Open",
   },
   {
@@ -31,7 +23,7 @@ const tiles: Tile[] = [
     description:
       "Adjust mood, voices, characters, and generate your scene.",
     href: "/create-your-own-fantasy-audio",
-    icon: Sparkles,
+    icon: "✨",
     cta: "Open",
   },
   {
@@ -39,14 +31,14 @@ const tiles: Tile[] = [
     description:
       "Upload your favourite ebook and transform it into an immersive fantasy audio experience.",
     href: "/convert-ebook-to-fantasy-audio",
-    icon: Wand2,
+    icon: "🎧",
     cta: "Open",
   },
   {
     title: "Marketplace",
     description:
       "Explore and discover fantasy audio experiences from the community.",
-    icon: Store,
+    icon: "🛍️",
     disabled: true,
     cta: "Coming soon",
   },
@@ -55,14 +47,12 @@ const tiles: Tile[] = [
     description:
       "Manage your details, preferences, and account settings.",
     href: "/profile",
-    icon: User,
+    icon: "👤",
     cta: "Open",
   },
 ];
 
 function TileCard({ tile }: { tile: Tile }) {
-  const Icon = tile.icon;
-
   const content = (
     <div
       className={`group h-full rounded-3xl border p-6 shadow-sm transition-all duration-200 ${
@@ -71,8 +61,8 @@ function TileCard({ tile }: { tile: Tile }) {
           : "border-zinc-200 bg-white hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md"
       }`}
     >
-      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-100">
-        <Icon className="h-6 w-6 text-zinc-900" />
+      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-100 text-2xl">
+        <span aria-hidden="true">{tile.icon}</span>
       </div>
 
       <div className="space-y-2">
@@ -84,9 +74,7 @@ function TileCard({ tile }: { tile: Tile }) {
 
       <div className="mt-6 flex items-center text-sm font-medium text-zinc-900">
         <span>{tile.cta}</span>
-        {!tile.disabled && (
-          <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-        )}
+        {!tile.disabled && <span className="ml-2">→</span>}
       </div>
     </div>
   );
@@ -134,4 +122,3 @@ export default function DashboardPage() {
     </main>
   );
 }
-   
