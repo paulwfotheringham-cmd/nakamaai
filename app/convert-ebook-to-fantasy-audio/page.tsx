@@ -13,10 +13,12 @@ export default function ConvertEbookPage() {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoadingFiles, setIsLoadingFiles] = useState(true);
+  const [isConverting, setIsConverting] = useState(false);
   const [message, setMessage] = useState("");
   const [uploadedPath, setUploadedPath] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [selectedForConversion, setSelectedForConversion] = useState("");
+  const [audioReady, setAudioReady] = useState("");
 
   async function loadFiles() {
     setIsLoadingFiles(true);
@@ -114,9 +116,38 @@ export default function ConvertEbookPage() {
     }
   }
 
-  function handleConvertClick(uploadedFile: UploadedFile) {
+  async function handleConvertClick(uploadedFile: UploadedFile) {
     setSelectedForConversion(uploadedFile.path);
-    setMessage(`Selected for conversion: ${uploadedFile.name}`);
+    setMessage("Starting conversion...");
+    setIsConverting(true);
+    setAudioReady("");
+
+    try {
+      const res = await fetch("/api/convert-ebook", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ path: uploadedFile.path }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Conversion failed");
+      }
+
+      setAudioReady(data.audioPath);
+      setMessage("Conversion complete 🎧");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Conversion failed.");
+    } finally {
+      setIsConverting(false);
+    }
+  }
+
+  function getExpectedAudioPath(path: string) {
+    return path.replace("ebooks", "audio").replace(".epub", ".mp3");
   }
 
   return (
@@ -208,6 +239,21 @@ export default function ConvertEbookPage() {
                     <p className="mt-3 text-xs text-purple-300">
                       Ready to convert this ebook.
                     </p>
+                  )}
+
+                  {isConverting && selectedForConversion === uploadedFile.path && (
+                    <p className="mt-2 text-xs text-yellow-300">
+                      Converting... please wait
+                    </p>
+                  )}
+
+                  {audioReady === getExpectedAudioPath(uploadedFile.path) && (
+                    <button
+                      type="button"
+                      className="mt-3 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500"
+                    >
+                      Play audio
+                    </button>
                   )}
                 </li>
               ))}
