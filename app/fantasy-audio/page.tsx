@@ -1,73 +1,39 @@
+"use client";
+
+import { useMemo, useState } from "react";
+
 export default function FantasyAudioPage() {
-  const sections = [
-    {
-      title: "Stories + Fantasies",
-      items: [
-        "Anime/Hentai",
-        "Paranormal",
-        "Supernatural",
-        "Shapeshifter",
-        "Fairy Tales",
-        "Monsters",
-        "Witch",
-        "Magic",
-        "Sci-Fi / Aliens",
-        "Dark",
-        "Erotic",
-        "Historical",
-        "Harem",
-        "Modern",
-        "Medieval",
-        "Power Dynamics",
-        "Sub / Dom",
-      ],
-    },
-    {
-      title: "Mood",
-      items: [
-        "Romantic",
-        "Obsessive",
-        "Gentle",
-        "Possessive",
-        "Forbidden",
-        "Jealous",
-        "Protective",
-        "Seductive",
-        "Emotional",
-        "Dangerous",
-      ],
-    },
-    {
-      title: "Character Type",
-      items: [
-        "Prince",
-        "Knight",
-        "Elf",
-        "Witch",
-        "Vampire",
-        "Demon",
-        "Monster",
-        "Alien",
-        "Professor",
-        "Bodyguard",
-      ],
-    },
-    {
-      title: "Setting",
-      items: [
-        "Castle",
-        "Forest",
-        "Hidden Village",
-        "Academy",
-        "Dungeon",
-        "Royal Court",
-        "Battlefield",
-        "Space Ship",
-        "Temple",
-        "Moonlit Garden",
-      ],
-    },
+  const stories = [
+    "Anime/Hentai",
+    "Paranormal",
+    "Supernatural",
+    "Shapeshifter",
+    "Fairy Tales",
+    "Monsters",
+    "Witch",
+    "Magic",
+    "Sci-Fi / Aliens",
+    "Dark",
+    "Erotic",
+    "Historical",
+    "Harem",
+    "Modern",
+    "Medieval",
+    "Power Dynamics",
+    "Sub / Dom",
   ];
+
+  const [index, setIndex] = useState(0);
+
+  const currentStory = useMemo(() => stories[index], [stories, index]);
+
+  function goPrev() {
+    setIndex((prev) => (prev === 0 ? stories.length - 1 : prev - 1));
+  }
+
+  function goNext() {
+    setIndex((prev) => (prev === stories.length - 1 ? 0 : prev + 1));
+  }
 
   return (
     <main
@@ -115,87 +81,128 @@ export default function FantasyAudioPage() {
               margin: 0,
             }}
           >
-            Pick a fantasy theme by tapping the buttons below.
+            Swipe through story types and choose the one you want.
           </p>
         </div>
 
-        <div style={{ display: "grid", gap: "20px" }}>
-          {sections.map((section) => (
-            <section
-              key={section.title}
+        <section
+          style={{
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "28px",
+            background: "rgba(255,255,255,0.04)",
+            padding: "32px",
+            minHeight: "320px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <h2
               style={{
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: "20px",
-                background: "rgba(255,255,255,0.04)",
+                margin: "0 0 20px 0",
+                fontSize: "26px",
+                fontWeight: 700,
+              }}
+            >
+              Stories
+            </h2>
+
+            <div
+              style={{
+                borderRadius: "24px",
+                border: "1px solid rgba(255,255,255,0.12)",
+                background:
+                  "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03))",
+                minHeight: "170px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
                 padding: "24px",
               }}
             >
-              <h2
-                style={{
-                  margin: "0 0 16px 0",
-                  fontSize: "22px",
-                  fontWeight: 600,
-                }}
-              >
-                {section.title}
-              </h2>
+              <div>
+                <div
+                  style={{
+                    fontSize: "14px",
+                    letterSpacing: "0.2em",
+                    textTransform: "uppercase",
+                    color: "#d8b26e",
+                    marginBottom: "14px",
+                  }}
+                >
+                  Story Type
+                </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "12px",
-                }}
-              >
-                {section.items.map((item) => (
-                  <button
-                    key={item}
-                    style={{
-                      borderRadius: "999px",
-                      border: "1px solid rgba(255,255,255,0.14)",
-                      background: "rgba(255,255,255,0.08)",
-                      color: "white",
-                      padding: "10px 16px",
-                      fontSize: "14px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {item}
-                  </button>
-                ))}
+                <div
+                  style={{
+                    fontSize: "52px",
+                    fontWeight: 700,
+                    lineHeight: 1.05,
+                  }}
+                >
+                  {currentStory}
+                </div>
               </div>
-            </section>
-          ))}
-        </div>
+            </div>
+          </div>
+
+          <div
+            style={{
+              marginTop: "28px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "16px",
+            }}
+          >
+            <button
+              onClick={goPrev}
+              style={{
+                borderRadius: "14px",
+                border: "1px solid rgba(255,255,255,0.14)",
+                background: "rgba(255,255,255,0.08)",
+                color: "white",
+                padding: "14px 20px",
+                fontSize: "16px",
+                cursor: "pointer",
+              }}
+            >
+              ← Previous
+            </button>
+
+            <div
+              style={{
+                color: "rgba(255,255,255,0.65)",
+                fontSize: "15px",
+              }}
+            >
+              {index + 1} / {stories.length}
+            </div>
+
+            <button
+              onClick={goNext}
+              style={{
+                borderRadius: "14px",
+                border: "1px solid rgba(255,255,255,0.14)",
+                background: "rgba(255,255,255,0.08)",
+                color: "white",
+                padding: "14px 20px",
+                fontSize: "16px",
+                cursor: "pointer",
+              }}
+            >
+              Next →
+            </button>
+          </div>
+        </section>
 
         <div
           style={{
             marginTop: "28px",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: "20px",
-            background: "rgba(255,255,255,0.04)",
-            padding: "24px",
           }}
         >
-          <h3
-            style={{
-              margin: "0 0 10px 0",
-              fontSize: "20px",
-              fontWeight: 600,
-            }}
-          >
-            Next
-          </h3>
-
-          <p
-            style={{
-              margin: "0 0 16px 0",
-              color: "rgba(255,255,255,0.72)",
-            }}
-          >
-            After this page looks right, we’ll connect the dashboard button to open it.
-          </p>
-
           <a
             href="/dashboard"
             style={{
@@ -205,6 +212,7 @@ export default function FantasyAudioPage() {
               padding: "12px 18px",
               borderRadius: "12px",
               fontWeight: 600,
+              textDecoration: "none",
             }}
           >
             Back to Dashboard
