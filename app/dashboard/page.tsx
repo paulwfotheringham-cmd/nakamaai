@@ -69,7 +69,9 @@ function TileCard({ tile }: { tile: Tile }) {
         <h3 className="text-lg font-semibold tracking-tight text-white">
           {tile.title}
         </h3>
-        <p className="text-sm leading-6 text-zinc-300">{tile.description}</p>
+        <p className="text-sm leading-6 text-zinc-300">
+          {tile.description}
+        </p>
       </div>
 
       <div className="mt-6 flex items-center text-sm font-medium text-white">
@@ -93,18 +95,21 @@ function TileCard({ tile }: { tile: Tile }) {
 export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-[#07040d] text-white">
-      <section className="mx-auto max-w-7xl px-6 py-12 sm:px-8 lg:px-10">
-        <div className="mb-10">
+      <section className="mx-auto max-w-6xl px-6 py-12 sm:px-8 lg:px-8">
+        <div className="mb-12">
           <p className="text-sm font-medium text-zinc-400">
             Welcome to your dashboard
           </p>
+
           <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
             Your creative hub
           </h1>
-          <div className="mt-6 max-w-3xl">
-            <h2 className="text-2xl font-semibold tracking-tight text-white">
+
+          <div className="mt-6 max-w-2xl">
+            <h2 className="text-xl font-semibold text-white">
               Pick what you want to do in Nakama
             </h2>
+
             <p className="mt-3 text-base leading-7 text-zinc-300">
               Choose fantasy audio, create your own fantasy audio, convert an
               ebook into fantasy audio, explore the marketplace, or manage your
@@ -113,7 +118,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {tiles.map((tile) => (
             <TileCard key={tile.title} tile={tile} />
           ))}
