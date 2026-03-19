@@ -16,6 +16,7 @@ export default function ConvertEbookPage() {
   const [message, setMessage] = useState("");
   const [uploadedPath, setUploadedPath] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [selectedForConversion, setSelectedForConversion] = useState("");
 
   async function loadFiles() {
     setIsLoadingFiles(true);
@@ -113,6 +114,11 @@ export default function ConvertEbookPage() {
     }
   }
 
+  function handleConvertClick(uploadedFile: UploadedFile) {
+    setSelectedForConversion(uploadedFile.path);
+    setMessage(`Selected for conversion: ${uploadedFile.name}`);
+  }
+
   return (
     <main className="min-h-screen bg-[#07040d] text-white">
       <div className="mx-auto max-w-3xl px-6 py-16">
@@ -192,10 +198,17 @@ export default function ConvertEbookPage() {
 
                   <button
                     type="button"
+                    onClick={() => handleConvertClick(uploadedFile)}
                     className="mt-3 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-500"
                   >
                     Convert ebook to audio
                   </button>
+
+                  {selectedForConversion === uploadedFile.path && (
+                    <p className="mt-3 text-xs text-purple-300">
+                      Ready to convert this ebook.
+                    </p>
+                  )}
                 </li>
               ))}
             </ul>
