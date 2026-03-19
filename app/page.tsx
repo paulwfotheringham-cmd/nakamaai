@@ -65,12 +65,12 @@ export default function SignupPage() {
           justifyContent: "space-between",
           gap: "64px",
           padding: "64px 24px",
-          flexWrap: "wrap",
+          flexWrap: "nowrap",
         }}
       >
         <section
           style={{
-            flex: "1 1 620px",
+            flex: 1,
             maxWidth: "760px",
           }}
         >
@@ -138,7 +138,7 @@ export default function SignupPage() {
             style={{
               marginTop: "40px",
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+              gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
               gap: "16px",
               maxWidth: "760px",
             }}
@@ -160,10 +160,11 @@ export default function SignupPage() {
                 title: "Fast iteration",
                 text: "Adjust one detail and instantly create a new version.",
               },
-            ].map((item) => (
+            ].map((item, index) => (
               <div
                 key={item.title}
                 style={{
+                  gridColumn: index === 3 ? "1 / 2" : undefined,
                   borderRadius: "24px",
                   border: "1px solid rgba(255,255,255,0.10)",
                   background: "rgba(255,255,255,0.04)",
@@ -200,7 +201,7 @@ export default function SignupPage() {
           style={{
             width: "100%",
             maxWidth: "520px",
-            flex: "0 1 520px",
+            flex: "0 0 520px",
           }}
         >
           <div
