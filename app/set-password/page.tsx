@@ -41,7 +41,7 @@ export default function SetPasswordPage() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push("/select-plan");
   }
 
   return (
