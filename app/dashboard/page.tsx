@@ -104,15 +104,15 @@ export default function DashboardPage() {
               color: "rgba(255,255,255,0.7)",
             }}
           >
-            Choose fantasy audio, customize your story experience, or manage your
-            profile.
+            Choose fantasy audio, create your own fantasy audio, explore the
+            marketplace, or manage your profile.
           </p>
         </div>
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
+            gridTemplateColumns: "1fr 1fr 1fr 1fr",
             gap: "28px",
             marginTop: "24px",
           }}
@@ -124,9 +124,15 @@ export default function DashboardPage() {
           />
 
           <DashboardCard
-            title="Customize your audio"
+            title="Create your own fantasy audio"
             href="/create-audio"
             description="Adjust mood, voices, characters, and generate your scene."
+          />
+
+          <DashboardCard
+            title="Marketplace"
+            href="#"
+            description="Explore and discover fantasy audio experiences from the community."
           />
 
           <DashboardCard
@@ -149,76 +155,86 @@ function DashboardCard({
   href: string;
   description: string;
 }) {
-  return (
-    <Link href={href} style={{ textDecoration: "none" }}>
+  const isPlaceholder = href === "#";
+
+  const card = (
+    <div
+      style={{
+        minHeight: "220px",
+        borderRadius: "28px",
+        border: "1px solid rgba(255,255,255,0.1)",
+        background: "rgba(255,255,255,0.06)",
+        boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
+        backdropFilter: "blur(12px)",
+        padding: "28px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        cursor: isPlaceholder ? "default" : "pointer",
+        boxSizing: "border-box",
+      }}
+    >
       <div
         style={{
-          minHeight: "220px",
-          borderRadius: "28px",
-          border: "1px solid rgba(255,255,255,0.1)",
-          background: "rgba(255,255,255,0.06)",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
-          backdropFilter: "blur(12px)",
-          padding: "28px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          cursor: "pointer",
-          boxSizing: "border-box",
+          display: "inline-flex",
+          width: "fit-content",
+          borderRadius: "999px",
+          border: "1px solid rgba(216,178,110,0.25)",
+          background: "rgba(216,178,110,0.08)",
+          padding: "6px 12px",
+          fontSize: "12px",
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+          color: "#d8b26e",
         }}
       >
+        Nakama
+      </div>
+
+      <div>
         <div
           style={{
-            display: "inline-flex",
-            width: "fit-content",
-            borderRadius: "999px",
-            border: "1px solid rgba(216,178,110,0.25)",
-            background: "rgba(216,178,110,0.08)",
-            padding: "6px 12px",
-            fontSize: "12px",
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-            color: "#d8b26e",
-          }}
-        >
-          Nakama
-        </div>
-
-        <div>
-          <div
-            style={{
-              fontSize: "24px",
-              fontWeight: 700,
-              color: "white",
-              lineHeight: 1.3,
-            }}
-          >
-            {title}
-          </div>
-
-          <div
-            style={{
-              marginTop: "12px",
-              fontSize: "15px",
-              lineHeight: 1.7,
-              color: "rgba(255,255,255,0.65)",
-            }}
-          >
-            {description}
-          </div>
-        </div>
-
-        <div
-          style={{
-            marginTop: "20px",
-            color: "#d8b26e",
-            fontSize: "15px",
+            fontSize: "24px",
             fontWeight: 700,
+            color: "white",
+            lineHeight: 1.3,
           }}
         >
-          Open →
+          {title}
+        </div>
+
+        <div
+          style={{
+            marginTop: "12px",
+            fontSize: "15px",
+            lineHeight: 1.7,
+            color: "rgba(255,255,255,0.65)",
+          }}
+        >
+          {description}
         </div>
       </div>
+
+      <div
+        style={{
+          marginTop: "20px",
+          color: "#d8b26e",
+          fontSize: "15px",
+          fontWeight: 700,
+        }}
+      >
+        {isPlaceholder ? "Coming soon" : "Open →"}
+      </div>
+    </div>
+  );
+
+  if (isPlaceholder) {
+    return <div style={{ textDecoration: "none" }}>{card}</div>;
+  }
+
+  return (
+    <Link href={href} style={{ textDecoration: "none" }}>
+      {card}
     </Link>
   );
 }
