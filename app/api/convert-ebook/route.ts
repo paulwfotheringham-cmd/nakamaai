@@ -29,7 +29,6 @@ export async function POST(req: Request) {
       throw new Error("Missing file path");
     }
 
-    // 1. Download ebook
     const { data: fileData, error: downloadError } = await supabase.storage
       .from("ebooks")
       .download(path);
@@ -40,7 +39,6 @@ export async function POST(req: Request) {
 
     let text = "";
 
-    // 2. Extract text from EPUB
     if (path.toLowerCase().endsWith(".epub")) {
       const arrayBuffer = await fileData.arrayBuffer();
       const zip = await JSZip.loadAsync(arrayBuffer);
@@ -80,18 +78,15 @@ export async function POST(req: Request) {
       throw new Error("No text extracted from ebook");
     }
 
-    // 3. Convert to audio (FIXED)
     const audioResponse = await openai.audio.speech.create({
       model: "gpt-4o-mini-tts",
       voice: "alloy",
       input: text,
-      format: "mp3",
     });
 
     const audioArrayBuffer = await audioResponse.arrayBuffer();
     const audioBuffer = Buffer.from(audioArrayBuffer);
 
-    // 4. Save to Supabase
     const audioPath = path.replace(".epub", ".mp3");
 
     const { error: uploadError } = await supabase.storage
