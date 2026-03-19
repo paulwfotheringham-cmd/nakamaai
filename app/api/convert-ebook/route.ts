@@ -9,17 +9,11 @@ export async function POST(req: Request) {
     const openAiKey = process.env.OPENAI_API_KEY;
 
     if (!supabaseUrl || !supabaseServiceRoleKey) {
-      return NextResponse.json(
-        { error: "Supabase server credentials are missing." },
-        { status: 500 }
-      );
+      throw new Error("Supabase credentials missing");
     }
 
     if (!openAiKey) {
-      return NextResponse.json(
-        { error: "OpenAI API key is missing." },
-        { status: 500 }
-      );
+      throw new Error("OpenAI API key missing");
     }
 
     const openai = new OpenAI({
@@ -31,7 +25,7 @@ export async function POST(req: Request) {
     const { path } = await req.json();
 
     if (!path) {
-      return NextResponse.json({ error: "Missing file path" }, { status: 400 });
+      throw new Error("Missing file path");
     }
 
     // 1. Download ebook
@@ -43,7 +37,7 @@ export async function POST(req: Request) {
       throw new Error("Failed to download ebook");
     }
 
-    // 2. TEMP: fake text (we'll fix later)
+    // 2. TEMP text
     const text = "This is a sample audiobook narration from your ebook.";
 
     // 3. Convert to audio
@@ -55,7 +49,7 @@ export async function POST(req: Request) {
 
     const audioBuffer = Buffer.from(await audioResponse.arrayBuffer());
 
-    // 4. Save audio to Supabase
+    // 4. Save to audio bucket
     const audioPath = path
       .replace(".epub", ".mp3")
       .replace(".pdf", ".mp3");
@@ -79,7 +73,7 @@ export async function POST(req: Request) {
     console.error(error);
 
     return NextResponse.json(
-      { error: "Conversion failed" },
+      { error: error instanceof Error ? error.message : "Conversion failed" },
       { status: 500 }
     );
   }
