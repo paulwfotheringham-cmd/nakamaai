@@ -180,14 +180,22 @@ export default function ConvertEbookPage() {
               {uploadedFiles.map((uploadedFile) => (
                 <li
                   key={uploadedFile.path}
-                  className="rounded-xl border border-white/10 bg-white/5 px-4 py-3"
+                  className="rounded-xl border border-white/10 bg-white/5 px-4 py-4"
                 >
                   <p className="break-all text-sm text-white">
                     {uploadedFile.name}
                   </p>
+
                   <p className="mt-1 break-all text-xs text-zinc-500">
                     {uploadedFile.path}
                   </p>
+
+                  <button
+                    type="button"
+                    className="mt-3 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-500"
+                  >
+                    Convert ebook to audio
+                  </button>
                 </li>
               ))}
             </ul>
