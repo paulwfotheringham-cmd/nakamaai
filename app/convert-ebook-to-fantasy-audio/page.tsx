@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase-browser";
+import { supabase } from "../../lib/supabase-browser";
 
 export default function ConvertEbookPage() {
   const [file, setFile] = useState<File | null>(null);
