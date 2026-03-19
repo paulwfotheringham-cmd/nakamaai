@@ -3,6 +3,44 @@ import OpenAI from "openai";
 import { createClient } from "@supabase/supabase-js";
 import JSZip from "jszip";
 
+function cleanHtmlToText(html: string) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function looksLikeFrontMatter(fileName: string, text: string) {
+  const lowerName = fileName.toLowerCase();
+  const lowerText = text.toLowerCase();
+
+  const badName =
+    lowerName.includes("cover") ||
+    lowerName.includes("title") ||
+    lowerName.includes("toc") ||
+    lowerName.includes("nav") ||
+    lowerName.includes("contents") ||
+    lowerName.includes("copyright") ||
+    lowerName.includes("imprint") ||
+    lowerName.includes("front");
+
+  const badText =
+    lowerText === "cover" ||
+    lowerText.startsWith("table of contents") ||
+    lowerText.startsWith("contents") ||
+    lowerText.startsWith("copyright") ||
+    lowerText.startsWith("title page");
+
+  return badName || badText;
+}
+
 export async function POST(req: Request) {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -43,33 +81,49 @@ export async function POST(req: Request) {
       const arrayBuffer = await fileData.arrayBuffer();
       const zip = await JSZip.loadAsync(arrayBuffer);
 
-      const fileNames = Object.keys(zip.files);
-
-      const htmlFileName = fileNames.find(
-        (name) =>
-          !zip.files[name].dir &&
+      const fileNames = Object.keys(zip.files).filter((name) => {
+        const file = zip.files[name];
+        return (
+          !file.dir &&
           (name.endsWith(".xhtml") ||
             name.endsWith(".html") ||
             name.endsWith(".htm"))
-      );
+        );
+      });
 
-      if (!htmlFileName) {
+      if (fileNames.length === 0) {
         throw new Error("No readable content found in EPUB");
       }
 
-      const htmlContent = await zip.file(htmlFileName)?.async("text");
+      let chosenText = "";
 
-      if (!htmlContent) {
-        throw new Error("Failed to read EPUB content");
+      for (const fileName of fileNames) {
+        const htmlContent = await zip.file(fileName)?.async("text");
+        if (!htmlContent) continue;
+
+        const extracted = cleanHtmlToText(htmlContent);
+
+        if (!extracted) continue;
+        if (extracted.length < 200) continue;
+        if (looksLikeFrontMatter(fileName, extracted)) continue;
+
+        chosenText = extracted;
+        break;
       }
 
-      text = htmlContent
-        .replace(/<script[\s\S]*?<\/script>/gi, " ")
-        .replace(/<style[\s\S]*?<\/style>/gi, " ")
-        .replace(/<[^>]+>/g, " ")
-        .replace(/\s+/g, " ")
-        .trim()
-        .slice(0, 2000);
+      if (!chosenText) {
+        for (const fileName of fileNames) {
+          const htmlContent = await zip.file(fileName)?.async("text");
+          if (!htmlContent) continue;
+
+          const extracted = cleanHtmlToText(htmlContent);
+          if (extracted.length > chosenText.length) {
+            chosenText = extracted;
+          }
+        }
+      }
+
+      text = chosenText.slice(0, 2000);
     } else {
       throw new Error("Only EPUB supported right now");
     }
@@ -103,6 +157,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       audioPath,
+      previewText: text.slice(0, 300),
     });
   } catch (error) {
     console.error(error);
