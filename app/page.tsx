@@ -41,7 +41,6 @@ export default function SignupPage() {
         color: "white",
       }}
     >
-      {/* BACKGROUND GLOW */}
       <div
         style={{
           position: "absolute",
@@ -64,13 +63,14 @@ export default function SignupPage() {
           justifyContent: "space-between",
           gap: "96px",
           padding: "56px 32px",
+          flexWrap: "wrap",
         }}
       >
-        {/* LEFT SIDE */}
         <section
           style={{
             flex: 1,
             maxWidth: "700px",
+            minWidth: "320px",
           }}
         >
           <p
@@ -99,7 +99,7 @@ export default function SignupPage() {
               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
             }}
           >
-            Private fantasy audio experiences
+            Premium fantasy audio experiences
           </div>
 
           <h1
@@ -120,6 +120,7 @@ export default function SignupPage() {
           <p
             style={{
               margin: "34px 0 0 0",
+              maxWidth: "720px",
               fontSize: "22px",
               lineHeight: 1.55,
               color: "rgba(255,255,255,0.78)",
@@ -131,6 +132,7 @@ export default function SignupPage() {
           <p
             style={{
               margin: "18px 0 0 0",
+              maxWidth: "720px",
               fontSize: "22px",
               lineHeight: 1.55,
               color: "rgba(255,255,255,0.78)",
@@ -142,6 +144,7 @@ export default function SignupPage() {
           <p
             style={{
               margin: "18px 0 0 0",
+              maxWidth: "720px",
               fontSize: "20px",
               lineHeight: 1.55,
               color: "rgba(255,255,255,0.72)",
@@ -153,17 +156,19 @@ export default function SignupPage() {
           <p
             style={{
               margin: "28px 0 0 0",
+              maxWidth: "720px",
               fontSize: "18px",
               lineHeight: 1.6,
               color: "rgba(255,255,255,0.62)",
             }}
           >
-            We're the only professional service dedicated exclusively to bringing your romantic fantasies to life through sound.
+            We&apos;re the only professional service dedicated exclusively to bringing your romantic fantasies to life through sound.
           </p>
 
           <p
             style={{
               margin: "16px 0 0 0",
+              maxWidth: "720px",
               fontSize: "18px",
               lineHeight: 1.6,
               color: "rgba(255,255,255,0.62)",
@@ -184,7 +189,6 @@ export default function SignupPage() {
             100% private. 100% yours.
           </p>
 
-          {/* TILES (UNCHANGED) */}
           <div
             style={{
               display: "grid",
@@ -228,7 +232,9 @@ export default function SignupPage() {
                   style={{
                     margin: "0 0 12px 0",
                     fontSize: "17px",
+                    lineHeight: 1.2,
                     fontWeight: 700,
+                    color: "#ffffff",
                   }}
                 >
                   {item.title}
@@ -237,6 +243,7 @@ export default function SignupPage() {
                   style={{
                     margin: 0,
                     fontSize: "15px",
+                    lineHeight: 1.6,
                     color: "rgba(255,255,255,0.66)",
                   }}
                 >
@@ -247,7 +254,6 @@ export default function SignupPage() {
           </div>
         </section>
 
-        {/* RIGHT SIDE (UNCHANGED) */}
         <aside
           style={{
             width: "100%",
@@ -266,16 +272,56 @@ export default function SignupPage() {
               backdropFilter: "blur(12px)",
             }}
           >
-            <p style={{ fontSize: "13px", letterSpacing: "0.34em", color: "#c9a96a" }}>
+            <p
+              style={{
+                margin: "0 0 22px 0",
+                fontSize: "13px",
+                letterSpacing: "0.34em",
+                textTransform: "uppercase",
+                color: "#c9a96a",
+              }}
+            >
               Get started
             </p>
 
-            <h2 style={{ fontSize: "58px", fontWeight: 700 }}>
+            <h2
+              style={{
+                margin: "0 0 18px 0",
+                fontSize: "58px",
+                lineHeight: 0.98,
+                letterSpacing: "-0.035em",
+                fontWeight: 700,
+                color: "#f7f5f2",
+              }}
+            >
               Join Nakama
             </h2>
 
+            <p
+              style={{
+                margin: "0 0 28px 0",
+                fontSize: "19px",
+                lineHeight: 1.6,
+                color: "rgba(255,255,255,0.68)",
+              }}
+            >
+              Create your account to set up your password and start building
+              your first audio experience.
+            </p>
+
             {submitted ? (
-              <div>Check your email for your magic login link.</div>
+              <div
+                style={{
+                  borderRadius: "18px",
+                  border: "1px solid rgba(74, 222, 128, 0.2)",
+                  background: "rgba(74, 222, 128, 0.1)",
+                  padding: "16px 18px",
+                  color: "#bbf7d0",
+                  fontSize: "15px",
+                }}
+              >
+                Check your email for your magic login link.
+              </div>
             ) : (
               <form onSubmit={handleSubmit}>
                 <input
@@ -284,7 +330,19 @@ export default function SignupPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  style={{ width: "100%", height: "58px", marginBottom: "14px" }}
+                  style={{
+                    width: "100%",
+                    height: "58px",
+                    marginBottom: "14px",
+                    borderRadius: "18px",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "rgba(255,255,255,0.04)",
+                    padding: "0 18px",
+                    color: "white",
+                    boxSizing: "border-box",
+                    fontSize: "16px",
+                    outline: "none",
+                  }}
                 />
 
                 <input
@@ -293,14 +351,61 @@ export default function SignupPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  style={{ width: "100%", height: "58px", marginBottom: "18px" }}
+                  style={{
+                    width: "100%",
+                    height: "58px",
+                    marginBottom: "18px",
+                    borderRadius: "18px",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "rgba(255,255,255,0.04)",
+                    padding: "0 18px",
+                    color: "white",
+                    boxSizing: "border-box",
+                    fontSize: "16px",
+                    outline: "none",
+                  }}
                 />
 
-                <button type="submit" disabled={loading}>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    width: "100%",
+                    height: "60px",
+                    border: "none",
+                    borderRadius: "18px",
+                    background: "#d2b56f",
+                    color: "#111111",
+                    fontSize: "18px",
+                    fontWeight: 700,
+                    cursor: loading ? "default" : "pointer",
+                    opacity: loading ? 0.7 : 1,
+                  }}
+                >
                   {loading ? "Creating..." : "Create Account"}
                 </button>
               </form>
             )}
+
+            <p
+              style={{
+                margin: "18px 0 0 0",
+                fontSize: "14px",
+                color: "rgba(255,255,255,0.62)",
+              }}
+            >
+              Already have an account?{" "}
+              <a
+                href="/login"
+                style={{
+                  color: "#d2b56f",
+                  textDecoration: "none",
+                  fontWeight: 600,
+                }}
+              >
+                Log in
+              </a>
+            </p>
           </div>
         </aside>
       </div>
