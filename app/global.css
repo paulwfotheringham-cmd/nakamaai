@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* REQUIRED for Tailwind v3 in Next app router */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+}
