@@ -119,7 +119,7 @@ export default function DashboardPage() {
         >
           <DashboardCard
             title="Choose fantasy Audio"
-            href="/create-audio"
+            href="/fantasy-audio"
             description="Browse and begin your next immersive audio experience."
           />
 
