@@ -9,7 +9,7 @@ export default function SelectPlanPage() {
       features: ["Standard Voice", "Cancel anytime"],
       highlighted: false,
       cta: "Select plan",
-      href: "#",
+      href: "/fake-checkout?plan=tease",
     },
     {
       name: "The Protagonist",
@@ -18,7 +18,7 @@ export default function SelectPlanPage() {
       features: ["Premier Voice", "Cancel anytime"],
       highlighted: true,
       cta: "Select plan",
-      href: "#",
+      href: "/fake-checkout?plan=protagonist",
     },
     {
       name: "Starter",
@@ -35,9 +35,7 @@ export default function SelectPlanPage() {
     <main className="min-h-screen bg-[#07040d] text-white">
       <section className="mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-medium text-zinc-400">
-            Choose your plan
-          </p>
+          <p className="text-sm font-medium text-zinc-400">Choose your plan</p>
           <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">
             Start your Nakama journey
           </h1>
@@ -105,28 +103,16 @@ export default function SelectPlanPage() {
                 </div>
               </div>
 
-              {plan.href === "#" ? (
-                <button
-                  className={`mt-8 rounded-2xl px-5 py-4 text-base font-medium transition ${
-                    plan.highlighted
-                      ? "bg-black text-white hover:bg-zinc-900"
-                      : "bg-white text-black hover:bg-zinc-200"
-                  }`}
-                >
-                  {plan.cta}
-                </button>
-              ) : (
-                <Link
-                  href={plan.href}
-                  className={`mt-8 rounded-2xl px-5 py-4 text-center text-base font-medium transition ${
-                    plan.highlighted
-                      ? "bg-black text-white hover:bg-zinc-900"
-                      : "bg-white text-black hover:bg-zinc-200"
-                  }`}
-                >
-                  {plan.cta}
-                </Link>
-              )}
+              <Link
+                href={plan.href}
+                className={`mt-8 rounded-2xl px-5 py-4 text-center text-base font-medium transition ${
+                  plan.highlighted
+                    ? "bg-black text-white hover:bg-zinc-900"
+                    : "bg-white text-black hover:bg-zinc-200"
+                }`}
+              >
+                {plan.cta}
+              </Link>
             </div>
           ))}
         </div>
