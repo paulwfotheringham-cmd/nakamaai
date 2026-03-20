@@ -39,7 +39,7 @@ export default function Page() {
           position: "absolute",
           top: "24px",
           right: "32px",
-          height: "42px",
+          height: "84px",
           zIndex: 20,
         }}
       />
