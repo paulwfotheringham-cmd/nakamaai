@@ -32,7 +32,20 @@ export default function SelectPlanPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#07040d] text-white">
+    <main className="relative min-h-screen bg-[#07040d] text-white">
+      {/* LOGO (top-right corner) */}
+      <img
+        src="/Nakama-AI-July25-White.png"
+        alt="Nakama logo"
+        style={{
+          position: "absolute",
+          top: "24px",
+          right: "32px",
+          height: "63px",
+          zIndex: 20,
+        }}
+      />
+
       <section className="mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-sm font-medium text-zinc-400">Choose your plan</p>
