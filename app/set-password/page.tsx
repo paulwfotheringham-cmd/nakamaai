@@ -1,19 +1,23 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 
 export default function SetPasswordPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const name = useMemo(() => searchParams.get("name") || "", [searchParams]);
-  const email = useMemo(() => searchParams.get("email") || "", [searchParams]);
-
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("Create your password");
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setName(params.get("name") || "");
+    setEmail(params.get("email") || "");
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
