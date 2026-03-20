@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useState } from "react";
@@ -130,7 +131,6 @@ function CategoryThumbnail({ row }: { row: Row }) {
       </div>
       <div className="fantasy-category-caption">
         <div className="fantasy-category-caption-title">{row.thumbnailLabel}</div>
-        <div className="fantasy-category-caption-subtitle">{row.title}</div>
       </div>
     </div>
   );
@@ -432,23 +432,16 @@ export default function FantasyAudioPage() {
         .fantasy-category-caption {
           padding: 12px 14px;
           display: flex;
-          flex-direction: column;
+          align-items: center;
           justify-content: center;
-          gap: 4px;
-          text-align: left;
+          text-align: center;
         }
 
         .fantasy-category-caption-title {
           font-size: 15px;
           font-weight: 700;
           color: #f7f5f2;
-          line-height: 1.15;
-        }
-
-        .fantasy-category-caption-subtitle {
-          font-size: 11px;
-          color: rgba(255, 255, 255, 0.56);
-          line-height: 1.25;
+          line-height: 1.2;
         }
 
         .fantasy-arrow-wrap {
