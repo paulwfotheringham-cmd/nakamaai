@@ -5,40 +5,67 @@ import { useMemo, useState } from "react";
 type Row = {
   title: string;
   items: string[];
+  thumbnailLabel: string;
+  thumbnailEmoji: string;
+  gradient: string;
 };
 
 const rows: Row[] = [
   {
     title: "Anime / Hentai",
     items: ["Anime 1", "Anime 2", "Hentai 1", "Hentai 2"],
+    thumbnailLabel: "Anime / Hentai",
+    thumbnailEmoji: "🦋",
+    gradient: "linear-gradient(135deg, #5cc8ff 0%, #7b61ff 52%, #ff6ec7 100%)",
   },
   {
     title: "Paranormal & Supernatural",
     items: ["Werewolf", "Ghost", "Devil", "Angel"],
+    thumbnailLabel: "Paranormal",
+    thumbnailEmoji: "🌙",
+    gradient: "linear-gradient(135deg, #29323c 0%, #485563 45%, #8e9eab 100%)",
   },
   {
     title: "Fairy Tales & Monsters",
     items: ["Dragon", "Witch", "Wizard", "Dwarf"],
+    thumbnailLabel: "Fairy Tales",
+    thumbnailEmoji: "🐉",
+    gradient: "linear-gradient(135deg, #3f2b96 0%, #a8c0ff 100%)",
   },
   {
     title: "Sci-Fi / Alien",
     items: ["Star Trek", "Battlestar Galactica", "Alien 1", "Alien 2"],
+    thumbnailLabel: "Sci-Fi / Alien",
+    thumbnailEmoji: "👽",
+    gradient: "linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)",
   },
   {
     title: "Power Dynamics",
     items: ["Sub 1", "Sub 2", "Dom 1", "Dom 2"],
+    thumbnailLabel: "Power Dynamics",
+    thumbnailEmoji: "⚡",
+    gradient: "linear-gradient(135deg, #41295a 0%, #2f0743 100%)",
   },
   {
     title: "Modern",
     items: ["Office", "Travel", "Outdoors", "Stranger Encounter"],
+    thumbnailLabel: "Modern",
+    thumbnailEmoji: "🏙️",
+    gradient: "linear-gradient(135deg, #3a6073 0%, #16222a 100%)",
   },
   {
     title: "Dark & Erotic",
-    items: ["Anime 1", "Anime 2", "Hentai 1", "Hentai 2"],
+    items: ["Obsession", "Seduction", "Forbidden", "After Dark"],
+    thumbnailLabel: "Dark & Erotic",
+    thumbnailEmoji: "🖤",
+    gradient: "linear-gradient(135deg, #200122 0%, #6f0000 100%)",
   },
   {
     title: "Historical Romance",
     items: ["Victorian", "Medieval", "Pirate", "Caveman"],
+    thumbnailLabel: "Historical",
+    thumbnailEmoji: "👑",
+    gradient: "linear-gradient(135deg, #614385 0%, #516395 100%)",
   },
 ];
 
@@ -88,6 +115,24 @@ function ArrowButton({
     >
       {isLeft ? "←" : "→"}
     </button>
+  );
+}
+
+function CategoryThumbnail({ row }: { row: Row }) {
+  return (
+    <div className="fantasy-category-card">
+      <div
+        className="fantasy-category-image"
+        style={{ background: row.gradient }}
+      >
+        <div className="fantasy-category-glow" />
+        <div className="fantasy-category-emoji">{row.thumbnailEmoji}</div>
+      </div>
+      <div className="fantasy-category-caption">
+        <div className="fantasy-category-caption-title">{row.thumbnailLabel}</div>
+        <div className="fantasy-category-caption-subtitle">{row.title}</div>
+      </div>
+    </div>
   );
 }
 
@@ -156,7 +201,7 @@ export default function FantasyAudioPage() {
           <div className="fantasy-rows">
             {rows.map((row, rowIndex) => (
               <div key={row.title} className="fantasy-row">
-                <div className="fantasy-category">{row.title}</div>
+                <CategoryThumbnail row={row} />
 
                 <div className="fantasy-arrow-wrap fantasy-arrow-left">
                   <ArrowButton
@@ -341,24 +386,68 @@ export default function FantasyAudioPage() {
           align-items: stretch;
         }
 
-        .fantasy-category {
-          min-height: 72px;
+        .fantasy-category-card {
+          min-height: 84px;
           border-radius: 22px;
-          border: 1px solid rgba(216, 178, 110, 0.16);
+          border: 1px solid rgba(255, 255, 255, 0.08);
           background: linear-gradient(
             180deg,
-            rgba(216, 178, 110, 0.12),
-            rgba(216, 178, 110, 0.06)
+            rgba(255, 255, 255, 0.06),
+            rgba(255, 255, 255, 0.03)
           );
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+          overflow: hidden;
+          box-shadow:
+            0 12px 28px rgba(0, 0, 0, 0.22),
+            inset 0 1px 0 rgba(255, 255, 255, 0.04);
+          display: grid;
+          grid-template-columns: 70px 1fr;
+        }
+
+        .fantasy-category-image {
+          position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 0 18px;
-          text-align: center;
-          font-size: 18px;
+          overflow: hidden;
+        }
+
+        .fantasy-category-glow {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(
+            circle at top left,
+            rgba(255, 255, 255, 0.28),
+            transparent 55%
+          );
+          pointer-events: none;
+        }
+
+        .fantasy-category-emoji {
+          position: relative;
+          z-index: 1;
+          font-size: 28px;
+          filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.28));
+        }
+
+        .fantasy-category-caption {
+          padding: 12px 14px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 4px;
+          text-align: left;
+        }
+
+        .fantasy-category-caption-title {
+          font-size: 15px;
           font-weight: 700;
-          color: #f4e6ca;
+          color: #f7f5f2;
+          line-height: 1.15;
+        }
+
+        .fantasy-category-caption-subtitle {
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.56);
           line-height: 1.25;
         }
 
@@ -375,7 +464,7 @@ export default function FantasyAudioPage() {
         }
 
         .fantasy-tile {
-          min-height: 72px;
+          min-height: 84px;
           border-radius: 22px;
           border: 1px solid rgba(255, 255, 255, 0.08);
           background: linear-gradient(
@@ -467,9 +556,20 @@ export default function FantasyAudioPage() {
             grid-template-columns: 1fr;
           }
 
-          .fantasy-category,
+          .fantasy-category-card,
           .fantasy-tile {
-            min-height: 64px;
+            min-height: 72px;
+          }
+
+          .fantasy-category-card {
+            grid-template-columns: 64px 1fr;
+          }
+
+          .fantasy-category-emoji {
+            font-size: 24px;
+          }
+
+          .fantasy-tile {
             font-size: 16px;
           }
         }
