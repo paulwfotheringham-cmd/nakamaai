@@ -300,21 +300,21 @@ export default function CreateAudioPage() {
               <TwoCol>
                 <Field label="Setting">
                   <select style={inputStyle} value={setting} onChange={(e) => setSetting(e.target.value)}>
-                    <option>office</option>
-                    <option>café</option>
-                    <option>beach</option>
-                    <option>hotel</option>
-                    <option>city penthouse</option>
+                    <option style={{ color: "black" }}>office</option>
+                    <option style={{ color: "black" }}>café</option>
+                    <option style={{ color: "black" }}>beach</option>
+                    <option style={{ color: "black" }}>hotel</option>
+                    <option style={{ color: "black" }}>city penthouse</option>
                   </select>
                 </Field>
 
                 <Field label="Mood">
                   <select style={inputStyle} value={mood} onChange={(e) => setMood(e.target.value)}>
-                    <option>romantic</option>
-                    <option>playful</option>
-                    <option>intense</option>
-                    <option>dramatic</option>
-                    <option>tender</option>
+                    <option style={{ color: "black" }}>romantic</option>
+                    <option style={{ color: "black" }}>playful</option>
+                    <option style={{ color: "black" }}>intense</option>
+                    <option style={{ color: "black" }}>dramatic</option>
+                    <option style={{ color: "black" }}>tender</option>
                   </select>
                 </Field>
               </TwoCol>
@@ -322,19 +322,19 @@ export default function CreateAudioPage() {
               <TwoCol>
                 <Field label="Build-up">
                   <select style={inputStyle} value={buildUp} onChange={(e) => setBuildUp(e.target.value)}>
-                    <option>slow burn</option>
-                    <option>medium pace</option>
-                    <option>instant spark</option>
+                    <option style={{ color: "black" }}>slow burn</option>
+                    <option style={{ color: "black" }}>medium pace</option>
+                    <option style={{ color: "black" }}>instant spark</option>
                   </select>
                 </Field>
 
                 <Field label="Story Type">
                   <select style={inputStyle} value={storyType} onChange={(e) => setStoryType(e.target.value)}>
-                    <option>romantic encounter</option>
-                    <option>forbidden romance</option>
-                    <option>reunion</option>
-                    <option>enemies to lovers</option>
-                    <option>late night confession</option>
+                    <option style={{ color: "black" }}>romantic encounter</option>
+                    <option style={{ color: "black" }}>forbidden romance</option>
+                    <option style={{ color: "black" }}>reunion</option>
+                    <option style={{ color: "black" }}>enemies to lovers</option>
+                    <option style={{ color: "black" }}>late night confession</option>
                   </select>
                 </Field>
               </TwoCol>
@@ -342,21 +342,21 @@ export default function CreateAudioPage() {
               <TwoCol>
                 <Field label="Male Character">
                   <select style={inputStyle} value={maleRole} onChange={(e) => setMaleRole(e.target.value)}>
-                    <option>boss</option>
-                    <option>stranger</option>
-                    <option>chef</option>
-                    <option>artist</option>
-                    <option>billionaire</option>
+                    <option style={{ color: "black" }}>boss</option>
+                    <option style={{ color: "black" }}>stranger</option>
+                    <option style={{ color: "black" }}>chef</option>
+                    <option style={{ color: "black" }}>artist</option>
+                    <option style={{ color: "black" }}>billionaire</option>
                   </select>
                 </Field>
 
                 <Field label="Female Character">
                   <select style={inputStyle} value={femaleRole} onChange={(e) => setFemaleRole(e.target.value)}>
-                    <option>assistant</option>
-                    <option>traveler</option>
-                    <option>writer</option>
-                    <option>singer</option>
-                    <option>entrepreneur</option>
+                    <option style={{ color: "black" }}>assistant</option>
+                    <option style={{ color: "black" }}>traveler</option>
+                    <option style={{ color: "black" }}>writer</option>
+                    <option style={{ color: "black" }}>singer</option>
+                    <option style={{ color: "black" }}>entrepreneur</option>
                   </select>
                 </Field>
               </TwoCol>
@@ -396,7 +396,7 @@ export default function CreateAudioPage() {
                   <Field label="Narrator Voice">
                     <select style={inputStyle} value={narratorVoice} onChange={(e) => setNarratorVoice(e.target.value)}>
                       {englishVoices.map((v) => (
-                        <option key={`n-${v.name}`} value={v.name}>
+                        <option key={`n-${v.name}`} value={v.name} style={{ color: "black" }}>
                           {cleanVoiceName(v.name)}
                         </option>
                       ))}
@@ -406,7 +406,7 @@ export default function CreateAudioPage() {
                   <Field label="Male Character Voice">
                     <select style={inputStyle} value={maleVoice} onChange={(e) => setMaleVoice(e.target.value)}>
                       {englishVoices.map((v) => (
-                        <option key={`m-${v.name}`} value={v.name}>
+                        <option key={`m-${v.name}`} value={v.name} style={{ color: "black" }}>
                           {cleanVoiceName(v.name)}
                         </option>
                       ))}
@@ -416,7 +416,7 @@ export default function CreateAudioPage() {
                   <Field label="Female Character Voice">
                     <select style={inputStyle} value={femaleVoice} onChange={(e) => setFemaleVoice(e.target.value)}>
                       {englishVoices.map((v) => (
-                        <option key={`f-${v.name}`} value={v.name}>
+                        <option key={`f-${v.name}`} value={v.name} style={{ color: "black" }}>
                           {cleanVoiceName(v.name)}
                         </option>
                       ))}
@@ -591,7 +591,7 @@ const inputStyle: React.CSSProperties = {
   borderRadius: "16px",
   border: "1px solid rgba(255,255,255,0.1)",
   background: "rgba(255,255,255,0.06)",
-  color: "black",
+  color: "white",
   padding: "14px 16px",
   outline: "none",
   fontSize: "16px",
