@@ -31,6 +31,19 @@ export default function Page() {
         color: "white",
       }}
     >
+      {/* LOGO (top-right corner) */}
+      <img
+        src="/Nakama-AI-July25-White.png"
+        alt="Nakama logo"
+        style={{
+          position: "absolute",
+          top: "24px",
+          right: "32px",
+          height: "42px",
+          zIndex: 20,
+        }}
+      />
+
       <div
         style={{
           position: "absolute",
