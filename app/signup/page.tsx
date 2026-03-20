@@ -1,84 +1,94 @@
+
 "use client";
 
 import { useState } from "react";
-import { supabase } from "../../lib/supabase";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
+  const router = useRouter();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: "https://nakamaai.vercel.app/set-password",
-        data: {
-          full_name: name,
-        },
-      },
-    });
-
-    setLoading(false);
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    setSubmitted(true);
+    router.push(
+      `/set-password?email=${encodeURIComponent(
+        email
+      )}&name=${encodeURIComponent(name)}`
+    );
   }
 
+export default function Page() {
   return (
-    <div
+    <main
       style={{
+        position: "relative",
         minHeight: "100vh",
-        background:
-          "radial-gradient(circle at top, #3a1d2e 0%, #160f18 35%, #09080b 100%)",
+        overflow: "hidden",
+        background: "#07040d",
         color: "white",
-        fontFamily: "Arial, Helvetica, sans-serif",
       }}
     >
       <div
         style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(circle at top center, rgba(120, 52, 120, 0.22), transparent 45%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        style={{
+          position: "relative",
+          zIndex: 10,
           maxWidth: "1280px",
           margin: "0 auto",
           minHeight: "100vh",
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "40px",
+          display: "flex",
           alignItems: "center",
-          padding: "32px 24px",
+          justifyContent: "space-between",
+          gap: "96px",
+          padding: "56px 32px",
+          flexWrap: "wrap",
         }}
       >
-        <div>
-          <div
+        <section
+          style={{
+            flex: 1,
+            maxWidth: "700px",
+            minWidth: "320px",
+          }}
+        >
+          <p
             style={{
-              fontSize: "12px",
+              margin: "0 0 24px 0",
+              fontSize: "13px",
+              letterSpacing: "0.42em",
               textTransform: "uppercase",
-              letterSpacing: "0.4em",
-              color: "#d8b26e",
-              marginBottom: "18px",
+              color: "#c9a96a",
             }}
           >
             Nakama
-          </div>
+          </p>
 
           <div
             style={{
               display: "inline-flex",
-              width: "fit-content",
+              alignItems: "center",
+              marginBottom: "28px",
               borderRadius: "999px",
-              border: "1px solid rgba(216,178,110,0.3)",
-              background: "rgba(216,178,110,0.1)",
-              padding: "8px 16px",
+              border: "1px solid rgba(201,169,106,0.28)",
+              background: "rgba(64, 43, 33, 0.45)",
+              padding: "12px 20px",
               fontSize: "14px",
-              color: "#f1d7a1",
-              marginBottom: "20px",
+              color: "#e5c888",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
             }}
           >
             Premium fantasy audio experiences
@@ -87,122 +97,254 @@ export default function SignupPage() {
           <h1
             style={{
               margin: 0,
-              fontSize: "64px",
+              fontSize: "clamp(64px, 7vw, 98px)",
+              lineHeight: 0.98,
               fontWeight: 700,
-              lineHeight: 1.05,
-              maxWidth: "640px",
+              letterSpacing: "-0.04em",
+              color: "#f7f5f2",
             }}
           >
-            Create immersive romantic audio stories with
-            <span style={{ color: "#d8b26e" }}> Nakama</span>
+            Ready to turn
+            <br />
+            up the heat?
           </h1>
 
           <p
             style={{
-              marginTop: "24px",
-              maxWidth: "620px",
+              margin: "34px 0 0 0",
+              maxWidth: "720px",
               fontSize: "22px",
-              lineHeight: 1.6,
+              lineHeight: 1.55,
+              color: "rgba(255,255,255,0.78)",
+            }}
+          >
+            Craving something steamier than standard audiobooks?
+          </p>
+
+          <p
+            style={{
+              margin: "18px 0 0 0",
+              maxWidth: "720px",
+              fontSize: "22px",
+              lineHeight: 1.55,
+              color: "rgba(255,255,255,0.78)",
+            }}
+          >
+            Whisper your wildest fantasies.
+          </p>
+
+          <p
+            style={{
+              margin: "18px 0 0 0",
+              maxWidth: "720px",
+              fontSize: "20px",
+              lineHeight: 1.55,
               color: "rgba(255,255,255,0.72)",
             }}
           >
-            Choose the mood, shape the characters, customise the voices,
-            and generate a private audio fantasy built around your taste.
+            Join Nakama today and transform your reading time into an
+            unforgettable auditory experience.
+          </p>
+
+          <p
+            style={{
+              margin: "28px 0 0 0",
+              maxWidth: "720px",
+              fontSize: "18px",
+              lineHeight: 1.6,
+              color: "rgba(255,255,255,0.62)",
+            }}
+          >
+            We&apos;re the only professional service dedicated exclusively to
+            bringing your romantic fantasies to life through sound.
+          </p>
+
+          <p
+            style={{
+              margin: "16px 0 0 0",
+              maxWidth: "720px",
+              fontSize: "18px",
+              lineHeight: 1.6,
+              color: "rgba(255,255,255,0.62)",
+            }}
+          >
+            We convert your favorite romantic books into breathtaking, sexy
+            audio stories.
+          </p>
+
+          <p
+            style={{
+              margin: "20px 0 0 0",
+              fontSize: "16px",
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+              color: "#d2b56f",
+            }}
+          >
+            100% private. 100% yours.
           </p>
 
           <div
             style={{
-              marginTop: "32px",
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "14px",
-              maxWidth: "680px",
+              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+              gap: "18px",
+              marginTop: "42px",
+              maxWidth: "640px",
             }}
           >
-            <FeatureCard
-              title="Guided story design"
-              text="Pick the setting, tone, pacing, and story type."
-            />
-            <FeatureCard
-              title="Voice customization"
-              text="Assign different voices to different characters."
-            />
-            <FeatureCard
-              title="Private audio scenes"
-              text="Generate scenes made for listening, not just reading."
-            />
-            <FeatureCard
-              title="Fast iteration"
-              text="Adjust one detail and instantly create a new version."
-            />
+            {[
+              {
+                title: "Guided story design",
+                text: "Pick the setting, tone, pacing, and story type.",
+              },
+              {
+                title: "Voice customization",
+                text: "Assign different voices to different characters.",
+              },
+              {
+                title: "Private audio scenes",
+                text: "Generate scenes made for listening, not just reading.",
+              },
+              {
+                title: "Fast iteration",
+                text: "Adjust one detail and instantly create a new version.",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                style={{
+                  borderRadius: "22px",
+                  border: "1px solid rgba(255,255,255,0.09)",
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.03))",
+                  padding: "22px 20px",
+                  boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
+                  backdropFilter: "blur(6px)",
+                }}
+              >
+                <h3
+                  style={{
+                    margin: "0 0 12px 0",
+                    fontSize: "17px",
+                    lineHeight: 1.2,
+                    fontWeight: 700,
+                    color: "#ffffff",
+                  }}
+                >
+                  {item.title}
+                </h3>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "15px",
+                    lineHeight: 1.6,
+                    color: "rgba(255,255,255,0.66)",
+                  }}
+                >
+                  {item.text}
+                </p>
+              </div>
+            ))}
           </div>
-        </div>
+        </section>
 
-        <div
+        <aside
           style={{
             width: "100%",
-            maxWidth: "540px",
-            justifySelf: "end",
-            background: "rgba(255,255,255,0.06)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: "28px",
-            padding: "32px",
-            boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
-            backdropFilter: "blur(12px)",
+            maxWidth: "520px",
+            flex: "0 0 520px",
           }}
         >
           <div
             style={{
-              fontSize: "12px",
-              textTransform: "uppercase",
-              letterSpacing: "0.25em",
-              color: "#d8b26e",
-              marginBottom: "12px",
+              borderRadius: "34px",
+              border: "1px solid rgba(255,255,255,0.09)",
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.035))",
+              padding: "38px",
+              boxShadow: "0 22px 80px rgba(0,0,0,0.35)",
+              backdropFilter: "blur(12px)",
             }}
           >
-            Get started
-          </div>
+            <p
+              style={{
+                margin: "0 0 22px 0",
+                fontSize: "13px",
+                letterSpacing: "0.34em",
+                textTransform: "uppercase",
+                color: "#c9a96a",
+              }}
+            >
+              Get started
+            </p>
 
-          <h2
-            style={{
-              margin: 0,
-              fontSize: "44px",
-              fontWeight: 700,
-            }}
-          >
-            Join Nakama
-          </h2>
+            <h2
+              style={{
+                margin: "0 0 18px 0",
+                fontSize: "58px",
+                lineHeight: 0.98,
+                letterSpacing: "-0.035em",
+                fontWeight: 700,
+                color: "#f7f5f2",
+              }}
+            >
+              Join Nakama
+            </h2>
 
-          <p
-            style={{
-              marginTop: "12px",
-              marginBottom: "24px",
-              color: "rgba(255,255,255,0.7)",
-              lineHeight: 1.6,
-              fontSize: "17px",
-            }}
-          >
-            Create your account to set up your password and start building your
-            first audio experience.
-          </p>
+            <p
+              style={{
+                margin: "0 0 28px 0",
+                fontSize: "19px",
+                lineHeight: 1.6,
+                color: "rgba(255,255,255,0.68)",
+              }}
+            >
+              Create your account to set up your password and start building
+              your first audio experience.
+            </p>
 
-          {!submitted ? (
-            <form onSubmit={handleSubmit} style={{ display: "grid", gap: "16px" }}>
+            <form onSubmit={handleSubmit}>
               <input
+                type="text"
                 placeholder="Full Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                style={inputStyle}
+                style={{
+                  width: "100%",
+                  height: "58px",
+                  marginBottom: "14px",
+                  borderRadius: "18px",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: "rgba(255,255,255,0.04)",
+                  padding: "0 18px",
+                  color: "white",
+                  boxSizing: "border-box",
+                  fontSize: "16px",
+                  outline: "none",
+                }}
               />
 
               <input
-                placeholder="Email Address"
                 type="email"
+                placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                style={inputStyle}
+                style={{
+                  width: "100%",
+                  height: "58px",
+                  marginBottom: "18px",
+                  borderRadius: "18px",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: "rgba(255,255,255,0.04)",
+                  padding: "0 18px",
+                  color: "white",
+                  boxSizing: "border-box",
+                  fontSize: "16px",
+                  outline: "none",
+                }}
               />
 
               <button
@@ -210,108 +352,78 @@ export default function SignupPage() {
                 disabled={loading}
                 style={{
                   width: "100%",
-                  padding: "15px 18px",
-                  borderRadius: "16px",
+                  height: "60px",
                   border: "none",
-                  background: "#d8b26e",
-                  color: "black",
+                  borderRadius: "18px",
+                  background: "#d2b56f",
+                  color: "#111111",
+                  fontSize: "18px",
                   fontWeight: 700,
-                  fontSize: "17px",
-                  cursor: loading ? "not-allowed" : "pointer",
+                  cursor: loading ? "default" : "pointer",
                   opacity: loading ? 0.7 : 1,
                 }}
               >
-                {loading ? "Sending..." : "Create Account"}
+                {loading ? "Continuing..." : "Create Account"}
               </button>
             </form>
-          ) : (
-            <div
-              style={{
-                padding: "16px",
-                borderRadius: "14px",
-                background: "rgba(72, 187, 120, 0.12)",
-                border: "1px solid rgba(72, 187, 120, 0.35)",
-                color: "#86efac",
-                lineHeight: 1.6,
-              }}
-            >
-              Check your email for your password setup link.
-            </div>
-          )}
 
-          <div
-            style={{
-              marginTop: "18px",
-              fontSize: "14px",
-              color: "rgba(255,255,255,0.55)",
-              lineHeight: 1.6,
-            }}
-          >
-            Already have an account?{" "}
-            <a
-              href="/login"
+            <p
               style={{
-                color: "#d8b26e",
-                textDecoration: "none",
-                fontWeight: 700,
+                margin: "18px 0 0 0",
+                fontSize: "14px",
+                color: "rgba(255,255,255,0.62)",
               }}
             >
-              Log in
-            </a>
+              Already have an account?{" "}
+              <a
+                href="/login"
+                style={{
+                  color: "#d2b56f",
+                  textDecoration: "none",
+                  fontWeight: 600,
+                }}
+              >
+                Log in
+              </a>
+            </p>
           </div>
+        </aside>
+    <div className="flex min-h-screen items-center justify-center bg-black text-white">
+      <div className="w-full max-w-md rounded-2xl bg-zinc-900 p-8 shadow-lg">
+        <p className="text-xs tracking-widest text-yellow-500 mb-2">
+          GET STARTED
+        </p>
+
+        <h1 className="text-3xl font-bold mb-4">Join Nakama</h1>
+
+        <p className="text-zinc-400 mb-6">
+          create your account and sign up for a subscription or a FREE 7 day trial
+        </p>
+
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder="Full Name"
+            className="w-full rounded-lg bg-zinc-800 p-3 outline-none"
+          />
+
+          <input
+            type="email"
+            placeholder="Email Address"
+            className="w-full rounded-lg bg-zinc-800 p-3 outline-none"
+          />
+
+          <button className="w-full rounded-lg bg-yellow-400 p-3 font-semibold text-black">
+            Create Account
+          </button>
         </div>
+
+        <p className="mt-4 text-sm text-zinc-500">
+          Already have an account?{" "}
+          <span className="text-yellow-400 cursor-pointer">Log in</span>
+        </p>
       </div>
+    </main>
     </div>
   );
 }
-
-function FeatureCard({
-  title,
-  text,
-}: {
-  title: string;
-  text: string;
-}) {
-  return (
-    <div
-      style={{
-        borderRadius: "18px",
-        border: "1px solid rgba(255,255,255,0.1)",
-        background: "rgba(255,255,255,0.05)",
-        padding: "18px",
-      }}
-    >
-      <div
-        style={{
-          fontSize: "15px",
-          fontWeight: 700,
-          color: "white",
-        }}
-      >
-        {title}
-      </div>
-      <div
-        style={{
-          marginTop: "8px",
-          fontSize: "14px",
-          lineHeight: 1.6,
-          color: "rgba(255,255,255,0.62)",
-        }}
-      >
-        {text}
-      </div>
-    </div>
-  );
-}
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "14px 16px",
-  borderRadius: "16px",
-  border: "1px solid rgba(255,255,255,0.12)",
-  background: "rgba(255,255,255,0.06)",
-  color: "white",
-  fontSize: "16px",
-  outline: "none",
-  boxSizing: "border-box",
-};
