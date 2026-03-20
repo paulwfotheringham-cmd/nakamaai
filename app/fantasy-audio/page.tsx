@@ -8,8 +8,6 @@ type Row = {
   title: string;
   items: string[];
   thumbnailLabel: string;
-  thumbnailEmoji: string;
-  gradient: string;
   imageSrc?: StaticImageData;
 };
 
@@ -18,58 +16,42 @@ const rows: Row[] = [
     title: "Anime / Hentai",
     items: ["Anime 1", "Anime 2", "Hentai 1", "Hentai 2"],
     thumbnailLabel: "Anime / Hentai",
-    thumbnailEmoji: "🦋",
-    gradient: "linear-gradient(135deg, #5cc8ff 0%, #7b61ff 52%, #ff6ec7 100%)",
     imageSrc: animeAudio,
   },
   {
     title: "Paranormal & Supernatural",
     items: ["Werewolf", "Ghost", "Devil", "Angel"],
     thumbnailLabel: "Paranormal",
-    thumbnailEmoji: "🌙",
-    gradient: "linear-gradient(135deg, #29323c 0%, #485563 45%, #8e9eab 100%)",
   },
   {
     title: "Fairy Tales & Monsters",
     items: ["Dragon", "Witch", "Wizard", "Dwarf"],
     thumbnailLabel: "Fairy Tales",
-    thumbnailEmoji: "🐉",
-    gradient: "linear-gradient(135deg, #3f2b96 0%, #a8c0ff 100%)",
   },
   {
     title: "Sci-Fi / Alien",
     items: ["Star Trek", "Battlestar Galactica", "Alien 1", "Alien 2"],
     thumbnailLabel: "Sci-Fi / Alien",
-    thumbnailEmoji: "👽",
-    gradient: "linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)",
   },
   {
     title: "Power Dynamics",
     items: ["Sub 1", "Sub 2", "Dom 1", "Dom 2"],
     thumbnailLabel: "Power Dynamics",
-    thumbnailEmoji: "⚡",
-    gradient: "linear-gradient(135deg, #41295a 0%, #2f0743 100%)",
   },
   {
     title: "Modern",
     items: ["Office", "Travel", "Outdoors", "Stranger Encounter"],
     thumbnailLabel: "Modern",
-    thumbnailEmoji: "🏙️",
-    gradient: "linear-gradient(135deg, #3a6073 0%, #16222a 100%)",
   },
   {
     title: "Dark & Erotic",
     items: ["Obsession", "Seduction", "Forbidden", "After Dark"],
     thumbnailLabel: "Dark & Erotic",
-    thumbnailEmoji: "🖤",
-    gradient: "linear-gradient(135deg, #200122 0%, #6f0000 100%)",
   },
   {
     title: "Historical Romance",
     items: ["Victorian", "Medieval", "Pirate", "Caveman"],
     thumbnailLabel: "Historical",
-    thumbnailEmoji: "👑",
-    gradient: "linear-gradient(135deg, #614385 0%, #516395 100%)",
   },
 ];
 
@@ -125,23 +107,17 @@ function ArrowButton({
 function CategoryThumbnail({ row }: { row: Row }) {
   return (
     <div className="fantasy-category-card">
-      <div
-        className="fantasy-category-image"
-        style={!row.imageSrc ? { background: row.gradient } : undefined}
-      >
+      <div className="fantasy-category-image-wrap">
         {row.imageSrc ? (
           <Image
             src={row.imageSrc}
             alt={row.thumbnailLabel}
-            fill
+            width={64}
+            height={64}
             className="fantasy-category-photo"
-            sizes="70px"
           />
         ) : (
-          <>
-            <div className="fantasy-category-glow" />
-            <div className="fantasy-category-emoji">{row.thumbnailEmoji}</div>
-          </>
+          <div className="fantasy-category-fallback">{row.thumbnailLabel[0]}</div>
         )}
       </div>
 
@@ -399,7 +375,7 @@ export default function FantasyAudioPage() {
           display: grid;
           grid-template-columns: 220px 56px minmax(0, 1fr) 56px;
           gap: 14px;
-          align-items: stretch;
+          align-items: center;
         }
 
         .fantasy-category-card {
@@ -416,41 +392,40 @@ export default function FantasyAudioPage() {
             0 12px 28px rgba(0, 0, 0, 0.22),
             inset 0 1px 0 rgba(255, 255, 255, 0.04);
           display: grid;
-          grid-template-columns: 70px 1fr;
+          grid-template-columns: 74px 1fr;
+          align-items: center;
         }
 
-        .fantasy-category-image {
-          position: relative;
+        .fantasy-category-image-wrap {
           display: flex;
           align-items: center;
           justify-content: center;
-          overflow: hidden;
+          padding-left: 10px;
         }
 
         .fantasy-category-photo {
+          width: 64px;
+          height: 64px;
           object-fit: cover;
+          border-radius: 10px;
+          display: block;
         }
 
-        .fantasy-category-glow {
-          position: absolute;
-          inset: 0;
-          background: radial-gradient(
-            circle at top left,
-            rgba(255, 255, 255, 0.28),
-            transparent 55%
-          );
-          pointer-events: none;
-        }
-
-        .fantasy-category-emoji {
-          position: relative;
-          z-index: 1;
-          font-size: 28px;
-          filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.28));
+        .fantasy-category-fallback {
+          width: 64px;
+          height: 64px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #4b5563 0%, #1f2937 100%);
+          color: white;
+          font-size: 24px;
+          font-weight: 700;
         }
 
         .fantasy-category-caption {
-          padding: 12px 14px;
+          padding: 12px 14px 12px 10px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -575,11 +550,13 @@ export default function FantasyAudioPage() {
           }
 
           .fantasy-category-card {
-            grid-template-columns: 64px 1fr;
+            grid-template-columns: 74px 1fr;
           }
 
-          .fantasy-category-emoji {
-            font-size: 24px;
+          .fantasy-category-photo,
+          .fantasy-category-fallback {
+            width: 56px;
+            height: 56px;
           }
 
           .fantasy-tile {
