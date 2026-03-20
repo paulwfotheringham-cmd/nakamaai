@@ -1,7 +1,8 @@
-
 "use client";
 
 import { useMemo, useState } from "react";
+import Image, { StaticImageData } from "next/image";
+import animeAudio from "./animeaudio.jpg";
 
 type Row = {
   title: string;
@@ -9,6 +10,7 @@ type Row = {
   thumbnailLabel: string;
   thumbnailEmoji: string;
   gradient: string;
+  imageSrc?: StaticImageData;
 };
 
 const rows: Row[] = [
@@ -18,6 +20,7 @@ const rows: Row[] = [
     thumbnailLabel: "Anime / Hentai",
     thumbnailEmoji: "🦋",
     gradient: "linear-gradient(135deg, #5cc8ff 0%, #7b61ff 52%, #ff6ec7 100%)",
+    imageSrc: animeAudio,
   },
   {
     title: "Paranormal & Supernatural",
@@ -124,11 +127,24 @@ function CategoryThumbnail({ row }: { row: Row }) {
     <div className="fantasy-category-card">
       <div
         className="fantasy-category-image"
-        style={{ background: row.gradient }}
+        style={!row.imageSrc ? { background: row.gradient } : undefined}
       >
-        <div className="fantasy-category-glow" />
-        <div className="fantasy-category-emoji">{row.thumbnailEmoji}</div>
+        {row.imageSrc ? (
+          <Image
+            src={row.imageSrc}
+            alt={row.thumbnailLabel}
+            fill
+            className="fantasy-category-photo"
+            sizes="70px"
+          />
+        ) : (
+          <>
+            <div className="fantasy-category-glow" />
+            <div className="fantasy-category-emoji">{row.thumbnailEmoji}</div>
+          </>
+        )}
       </div>
+
       <div className="fantasy-category-caption">
         <div className="fantasy-category-caption-title">{row.thumbnailLabel}</div>
       </div>
@@ -409,6 +425,10 @@ export default function FantasyAudioPage() {
           align-items: center;
           justify-content: center;
           overflow: hidden;
+        }
+
+        .fantasy-category-photo {
+          object-fit: cover;
         }
 
         .fantasy-category-glow {
