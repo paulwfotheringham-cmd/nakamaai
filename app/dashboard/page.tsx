@@ -112,7 +112,7 @@ export default function DashboardPage() {
             Welcome to your dashboard
           </p>
           <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-            Your creative hub
+            ISNT THIS AWESOME
           </h1>
           <div className="mt-6 max-w-3xl">
             <h2 className="text-2xl font-semibold tracking-tight text-white">
