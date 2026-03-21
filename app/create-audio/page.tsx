@@ -85,6 +85,8 @@ export default function CreateAudioPage() {
   }, []);
 
   function speakStory() {
+    if (!story.trim()) return;
+
     window.speechSynthesis.cancel();
     speechTimeouts.current.forEach((id) => clearTimeout(id));
     speechTimeouts.current = [];
@@ -94,7 +96,7 @@ export default function CreateAudioPage() {
       .map((l) => l.trim())
       .filter(Boolean);
 
-    let delay = 0;
+    const queue: { text: string; voiceName: string }[] = [];
 
     lines.forEach((line) => {
       let text = line;
@@ -103,20 +105,25 @@ export default function CreateAudioPage() {
       if (line.startsWith("MALE:")) {
         text = line.replace("MALE:", "").trim();
         voiceName = maleVoice;
-      }
-
-      if (line.startsWith("FEMALE:")) {
+      } else if (line.startsWith("FEMALE:")) {
         text = line.replace("FEMALE:", "").trim();
         voiceName = femaleVoice;
-      }
-
-      if (line.startsWith("NARRATOR:")) {
+      } else if (line.startsWith("NARRATOR:")) {
         text = line.replace("NARRATOR:", "").trim();
         voiceName = narratorVoice;
       }
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      const matched = englishVoices.find((v) => v.name === voiceName);
+      queue.push({ text, voiceName });
+    });
+
+    let index = 0;
+
+    const speakNext = () => {
+      if (index >= queue.length) return;
+
+      const item = queue[index++];
+      const utterance = new SpeechSynthesisUtterance(item.text);
+      const matched = englishVoices.find((v) => v.name === item.voiceName);
 
       if (matched) {
         utterance.voice = matched;
@@ -126,14 +133,13 @@ export default function CreateAudioPage() {
       }
 
       utterance.rate = 0.95;
+      utterance.onend = () => speakNext();
+      utterance.onerror = () => speakNext();
 
-      const timeoutId = window.setTimeout(() => {
-        window.speechSynthesis.speak(utterance);
-      }, delay);
+      window.speechSynthesis.speak(utterance);
+    };
 
-      speechTimeouts.current.push(timeoutId);
-      delay += text.length * 60 + 1200;
-    });
+    speakNext();
   }
 
   function stopStory() {
