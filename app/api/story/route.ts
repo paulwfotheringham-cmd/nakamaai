@@ -1,3 +1,9 @@
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
+});
+
 export async function POST(req: Request) {
   const {
     setting,
@@ -15,47 +21,47 @@ export async function POST(req: Request) {
   const maleName = maleNames[Math.floor(Math.random() * maleNames.length)];
   const femaleName = femaleNames[Math.floor(Math.random() * femaleNames.length)];
 
-  const moodLineMap: Record<string, string> = {
-    romantic: "There was a warm pull between them from the very beginning.",
-    playful: "Their conversation was light, teasing, and impossible to forget.",
-    intense: "Every glance carried a dangerous kind of tension.",
-    dramatic: "The emotions between them felt impossible to ignore.",
-    tender: "Something soft and deeply personal began to unfold.",
-  };
+  const prompt = `
+Write a full romantic audio story that will take about 10 minutes to read aloud.
 
-  const buildUpLineMap: Record<string, string> = {
-    "slow burn": "They took their time, letting anticipation build little by little.",
-    "medium pace": "The connection grew naturally as the evening moved on.",
-    "instant spark": "The attraction was immediate and impossible to deny.",
-  };
+Target length: 1,600 to 2,000 words.
 
-  const storyTypeLineMap: Record<string, string> = {
-    "romantic encounter":
-      "What began as a simple meeting quickly became something more meaningful.",
-    "forbidden romance":
-      "They both knew this connection came with risks, which only made it harder to resist.",
-    reunion:
-      "Seeing each other again awakened feelings neither of them had truly left behind.",
-    "enemies to lovers":
-      "Their sharp words hid a chemistry that was becoming harder to fight.",
-    "late night confession":
-      "As the night deepened, honesty replaced distance.",
-  };
+Story requirements:
+- Setting: ${setting}
+- Mood: ${mood}
+- Build-up: ${buildUp}
+- Male character: ${maleRole} named ${maleName}
+- Female character: ${femaleRole} named ${femaleName}
+- Story type: ${storyType}
+${extraDetail ? `- Extra detail: ${extraDetail}` : ""}
 
-  const extraLine = extraDetail
-    ? `NARRATOR: One detail made the moment even more unforgettable: ${extraDetail}.`
-    : "";
+Instructions:
+- Create a complete story with beginning, middle, climax, and ending.
+- Make it immersive, emotional, and detailed.
+- Include rich dialogue and narration.
+- Format EVERY line exactly like this:
+  NARRATOR:
+  MALE:
+  FEMALE:
+- No paragraphs without labels.
+- No explanations or titles — ONLY the story.
+`;
 
-  const story = `NARRATOR: In a ${setting}, a ${maleRole} named ${maleName} crossed paths with a ${femaleRole} named ${femaleName}.
-NARRATOR: ${moodLineMap[mood] || moodLineMap.romantic}
-NARRATOR: ${buildUpLineMap[buildUp] || buildUpLineMap["slow burn"]}
-MALE: I didn't expect tonight to change anything, ${maleName} admitted, but then I saw you.
-FEMALE: Maybe some nights are meant to change everything, ${femaleName} replied softly.
-NARRATOR: ${storyTypeLineMap[storyType] || storyTypeLineMap["romantic encounter"]}
-${extraLine}
-MALE: Stay with me a little longer, said ${maleName}, his voice lower now.
-FEMALE: I was hoping you would ask, ${femaleName} answered with a knowing smile.
-NARRATOR: By the end of the evening, what had begun with curiosity had deepened into a connection neither wanted to lose.`;
+  try {
+    const response = await openai.responses.create({
+      model: "gpt-5",
+      input: prompt,
+      max_output_tokens: 3000,
+    });
 
-  return Response.json({ story });
+    const story =
+      response.output_text ||
+      response.output?.[0]?.content?.[0]?.text ||
+      "";
+
+    return Response.json({ story });
+  } catch (error) {
+    console.error(error);
+    return Response.json({ story: "Failed to generate story." });
+  }
 }
