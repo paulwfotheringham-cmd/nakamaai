@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import Image, { StaticImageData } from "next/image";
 import animeAudio from "./animeaudio.jpg";
 
@@ -130,6 +130,56 @@ function CategoryThumbnail({ row }: { row: Row }) {
 
 export default function FantasyAudioPage() {
   const [positions, setPositions] = useState<number[]>(rows.map(() => 0));
+  const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Audio URL for Anime 1
+  const audioFiles: { [key: string]: string } = {
+    "Anime 1": "https://dowomlnsxwxslpydtitw.supabase.co/storage/v1/object/sign/audio/firstaudio.mp3?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xZjJiZGI3MS1iNzJkLTQ2Y2MtYjUwZS1kMDYyZTU5NmEyZDQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhdWRpby9maXJzdGF1ZGlvLm1wMyIsImlhdCI6MTc3NDEzNTU3MywiZXhwIjoxODA1NjcxNTczfQ.Z7lLEDEAbZD0My_312T8M2YA6GAYdHX0Qh8neROAFZ0"
+  };
+
+  const handleTileClick = (item: string) => {
+    if (audioFiles[item]) {
+      if (currentlyPlaying === item && isPlaying) {
+        // Pause current audio
+        if (audioRef.current) {
+          audioRef.current.pause();
+          setIsPlaying(false);
+        }
+      } else {
+        // Play new audio or resume paused audio
+        if (audioRef.current) {
+          audioRef.current.pause();
+        }
+        
+        const audio = new Audio(audioFiles[item]);
+        audioRef.current = audio;
+        setCurrentlyPlaying(item);
+        setIsPlaying(true);
+        
+        audio.play().catch(error => {
+          console.error('Error playing audio:', error);
+          setIsPlaying(false);
+        });
+        
+        audio.onended = () => {
+          setIsPlaying(false);
+          setCurrentlyPlaying(null);
+        };
+      }
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      // Cleanup audio when component unmounts
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   function goPrev(rowIndex: number) {
     setPositions((prev) =>
@@ -203,13 +253,25 @@ export default function FantasyAudioPage() {
                 </div>
 
                 <div className="fantasy-tiles">
-                  {visibleRows[rowIndex].map((item, itemIndex) => (
+                                    {visibleRows[rowIndex].map((item, itemIndex) => (
                     <button
                       key={`${row.title}-${item}-${itemIndex}`}
                       type="button"
-                      className="fantasy-tile"
+                      className={`fantasy-tile ${
+                        audioFiles[item] ? 'fantasy-tile-playable' : ''
+                      } ${
+                        currentlyPlaying === item && isPlaying ? 'fantasy-tile-playing' : ''
+                      }`}
+                      onClick={() => handleTileClick(item)}
                     >
-                      {item}
+                      <div className="fantasy-tile-content">
+                        {audioFiles[item] && (
+                          <div className="fantasy-tile-icon">
+                            {currentlyPlaying === item && isPlaying ? '⏸️' : '▶️'}
+                          </div>
+                        )}
+                        <span>{item}</span>
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -451,7 +513,7 @@ export default function FantasyAudioPage() {
           gap: 14px;
         }
 
-        .fantasy-tile {
+                .fantasy-tile {
           min-height: 84px;
           border-radius: 22px;
           border: 1px solid rgba(255, 255, 255, 0.08);
@@ -482,6 +544,59 @@ export default function FantasyAudioPage() {
             rgba(216, 178, 110, 0.16),
             rgba(255, 255, 255, 0.05)
           );
+        }
+
+        .fantasy-tile-playable {
+          background: linear-gradient(
+            180deg,
+            rgba(76, 175, 80, 0.12),
+            rgba(255, 255, 255, 0.035)
+          );
+          border-color: rgba(76, 175, 80, 0.2);
+        }
+
+        .fantasy-tile-playable:hover {
+          background: linear-gradient(
+            180deg,
+            rgba(76, 175, 80, 0.2),
+            rgba(255, 255, 255, 0.05)
+          );
+          border-color: rgba(76, 175, 80, 0.4);
+        }
+
+        .fantasy-tile-playing {
+          background: linear-gradient(
+            180deg,
+            rgba(255, 193, 7, 0.15),
+            rgba(255, 255, 255, 0.035)
+          );
+          border-color: rgba(255, 193, 7, 0.4);
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0% {
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22), 0 0 0 0 rgba(255, 193, 7, 0.4);
+          }
+          70% {
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22), 0 0 0 8px rgba(255, 193, 7, 0);
+          }
+          100% {
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22), 0 0 0 0 rgba(255, 193, 7, 0);
+          }
+        }
+
+        .fantasy-tile-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          height: 100%;
+        }
+
+        .fantasy-tile-icon {
+          font-size: 16px;
+          opacity: 0.8;
         }
 
         .fantasy-footer {
@@ -559,8 +674,12 @@ export default function FantasyAudioPage() {
             height: 56px;
           }
 
-          .fantasy-tile {
+                    .fantasy-tile {
             font-size: 16px;
+          }
+
+          .fantasy-tile-icon {
+            font-size: 14px;
           }
         }
       `}</style>
