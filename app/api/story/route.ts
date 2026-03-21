@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function POST(req: Request) {
@@ -36,32 +36,30 @@ Story requirements:
 ${extraDetail ? `- Extra detail: ${extraDetail}` : ""}
 
 Instructions:
-- Create a complete story with beginning, middle, climax, and ending.
+- Create a complete story with beginning, middle, emotional escalation, climax, and ending.
 - Make it immersive, emotional, and detailed.
 - Include rich dialogue and narration.
-- Format EVERY line exactly like this:
+- Format EVERY line exactly with one of these prefixes:
   NARRATOR:
   MALE:
   FEMALE:
-- No paragraphs without labels.
-- No explanations or titles — ONLY the story.
+- No title.
+- No explanations.
+- Return ONLY the story.
 `;
 
   try {
     const response = await openai.responses.create({
-      model: "gpt-5",
+      model: "gpt-4.1",
       input: prompt,
       max_output_tokens: 3000,
     });
 
-    const story =
-      response.output_text ||
-      response.output?.[0]?.content?.[0]?.text ||
-      "";
+    const story = response.output_text || "Failed to generate story.";
 
     return Response.json({ story });
   } catch (error) {
     console.error(error);
-    return Response.json({ story: "Failed to generate story." });
+    return Response.json({ story: "Failed to generate story." }, { status: 500 });
   }
 }
