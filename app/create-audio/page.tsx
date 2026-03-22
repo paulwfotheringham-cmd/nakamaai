@@ -33,8 +33,46 @@ export default function CreateAudioPage() {
   const [totalLines, setTotalLines] = useState(0);
   const [audioError, setAudioError] = useState("");
 
+  const [previewingVoice, setPreviewingVoice] = useState<string | null>(null);
+
   const stoppedRef      = useRef(false);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  const PREVIEW_LINES: Record<string, string> = {
+    Scarlett: "Hi, I'm Scarlett. Close your eyes and let me tell you a story.",
+    Liv:      "Hi, I'm Liv. Every great romance begins with a single glance.",
+    Amy:      "Hi, I'm Amy. Let me set the scene for you, slowly and deliberately.",
+    Dan:      "Hi, I'm Dan. I've been watching you from across the room all evening.",
+    Will:     "Hi, I'm Will. There's something about you I simply can't ignore.",
+  };
+
+  async function previewVoice(voiceId: string) {
+    if (previewingVoice === voiceId) {
+      previewAudioRef.current?.pause();
+      previewAudioRef.current = null;
+      setPreviewingVoice(null);
+      return;
+    }
+    previewAudioRef.current?.pause();
+    setPreviewingVoice(voiceId);
+    try {
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: PREVIEW_LINES[voiceId], voiceId }),
+      });
+      if (!res.ok) { setPreviewingVoice(null); return; }
+      const { outputUri } = await res.json();
+      const audio = new Audio(outputUri);
+      previewAudioRef.current = audio;
+      audio.onended = () => setPreviewingVoice(null);
+      audio.onerror = () => setPreviewingVoice(null);
+      audio.play().catch(() => setPreviewingVoice(null));
+    } catch {
+      setPreviewingVoice(null);
+    }
+  }
 
   async function generateStory() {
     setLoading(true);
@@ -340,36 +378,31 @@ export default function CreateAudioPage() {
                   Voice Casting · AI Voices
                 </div>
 
-                <div style={{ display: "grid", gap: "16px" }}>
-                  <Field label="Narrator Voice">
-                    <select style={inputStyle} value={narratorVoice} onChange={(e) => setNarratorVoice(e.target.value)}>
-                      {VOICES.map((v) => (
-                        <option key={`n-${v.id}`} value={v.id} style={{ color: "black" }}>
-                          {v.label} — {v.desc}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
-
-                  <Field label="Male Character Voice">
-                    <select style={inputStyle} value={maleVoice} onChange={(e) => setMaleVoice(e.target.value)}>
-                      {MALE_VOICES.map((v) => (
-                        <option key={`m-${v.id}`} value={v.id} style={{ color: "black" }}>
-                          {v.label} — {v.desc}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
-
-                  <Field label="Female Character Voice">
-                    <select style={inputStyle} value={femaleVoice} onChange={(e) => setFemaleVoice(e.target.value)}>
-                      {FEMALE_VOICES.map((v) => (
-                        <option key={`f-${v.id}`} value={v.id} style={{ color: "black" }}>
-                          {v.label} — {v.desc}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
+                <div style={{ display: "grid", gap: "20px" }}>
+                  <VoicePicker
+                    label="Narrator Voice"
+                    voices={VOICES}
+                    selected={narratorVoice}
+                    onSelect={setNarratorVoice}
+                    previewingVoice={previewingVoice}
+                    onPreview={previewVoice}
+                  />
+                  <VoicePicker
+                    label="Male Character Voice"
+                    voices={MALE_VOICES}
+                    selected={maleVoice}
+                    onSelect={setMaleVoice}
+                    previewingVoice={previewingVoice}
+                    onPreview={previewVoice}
+                  />
+                  <VoicePicker
+                    label="Female Character Voice"
+                    voices={FEMALE_VOICES}
+                    selected={femaleVoice}
+                    onSelect={setFemaleVoice}
+                    previewingVoice={previewingVoice}
+                    onPreview={previewVoice}
+                  />
                 </div>
 
               </div>
@@ -575,6 +608,103 @@ function FeatureCard({ title, text }: { title: string; text: string }) {
     >
       <div style={{ fontSize: "14px", fontWeight: 700, color: "white" }}>{title}</div>
       <div style={{ marginTop: "6px", fontSize: "14px", lineHeight: 1.6, color: "rgba(255,255,255,0.6)" }}>{text}</div>
+    </div>
+  );
+}
+
+function VoicePicker({
+  label,
+  voices,
+  selected,
+  onSelect,
+  previewingVoice,
+  onPreview,
+}: {
+  label: string;
+  voices: { id: string; label: string; desc: string; gender: string }[];
+  selected: string;
+  onSelect: (id: string) => void;
+  previewingVoice: string | null;
+  onPreview: (id: string) => void;
+}) {
+  return (
+    <div>
+      <div style={{ fontSize: "14px", fontWeight: 600, color: "rgba(255,255,255,0.8)", marginBottom: "10px" }}>
+        {label}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        {voices.map((v) => {
+          const isSelected  = selected === v.id;
+          const isPreviewing = previewingVoice === v.id;
+          return (
+            <div
+              key={v.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                borderRadius: "14px",
+                border: isSelected
+                  ? "1px solid rgba(216,178,110,0.6)"
+                  : "1px solid rgba(255,255,255,0.08)",
+                background: isSelected
+                  ? "rgba(216,178,110,0.12)"
+                  : "rgba(255,255,255,0.04)",
+                padding: "10px 14px",
+                cursor: "pointer",
+                transition: "all 0.15s ease",
+              }}
+              onClick={() => onSelect(v.id)}
+            >
+              {/* Selection indicator */}
+              <div
+                style={{
+                  width: "16px",
+                  height: "16px",
+                  borderRadius: "50%",
+                  border: isSelected
+                    ? "2px solid #d8b26e"
+                    : "2px solid rgba(255,255,255,0.2)",
+                  background: isSelected ? "#d8b26e" : "transparent",
+                  flexShrink: 0,
+                  transition: "all 0.15s ease",
+                }}
+              />
+
+              {/* Voice info */}
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "14px", fontWeight: 700, color: "white" }}>{v.label}</div>
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", marginTop: "1px" }}>{v.desc}</div>
+              </div>
+
+              {/* Preview button */}
+              <button
+                onClick={(e) => { e.stopPropagation(); onPreview(v.id); }}
+                style={{
+                  flexShrink: 0,
+                  borderRadius: "10px",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  background: isPreviewing
+                    ? "rgba(216,178,110,0.2)"
+                    : "rgba(255,255,255,0.06)",
+                  color: isPreviewing ? "#d8b26e" : "rgba(255,255,255,0.7)",
+                  padding: "6px 12px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px",
+                  transition: "all 0.15s ease",
+                }}
+                title="Preview this voice"
+              >
+                {isPreviewing ? "⏹ Stop" : "▶ Preview"}
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
