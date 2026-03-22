@@ -4,6 +4,7 @@ import { useMemo, useState, useRef, useEffect } from "react";
 import Image, { StaticImageData } from "next/image";
 import animeAudio from "./animeaudio.jpg";
 import werewolfImg from "./Images each category/werewolf.jpg";
+import animeImg from "./Images each category/anime3.jpg";
 
 type Row = {
   title: string;
@@ -137,6 +138,7 @@ export default function FantasyAudioPage() {
 
     const itemImages: { [key: string]: StaticImageData } = {
     "Werewolf": werewolfImg,
+    "Anime 1": animeImg,
   };
 
   // Audio URLs
