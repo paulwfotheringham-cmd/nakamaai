@@ -21,6 +21,7 @@ export default function CreateAudioPage() {
   const [femaleVoice, setFemaleVoice] = useState("");
 
   const speechTimeouts = useRef<number[]>([]);
+  const stoppedRef = useRef(false);
 
   async function generateStory() {
     setLoading(true);
@@ -87,6 +88,7 @@ export default function CreateAudioPage() {
   function speakStory() {
     if (!story.trim()) return;
 
+    stoppedRef.current = false;
     window.speechSynthesis.cancel();
     speechTimeouts.current.forEach((id) => clearTimeout(id));
     speechTimeouts.current = [];
@@ -119,7 +121,7 @@ export default function CreateAudioPage() {
     let index = 0;
 
     const speakNext = () => {
-      if (index >= queue.length) return;
+      if (stoppedRef.current || index >= queue.length) return;
 
       const item = queue[index++];
       const utterance = new SpeechSynthesisUtterance(item.text);
@@ -143,6 +145,7 @@ export default function CreateAudioPage() {
   }
 
   function stopStory() {
+    stoppedRef.current = true;
     window.speechSynthesis.cancel();
     speechTimeouts.current.forEach((id) => clearTimeout(id));
     speechTimeouts.current = [];
