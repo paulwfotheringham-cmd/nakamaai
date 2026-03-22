@@ -14,7 +14,7 @@ export default function SelectPlanPage() {
     {
       name: "The Protagonist",
       subtitle: "Our most popular tier. Dive deep into your fantasies",
-      price: "$14.99 / month",
+      price: "$17.99 / month",
       features: ["Premier Voice", "Cancel anytime"],
       highlighted: true,
       cta: "Select plan",
