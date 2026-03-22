@@ -203,6 +203,9 @@ export default function FantasyAudioPage() {
   const [positions, setPositions] = useState<number[]>(rows.map(() => 0));
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [audioDurations, setAudioDurations] = useState<{ [key: string]: number }>({});
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const itemImages: { [key: string]: StaticImageData } = {
@@ -246,41 +249,80 @@ export default function FantasyAudioPage() {
     "Werewolf": "https://dowomlnsxwxslpydtitw.supabase.co/storage/v1/object/sign/audio/werewolf.mp3?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xZjJiZGI3MS1iNzJkLTQ2Y2MtYjUwZS1kMDYyZTU5NmEyZDQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhdWRpby93ZXJld29sZi5tcDMiLCJpYXQiOjE3NzQxMzY1OTYsImV4cCI6MTgwNTY3MjU5Nn0.hYlkbQGvo0BpzZTX6JTVrH-mryufj2ksbwXwIirSUGY"
   };
 
+  // Preload durations for all audio files
+  useEffect(() => {
+    Object.entries(audioFiles).forEach(([name, url]) => {
+      const a = new Audio();
+      a.preload = "metadata";
+      a.src = url;
+      a.onloadedmetadata = () => {
+        setAudioDurations((prev) => ({ ...prev, [name]: a.duration }));
+      };
+    });
+  }, []);
+
   const handleTileClick = (item: string) => {
     if (audioFiles[item]) {
       if (currentlyPlaying === item && isPlaying) {
-        // Pause current audio
         if (audioRef.current) {
           audioRef.current.pause();
           setIsPlaying(false);
         }
+      } else if (currentlyPlaying === item && !isPlaying) {
+        // Resume
+        if (audioRef.current) {
+          audioRef.current.play().catch(() => setIsPlaying(false));
+          setIsPlaying(true);
+        }
       } else {
-        // Play new audio or resume paused audio
+        // New track
         if (audioRef.current) {
           audioRef.current.pause();
         }
-        
+        setCurrentTime(0);
+        setDuration(0);
+
         const audio = new Audio(audioFiles[item]);
         audioRef.current = audio;
         setCurrentlyPlaying(item);
         setIsPlaying(true);
-        
-        audio.play().catch(error => {
-          console.error('Error playing audio:', error);
-          setIsPlaying(false);
-        });
-        
+
+        audio.onloadedmetadata = () => setDuration(audio.duration);
+        audio.ontimeupdate = () => setCurrentTime(audio.currentTime);
         audio.onended = () => {
           setIsPlaying(false);
           setCurrentlyPlaying(null);
+          setCurrentTime(0);
         };
+
+        audio.play().catch(() => setIsPlaying(false));
       }
     }
   };
 
+  function handleSeek(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = parseFloat(e.target.value);
+    setCurrentTime(val);
+    if (audioRef.current) audioRef.current.currentTime = val;
+  }
+
+  function handleDownload() {
+    if (!currentlyPlaying || !audioFiles[currentlyPlaying]) return;
+    const a = document.createElement("a");
+    a.href = audioFiles[currentlyPlaying];
+    a.download = `${currentlyPlaying}.mp3`;
+    a.click();
+  }
+
+  function formatTime(secs: number) {
+    if (!secs || isNaN(secs)) return "0:00";
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  }
+
   useEffect(() => {
     return () => {
-      // Cleanup audio when component unmounts
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
@@ -361,30 +403,36 @@ export default function FantasyAudioPage() {
 
                 <div className="fantasy-tiles">
                                     {visibleRows[rowIndex].map((item, itemIndex) => (
-                    <button
-                      key={`${row.title}-${item}-${itemIndex}`}
-                      type="button"
-                      className={`fantasy-tile ${
-                        audioFiles[item] ? 'fantasy-tile-playable' : ''
-                      } ${
-                        currentlyPlaying === item && isPlaying ? 'fantasy-tile-playing' : ''
-                      }`}
-                      onClick={() => handleTileClick(item)}
-                      style={itemImages[item] ? {
-                        backgroundImage: `url(${itemImages[item].src})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                      } : undefined}
-                    >
-                      <div className="fantasy-tile-content">
-                        {audioFiles[item] && (
-                          <div className="fantasy-tile-icon">
-                            {currentlyPlaying === item && isPlaying ? '⏸️' : '▶️'}
-                          </div>
-                        )}
-                        <span>{item}</span>
-                      </div>
-                    </button>
+                    <div key={`${row.title}-${item}-${itemIndex}`} className="fantasy-tile-wrap">
+                      <button
+                        type="button"
+                        className={`fantasy-tile ${
+                          audioFiles[item] ? 'fantasy-tile-playable' : ''
+                        } ${
+                          currentlyPlaying === item && isPlaying ? 'fantasy-tile-playing' : ''
+                        }`}
+                        onClick={() => handleTileClick(item)}
+                        style={itemImages[item] ? {
+                          backgroundImage: `url(${itemImages[item].src})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        } : undefined}
+                      >
+                        <div className="fantasy-tile-content">
+                          {audioFiles[item] && (
+                            <div className="fantasy-tile-icon">
+                              {currentlyPlaying === item && isPlaying ? '⏸️' : '▶️'}
+                            </div>
+                          )}
+                          <span>{item}</span>
+                          {audioFiles[item] && audioDurations[item] && (
+                            <span className="fantasy-tile-duration">
+                              {formatTime(audioDurations[item])}
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    </div>
                   ))}
                 </div>
 
@@ -398,6 +446,45 @@ export default function FantasyAudioPage() {
             ))}
           </div>
         </section>
+
+        {currentlyPlaying && (
+          <div className="fantasy-player">
+            <div className="fantasy-player-title">{currentlyPlaying}</div>
+
+            <div className="fantasy-player-controls">
+              <button
+                type="button"
+                className="fantasy-player-playbtn"
+                onClick={() => handleTileClick(currentlyPlaying)}
+              >
+                {isPlaying ? '⏸' : '▶'}
+              </button>
+
+              <span className="fantasy-player-time">{formatTime(currentTime)}</span>
+
+              <input
+                type="range"
+                className="fantasy-player-slider"
+                min={0}
+                max={duration || 0}
+                step={0.5}
+                value={currentTime}
+                onChange={handleSeek}
+              />
+
+              <span className="fantasy-player-time">{formatTime(duration)}</span>
+
+              <button
+                type="button"
+                className="fantasy-player-download"
+                onClick={handleDownload}
+                title="Download"
+              >
+                ↓ Download
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="fantasy-footer">
           <a href="/dashboard" className="fantasy-back">
@@ -746,6 +833,122 @@ export default function FantasyAudioPage() {
         .fantasy-footer-copy {
           color: rgba(255, 255, 255, 0.56);
           font-size: 14px;
+        }
+
+        .fantasy-tile-wrap {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .fantasy-tile-duration {
+          display: block;
+          font-size: 11px;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.6);
+          margin-top: 4px;
+          letter-spacing: 0.04em;
+        }
+
+        .fantasy-player {
+          margin-top: 20px;
+          border-radius: 22px;
+          border: 1px solid rgba(216, 178, 110, 0.25);
+          background: linear-gradient(180deg, rgba(216,178,110,0.08), rgba(255,255,255,0.03));
+          padding: 18px 22px;
+          backdrop-filter: blur(12px);
+          box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+        }
+
+        .fantasy-player-title {
+          font-size: 13px;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #d8b26e;
+          margin-bottom: 14px;
+        }
+
+        .fantasy-player-controls {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .fantasy-player-playbtn {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 1px solid rgba(216,178,110,0.4);
+          background: rgba(216,178,110,0.12);
+          color: #d8b26e;
+          font-size: 18px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          transition: background 0.2s;
+        }
+
+        .fantasy-player-playbtn:hover {
+          background: rgba(216,178,110,0.22);
+        }
+
+        .fantasy-player-time {
+          font-size: 13px;
+          color: rgba(255,255,255,0.6);
+          font-variant-numeric: tabular-nums;
+          flex-shrink: 0;
+          min-width: 36px;
+        }
+
+        .fantasy-player-slider {
+          flex: 1;
+          height: 4px;
+          -webkit-appearance: none;
+          appearance: none;
+          background: rgba(255,255,255,0.15);
+          border-radius: 999px;
+          outline: none;
+          cursor: pointer;
+        }
+
+        .fantasy-player-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          background: #d8b26e;
+          cursor: pointer;
+          box-shadow: 0 0 6px rgba(216,178,110,0.5);
+        }
+
+        .fantasy-player-slider::-moz-range-thumb {
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          background: #d8b26e;
+          cursor: pointer;
+          border: none;
+        }
+
+        .fantasy-player-download {
+          flex-shrink: 0;
+          padding: 8px 14px;
+          border-radius: 12px;
+          border: 1px solid rgba(216,178,110,0.3);
+          background: rgba(216,178,110,0.08);
+          color: #d8b26e;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.2s;
+          white-space: nowrap;
+        }
+
+        .fantasy-player-download:hover {
+          background: rgba(216,178,110,0.18);
         }
 
         @media (max-width: 1080px) {
