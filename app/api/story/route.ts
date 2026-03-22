@@ -1,7 +1,7 @@
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 export async function POST(req: Request) {
@@ -21,8 +21,7 @@ export async function POST(req: Request) {
   const maleName = maleNames[Math.floor(Math.random() * maleNames.length)];
   const femaleName = femaleNames[Math.floor(Math.random() * femaleNames.length)];
 
-  const prompt = `
-Write a full romantic audio story that will take about 10 minutes to read aloud.
+  const prompt = `Write a full romantic audio story that will take about 10 minutes to read aloud.
 
 Target length: 1,600 to 2,000 words.
 
@@ -45,17 +44,19 @@ Instructions:
   FEMALE:
 - No title.
 - No explanations.
-- Return ONLY the story.
-`;
+- Return ONLY the story.`;
 
   try {
-    const response = await openai.responses.create({
-      model: "gpt-4.1",
-      input: prompt,
-      max_output_tokens: 3000,
+    const message = await anthropic.messages.create({
+      model: "claude-opus-4-5",
+      max_tokens: 3000,
+      messages: [{ role: "user", content: prompt }],
     });
 
-    const story = response.output_text || "Failed to generate story.";
+    const story =
+      message.content[0].type === "text"
+        ? message.content[0].text
+        : "Failed to generate story.";
 
     return Response.json({ story });
   } catch (error) {
