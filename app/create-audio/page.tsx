@@ -3,11 +3,11 @@
 import { useRef, useState } from "react";
 
 const VOICES = [
-  { id: "Scarlett", label: "Scarlett", desc: "Young Female · American",  gender: "female" },
-  { id: "Liv",      label: "Liv",      desc: "Young Female · American",  gender: "female" },
-  { id: "Amy",      label: "Amy",      desc: "Mature Female · American", gender: "female" },
-  { id: "Dan",      label: "Dan",      desc: "Young Male · American",    gender: "male" },
-  { id: "Will",     label: "Will",     desc: "Mature Male · American",   gender: "male" },
+  { id: "Scarlett", label: "Scarlett", desc: "Young Female · bright & warm",    gender: "female" },
+  { id: "Liv",      label: "Liv",      desc: "Young Female · light & breezy",   gender: "female" },
+  { id: "Amy",      label: "Amy",      desc: "Mature Female · measured & rich",  gender: "female" },
+  { id: "Dan",      label: "Dan",      desc: "Young Male · natural & smooth",   gender: "male" },
+  { id: "Will",     label: "Will",     desc: "Mature Male · deep & deliberate", gender: "male" },
 ];
 
 const MALE_VOICES   = VOICES.filter((v) => v.gender === "male");

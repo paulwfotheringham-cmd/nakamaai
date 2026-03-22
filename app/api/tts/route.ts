@@ -16,6 +16,17 @@ export async function POST(req: NextRequest) {
 
   const safeText = text.trim().slice(0, 3000);
 
+  // Per-voice pitch/speed tuning to make each voice distinctly different
+  const VOICE_SETTINGS: Record<string, { pitch: string; speed: string }> = {
+    Scarlett: { pitch: "1.05", speed: "0" },     // Young female — slightly bright
+    Liv:      { pitch: "1.1",  speed: "0.05" },   // Young female — lighter, breezier
+    Amy:      { pitch: "0.97", speed: "-0.05" },  // Mature female — measured, warm
+    Dan:      { pitch: "0.95", speed: "0" },      // Young male — natural
+    Will:     { pitch: "0.82", speed: "-0.1" },   // Mature male — deep, deliberate
+  };
+
+  const settings = VOICE_SETTINGS[voiceId] ?? { pitch: "1", speed: "0" };
+
   const response = await fetch("https://api.v7.unrealspeech.com/speech", {
     method: "POST",
     headers: {
@@ -26,8 +37,8 @@ export async function POST(req: NextRequest) {
       Text: safeText,
       VoiceId: voiceId || "Scarlett",
       Bitrate: "192k",
-      Speed: "0",
-      Pitch: "1",
+      Speed: settings.speed,
+      Pitch: settings.pitch,
     }),
   });
 
