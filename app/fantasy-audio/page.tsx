@@ -447,44 +447,6 @@ export default function FantasyAudioPage() {
           </div>
         </section>
 
-        {currentlyPlaying && (
-          <div className="fantasy-player">
-            <div className="fantasy-player-title">{currentlyPlaying}</div>
-
-            <div className="fantasy-player-controls">
-              <button
-                type="button"
-                className="fantasy-player-playbtn"
-                onClick={() => handleTileClick(currentlyPlaying)}
-              >
-                {isPlaying ? '⏸' : '▶'}
-              </button>
-
-              <span className="fantasy-player-time">{formatTime(currentTime)}</span>
-
-              <input
-                type="range"
-                className="fantasy-player-slider"
-                min={0}
-                max={duration || 0}
-                step={0.5}
-                value={currentTime}
-                onChange={handleSeek}
-              />
-
-              <span className="fantasy-player-time">{formatTime(duration)}</span>
-
-              <button
-                type="button"
-                className="fantasy-player-download"
-                onClick={handleDownload}
-                title="Download"
-              >
-                ↓ Download
-              </button>
-            </div>
-          </div>
-        )}
 
         <div className="fantasy-footer">
           <a href="/dashboard" className="fantasy-back">
@@ -496,6 +458,48 @@ export default function FantasyAudioPage() {
           </div>
         </div>
       </div>
+
+      {currentlyPlaying && (
+        <div className="fantasy-player">
+          <div className="fantasy-player-left">
+            <button
+              type="button"
+              className="fantasy-player-playbtn"
+              onClick={() => handleTileClick(currentlyPlaying)}
+            >
+              {isPlaying ? '⏸' : '▶'}
+            </button>
+            <div className="fantasy-player-title">{currentlyPlaying}</div>
+          </div>
+
+          <div className="fantasy-player-center">
+            <div className="fantasy-player-times">
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(duration)}</span>
+            </div>
+            <input
+              type="range"
+              className="fantasy-player-slider"
+              min={0}
+              max={duration || 100}
+              step={0.5}
+              value={currentTime}
+              onChange={handleSeek}
+              style={{
+                background: `linear-gradient(to right, #d8b26e ${duration ? (currentTime / duration) * 100 : 0}%, rgba(255,255,255,0.15) 0%)`,
+              }}
+            />
+          </div>
+
+          <button
+            type="button"
+            className="fantasy-player-download"
+            onClick={handleDownload}
+          >
+            ↓ Download
+          </button>
+        </div>
+      )}
 
       <style jsx>{`
         .fantasy-page {
@@ -850,38 +854,62 @@ export default function FantasyAudioPage() {
         }
 
         .fantasy-player {
-          margin-top: 20px;
-          border-radius: 22px;
-          border: 1px solid rgba(216, 178, 110, 0.25);
-          background: linear-gradient(180deg, rgba(216,178,110,0.08), rgba(255,255,255,0.03));
-          padding: 18px 22px;
-          backdrop-filter: blur(12px);
-          box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 100;
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          padding: 14px 28px;
+          background: rgba(10, 7, 18, 0.96);
+          border-top: 1px solid rgba(216, 178, 110, 0.2);
+          backdrop-filter: blur(20px);
+          box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+        }
+
+        .fantasy-player-left {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-shrink: 0;
+          min-width: 160px;
         }
 
         .fantasy-player-title {
           font-size: 13px;
           font-weight: 700;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          color: #d8b26e;
-          margin-bottom: 14px;
+          color: #e5c888;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
-        .fantasy-player-controls {
+        .fantasy-player-center {
+          flex: 1;
           display: flex;
-          align-items: center;
-          gap: 14px;
+          flex-direction: column;
+          gap: 6px;
+          min-width: 0;
+        }
+
+        .fantasy-player-times {
+          display: flex;
+          justify-content: space-between;
+          font-size: 11px;
+          color: rgba(255,255,255,0.5);
+          font-variant-numeric: tabular-nums;
         }
 
         .fantasy-player-playbtn {
-          width: 40px;
-          height: 40px;
+          width: 38px;
+          height: 38px;
           border-radius: 50%;
-          border: 1px solid rgba(216,178,110,0.4);
-          background: rgba(216,178,110,0.12);
+          border: 1px solid rgba(216,178,110,0.5);
+          background: rgba(216,178,110,0.15);
           color: #d8b26e;
-          font-size: 18px;
+          font-size: 16px;
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -891,23 +919,14 @@ export default function FantasyAudioPage() {
         }
 
         .fantasy-player-playbtn:hover {
-          background: rgba(216,178,110,0.22);
-        }
-
-        .fantasy-player-time {
-          font-size: 13px;
-          color: rgba(255,255,255,0.6);
-          font-variant-numeric: tabular-nums;
-          flex-shrink: 0;
-          min-width: 36px;
+          background: rgba(216,178,110,0.28);
         }
 
         .fantasy-player-slider {
-          flex: 1;
+          width: 100%;
           height: 4px;
           -webkit-appearance: none;
           appearance: none;
-          background: rgba(255,255,255,0.15);
           border-radius: 999px;
           outline: none;
           cursor: pointer;
@@ -921,7 +940,7 @@ export default function FantasyAudioPage() {
           border-radius: 50%;
           background: #d8b26e;
           cursor: pointer;
-          box-shadow: 0 0 6px rgba(216,178,110,0.5);
+          box-shadow: 0 0 6px rgba(216,178,110,0.6);
         }
 
         .fantasy-player-slider::-moz-range-thumb {
@@ -935,10 +954,10 @@ export default function FantasyAudioPage() {
 
         .fantasy-player-download {
           flex-shrink: 0;
-          padding: 8px 14px;
+          padding: 9px 16px;
           border-radius: 12px;
-          border: 1px solid rgba(216,178,110,0.3);
-          background: rgba(216,178,110,0.08);
+          border: 1px solid rgba(216,178,110,0.35);
+          background: rgba(216,178,110,0.1);
           color: #d8b26e;
           font-size: 13px;
           font-weight: 600;
@@ -948,7 +967,7 @@ export default function FantasyAudioPage() {
         }
 
         .fantasy-player-download:hover {
-          background: rgba(216,178,110,0.18);
+          background: rgba(216,178,110,0.2);
         }
 
         @media (max-width: 1080px) {
