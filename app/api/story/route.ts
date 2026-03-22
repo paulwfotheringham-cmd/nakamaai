@@ -1,8 +1,6 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
   const {
@@ -47,16 +45,9 @@ Instructions:
 - Return ONLY the story.`;
 
   try {
-    const message = await anthropic.messages.create({
-      model: "claude-opus-4-5",
-      max_tokens: 3000,
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    const story =
-      message.content[0].type === "text"
-        ? message.content[0].text
-        : "Failed to generate story.";
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+    const story = result.response.text() || "Failed to generate story.";
 
     return Response.json({ story });
   } catch (error) {
