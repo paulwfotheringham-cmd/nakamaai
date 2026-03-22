@@ -31,6 +31,7 @@ export default function SignupPage() {
         color: "white",
       }}
     >
+      <a href="/" style={backBtnStyle}>← Home</a>
       <div
         style={{
           position: "absolute",
@@ -378,3 +379,22 @@ export default function SignupPage() {
     </main>
   );
 }
+
+const backBtnStyle: React.CSSProperties = {
+  position: "fixed",
+  top: "20px",
+  left: "24px",
+  zIndex: 50,
+  color: "rgba(255,255,255,0.75)",
+  textDecoration: "none",
+  fontSize: "14px",
+  fontWeight: 600,
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "6px",
+  background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(255,255,255,0.1)",
+  padding: "8px 14px",
+  borderRadius: "12px",
+  backdropFilter: "blur(10px)",
+};

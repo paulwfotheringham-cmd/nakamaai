@@ -75,6 +75,7 @@ export default function ProfilePage() {
           padding: "40px 20px",
         }}
       >
+        <a href="/dashboard" style={backBtnStyle}>← Dashboard</a>
         {/* HEADER */}
         <div style={{ marginBottom: "40px" }}>
           <div
@@ -181,6 +182,25 @@ function ActionCard({ title }: { title: string }) {
     </div>
   );
 }
+
+const backBtnStyle: React.CSSProperties = {
+  position: "fixed",
+  top: "20px",
+  left: "24px",
+  zIndex: 50,
+  color: "rgba(255,255,255,0.75)",
+  textDecoration: "none",
+  fontSize: "14px",
+  fontWeight: 600,
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "6px",
+  background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(255,255,255,0.1)",
+  padding: "8px 14px",
+  borderRadius: "12px",
+  backdropFilter: "blur(10px)",
+};
 
 const inputStyle: React.CSSProperties = {
   padding: "14px",
