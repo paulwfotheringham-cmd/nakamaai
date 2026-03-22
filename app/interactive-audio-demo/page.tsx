@@ -36,7 +36,7 @@ export default function InteractiveAudioDemo() {
   const [femaleVoice, setFemaleVoice] = useState("");
 
   const stoppedRef = useRef(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<InstanceType<typeof window.SpeechRecognition> | null>(null);
   const storyRef = useRef<HTMLDivElement>(null);
 
   const englishVoices = useMemo(
@@ -185,7 +185,7 @@ export default function InteractiveAudioDemo() {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) { alert("Voice input not supported in this browser. Try Chrome."); return; }
 
-    const recognition: SpeechRecognition = new SR();
+    const recognition = new SR() as InstanceType<typeof window.SpeechRecognition>;
     recognitionRef.current = recognition;
     recognition.lang = "en-US";
     recognition.interimResults = false;
