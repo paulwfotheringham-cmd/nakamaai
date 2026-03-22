@@ -1,8 +1,14 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Anthropic from "@anthropic-ai/sdk";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || "",
+});
 
 export async function POST(req: Request) {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return Response.json({ story: "Error: ANTHROPIC_API_KEY is not set in environment variables." }, { status: 500 });
+  }
+
   const {
     setting,
     mood,
@@ -44,14 +50,17 @@ Instructions:
 - No explanations.
 - Return ONLY the story.`;
 
-  if (!process.env.GEMINI_API_KEY) {
-    return Response.json({ story: "Error: GEMINI_API_KEY is not set in environment variables." }, { status: 500 });
-  }
-
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const result = await model.generateContent(prompt);
-    const story = result.response.text() || "Failed to generate story.";
+    const message = await anthropic.messages.create({
+      model: "claude-haiku-4-5",
+      max_tokens: 3000,
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    const story =
+      message.content[0].type === "text"
+        ? message.content[0].text
+        : "Failed to generate story.";
 
     return Response.json({ story });
   } catch (error) {
