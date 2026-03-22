@@ -28,10 +28,13 @@ export default function CreateAudioPage() {
   const [maleVoice, setMaleVoice]         = useState("Will");
   const [femaleVoice, setFemaleVoice]     = useState("Scarlett");
 
-  const [isPlaying, setIsPlaying]   = useState(false);
-  const [playingLine, setPlayingLine] = useState(0);
-  const [totalLines, setTotalLines] = useState(0);
-  const [audioError, setAudioError] = useState("");
+  const [isPlaying, setIsPlaying]       = useState(false);
+  const [playingLine, setPlayingLine]   = useState(0);
+  const [totalLines, setTotalLines]     = useState(0);
+  const [audioError, setAudioError]     = useState("");
+  const [audioCurrentTime, setAudioCurrentTime] = useState(0);
+  const [audioDuration, setAudioDuration]       = useState(0);
+  const [currentLineText, setCurrentLineText]   = useState("");
 
   const [previewingVoice, setPreviewingVoice] = useState<string | null>(null);
 
@@ -125,6 +128,9 @@ export default function CreateAudioPage() {
       }
 
       setPlayingLine(i + 1);
+      setCurrentLineText(text);
+      setAudioCurrentTime(0);
+      setAudioDuration(0);
 
       try {
         const res = await fetch("/api/tts", {
@@ -145,6 +151,8 @@ export default function CreateAudioPage() {
           if (stoppedRef.current) { resolve(); return; }
           const audio = new Audio(outputUri);
           currentAudioRef.current = audio;
+          audio.onloadedmetadata = () => setAudioDuration(audio.duration);
+          audio.ontimeupdate     = () => setAudioCurrentTime(audio.currentTime);
           audio.onended  = () => resolve();
           audio.onerror  = () => resolve();
           audio.play().catch(() => resolve());
@@ -158,6 +166,9 @@ export default function CreateAudioPage() {
     setIsPlaying(false);
     setPlayingLine(0);
     setTotalLines(0);
+    setAudioCurrentTime(0);
+    setAudioDuration(0);
+    setCurrentLineText("");
   }
 
   function stopStory() {
@@ -169,6 +180,23 @@ export default function CreateAudioPage() {
     setIsPlaying(false);
     setPlayingLine(0);
     setTotalLines(0);
+    setAudioCurrentTime(0);
+    setAudioDuration(0);
+    setCurrentLineText("");
+  }
+
+  function handleSeek(value: number) {
+    if (currentAudioRef.current && audioDuration > 0) {
+      currentAudioRef.current.currentTime = value;
+      setAudioCurrentTime(value);
+    }
+  }
+
+  function formatTime(s: number) {
+    if (!isFinite(s) || isNaN(s)) return "0:00";
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${m}:${sec.toString().padStart(2, "0")}`;
   }
 
   return (
@@ -525,30 +553,78 @@ export default function CreateAudioPage() {
               </div>
             )}
 
-            {/* Progress bar */}
-            {isPlaying && totalLines > 0 && (
-              <div style={{ marginBottom: "16px" }}>
-                <div
-                  style={{
-                    height: "4px",
-                    borderRadius: "4px",
-                    background: "rgba(255,255,255,0.1)",
-                    overflow: "hidden",
-                  }}
-                >
-                  <div
+            {/* Audio player bar */}
+            {isPlaying && (
+              <div
+                style={{
+                  marginBottom: "20px",
+                  borderRadius: "16px",
+                  border: "1px solid rgba(216,178,110,0.25)",
+                  background: "rgba(216,178,110,0.06)",
+                  padding: "14px 16px",
+                }}
+              >
+                {/* Line counter + current line text */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px", gap: "12px" }}>
+                  <div style={{ fontSize: "12px", color: "#d8b26e", fontWeight: 600, whiteSpace: "nowrap" }}>
+                    Line {playingLine} of {totalLines}
+                  </div>
+                  {currentLineText && (
+                    <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, textAlign: "right" }}>
+                      {currentLineText.length > 60 ? currentLineText.slice(0, 60) + "…" : currentLineText}
+                    </div>
+                  )}
+                </div>
+
+                {/* Seek slider */}
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", minWidth: "32px" }}>
+                    {formatTime(audioCurrentTime)}
+                  </span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={audioDuration || 1}
+                    step={0.1}
+                    value={audioCurrentTime}
+                    onChange={(e) => handleSeek(parseFloat(e.target.value))}
                     style={{
-                      height: "100%",
-                      width: `${(playingLine / totalLines) * 100}%`,
-                      background: "#d8b26e",
+                      flex: 1,
+                      height: "4px",
+                      accentColor: "#d8b26e",
+                      cursor: "pointer",
+                      background: audioDuration > 0
+                        ? `linear-gradient(to right, #d8b26e ${(audioCurrentTime / audioDuration) * 100}%, rgba(255,255,255,0.15) ${(audioCurrentTime / audioDuration) * 100}%)`
+                        : "rgba(255,255,255,0.15)",
                       borderRadius: "4px",
-                      transition: "width 0.3s ease",
+                      outline: "none",
+                      border: "none",
                     }}
                   />
+                  <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", minWidth: "32px", textAlign: "right" }}>
+                    {formatTime(audioDuration)}
+                  </span>
                 </div>
-                <div style={{ marginTop: "6px", fontSize: "12px", color: "rgba(255,255,255,0.4)", textAlign: "right" }}>
-                  {Math.round((playingLine / totalLines) * 100)}% complete
-                </div>
+
+                {/* Overall story progress */}
+                {totalLines > 0 && (
+                  <div style={{ marginTop: "10px" }}>
+                    <div style={{ height: "2px", borderRadius: "2px", background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+                      <div
+                        style={{
+                          height: "100%",
+                          width: `${(playingLine / totalLines) * 100}%`,
+                          background: "rgba(216,178,110,0.4)",
+                          borderRadius: "2px",
+                          transition: "width 0.4s ease",
+                        }}
+                      />
+                    </div>
+                    <div style={{ marginTop: "4px", fontSize: "11px", color: "rgba(255,255,255,0.3)", textAlign: "right" }}>
+                      Story {Math.round((playingLine / totalLines) * 100)}% complete
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
