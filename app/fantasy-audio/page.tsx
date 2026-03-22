@@ -3,6 +3,7 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import Image, { StaticImageData } from "next/image";
 import animeAudio from "./animeaudio.jpg";
+import werewolfImg from "./Images each category/werewolf.jpg";
 
 type Row = {
   title: string;
@@ -134,7 +135,11 @@ export default function FantasyAudioPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    // Audio URLs
+    const itemImages: { [key: string]: StaticImageData } = {
+    "Werewolf": werewolfImg,
+  };
+
+  // Audio URLs
   const audioFiles: { [key: string]: string } = {
     "Anime 1": "https://dowomlnsxwxslpydtitw.supabase.co/storage/v1/object/sign/audio/firstaudio.mp3?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xZjJiZGI3MS1iNzJkLTQ2Y2MtYjUwZS1kMDYyZTU5NmEyZDQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhdWRpby9maXJzdGF1ZGlvLm1wMyIsImlhdCI6MTc3NDEzNTU3MywiZXhwIjoxODA1NjcxNTczfQ.Z7lLEDEAbZD0My_312T8M2YA6GAYdHX0Qh8neROAFZ0",
     "Werewolf": "https://dowomlnsxwxslpydtitw.supabase.co/storage/v1/object/sign/audio/werewolf.mp3?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xZjJiZGI3MS1iNzJkLTQ2Y2MtYjUwZS1kMDYyZTU5NmEyZDQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhdWRpby93ZXJld29sZi5tcDMiLCJpYXQiOjE3NzQxMzY1OTYsImV4cCI6MTgwNTY3MjU5Nn0.hYlkbQGvo0BpzZTX6JTVrH-mryufj2ksbwXwIirSUGY"
@@ -264,6 +269,11 @@ export default function FantasyAudioPage() {
                         currentlyPlaying === item && isPlaying ? 'fantasy-tile-playing' : ''
                       }`}
                       onClick={() => handleTileClick(item)}
+                      style={itemImages[item] ? {
+                        backgroundImage: `url(${itemImages[item].src})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      } : undefined}
                     >
                       <div className="fantasy-tile-content">
                         {audioFiles[item] && (
