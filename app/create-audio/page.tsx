@@ -378,7 +378,7 @@ export default function CreateAudioPage() {
                   Voice Casting · AI Voices
                 </div>
 
-                <div style={{ display: "grid", gap: "20px" }}>
+                <div style={{ display: "grid", gap: "16px" }}>
                   <VoicePicker
                     label="Narrator Voice"
                     voices={VOICES}
@@ -627,85 +627,41 @@ function VoicePicker({
   previewingVoice: string | null;
   onPreview: (id: string) => void;
 }) {
+  const isPreviewing = previewingVoice === selected;
   return (
-    <div>
-      <div style={{ fontSize: "14px", fontWeight: 600, color: "rgba(255,255,255,0.8)", marginBottom: "10px" }}>
-        {label}
+    <Field label={label}>
+      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <select
+          style={{ ...inputStyle, flex: 1 }}
+          value={selected}
+          onChange={(e) => onSelect(e.target.value)}
+        >
+          {voices.map((v) => (
+            <option key={v.id} value={v.id} style={{ color: "black" }}>
+              {v.label} — {v.desc}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={() => onPreview(selected)}
+          style={{
+            flexShrink: 0,
+            borderRadius: "14px",
+            border: "1px solid rgba(255,255,255,0.12)",
+            background: isPreviewing ? "rgba(216,178,110,0.2)" : "rgba(255,255,255,0.06)",
+            color: isPreviewing ? "#d8b26e" : "rgba(255,255,255,0.7)",
+            padding: "0 16px",
+            height: "50px",
+            fontSize: "13px",
+            fontWeight: 600,
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {isPreviewing ? "⏹ Stop" : "▶ Preview"}
+        </button>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-        {voices.map((v) => {
-          const isSelected  = selected === v.id;
-          const isPreviewing = previewingVoice === v.id;
-          return (
-            <div
-              key={v.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                borderRadius: "14px",
-                border: isSelected
-                  ? "1px solid rgba(216,178,110,0.6)"
-                  : "1px solid rgba(255,255,255,0.08)",
-                background: isSelected
-                  ? "rgba(216,178,110,0.12)"
-                  : "rgba(255,255,255,0.04)",
-                padding: "10px 14px",
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-              }}
-              onClick={() => onSelect(v.id)}
-            >
-              {/* Selection indicator */}
-              <div
-                style={{
-                  width: "16px",
-                  height: "16px",
-                  borderRadius: "50%",
-                  border: isSelected
-                    ? "2px solid #d8b26e"
-                    : "2px solid rgba(255,255,255,0.2)",
-                  background: isSelected ? "#d8b26e" : "transparent",
-                  flexShrink: 0,
-                  transition: "all 0.15s ease",
-                }}
-              />
-
-              {/* Voice info */}
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: "14px", fontWeight: 700, color: "white" }}>{v.label}</div>
-                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", marginTop: "1px" }}>{v.desc}</div>
-              </div>
-
-              {/* Preview button */}
-              <button
-                onClick={(e) => { e.stopPropagation(); onPreview(v.id); }}
-                style={{
-                  flexShrink: 0,
-                  borderRadius: "10px",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  background: isPreviewing
-                    ? "rgba(216,178,110,0.2)"
-                    : "rgba(255,255,255,0.06)",
-                  color: isPreviewing ? "#d8b26e" : "rgba(255,255,255,0.7)",
-                  padding: "6px 12px",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                  transition: "all 0.15s ease",
-                }}
-                title="Preview this voice"
-              >
-                {isPreviewing ? "⏹ Stop" : "▶ Preview"}
-              </button>
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    </Field>
   );
 }
 
