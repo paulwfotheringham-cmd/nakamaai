@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CreateAudioTile from "./CreateAudioTile";
 
 type Tile = {
   title: string;
@@ -16,14 +17,6 @@ const tiles: Tile[] = [
       "Browse and begin your next immersive audio experience.",
     href: "/fantasy-audio",
     icon: "📚",
-    cta: "Open",
-  },
-  {
-    title: "Create your own fantasy audio",
-    description:
-      "Adjust mood, voices, characters, and generate your scene.",
-    href: "/create-audio",
-    icon: "✨",
     cta: "Open",
   },
   {
@@ -128,7 +121,9 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {tiles.map((tile) => (
+          <TileCard key={tiles[0].title} tile={tiles[0]} />
+          <CreateAudioTile />
+          {tiles.slice(1).map((tile) => (
             <TileCard key={tile.title} tile={tile} />
           ))}
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 type SavedStory = {
   id: string;
@@ -52,7 +53,22 @@ export default function CreateAudioPage() {
   const [savedStories, setSavedStories]     = useState<SavedStory[]>([]);
   const [showDropdown, setShowDropdown]     = useState(false);
   const [loadingStories, setLoadingStories] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRef  = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+
+  // Auto-load a saved story if ?story_id= is in the URL
+  useEffect(() => {
+    const id = searchParams.get("story_id");
+    if (!id) return;
+    fetch("/api/saved-stories")
+      .then((r) => r.json())
+      .then(({ stories }) => {
+        const found = (stories ?? []).find((s: SavedStory) => s.id === id);
+        if (found) loadSavedStory(found);
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const stoppedRef        = useRef(false);
   const currentAudioRef   = useRef<HTMLAudioElement | null>(null);
