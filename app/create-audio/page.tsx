@@ -1,167 +1,146 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
-type BrowserVoice = SpeechSynthesisVoice;
+const VOICES = [
+  { id: "Scarlett", label: "Scarlett", desc: "Young Female · American" },
+  { id: "Liv",      label: "Liv",      desc: "Young Female · American" },
+  { id: "Amy",      label: "Amy",      desc: "Mature Female · American" },
+  { id: "Dan",      label: "Dan",      desc: "Young Male · American" },
+  { id: "Will",     label: "Will",     desc: "Mature Male · American" },
+];
 
 export default function CreateAudioPage() {
-  const [setting, setSetting] = useState("office");
-  const [mood, setMood] = useState("romantic");
-  const [buildUp, setBuildUp] = useState("slow burn");
-  const [maleRole, setMaleRole] = useState("boss");
+  const [setting, setSetting]       = useState("office");
+  const [mood, setMood]             = useState("romantic");
+  const [buildUp, setBuildUp]       = useState("slow burn");
+  const [maleRole, setMaleRole]     = useState("boss");
   const [femaleRole, setFemaleRole] = useState("assistant");
-  const [storyType, setStoryType] = useState("romantic encounter");
+  const [storyType, setStoryType]   = useState("romantic encounter");
   const [extraDetail, setExtraDetail] = useState("");
-  const [story, setStory] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [story, setStory]           = useState("");
+  const [loading, setLoading]       = useState(false);
 
-  const [voices, setVoices] = useState<BrowserVoice[]>([]);
-  const [narratorVoice, setNarratorVoice] = useState("");
-  const [maleVoice, setMaleVoice] = useState("");
-  const [femaleVoice, setFemaleVoice] = useState("");
+  const [narratorVoice, setNarratorVoice] = useState("Amy");
+  const [maleVoice, setMaleVoice]         = useState("Will");
+  const [femaleVoice, setFemaleVoice]     = useState("Scarlett");
 
-  const speechTimeouts = useRef<number[]>([]);
-  const stoppedRef = useRef(false);
+  const [isPlaying, setIsPlaying]   = useState(false);
+  const [playingLine, setPlayingLine] = useState(0);
+  const [totalLines, setTotalLines] = useState(0);
+  const [audioError, setAudioError] = useState("");
+
+  const stoppedRef      = useRef(false);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
   async function generateStory() {
     setLoading(true);
-
+    setStory("");
+    setAudioError("");
     try {
       const response = await fetch("/api/story", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          setting,
-          mood,
-          buildUp,
-          maleRole,
-          femaleRole,
-          storyType,
-          extraDetail,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ setting, mood, buildUp, maleRole, femaleRole, storyType, extraDetail }),
       });
-
       const data = await response.json();
       setStory(data.story || "");
     } catch {
       alert("Failed to generate story");
     }
-
     setLoading(false);
   }
 
-  function cleanVoiceName(name: string) {
-    return name
-      .replace("Microsoft ", "")
-      .replace("Google ", "")
-      .split(" - ")[0]
-      .trim();
-  }
-
-  const englishVoices = useMemo(() => {
-    return voices.filter((v) => v.lang.toLowerCase().startsWith("en"));
-  }, [voices]);
-
-  useEffect(() => {
-    function loadVoices() {
-      const all = window.speechSynthesis.getVoices();
-      setVoices(all);
-
-      const english = all.filter((v) => v.lang.toLowerCase().startsWith("en"));
-      if (english.length === 0) return;
-
-      setNarratorVoice((current) => current || english[0].name);
-      setMaleVoice((current) => current || english[1]?.name || english[0].name);
-      setFemaleVoice((current) => current || english[2]?.name || english[0].name);
-    }
-
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-
-    return () => {
-      window.speechSynthesis.onvoiceschanged = null;
-    };
-  }, []);
-
-  function speakStory() {
-    if (!story.trim()) return;
+  async function speakStory() {
+    if (!story.trim() || isPlaying) return;
 
     stoppedRef.current = false;
-    window.speechSynthesis.cancel();
-    speechTimeouts.current.forEach((id) => clearTimeout(id));
-    speechTimeouts.current = [];
+    setAudioError("");
+    setIsPlaying(true);
 
     const lines = story
       .split("\n")
       .map((l) => l.trim())
       .filter(Boolean);
 
-    const queue: { text: string; voiceName: string }[] = [];
+    setTotalLines(lines.length);
 
-    lines.forEach((line) => {
-      let text = line;
-      let voiceName = narratorVoice;
+    for (let i = 0; i < lines.length; i++) {
+      if (stoppedRef.current) break;
+
+      const line = lines[i];
+      let text    = line;
+      let voiceId = narratorVoice;
 
       if (line.startsWith("MALE:")) {
-        text = line.replace("MALE:", "").trim();
-        voiceName = maleVoice;
+        text    = line.replace("MALE:", "").trim();
+        voiceId = maleVoice;
       } else if (line.startsWith("FEMALE:")) {
-        text = line.replace("FEMALE:", "").trim();
-        voiceName = femaleVoice;
+        text    = line.replace("FEMALE:", "").trim();
+        voiceId = femaleVoice;
       } else if (line.startsWith("NARRATOR:")) {
-        text = line.replace("NARRATOR:", "").trim();
-        voiceName = narratorVoice;
+        text    = line.replace("NARRATOR:", "").trim();
+        voiceId = narratorVoice;
       }
 
-      queue.push({ text, voiceName });
-    });
+      setPlayingLine(i + 1);
 
-    let index = 0;
+      try {
+        const res = await fetch("/api/tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, voiceId }),
+        });
 
-    const speakNext = () => {
-      if (stoppedRef.current || index >= queue.length) return;
+        if (!res.ok) {
+          const err = await res.json();
+          setAudioError(`Audio error: ${err.error}`);
+          break;
+        }
 
-      const item = queue[index++];
-      const utterance = new SpeechSynthesisUtterance(item.text);
-      const matched = englishVoices.find((v) => v.name === item.voiceName);
+        const { outputUri } = await res.json();
 
-      if (matched) {
-        utterance.voice = matched;
-        utterance.lang = matched.lang;
-      } else {
-        utterance.lang = "en-US";
+        await new Promise<void>((resolve) => {
+          if (stoppedRef.current) { resolve(); return; }
+          const audio = new Audio(outputUri);
+          currentAudioRef.current = audio;
+          audio.onended  = () => resolve();
+          audio.onerror  = () => resolve();
+          audio.play().catch(() => resolve());
+        });
+      } catch {
+        setAudioError("Failed to generate audio for a line.");
+        break;
       }
+    }
 
-      utterance.rate = 0.95;
-      utterance.onend = () => speakNext();
-      utterance.onerror = () => speakNext();
-
-      window.speechSynthesis.speak(utterance);
-    };
-
-    speakNext();
+    setIsPlaying(false);
+    setPlayingLine(0);
+    setTotalLines(0);
   }
 
   function stopStory() {
     stoppedRef.current = true;
-    window.speechSynthesis.cancel();
-    speechTimeouts.current.forEach((id) => clearTimeout(id));
-    speechTimeouts.current = [];
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+    }
+    setIsPlaying(false);
+    setPlayingLine(0);
+    setTotalLines(0);
   }
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background:
-          "radial-gradient(circle at top, #3a1d2e 0%, #160f18 35%, #09080b 100%)",
+        background: "radial-gradient(circle at top, #3a1d2e 0%, #160f18 35%, #09080b 100%)",
         color: "white",
         fontFamily: "Arial, Helvetica, sans-serif",
       }}
     >
       <a href="/dashboard" style={backBtnStyle}>← Dashboard</a>
+
       <div
         style={{
           maxWidth: "1280px",
@@ -172,6 +151,7 @@ export default function CreateAudioPage() {
           padding: "32px 24px",
         }}
       >
+        {/* Header */}
         <div
           style={{
             marginBottom: "40px",
@@ -181,21 +161,11 @@ export default function CreateAudioPage() {
           }}
         >
           <div>
-            <div
-              style={{
-                fontSize: "12px",
-                textTransform: "uppercase",
-                letterSpacing: "0.4em",
-                color: "#d8b26e",
-              }}
-            >
+            <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.4em", color: "#d8b26e" }}>
               Nakama
             </div>
-            <div style={{ marginTop: "8px", fontSize: "32px", fontWeight: 700 }}>
-              Nakama AI
-            </div>
+            <div style={{ marginTop: "8px", fontSize: "32px", fontWeight: 700 }}>Nakama AI</div>
           </div>
-
           <div
             style={{
               borderRadius: "999px",
@@ -210,13 +180,10 @@ export default function CreateAudioPage() {
           </div>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gap: "32px",
-            gridTemplateColumns: "1fr 1.1fr",
-          }}
-        >
+        {/* Two-column layout */}
+        <div style={{ display: "grid", gap: "32px", gridTemplateColumns: "1fr 1.1fr" }}>
+
+          {/* Left: hero text */}
           <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <div
               style={{
@@ -260,33 +227,15 @@ export default function CreateAudioPage() {
               Generate a private story scene and listen to it like a mini audio drama.
             </p>
 
-            <div
-              style={{
-                marginTop: "32px",
-                display: "grid",
-                gap: "12px",
-                gridTemplateColumns: "1fr 1fr",
-              }}
-            >
-              <FeatureCard
-                title="Guided story design"
-                text="Choose the tone, setting, and romantic arc before generating."
-              />
-              <FeatureCard
-                title="Voice casting"
-                text="Assign different voices to narrator, male character, and female character."
-              />
-              <FeatureCard
-                title="Audio playback"
-                text="Listen to every line in sequence with your selected cast."
-              />
-              <FeatureCard
-                title="Fast iteration"
-                text="Change one detail and instantly create a new version."
-              />
+            <div style={{ marginTop: "32px", display: "grid", gap: "12px", gridTemplateColumns: "1fr 1fr" }}>
+              <FeatureCard title="Guided story design"  text="Choose the tone, setting, and romantic arc before generating." />
+              <FeatureCard title="Voice casting"        text="Assign one of 5 natural AI voices to narrator, male, and female characters." />
+              <FeatureCard title="Audio playback"       text="Listen to every line in sequence with your selected cast." />
+              <FeatureCard title="Fast iteration"       text="Change one detail and instantly create a new version." />
             </div>
           </div>
 
+          {/* Right: form */}
           <div
             style={{
               borderRadius: "28px",
@@ -298,9 +247,7 @@ export default function CreateAudioPage() {
             }}
           >
             <div style={{ marginBottom: "24px" }}>
-              <h2 style={{ margin: 0, fontSize: "32px", fontWeight: 700 }}>
-                Build your scene
-              </h2>
+              <h2 style={{ margin: 0, fontSize: "32px", fontWeight: 700 }}>Build your scene</h2>
               <p style={{ marginTop: "8px", fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>
                 Adjust the story ingredients, then generate and listen.
               </p>
@@ -310,21 +257,16 @@ export default function CreateAudioPage() {
               <TwoCol>
                 <Field label="Setting">
                   <select style={inputStyle} value={setting} onChange={(e) => setSetting(e.target.value)}>
-                    <option style={{ color: "black" }}>office</option>
-                    <option style={{ color: "black" }}>café</option>
-                    <option style={{ color: "black" }}>beach</option>
-                    <option style={{ color: "black" }}>hotel</option>
-                    <option style={{ color: "black" }}>city penthouse</option>
+                    {["office","café","beach","hotel","city penthouse"].map((o) => (
+                      <option key={o} style={{ color: "black" }}>{o}</option>
+                    ))}
                   </select>
                 </Field>
-
                 <Field label="Mood">
                   <select style={inputStyle} value={mood} onChange={(e) => setMood(e.target.value)}>
-                    <option style={{ color: "black" }}>romantic</option>
-                    <option style={{ color: "black" }}>playful</option>
-                    <option style={{ color: "black" }}>intense</option>
-                    <option style={{ color: "black" }}>dramatic</option>
-                    <option style={{ color: "black" }}>tender</option>
+                    {["romantic","playful","intense","dramatic","tender"].map((o) => (
+                      <option key={o} style={{ color: "black" }}>{o}</option>
+                    ))}
                   </select>
                 </Field>
               </TwoCol>
@@ -332,19 +274,16 @@ export default function CreateAudioPage() {
               <TwoCol>
                 <Field label="Build-up">
                   <select style={inputStyle} value={buildUp} onChange={(e) => setBuildUp(e.target.value)}>
-                    <option style={{ color: "black" }}>slow burn</option>
-                    <option style={{ color: "black" }}>medium pace</option>
-                    <option style={{ color: "black" }}>instant spark</option>
+                    {["slow burn","medium pace","instant spark"].map((o) => (
+                      <option key={o} style={{ color: "black" }}>{o}</option>
+                    ))}
                   </select>
                 </Field>
-
                 <Field label="Story Type">
                   <select style={inputStyle} value={storyType} onChange={(e) => setStoryType(e.target.value)}>
-                    <option style={{ color: "black" }}>romantic encounter</option>
-                    <option style={{ color: "black" }}>forbidden romance</option>
-                    <option style={{ color: "black" }}>reunion</option>
-                    <option style={{ color: "black" }}>enemies to lovers</option>
-                    <option style={{ color: "black" }}>late night confession</option>
+                    {["romantic encounter","forbidden romance","reunion","enemies to lovers","late night confession"].map((o) => (
+                      <option key={o} style={{ color: "black" }}>{o}</option>
+                    ))}
                   </select>
                 </Field>
               </TwoCol>
@@ -352,21 +291,16 @@ export default function CreateAudioPage() {
               <TwoCol>
                 <Field label="Male Character">
                   <select style={inputStyle} value={maleRole} onChange={(e) => setMaleRole(e.target.value)}>
-                    <option style={{ color: "black" }}>boss</option>
-                    <option style={{ color: "black" }}>stranger</option>
-                    <option style={{ color: "black" }}>chef</option>
-                    <option style={{ color: "black" }}>artist</option>
-                    <option style={{ color: "black" }}>billionaire</option>
+                    {["boss","stranger","chef","artist","billionaire"].map((o) => (
+                      <option key={o} style={{ color: "black" }}>{o}</option>
+                    ))}
                   </select>
                 </Field>
-
                 <Field label="Female Character">
                   <select style={inputStyle} value={femaleRole} onChange={(e) => setFemaleRole(e.target.value)}>
-                    <option style={{ color: "black" }}>assistant</option>
-                    <option style={{ color: "black" }}>traveler</option>
-                    <option style={{ color: "black" }}>writer</option>
-                    <option style={{ color: "black" }}>singer</option>
-                    <option style={{ color: "black" }}>entrepreneur</option>
+                    {["assistant","traveler","writer","singer","entrepreneur"].map((o) => (
+                      <option key={o} style={{ color: "black" }}>{o}</option>
+                    ))}
                   </select>
                 </Field>
               </TwoCol>
@@ -380,6 +314,7 @@ export default function CreateAudioPage() {
                 />
               </Field>
 
+              {/* Voice Casting */}
               <div
                 style={{
                   marginTop: "8px",
@@ -399,15 +334,15 @@ export default function CreateAudioPage() {
                     color: "#d8b26e",
                   }}
                 >
-                  Voice Casting
+                  Voice Casting · AI Voices
                 </div>
 
                 <div style={{ display: "grid", gap: "16px" }}>
                   <Field label="Narrator Voice">
                     <select style={inputStyle} value={narratorVoice} onChange={(e) => setNarratorVoice(e.target.value)}>
-                      {englishVoices.map((v) => (
-                        <option key={`n-${v.name}`} value={v.name} style={{ color: "black" }}>
-                          {cleanVoiceName(v.name)}
+                      {VOICES.map((v) => (
+                        <option key={`n-${v.id}`} value={v.id} style={{ color: "black" }}>
+                          {v.label} — {v.desc}
                         </option>
                       ))}
                     </select>
@@ -415,9 +350,9 @@ export default function CreateAudioPage() {
 
                   <Field label="Male Character Voice">
                     <select style={inputStyle} value={maleVoice} onChange={(e) => setMaleVoice(e.target.value)}>
-                      {englishVoices.map((v) => (
-                        <option key={`m-${v.name}`} value={v.name} style={{ color: "black" }}>
-                          {cleanVoiceName(v.name)}
+                      {VOICES.map((v) => (
+                        <option key={`m-${v.id}`} value={v.id} style={{ color: "black" }}>
+                          {v.label} — {v.desc}
                         </option>
                       ))}
                     </select>
@@ -425,13 +360,39 @@ export default function CreateAudioPage() {
 
                   <Field label="Female Character Voice">
                     <select style={inputStyle} value={femaleVoice} onChange={(e) => setFemaleVoice(e.target.value)}>
-                      {englishVoices.map((v) => (
-                        <option key={`f-${v.name}`} value={v.name} style={{ color: "black" }}>
-                          {cleanVoiceName(v.name)}
+                      {VOICES.map((v) => (
+                        <option key={`f-${v.id}`} value={v.id} style={{ color: "black" }}>
+                          {v.label} — {v.desc}
                         </option>
                       ))}
                     </select>
                   </Field>
+                </div>
+
+                {/* Voice legend */}
+                <div
+                  style={{
+                    marginTop: "16px",
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "8px",
+                  }}
+                >
+                  {VOICES.map((v) => (
+                    <span
+                      key={v.id}
+                      style={{
+                        borderRadius: "999px",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        background: "rgba(255,255,255,0.05)",
+                        padding: "4px 10px",
+                        fontSize: "12px",
+                        color: "rgba(255,255,255,0.6)",
+                      }}
+                    >
+                      {v.label} · {v.desc}
+                    </span>
+                  ))}
                 </div>
               </div>
 
@@ -444,17 +405,20 @@ export default function CreateAudioPage() {
                   fontWeight: 700,
                   color: "black",
                   border: "none",
-                  cursor: "pointer",
+                  cursor: loading ? "not-allowed" : "pointer",
                   fontSize: "16px",
+                  opacity: loading ? 0.7 : 1,
                 }}
                 onClick={generateStory}
+                disabled={loading}
               >
-                {loading ? "Generating..." : "Generate Story"}
+                {loading ? "Generating…" : "Generate Story"}
               </button>
             </div>
           </div>
         </div>
 
+        {/* Story + player */}
         {story && (
           <div
             style={{
@@ -474,6 +438,7 @@ export default function CreateAudioPage() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 gap: "16px",
+                flexWrap: "wrap",
               }}
             >
               <div>
@@ -483,18 +448,35 @@ export default function CreateAudioPage() {
                 </p>
               </div>
 
-              <div style={{ display: "flex", gap: "12px" }}>
+              <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+                {isPlaying && (
+                  <span
+                    style={{
+                      fontSize: "13px",
+                      color: "#d8b26e",
+                      borderRadius: "999px",
+                      border: "1px solid rgba(216,178,110,0.3)",
+                      background: "rgba(216,178,110,0.1)",
+                      padding: "6px 14px",
+                    }}
+                  >
+                    ▶ Line {playingLine} of {totalLines}
+                  </span>
+                )}
+
                 <button
                   style={{
                     borderRadius: "14px",
-                    background: "#d8b26e",
-                    padding: "10px 16px",
+                    background: isPlaying ? "rgba(255,255,255,0.1)" : "#d8b26e",
+                    padding: "10px 20px",
                     fontWeight: 700,
-                    color: "black",
+                    color: isPlaying ? "rgba(255,255,255,0.4)" : "black",
                     border: "none",
-                    cursor: "pointer",
+                    cursor: isPlaying ? "not-allowed" : "pointer",
+                    fontSize: "15px",
                   }}
                   onClick={speakStory}
+                  disabled={isPlaying}
                 >
                   🔊 Listen
                 </button>
@@ -504,16 +486,60 @@ export default function CreateAudioPage() {
                     borderRadius: "14px",
                     border: "1px solid rgba(255,255,255,0.15)",
                     background: "rgba(255,255,255,0.05)",
-                    padding: "10px 16px",
+                    padding: "10px 20px",
                     color: "white",
                     cursor: "pointer",
+                    fontSize: "15px",
                   }}
                   onClick={stopStory}
                 >
-                  Stop
+                  ⏹ Stop
                 </button>
               </div>
             </div>
+
+            {audioError && (
+              <div
+                style={{
+                  marginBottom: "16px",
+                  borderRadius: "12px",
+                  background: "rgba(255,80,80,0.12)",
+                  border: "1px solid rgba(255,80,80,0.3)",
+                  padding: "12px 16px",
+                  fontSize: "14px",
+                  color: "#ff8080",
+                }}
+              >
+                {audioError}
+              </div>
+            )}
+
+            {/* Progress bar */}
+            {isPlaying && totalLines > 0 && (
+              <div style={{ marginBottom: "16px" }}>
+                <div
+                  style={{
+                    height: "4px",
+                    borderRadius: "4px",
+                    background: "rgba(255,255,255,0.1)",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      width: `${(playingLine / totalLines) * 100}%`,
+                      background: "#d8b26e",
+                      borderRadius: "4px",
+                      transition: "width 0.3s ease",
+                    }}
+                  />
+                </div>
+                <div style={{ marginTop: "6px", fontSize: "12px", color: "rgba(255,255,255,0.4)", textAlign: "right" }}>
+                  {Math.round((playingLine / totalLines) * 100)}% complete
+                </div>
+              </div>
+            )}
 
             <div
               style={{
@@ -529,6 +555,7 @@ export default function CreateAudioPage() {
                   lineHeight: 1.8,
                   color: "rgba(255,255,255,0.85)",
                   margin: 0,
+                  fontSize: "15px",
                 }}
               >
                 {story}
@@ -543,42 +570,22 @@ export default function CreateAudioPage() {
 
 function TwoCol({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      style={{
-        display: "grid",
-        gap: "16px",
-        gridTemplateColumns: "1fr 1fr",
-      }}
-    >
+    <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "1fr 1fr" }}>
       {children}
     </div>
   );
 }
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label style={{ display: "grid", gap: "8px", textAlign: "left" }}>
-      <span style={{ fontSize: "14px", fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>
-        {label}
-      </span>
+      <span style={{ fontSize: "14px", fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>{label}</span>
       {children}
     </label>
   );
 }
 
-function FeatureCard({
-  title,
-  text,
-}: {
-  title: string;
-  text: string;
-}) {
+function FeatureCard({ title, text }: { title: string; text: string }) {
   return (
     <div
       style={{
@@ -589,9 +596,7 @@ function FeatureCard({
       }}
     >
       <div style={{ fontSize: "14px", fontWeight: 700, color: "white" }}>{title}</div>
-      <div style={{ marginTop: "6px", fontSize: "14px", lineHeight: 1.6, color: "rgba(255,255,255,0.6)" }}>
-        {text}
-      </div>
+      <div style={{ marginTop: "6px", fontSize: "14px", lineHeight: 1.6, color: "rgba(255,255,255,0.6)" }}>{text}</div>
     </div>
   );
 }
