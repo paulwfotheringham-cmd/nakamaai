@@ -205,9 +205,39 @@ export default function FantasyAudioPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    const itemImages: { [key: string]: StaticImageData } = {
-    "Werewolf": werewolfImg,
+  const itemImages: { [key: string]: StaticImageData } = {
     "Anime 1": animeImg,
+    "Anime 2": werewolfImg,
+    "Hentai 1": animeImg,
+    "Hentai 2": werewolfImg,
+    "Werewolf": werewolfImg,
+    "Ghost": animeImg,
+    "Devil": werewolfImg,
+    "Angel": animeImg,
+    "Dragon": werewolfImg,
+    "Witch": animeImg,
+    "Wizard": werewolfImg,
+    "Dwarf": animeImg,
+    "Star Trek": werewolfImg,
+    "Battlestar Galactica": animeImg,
+    "Alien 1": werewolfImg,
+    "Alien 2": animeImg,
+    "Sub 1": werewolfImg,
+    "Sub 2": animeImg,
+    "Dom 1": werewolfImg,
+    "Dom 2": animeImg,
+    "Office": werewolfImg,
+    "Travel": animeImg,
+    "Outdoors": werewolfImg,
+    "Stranger Encounter": animeImg,
+    "Obsession": werewolfImg,
+    "Seduction": animeImg,
+    "Forbidden": werewolfImg,
+    "After Dark": animeImg,
+    "Victorian": werewolfImg,
+    "Medieval": animeImg,
+    "Pirate": werewolfImg,
+    "Caveman": animeImg,
   };
 
   // Audio URLs
