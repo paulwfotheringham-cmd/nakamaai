@@ -154,20 +154,8 @@ export default function SignupPage() {
             }}
           >
             We&apos;re the only professional service dedicated exclusively to
-            bringing your romantic fantasies to life through sound.
-          </p>
-
-          <p
-            style={{
-              margin: "16px 0 0 0",
-              maxWidth: "720px",
-              fontSize: "18px",
-              lineHeight: 1.6,
-              color: "rgba(255,255,255,0.62)",
-            }}
-          >
-            We convert your favorite romantic books into breathtaking, sexy
-            audio stories.
+            bringing your romantic fantasies to life through sound. We convert
+            your favourite romantic books into breathtaking, sexy audio stories.
           </p>
 
           <p
