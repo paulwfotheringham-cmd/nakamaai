@@ -44,6 +44,10 @@ Instructions:
 - No explanations.
 - Return ONLY the story.`;
 
+  if (!process.env.GEMINI_API_KEY) {
+    return Response.json({ story: "Error: GEMINI_API_KEY is not set in environment variables." }, { status: 500 });
+  }
+
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
@@ -52,6 +56,7 @@ Instructions:
     return Response.json({ story });
   } catch (error) {
     console.error(error);
-    return Response.json({ story: "Failed to generate story." }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return Response.json({ story: `Error: ${message}` }, { status: 500 });
   }
 }
