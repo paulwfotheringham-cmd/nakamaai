@@ -3,12 +3,15 @@
 import { useRef, useState } from "react";
 
 const VOICES = [
-  { id: "Scarlett", label: "Scarlett", desc: "Young Female · American" },
-  { id: "Liv",      label: "Liv",      desc: "Young Female · American" },
-  { id: "Amy",      label: "Amy",      desc: "Mature Female · American" },
-  { id: "Dan",      label: "Dan",      desc: "Young Male · American" },
-  { id: "Will",     label: "Will",     desc: "Mature Male · American" },
+  { id: "Scarlett", label: "Scarlett", desc: "Young Female · American",  gender: "female" },
+  { id: "Liv",      label: "Liv",      desc: "Young Female · American",  gender: "female" },
+  { id: "Amy",      label: "Amy",      desc: "Mature Female · American", gender: "female" },
+  { id: "Dan",      label: "Dan",      desc: "Young Male · American",    gender: "male" },
+  { id: "Will",     label: "Will",     desc: "Mature Male · American",   gender: "male" },
 ];
+
+const MALE_VOICES   = VOICES.filter((v) => v.gender === "male");
+const FEMALE_VOICES = VOICES.filter((v) => v.gender === "female");
 
 export default function CreateAudioPage() {
   const [setting, setSetting]       = useState("office");
@@ -350,7 +353,7 @@ export default function CreateAudioPage() {
 
                   <Field label="Male Character Voice">
                     <select style={inputStyle} value={maleVoice} onChange={(e) => setMaleVoice(e.target.value)}>
-                      {VOICES.map((v) => (
+                      {MALE_VOICES.map((v) => (
                         <option key={`m-${v.id}`} value={v.id} style={{ color: "black" }}>
                           {v.label} — {v.desc}
                         </option>
@@ -360,7 +363,7 @@ export default function CreateAudioPage() {
 
                   <Field label="Female Character Voice">
                     <select style={inputStyle} value={femaleVoice} onChange={(e) => setFemaleVoice(e.target.value)}>
-                      {VOICES.map((v) => (
+                      {FEMALE_VOICES.map((v) => (
                         <option key={`f-${v.id}`} value={v.id} style={{ color: "black" }}>
                           {v.label} — {v.desc}
                         </option>
