@@ -1,6 +1,18 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+type SavedStory = {
+  id: string;
+  name: string;
+  story_text: string;
+  narrator_voice: string;
+  male_voice: string;
+  female_voice: string;
+  setting: string;
+  mood: string;
+  created_at: string;
+};
 
 const VOICES = [
   { id: "Scarlett", label: "Scarlett", desc: "Young Female · bright & warm",    gender: "female" },
@@ -35,6 +47,12 @@ export default function CreateAudioPage() {
   const [totalDuration, setTotalDuration]   = useState(0);
 
   const [previewingVoice, setPreviewingVoice] = useState<string | null>(null);
+
+  const [saveStatus, setSaveStatus]         = useState<"idle" | "saving" | "saved">("idle");
+  const [savedStories, setSavedStories]     = useState<SavedStory[]>([]);
+  const [showDropdown, setShowDropdown]     = useState(false);
+  const [loadingStories, setLoadingStories] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const stoppedRef        = useRef(false);
   const currentAudioRef   = useRef<HTMLAudioElement | null>(null);
@@ -81,6 +99,7 @@ export default function CreateAudioPage() {
     setLoading(true);
     setStory("");
     setAudioError("");
+    setSaveStatus("idle");
     try {
       const response = await fetch("/api/story", {
         method: "POST",
@@ -101,6 +120,79 @@ export default function CreateAudioPage() {
     const sec = Math.floor(s % 60);
     return `${m}:${sec.toString().padStart(2, "0")}`;
   }
+
+  function autoName() {
+    const date = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+    return `${setting.charAt(0).toUpperCase() + setting.slice(1)} · ${mood} · ${date}`;
+  }
+
+  async function saveStory() {
+    if (!story.trim() || saveStatus === "saving") return;
+    setSaveStatus("saving");
+    try {
+      const res = await fetch("/api/saved-stories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: autoName(),
+          storyText: story,
+          narratorVoice, maleVoice, femaleVoice, setting, mood,
+        }),
+      });
+      if (res.ok) {
+        setSaveStatus("saved");
+        // Refresh the saved stories list if dropdown was previously loaded
+        if (savedStories.length > 0) fetchSavedStories();
+      } else {
+        setSaveStatus("idle");
+        alert("Failed to save story.");
+      }
+    } catch {
+      setSaveStatus("idle");
+      alert("Failed to save story.");
+    }
+  }
+
+  async function fetchSavedStories() {
+    setLoadingStories(true);
+    try {
+      const res = await fetch("/api/saved-stories");
+      const data = await res.json();
+      setSavedStories(data.stories ?? []);
+    } catch {
+      setSavedStories([]);
+    }
+    setLoadingStories(false);
+  }
+
+  async function toggleDropdown() {
+    if (!showDropdown && savedStories.length === 0) await fetchSavedStories();
+    setShowDropdown((v) => !v);
+  }
+
+  function loadSavedStory(s: SavedStory) {
+    setStory(s.story_text);
+    if (s.narrator_voice) setNarratorVoice(s.narrator_voice);
+    if (s.male_voice) setMaleVoice(s.male_voice);
+    if (s.female_voice) setFemaleVoice(s.female_voice);
+    if (s.setting) setSetting(s.setting);
+    if (s.mood) setMood(s.mood);
+    setSaveStatus("idle");
+    setShowDropdown(false);
+    stopStory();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   function parseLines() {
     return story
@@ -501,7 +593,8 @@ export default function CreateAudioPage() {
                 </p>
               </div>
 
-              <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                {/* Listen */}
                 <button
                   style={{
                     borderRadius: "14px",
@@ -519,6 +612,7 @@ export default function CreateAudioPage() {
                   🔊 Listen
                 </button>
 
+                {/* Stop */}
                 <button
                   style={{
                     borderRadius: "14px",
@@ -533,6 +627,109 @@ export default function CreateAudioPage() {
                 >
                   ⏹ Stop
                 </button>
+
+                {/* Save Story */}
+                <button
+                  style={{
+                    borderRadius: "14px",
+                    border: saveStatus === "saved"
+                      ? "1px solid rgba(74,222,128,0.4)"
+                      : "1px solid rgba(255,255,255,0.15)",
+                    background: saveStatus === "saved"
+                      ? "rgba(74,222,128,0.12)"
+                      : "rgba(255,255,255,0.05)",
+                    padding: "10px 20px",
+                    color: saveStatus === "saved" ? "#4ade80" : "white",
+                    cursor: saveStatus === "saving" ? "not-allowed" : "pointer",
+                    fontSize: "15px",
+                    fontWeight: saveStatus === "saved" ? 700 : 400,
+                    opacity: saveStatus === "saving" ? 0.6 : 1,
+                  }}
+                  onClick={saveStory}
+                  disabled={saveStatus === "saving"}
+                >
+                  {saveStatus === "saved" ? "✓ Story Saved" : saveStatus === "saving" ? "Saving…" : "💾 Save Story"}
+                </button>
+
+                {/* Saved Stories dropdown */}
+                <div ref={dropdownRef} style={{ position: "relative" }}>
+                  <button
+                    style={{
+                      borderRadius: "14px",
+                      border: "1px solid rgba(255,255,255,0.15)",
+                      background: showDropdown ? "rgba(216,178,110,0.12)" : "rgba(255,255,255,0.05)",
+                      padding: "10px 20px",
+                      color: showDropdown ? "#d8b26e" : "white",
+                      cursor: "pointer",
+                      fontSize: "15px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                    onClick={toggleDropdown}
+                  >
+                    📚 Saved Stories {showDropdown ? "▲" : "▼"}
+                  </button>
+
+                  {showDropdown && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "calc(100% + 8px)",
+                        right: 0,
+                        zIndex: 100,
+                        minWidth: "300px",
+                        maxWidth: "420px",
+                        borderRadius: "16px",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        background: "#1a0f20",
+                        boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: "12px", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#d8b26e" }}>
+                        Saved Stories
+                      </div>
+
+                      {loadingStories ? (
+                        <div style={{ padding: "24px", textAlign: "center", fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>
+                          Loading…
+                        </div>
+                      ) : savedStories.length === 0 ? (
+                        <div style={{ padding: "24px", textAlign: "center", fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>
+                          No saved stories yet.
+                        </div>
+                      ) : (
+                        <div style={{ maxHeight: "320px", overflowY: "auto" }}>
+                          {savedStories.map((s) => (
+                            <button
+                              key={s.id}
+                              onClick={() => loadSavedStory(s)}
+                              style={{
+                                width: "100%",
+                                textAlign: "left",
+                                padding: "12px 16px",
+                                background: "transparent",
+                                border: "none",
+                                borderBottom: "1px solid rgba(255,255,255,0.05)",
+                                cursor: "pointer",
+                                color: "white",
+                              }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(216,178,110,0.08)"; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                            >
+                              <div style={{ fontSize: "14px", fontWeight: 600 }}>{s.name}</div>
+                              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginTop: "3px" }}>
+                                {new Date(s.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                                {s.narrator_voice ? ` · Narrator: ${s.narrator_voice}` : ""}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
