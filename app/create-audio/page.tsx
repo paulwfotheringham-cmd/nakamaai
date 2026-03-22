@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 type SavedStory = {
@@ -26,7 +26,7 @@ const VOICES = [
 const MALE_VOICES   = VOICES.filter((v) => v.gender === "male");
 const FEMALE_VOICES = VOICES.filter((v) => v.gender === "female");
 
-export default function CreateAudioPage() {
+function CreateAudioPageInner() {
   const [setting, setSetting]       = useState("office");
   const [mood, setMood]             = useState("romantic");
   const [buildUp, setBuildUp]       = useState("slow burn");
@@ -944,3 +944,11 @@ const inputStyle: React.CSSProperties = {
   fontSize: "16px",
   boxSizing: "border-box",
 };
+
+export default function CreateAudioPage() {
+  return (
+    <Suspense>
+      <CreateAudioPageInner />
+    </Suspense>
+  );
+}
