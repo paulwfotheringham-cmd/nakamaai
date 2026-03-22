@@ -341,18 +341,6 @@ export default function CreateAudioPage() {
             </div>
             <div style={{ marginTop: "8px", fontSize: "32px", fontWeight: 700 }}>Nakama AI</div>
           </div>
-          <div
-            style={{
-              borderRadius: "999px",
-              border: "1px solid rgba(255,255,255,0.1)",
-              background: "rgba(255,255,255,0.05)",
-              padding: "10px 16px",
-              fontSize: "14px",
-              color: "rgba(255,255,255,0.7)",
-            }}
-          >
-            Guided romance story builder
-          </div>
         </div>
 
         {/* Two-column layout */}
