@@ -40,11 +40,11 @@ export default function CreateAudioPage() {
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const PREVIEW_LINES: Record<string, string> = {
-    Scarlett: "Hi, I'm Scarlett. Close your eyes and let me tell you a story.",
-    Liv:      "Hi, I'm Liv. Every great romance begins with a single glance.",
-    Amy:      "Hi, I'm Amy. Let me set the scene for you, slowly and deliberately.",
-    Dan:      "Hi, I'm Dan. I've been watching you from across the room all evening.",
-    Will:     "Hi, I'm Will. There's something about you I simply can't ignore.",
+    Scarlett: "Hi, my name is Scarlett. I can be your voice to take you on your fantasy journey.",
+    Liv:      "Hi, my name is Liv. I can be your voice to take you on your fantasy journey.",
+    Amy:      "Hi, my name is Amy. I can be your voice to take you on your fantasy journey.",
+    Dan:      "Hi, my name is Dan. I can be your voice to take you on your fantasy journey.",
+    Will:     "Hi, my name is Will. I can be your voice to take you on your fantasy journey.",
   };
 
   async function previewVoice(voiceId: string) {
