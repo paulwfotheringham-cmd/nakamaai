@@ -372,31 +372,6 @@ export default function CreateAudioPage() {
                   </Field>
                 </div>
 
-                {/* Voice legend */}
-                <div
-                  style={{
-                    marginTop: "16px",
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "8px",
-                  }}
-                >
-                  {VOICES.map((v) => (
-                    <span
-                      key={v.id}
-                      style={{
-                        borderRadius: "999px",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        background: "rgba(255,255,255,0.05)",
-                        padding: "4px 10px",
-                        fontSize: "12px",
-                        color: "rgba(255,255,255,0.6)",
-                      }}
-                    >
-                      {v.label} · {v.desc}
-                    </span>
-                  ))}
-                </div>
               </div>
 
               <button
