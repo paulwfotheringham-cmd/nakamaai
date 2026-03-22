@@ -119,7 +119,7 @@ function CategoryThumbnail({ row }: { row: Row }) {
             className="fantasy-category-photo"
           />
         ) : (
-          <div className="fantasy-category-fallback">{row.thumbnailLabel[0]}</div>
+          <div className="fantasy-category-fallback" />
         )}
       </div>
 
