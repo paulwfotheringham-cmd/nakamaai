@@ -192,7 +192,7 @@ export default function InteractiveAudioDemo() {
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
-    recognition.onresult = (e) => {
+    recognition.onresult = (e: any) => {
       const transcript = e.results[0][0].transcript;
       setCustomChoice(transcript);
       setIsListening(false);
@@ -232,7 +232,7 @@ export default function InteractiveAudioDemo() {
             Your Story,<br />
             <span style={{ color: "#d8b26e" }}>Your Choices</span>
           </h1>
-          <p style={{ margin: 0, fontSize: "18px", color: "rgba(255,255,255,0.65)", maxWidth: "560px", margin: "0 auto", lineHeight: 1.6 }}>
+          <p style={{ margin: "0 auto", fontSize: "18px", color: "rgba(255,255,255,0.65)", maxWidth: "560px", lineHeight: 1.6 }}>
             The story pauses after each scene and asks what you want to happen next. Pick from options or speak your own.
           </p>
         </div>
