@@ -5,6 +5,7 @@ import Image, { StaticImageData } from "next/image";
 import animeAudio from "./animeaudio.jpg";
 import werewolfImg from "./Images each category/werewolf.jpg";
 import animeImg from "./Images each category/anime3.jpg";
+import alienImg from "./Images each category/alien.jpg";
 
 type Row = {
   title: string;
@@ -221,7 +222,7 @@ export default function FantasyAudioPage() {
     "Witch": animeImg,
     "Wizard": werewolfImg,
     "Dwarf": animeImg,
-    "Star Trek": werewolfImg,
+    "Star Trek": alienImg,
     "Battlestar Galactica": animeImg,
     "Alien 1": werewolfImg,
     "Alien 2": animeImg,
