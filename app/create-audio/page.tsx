@@ -28,19 +28,19 @@ export default function CreateAudioPage() {
   const [maleVoice, setMaleVoice]         = useState("Will");
   const [femaleVoice, setFemaleVoice]     = useState("Scarlett");
 
-  const [isPlaying, setIsPlaying]       = useState(false);
-  const [playingLine, setPlayingLine]   = useState(0);
-  const [totalLines, setTotalLines]     = useState(0);
-  const [audioError, setAudioError]     = useState("");
-  const [audioCurrentTime, setAudioCurrentTime] = useState(0);
-  const [audioDuration, setAudioDuration]       = useState(0);
-  const [currentLineText, setCurrentLineText]   = useState("");
+  const [isPlaying, setIsPlaying]           = useState(false);
+  const [preparingAudio, setPreparingAudio] = useState(false);
+  const [audioError, setAudioError]         = useState("");
+  const [overallTime, setOverallTime]       = useState(0);
+  const [totalDuration, setTotalDuration]   = useState(0);
 
   const [previewingVoice, setPreviewingVoice] = useState<string | null>(null);
 
-  const stoppedRef      = useRef(false);
-  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
-  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+  const stoppedRef        = useRef(false);
+  const currentAudioRef   = useRef<HTMLAudioElement | null>(null);
+  const previewAudioRef   = useRef<HTMLAudioElement | null>(null);
+  const segmentsRef       = useRef<{ url: string; duration: number; startTime: number }[]>([]);
+  const playActiveRef     = useRef(false);
 
   const PREVIEW_LINES: Record<string, string> = {
     Scarlett: "Hi, my name is Scarlett. I can be your voice to take you on your fantasy journey.",
@@ -95,108 +95,122 @@ export default function CreateAudioPage() {
     setLoading(false);
   }
 
-  async function speakStory() {
-    if (!story.trim() || isPlaying) return;
+  function formatTime(s: number) {
+    if (!isFinite(s) || isNaN(s) || s < 0) return "0:00";
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${m}:${sec.toString().padStart(2, "0")}`;
+  }
 
-    stoppedRef.current = false;
-    setAudioError("");
-    setIsPlaying(true);
-
-    const lines = story
+  function parseLines() {
+    return story
       .split("\n")
       .map((l) => l.trim())
-      .filter(Boolean);
+      .filter(Boolean)
+      .map((line) => {
+        let text = line, voiceId = narratorVoice;
+        if (line.startsWith("MALE:"))      { text = line.replace("MALE:", "").trim();      voiceId = maleVoice; }
+        else if (line.startsWith("FEMALE:"))   { text = line.replace("FEMALE:", "").trim();    voiceId = femaleVoice; }
+        else if (line.startsWith("NARRATOR:")) { text = line.replace("NARRATOR:", "").trim();  voiceId = narratorVoice; }
+        return { text, voiceId };
+      });
+  }
 
-    setTotalLines(lines.length);
+  async function speakStory() {
+    if (!story.trim() || isPlaying || preparingAudio) return;
 
-    for (let i = 0; i < lines.length; i++) {
+    stoppedRef.current = false;
+    playActiveRef.current = true;
+    setAudioError("");
+    setOverallTime(0);
+    setTotalDuration(0);
+    setPreparingAudio(true);
+
+    const lineConfigs = parseLines();
+
+    // 1. Generate all audio URLs sequentially (respects rate limits)
+    const urls: string[] = [];
+    for (const { text, voiceId } of lineConfigs) {
       if (stoppedRef.current) break;
-
-      const line = lines[i];
-      let text    = line;
-      let voiceId = narratorVoice;
-
-      if (line.startsWith("MALE:")) {
-        text    = line.replace("MALE:", "").trim();
-        voiceId = maleVoice;
-      } else if (line.startsWith("FEMALE:")) {
-        text    = line.replace("FEMALE:", "").trim();
-        voiceId = femaleVoice;
-      } else if (line.startsWith("NARRATOR:")) {
-        text    = line.replace("NARRATOR:", "").trim();
-        voiceId = narratorVoice;
-      }
-
-      setPlayingLine(i + 1);
-      setCurrentLineText(text);
-      setAudioCurrentTime(0);
-      setAudioDuration(0);
-
       try {
         const res = await fetch("/api/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text, voiceId }),
         });
-
-        if (!res.ok) {
-          const err = await res.json();
-          setAudioError(`Audio error: ${err.error}`);
-          break;
-        }
-
+        if (!res.ok) { setAudioError("Failed to generate audio."); setPreparingAudio(false); setIsPlaying(false); playActiveRef.current = false; return; }
         const { outputUri } = await res.json();
-
-        await new Promise<void>((resolve) => {
-          if (stoppedRef.current) { resolve(); return; }
-          const audio = new Audio(outputUri);
-          currentAudioRef.current = audio;
-          audio.onloadedmetadata = () => setAudioDuration(audio.duration);
-          audio.ontimeupdate     = () => setAudioCurrentTime(audio.currentTime);
-          audio.onended  = () => resolve();
-          audio.onerror  = () => resolve();
-          audio.play().catch(() => resolve());
-        });
+        urls.push(outputUri);
       } catch {
-        setAudioError("Failed to generate audio for a line.");
-        break;
+        setAudioError("Failed to generate audio."); setPreparingAudio(false); setIsPlaying(false); playActiveRef.current = false; return;
       }
     }
 
+    if (stoppedRef.current) { setPreparingAudio(false); setIsPlaying(false); playActiveRef.current = false; return; }
+
+    // 2. Preload all durations in parallel
+    const durations = await Promise.all(
+      urls.map((url) => new Promise<number>((resolve) => {
+        const a = new Audio(url);
+        a.onloadedmetadata = () => resolve(isFinite(a.duration) ? a.duration : 0);
+        a.onerror = () => resolve(0);
+      }))
+    );
+
+    // 3. Build segments with cumulative start times
+    let accumulated = 0;
+    const segments = urls.map((url, i) => {
+      const seg = { url, duration: durations[i], startTime: accumulated };
+      accumulated += durations[i];
+      return seg;
+    });
+
+    segmentsRef.current = segments;
+    const total = accumulated;
+    setTotalDuration(total);
+    setPreparingAudio(false);
+    setIsPlaying(true);
+
+    // 4. Play each segment, tracking overall timeline position
+    for (const seg of segments) {
+      if (stoppedRef.current) break;
+      await new Promise<void>((resolve) => {
+        if (stoppedRef.current) { resolve(); return; }
+        const audio = new Audio(seg.url);
+        currentAudioRef.current = audio;
+        audio.ontimeupdate = () => setOverallTime(seg.startTime + audio.currentTime);
+        audio.onended  = () => resolve();
+        audio.onerror  = () => resolve();
+        audio.play().catch(() => resolve());
+      });
+    }
+
     setIsPlaying(false);
-    setPlayingLine(0);
-    setTotalLines(0);
-    setAudioCurrentTime(0);
-    setAudioDuration(0);
-    setCurrentLineText("");
+    playActiveRef.current = false;
+    setOverallTime(0);
   }
 
   function stopStory() {
     stoppedRef.current = true;
-    if (currentAudioRef.current) {
-      currentAudioRef.current.pause();
-      currentAudioRef.current = null;
-    }
+    playActiveRef.current = false;
+    currentAudioRef.current?.pause();
+    currentAudioRef.current = null;
     setIsPlaying(false);
-    setPlayingLine(0);
-    setTotalLines(0);
-    setAudioCurrentTime(0);
-    setAudioDuration(0);
-    setCurrentLineText("");
+    setPreparingAudio(false);
+    setOverallTime(0);
+    setTotalDuration(0);
   }
 
   function handleSeek(value: number) {
-    if (currentAudioRef.current && audioDuration > 0) {
-      currentAudioRef.current.currentTime = value;
-      setAudioCurrentTime(value);
+    const segs = segmentsRef.current;
+    if (!segs.length) return;
+    // Find which segment the seek position falls in
+    const target = segs.findLast((s) => s.startTime <= value) ?? segs[0];
+    const offsetInSeg = value - target.startTime;
+    if (currentAudioRef.current) {
+      currentAudioRef.current.currentTime = offsetInSeg;
+      setOverallTime(value);
     }
-  }
-
-  function formatTime(s: number) {
-    if (!isFinite(s) || isNaN(s)) return "0:00";
-    const m = Math.floor(s / 60);
-    const sec = Math.floor(s % 60);
-    return `${m}:${sec.toString().padStart(2, "0")}`;
   }
 
   return (
@@ -488,34 +502,19 @@ export default function CreateAudioPage() {
               </div>
 
               <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
-                {isPlaying && (
-                  <span
-                    style={{
-                      fontSize: "13px",
-                      color: "#d8b26e",
-                      borderRadius: "999px",
-                      border: "1px solid rgba(216,178,110,0.3)",
-                      background: "rgba(216,178,110,0.1)",
-                      padding: "6px 14px",
-                    }}
-                  >
-                    ▶ Line {playingLine} of {totalLines}
-                  </span>
-                )}
-
                 <button
                   style={{
                     borderRadius: "14px",
-                    background: isPlaying ? "rgba(255,255,255,0.1)" : "#d8b26e",
+                    background: (isPlaying || preparingAudio) ? "rgba(255,255,255,0.1)" : "#d8b26e",
                     padding: "10px 20px",
                     fontWeight: 700,
-                    color: isPlaying ? "rgba(255,255,255,0.4)" : "black",
+                    color: (isPlaying || preparingAudio) ? "rgba(255,255,255,0.4)" : "black",
                     border: "none",
-                    cursor: isPlaying ? "not-allowed" : "pointer",
+                    cursor: (isPlaying || preparingAudio) ? "not-allowed" : "pointer",
                     fontSize: "15px",
                   }}
                   onClick={speakStory}
-                  disabled={isPlaying}
+                  disabled={isPlaying || preparingAudio}
                 >
                   🔊 Listen
                 </button>
@@ -553,8 +552,16 @@ export default function CreateAudioPage() {
               </div>
             )}
 
-            {/* Audio player bar */}
-            {isPlaying && (
+            {/* Preparing audio state */}
+            {preparingAudio && (
+              <div style={{ marginBottom: "20px", borderRadius: "16px", border: "1px solid rgba(216,178,110,0.2)", background: "rgba(216,178,110,0.06)", padding: "14px 16px", fontSize: "13px", color: "#d8b26e", display: "flex", alignItems: "center", gap: "10px" }}>
+                <span style={{ animation: "spin 1s linear infinite", display: "inline-block" }}>⏳</span>
+                Preparing audio — this takes a moment…
+              </div>
+            )}
+
+            {/* Single unified audio progress bar */}
+            {isPlaying && totalDuration > 0 && (
               <div
                 style={{
                   marginBottom: "20px",
@@ -564,67 +571,32 @@ export default function CreateAudioPage() {
                   padding: "14px 16px",
                 }}
               >
-                {/* Line counter + current line text */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px", gap: "12px" }}>
-                  <div style={{ fontSize: "12px", color: "#d8b26e", fontWeight: 600, whiteSpace: "nowrap" }}>
-                    Line {playingLine} of {totalLines}
-                  </div>
-                  {currentLineText && (
-                    <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, textAlign: "right" }}>
-                      {currentLineText.length > 60 ? currentLineText.slice(0, 60) + "…" : currentLineText}
-                    </div>
-                  )}
-                </div>
-
-                {/* Seek slider */}
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", minWidth: "32px" }}>
-                    {formatTime(audioCurrentTime)}
+                  <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", minWidth: "34px", fontVariantNumeric: "tabular-nums" }}>
+                    {formatTime(overallTime)}
                   </span>
                   <input
                     type="range"
                     min={0}
-                    max={audioDuration || 1}
+                    max={totalDuration}
                     step={0.1}
-                    value={audioCurrentTime}
+                    value={overallTime}
                     onChange={(e) => handleSeek(parseFloat(e.target.value))}
                     style={{
                       flex: 1,
                       height: "4px",
                       accentColor: "#d8b26e",
                       cursor: "pointer",
-                      background: audioDuration > 0
-                        ? `linear-gradient(to right, #d8b26e ${(audioCurrentTime / audioDuration) * 100}%, rgba(255,255,255,0.15) ${(audioCurrentTime / audioDuration) * 100}%)`
-                        : "rgba(255,255,255,0.15)",
+                      background: `linear-gradient(to right, #d8b26e ${(overallTime / totalDuration) * 100}%, rgba(255,255,255,0.15) ${(overallTime / totalDuration) * 100}%)`,
                       borderRadius: "4px",
                       outline: "none",
                       border: "none",
                     }}
                   />
-                  <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", minWidth: "32px", textAlign: "right" }}>
-                    {formatTime(audioDuration)}
+                  <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", minWidth: "34px", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
+                    {formatTime(totalDuration)}
                   </span>
                 </div>
-
-                {/* Overall story progress */}
-                {totalLines > 0 && (
-                  <div style={{ marginTop: "10px" }}>
-                    <div style={{ height: "2px", borderRadius: "2px", background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
-                      <div
-                        style={{
-                          height: "100%",
-                          width: `${(playingLine / totalLines) * 100}%`,
-                          background: "rgba(216,178,110,0.4)",
-                          borderRadius: "2px",
-                          transition: "width 0.4s ease",
-                        }}
-                      />
-                    </div>
-                    <div style={{ marginTop: "4px", fontSize: "11px", color: "rgba(255,255,255,0.3)", textAlign: "right" }}>
-                      Story {Math.round((playingLine / totalLines) * 100)}% complete
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
