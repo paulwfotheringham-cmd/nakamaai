@@ -1432,10 +1432,10 @@ function CreateAudioTestInner() {
                 </Field>
               </TwoCol>
 
-              <Field label="Extra Detail">
+              <Field label="Tell us what you really want">
                 <input
                   style={inputStyle}
-                  placeholder="Optional custom detail..."
+                  placeholder="Optional..."
                   value={extraDetail}
                   onChange={(e) => setExtraDetail(e.target.value)}
                 />
