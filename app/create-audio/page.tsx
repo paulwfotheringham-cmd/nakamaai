@@ -627,9 +627,13 @@ function CreateAudioTestInner() {
   useEffect(() => {
     const el = innerGridRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(entries => {
+    const apply = (h: number) => setInnerGridHeight(Math.round(h));
+    const measure = () => apply(el.getBoundingClientRect().height);
+    measure();
+    requestAnimationFrame(measure);
+    const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        setInnerGridHeight(Math.round(entry.contentRect.height));
+        apply(entry.contentRect.height);
       }
     });
     ro.observe(el);
@@ -1623,13 +1627,15 @@ function CreateAudioTestInner() {
 
           </div>{/* end inner grid */}
 
-          {/* Column 3: Results — pinned to inner grid height */}
+          {/* Column 3: Results — pinned to inner grid height (never taller than form column) */}
           <div style={{
             flex: "1",
             display: "flex",
             flexDirection: "column",
             minWidth: 0,
+            minHeight: 0,
             height: innerGridHeight ? `${innerGridHeight}px` : "auto",
+            maxHeight: innerGridHeight ? `${innerGridHeight}px` : "none",
             overflow: "hidden",
           }}>
 
@@ -1644,13 +1650,14 @@ function CreateAudioTestInner() {
               boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
               backdropFilter: "blur(12px)",
               flex: 1,
+              minHeight: 0,
               display: "flex",
               flexDirection: "column",
               overflow: "hidden",
             }}
           >
             {/* Header bar */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", flexShrink: 0 }}>
               <div>
                 <h2 style={{ margin: "0 0 8px", fontSize: "26px", fontWeight: 700, lineHeight: 1.3 }}>
                   Your fantasy experience.{" "}
@@ -1662,9 +1669,12 @@ function CreateAudioTestInner() {
               </div>
             </div>
 
+            {/* Phases: fill remaining height; scroll inside */}
+            <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+
             {/* Generating */}
             {interPhase === "generating" && (
-              <div style={{ textAlign: "center", padding: "48px 32px" }}>
+              <div style={{ textAlign: "center", padding: "48px 32px", flex: 1, overflowY: "auto" }}>
                 <div style={{ fontSize: "52px", marginBottom: "20px" }}>✍️</div>
                 <div style={{ fontSize: "22px", fontWeight: 600, color: "#22d3ee" }}>Writing your story...</div>
                 <div style={{ marginTop: "10px", fontSize: "14px", color: "rgba(255,255,255,0.45)" }}>Crafting the scene and your choices</div>
@@ -1679,9 +1689,9 @@ function CreateAudioTestInner() {
 
             {/* Playing */}
             {interPhase === "playing" && (
-              <div>
+              <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
                 {/* Status bar */}
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px", flexShrink: 0 }}>
                   {interPaused ? (
                     <>
                       <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#d8b26e" }} />
@@ -1772,8 +1782,8 @@ function CreateAudioTestInner() {
                   </div>
                 </div>
 
-                {/* Current segment text */}
-                <div style={{ borderRadius: "16px", background: "rgba(0,0,0,0.3)", padding: "20px", maxHeight: "320px", overflowY: "auto", lineHeight: 1.9, fontSize: "15px" }}>
+                {/* Current segment text — fills space below toolbar, scrolls */}
+                <div style={{ flex: 1, minHeight: 0, overflowY: "auto", borderRadius: "16px", background: "rgba(0,0,0,0.3)", padding: "20px", lineHeight: 1.9, fontSize: "15px" }}>
                   {interSegments[interSegments.length - 1]?.split("\n").map((line, i) => (
                     <p key={i} style={{ margin: "4px 0", color: line.startsWith("MALE:") ? "#93c5fd" : line.startsWith("FEMALE:") ? "#f9a8d4" : "rgba(255,255,255,0.85)" }}>
                       {line}
@@ -1783,7 +1793,7 @@ function CreateAudioTestInner() {
 
                 {/* Paused: show option to advance to choices */}
                 {interPaused && interChoices.length > 0 && (
-                  <div style={{ marginTop: "16px", textAlign: "center" }}>
+                  <div style={{ marginTop: "12px", textAlign: "center", flexShrink: 0 }}>
                     <button
                       onClick={() => { setInterPaused(false); setInterPhase("choosing"); }}
                       style={{ padding: "10px 24px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "14px", fontWeight: 600 }}
@@ -1797,14 +1807,15 @@ function CreateAudioTestInner() {
 
             {/* Choosing */}
             {interPhase === "choosing" && (
-              <div>
-                <div style={{ textAlign: "center", marginBottom: "28px" }}>
+              <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                <div style={{ flex: 1, minHeight: 0, overflowY: "auto", paddingRight: "4px" }}>
+                <div style={{ textAlign: "center", marginBottom: "20px" }}>
                   <div style={{ fontSize: "36px", marginBottom: "10px" }}>🎭</div>
                   <h3 style={{ margin: "0 0 6px", fontSize: "24px", fontWeight: 800 }}>What happens next?</h3>
                   <p style={{ margin: 0, fontSize: "14px", color: "rgba(255,255,255,0.5)" }}>Pick an option, speak your choice, or type your own</p>
                 </div>
 
-                <div style={{ display: "grid", gap: "12px", marginBottom: "24px" }}>
+                <div style={{ display: "grid", gap: "12px", marginBottom: "20px" }}>
                   {interChoices.map((choice, i) => (
                     <button
                       key={i}
@@ -1907,9 +1918,10 @@ function CreateAudioTestInner() {
                     </div>
                   )}
                 </div>
+                </div>
 
                 {/* Save & End row */}
-                <div style={{ marginTop: "20px", paddingTop: "20px", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", gap: "10px", justifyContent: "flex-end", alignItems: "center" }}>
+                <div style={{ marginTop: "12px", paddingTop: "16px", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", gap: "10px", justifyContent: "flex-end", alignItems: "center", flexShrink: 0, flexWrap: "wrap" }}>
                   <button
                     onClick={saveInterStory}
                     disabled={interSaveStatus === "saving"}
@@ -1972,6 +1984,7 @@ function CreateAudioTestInner() {
                 </div>
               </div>
             )}
+            </div>{/* end phases scroll area */}
           </div>
         )}
 
