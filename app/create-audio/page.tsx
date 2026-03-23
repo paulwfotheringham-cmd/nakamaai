@@ -1596,18 +1596,18 @@ function CreateAudioTestInner() {
                       <span style={{ fontSize: "14px", fontWeight: 600, color: "#4ade80" }}>Playing — listen for your prompt</span>
                     </>
                   )}
-                  <div style={{ marginLeft: "auto", display: "flex", gap: "8px" }}>
+                  <div style={{ marginLeft: "auto", display: "flex", gap: "8px", alignItems: "center" }}>
                     {interPaused ? (
                       <button
                         onClick={handleInterResume}
-                        style={{ padding: "8px 16px", borderRadius: "12px", border: "1px solid rgba(74,222,128,0.4)", background: "rgba(74,222,128,0.1)", color: "#4ade80", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+                        style={{ padding: "9px 18px", borderRadius: "12px", border: "1px solid rgba(74,222,128,0.4)", background: "rgba(74,222,128,0.1)", color: "#4ade80", cursor: "pointer", fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
                       >
                         ▶ Resume
                       </button>
                     ) : (
                       <button
                         onClick={handleInterPause}
-                        style={{ padding: "8px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "white", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+                        style={{ padding: "9px 18px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.18)", background: "rgba(255,255,255,0.07)", color: "white", cursor: "pointer", fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
                       >
                         ⏸ Pause
                       </button>
@@ -1616,22 +1616,23 @@ function CreateAudioTestInner() {
                       onClick={saveInterStory}
                       disabled={interSaveStatus === "saving"}
                       style={{
-                        padding: "8px 16px",
+                        padding: "9px 18px",
                         borderRadius: "12px",
                         border: interSaveStatus === "saved" ? "1px solid rgba(74,222,128,0.4)" : "1px solid rgba(216,178,110,0.35)",
                         background: interSaveStatus === "saved" ? "rgba(74,222,128,0.1)" : "rgba(216,178,110,0.1)",
                         color: interSaveStatus === "saved" ? "#4ade80" : "#d8b26e",
                         cursor: interSaveStatus === "saving" ? "not-allowed" : "pointer",
-                        fontSize: "13px",
+                        fontSize: "14px",
                         fontWeight: 600,
                         opacity: interSaveStatus === "saving" ? 0.6 : 1,
+                        whiteSpace: "nowrap",
                       }}
                     >
                       {interSaveStatus === "saved" ? "✓ Saved" : interSaveStatus === "saving" ? "Saving…" : "💾 Save"}
                     </button>
                     <div ref={interResultDropdownRef} style={{ position: "relative" }}>
                       <button
-                        style={{ padding: "8px 14px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.15)", background: showInterResultDropdown ? "rgba(216,178,110,0.12)" : "rgba(255,255,255,0.05)", color: showInterResultDropdown ? "#d8b26e" : "rgba(255,255,255,0.75)", cursor: "pointer", fontSize: "13px", fontWeight: 600, display: "flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}
+                        style={{ padding: "9px 18px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.18)", background: showInterResultDropdown ? "rgba(216,178,110,0.12)" : "rgba(255,255,255,0.07)", color: showInterResultDropdown ? "#d8b26e" : "white", cursor: "pointer", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px", whiteSpace: "nowrap" }}
                         onClick={async () => {
                           if (!showInterResultDropdown && savedStories.length === 0) await fetchSavedStories();
                           setShowInterResultDropdown(v => !v);
@@ -1667,7 +1668,7 @@ function CreateAudioTestInner() {
                     </div>
                     <button
                       onClick={handleInterStop}
-                      style={{ padding: "8px 16px", borderRadius: "12px", border: "1px solid rgba(255,80,80,0.3)", background: "rgba(255,80,80,0.08)", color: "#ff8080", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+                      style={{ padding: "9px 18px", borderRadius: "12px", border: "1px solid rgba(255,80,80,0.3)", background: "rgba(255,80,80,0.08)", color: "#ff8080", cursor: "pointer", fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
                     >
                       ✕ End
                     </button>
