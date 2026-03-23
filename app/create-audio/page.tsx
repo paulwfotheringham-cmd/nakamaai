@@ -609,7 +609,22 @@ function CreateAudioTestInner() {
   const dropdownRef            = useRef<HTMLDivElement>(null);
   const resultDropdownRef      = useRef<HTMLDivElement>(null);
   const interResultDropdownRef = useRef<HTMLDivElement>(null);
+  const innerGridRef           = useRef<HTMLDivElement>(null);
+  const [innerGridHeight, setInnerGridHeight] = useState<number | null>(null);
   const searchParams = useSearchParams();
+
+  // Measure the form+tiles column height and pin the result column to it
+  useEffect(() => {
+    const el = innerGridRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setInnerGridHeight(Math.round(entry.contentRect.height));
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const id = searchParams.get("story_id");
@@ -1160,10 +1175,10 @@ function CreateAudioTestInner() {
         }}
       >
         {/* Three-column layout: [hero + form] | results */}
-        <div style={{ display: "flex", gap: "28px", alignItems: "stretch" }}>
+        <div style={{ display: "flex", gap: "28px", alignItems: "flex-start" }}>
 
           {/* Inner flex: hero | form — sized to each other only */}
-          <div style={{ flex: "1.75", display: "grid", gap: "28px", gridTemplateColumns: "0.75fr 1fr", alignItems: "stretch" }}>
+          <div ref={innerGridRef} style={{ flex: "1.75", display: "grid", gap: "28px", gridTemplateColumns: "0.75fr 1fr", alignItems: "stretch" }}>
 
           {/* Left: hero text + tiles stacked */}
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -1540,8 +1555,15 @@ function CreateAudioTestInner() {
 
           </div>{/* end inner grid */}
 
-          {/* Column 3: Results */}
-          <div style={{ flex: "1", display: "flex", flexDirection: "column", minWidth: 0 }}>
+          {/* Column 3: Results — pinned to inner grid height */}
+          <div style={{
+            flex: "1",
+            display: "flex",
+            flexDirection: "column",
+            minWidth: 0,
+            height: innerGridHeight ? `${innerGridHeight}px` : "auto",
+            overflow: "hidden",
+          }}>
 
         {/* Interactive Story result area */}
         {interPhase !== "setup" && (
@@ -1843,6 +1865,7 @@ function CreateAudioTestInner() {
               flex: 1,
               display: "flex",
               flexDirection: "column",
+              minHeight: 0,
               overflow: "hidden",
             }}
           >
