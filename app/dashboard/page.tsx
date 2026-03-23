@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CreateAudioTile from "./CreateAudioTile";
+import ConvertEbookTile from "./ConvertEbookTile";
 
 type Tile = {
   title: string;
@@ -17,14 +18,6 @@ const tiles: Tile[] = [
       "Browse and begin your next immersive audio experience.",
     href: "/fantasy-audio",
     icon: "📚",
-    cta: "Open",
-  },
-  {
-    title: "Convert ebook to fantasy audio",
-    description:
-      "Upload your favourite ebook and transform it into an immersive fantasy audio experience.",
-    href: "/convert-ebook-to-fantasy-audio",
-    icon: "🎧",
     cta: "Open",
   },
   {
@@ -123,6 +116,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           <TileCard key={tiles[0].title} tile={tiles[0]} />
           <CreateAudioTile />
+          <ConvertEbookTile />
           {tiles.slice(1).map((tile) => (
             <TileCard key={tile.title} tile={tile} />
           ))}
