@@ -550,9 +550,25 @@ function VoiceSlot({
   );
 }
 
+// ─── Categories ──────────────────────────────────────────────────────────────
+
+const CATEGORIES: Record<string, string[]> = {
+  "Anime / Hentai":           ["Anime 1", "Anime 2", "Hentai 1", "Hentai 2"],
+  "Paranormal & Supernatural":["Werewolf", "Ghost", "Devil", "Angel"],
+  "Fairy Tales & Monsters":   ["Dragon", "Witch", "Wizard", "Dwarf"],
+  "Sci-Fi / Alien":           ["Star Trek", "Battlestar Galactica", "Alien 1", "Alien 2"],
+  "Power Dynamics":           ["Sub 1", "Sub 2", "Dom 1", "Dom 2"],
+  "Modern":                   ["Office", "Travel", "Outdoors", "Stranger Encounter"],
+  "Dark & Erotic":            ["Obsession", "Seduction", "Forbidden", "After Dark"],
+  "Historical Romance":       ["Victorian", "Medieval", "Pirate", "Caveman"],
+};
+const CATEGORY_KEYS = Object.keys(CATEGORIES);
+
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
 function CreateAudioTestInner() {
+  const [category, setCategory]       = useState(CATEGORY_KEYS[0]);
+  const [style, setStyle]             = useState(CATEGORIES[CATEGORY_KEYS[0]][0]);
   const [setting, setSetting]         = useState("office");
   const [mood, setMood]               = useState("romantic");
   const [buildUp, setBuildUp]         = useState("slow burn");
@@ -560,6 +576,11 @@ function CreateAudioTestInner() {
   const [femaleRole, setFemaleRole]   = useState("assistant");
   const [storyType, setStoryType]     = useState("romantic encounter");
   const [extraDetail, setExtraDetail] = useState("");
+
+  function handleCategoryChange(cat: string) {
+    setCategory(cat);
+    setStyle(CATEGORIES[cat][0]);
+  }
   const [story, setStory]             = useState("");
   const [loading, setLoading]         = useState(false);
 
@@ -643,7 +664,7 @@ function CreateAudioTestInner() {
       const response = await fetch("/api/story", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ setting, mood, buildUp, maleRole, femaleRole, storyType, extraDetail }),
+        body: JSON.stringify({ category, style, setting, mood, buildUp, maleRole, femaleRole, storyType, extraDetail }),
       });
       const data = await response.json();
       setStory(data.story || "");
@@ -982,6 +1003,23 @@ function CreateAudioTestInner() {
             </div>
 
             <div style={{ display: "grid", gap: "16px" }}>
+              <TwoCol>
+                <Field label="Category">
+                  <select style={inputStyle} value={category} onChange={(e) => handleCategoryChange(e.target.value)}>
+                    {CATEGORY_KEYS.map((c) => (
+                      <option key={c} style={{ color: "black" }}>{c}</option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="Style">
+                  <select style={inputStyle} value={style} onChange={(e) => setStyle(e.target.value)}>
+                    {CATEGORIES[category].map((s) => (
+                      <option key={s} style={{ color: "black" }}>{s}</option>
+                    ))}
+                  </select>
+                </Field>
+              </TwoCol>
+
               <TwoCol>
                 <Field label="Setting">
                   <select style={inputStyle} value={setting} onChange={(e) => setSetting(e.target.value)}>

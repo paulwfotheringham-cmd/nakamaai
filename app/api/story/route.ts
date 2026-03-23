@@ -14,6 +14,8 @@ export async function POST(req: Request) {
   }
 
   const {
+    category,
+    style,
     setting,
     mood,
     buildUp,
@@ -34,6 +36,8 @@ export async function POST(req: Request) {
 Target length: 1,600 to 2,000 words.
 
 Story requirements:
+${category ? `- Category: ${category}` : ""}
+${style ? `- Style / theme: ${style}` : ""}
 - Setting: ${setting}
 - Mood: ${mood}
 - Build-up: ${buildUp}
@@ -43,6 +47,7 @@ Story requirements:
 ${extraDetail ? `- Extra detail: ${extraDetail}` : ""}
 
 Instructions:
+- The category and style should strongly shape the world, atmosphere, and characters of the story.
 - Create a complete story with beginning, middle, emotional escalation, climax, and ending.
 - Make it immersive, emotional, and detailed.
 - Include rich dialogue and narration.
