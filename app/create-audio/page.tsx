@@ -1159,8 +1159,11 @@ function CreateAudioTestInner() {
           padding: "32px 24px",
         }}
       >
-        {/* Three-column layout: hero | form | results */}
-        <div style={{ display: "grid", gap: "28px", gridTemplateColumns: "0.75fr 1fr 1fr", alignItems: "stretch" }}>
+        {/* Three-column layout: [hero + form] | results */}
+        <div style={{ display: "grid", gap: "28px", gridTemplateColumns: "1.75fr 1fr", alignItems: "start" }}>
+
+          {/* Inner grid: hero | form — stretch against each other only */}
+          <div style={{ display: "grid", gap: "28px", gridTemplateColumns: "0.75fr 1fr", alignItems: "stretch" }}>
 
           {/* Left: hero text + tiles stacked */}
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -1532,6 +1535,8 @@ function CreateAudioTestInner() {
               </div>
             </div>
           </div>
+
+          </div>{/* end inner grid */}
 
           {/* Column 3: Results */}
           <div style={{ display: "flex", flexDirection: "column" }}>
