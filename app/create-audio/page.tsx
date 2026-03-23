@@ -1233,7 +1233,6 @@ function CreateAudioTestInner() {
                 justifyContent: "flex-start",
               }}
             >
-              <div style={{ fontSize: "44px", marginBottom: "20px" }}>📖</div>
               <div style={{ fontSize: "30px", fontWeight: 800, lineHeight: 1.2, color: "white" }}>
                 Generate your custom story
               </div>
@@ -1257,7 +1256,6 @@ function CreateAudioTestInner() {
                 justifyContent: "flex-start",
               }}
             >
-              <div style={{ fontSize: "44px", marginBottom: "20px" }}>🎭</div>
               <div style={{ fontSize: "30px", fontWeight: 800, lineHeight: 1.2, color: "white" }}>
                 Generate with interactive features
               </div>
