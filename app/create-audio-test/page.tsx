@@ -951,7 +951,7 @@ function CreateAudioTestInner() {
                 color: "rgba(255,255,255,0.7)",
               }}
             >
-              Browse our curated voice library — filter by gender, preview any voice live,
+              Browse our curated English voice library — filter by gender, accent, preview any voice live,
               and cast your narrator, male character, and female character.
             </p>
 
