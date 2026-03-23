@@ -1157,90 +1157,102 @@ function CreateAudioTestInner() {
         {/* Three-column layout: hero | form | results */}
         <div style={{ display: "grid", gap: "28px", gridTemplateColumns: "0.75fr 1fr 1fr", alignItems: "stretch" }}>
 
-          {/* Left: hero text */}
-          <div style={{ display: "flex", flexDirection: "column" }}>
+          {/* Left: hero text + tiles stacked */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+
+            {/* Hero card */}
             <div
               style={{
-                marginBottom: "16px",
-                display: "inline-flex",
-                width: "fit-content",
-                borderRadius: "999px",
-                border: "1px solid rgba(216,178,110,0.3)",
-                background: "rgba(216,178,110,0.1)",
-                padding: "8px 16px",
-                fontSize: "14px",
-                color: "#f1d7a1",
+                borderRadius: "20px",
+                border: "1px solid rgba(216,178,110,0.2)",
+                background: "rgba(255,255,255,0.04)",
+                padding: "28px 24px",
+                backdropFilter: "blur(10px)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
               }}
             >
-              Premium audio storytelling
-            </div>
-
-            <h1
-              style={{
-                maxWidth: "700px",
-                fontSize: "64px",
-                fontWeight: 700,
-                lineHeight: 1.1,
-                margin: 0,
-              }}
-            >
-              500+ voices for your{" "}
-              <span style={{ color: "#d8b26e" }}>story</span>
-            </h1>
-
-            <p
-              style={{
-                marginTop: "24px",
-                maxWidth: "620px",
-                fontSize: "22px",
-                lineHeight: 1.6,
-                color: "rgba(255,255,255,0.7)",
-              }}
-            >
-              Browse our curated English voice library — filter by gender, accent, preview any voice live,
-              and cast your narrator, male character, and female character.
-            </p>
-
-            {/* Two choice boxes */}
-            <div style={{ marginTop: "32px", display: "grid", gap: "14px", gridTemplateColumns: "1fr 1fr" }}>
               <div
                 style={{
-                  borderRadius: "20px",
-                  background: "linear-gradient(135deg, rgba(21,128,61,0.18) 0%, rgba(20,83,45,0.10) 100%)",
-                  border: "1px solid rgba(74,222,128,0.25)",
-                  padding: "24px 20px",
-                  backdropFilter: "blur(10px)",
-                  boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+                  marginBottom: "16px",
+                  display: "inline-flex",
+                  width: "fit-content",
+                  borderRadius: "999px",
+                  border: "1px solid rgba(216,178,110,0.3)",
+                  background: "rgba(216,178,110,0.1)",
+                  padding: "6px 14px",
+                  fontSize: "13px",
+                  color: "#f1d7a1",
                 }}
               >
-                <div style={{ fontSize: "22px", marginBottom: "12px" }}>📖</div>
-                <div style={{ fontSize: "15px", fontWeight: 700, lineHeight: 1.35, color: "white" }}>
-                  Generate your custom story
-                </div>
-                <div style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.55)", lineHeight: 1.55 }}>
-                  Full story from your scene settings, voiced with your cast.
-                </div>
+                Premium audio storytelling
               </div>
 
-              <div
+              <h1
                 style={{
-                  borderRadius: "20px",
-                  background: "linear-gradient(135deg, rgba(109,40,217,0.18) 0%, rgba(67,20,150,0.10) 100%)",
-                  border: "1px solid rgba(167,139,250,0.28)",
-                  padding: "24px 20px",
-                  backdropFilter: "blur(10px)",
-                  boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+                  fontSize: "44px",
+                  fontWeight: 700,
+                  lineHeight: 1.1,
+                  margin: 0,
                 }}
               >
-                <div style={{ fontSize: "22px", marginBottom: "12px" }}>🎭</div>
-                <div style={{ fontSize: "15px", fontWeight: 700, lineHeight: 1.35, color: "white" }}>
-                  Generate with interactive features
-                </div>
-                <div style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.55)", lineHeight: 1.55 }}>
-                  Story pauses after each scene — you choose what happens next.
-                </div>
+                500+ voices for your{" "}
+                <span style={{ color: "#d8b26e" }}>story</span>
+              </h1>
+
+              <p
+                style={{
+                  marginTop: "16px",
+                  fontSize: "15px",
+                  lineHeight: 1.6,
+                  color: "rgba(255,255,255,0.65)",
+                  margin: "16px 0 0 0",
+                }}
+              >
+                Browse our curated English voice library — filter by gender, accent, preview any voice live,
+                and cast your narrator, male character, and female character.
+              </p>
+            </div>
+
+            {/* Tile: custom story */}
+            <div
+              style={{
+                borderRadius: "20px",
+                background: "linear-gradient(135deg, rgba(21,128,61,0.18) 0%, rgba(20,83,45,0.10) 100%)",
+                border: "1px solid rgba(74,222,128,0.25)",
+                padding: "24px 20px",
+                backdropFilter: "blur(10px)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+              }}
+            >
+              <div style={{ fontSize: "22px", marginBottom: "12px" }}>📖</div>
+              <div style={{ fontSize: "15px", fontWeight: 700, lineHeight: 1.35, color: "white" }}>
+                Generate your custom story
+              </div>
+              <div style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.55)", lineHeight: 1.55 }}>
+                Full story from your scene settings, voiced with your cast.
               </div>
             </div>
+
+            {/* Tile: interactive */}
+            <div
+              style={{
+                borderRadius: "20px",
+                background: "linear-gradient(135deg, rgba(109,40,217,0.18) 0%, rgba(67,20,150,0.10) 100%)",
+                border: "1px solid rgba(167,139,250,0.28)",
+                padding: "24px 20px",
+                backdropFilter: "blur(10px)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+              }}
+            >
+              <div style={{ fontSize: "22px", marginBottom: "12px" }}>🎭</div>
+              <div style={{ fontSize: "15px", fontWeight: 700, lineHeight: 1.35, color: "white" }}>
+                Generate with interactive features
+              </div>
+              <div style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.55)", lineHeight: 1.55 }}>
+                Story pauses after each scene — you choose what happens next.
+              </div>
+            </div>
+
           </div>
 
           {/* Right: form */}
