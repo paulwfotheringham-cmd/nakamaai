@@ -633,8 +633,9 @@ function CreateAudioTestInner() {
   const [interCustomChoice, setInterCustomChoice] = useState("");
   const [isListening, setIsListening]             = useState(false);
   const [interLoading, setInterLoading]           = useState(false);
-  const [maleName]  = useState(() => randItem(["Luca", "Adrian", "Noah", "Julian", "Theo"]));
-  const [femaleName] = useState(() => randItem(["Elena", "Sofia", "Clara", "Mia", "Isla"]));
+  const [interSaveStatus, setInterSaveStatus]     = useState<"idle" | "saving" | "saved">("idle");
+  const [maleName, setMaleName]   = useState(() => randItem(["Luca", "Adrian", "Noah", "Julian", "Theo"]));
+  const [femaleName, setFemaleName] = useState(() => randItem(["Elena", "Sofia", "Clara", "Mia", "Isla"]));
   const interStoppedRef      = useRef(false);
   const interCurrentAudioRef = useRef<HTMLAudioElement | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -751,14 +752,40 @@ function CreateAudioTestInner() {
   }
 
   function loadSavedStory(s: SavedStory) {
-    setStory(s.story_text);
+    setShowDropdown(false);
     if (s.narrator_voice) setNarratorVoice({ id: s.narrator_voice, title: s.narrator_voice });
     if (s.male_voice)     setMaleVoice({ id: s.male_voice, title: s.male_voice });
     if (s.female_voice)   setFemaleVoice({ id: s.female_voice, title: s.female_voice });
     if (s.setting) setSetting(s.setting);
     if (s.mood)    setMood(s.mood);
+
+    // Detect interactive story saved state
+    if (s.story_text.trimStart().startsWith('{"__type":"interactive"')) {
+      try {
+        const data = JSON.parse(s.story_text);
+        stopStory();
+        setStory("");
+        setSaveStatus("idle");
+        if (data.category) setCategory(data.category);
+        if (data.setting)  setSetting(data.setting);
+        if (data.mood)     setMood(data.mood);
+        if (data.maleRole) setMaleRole(data.maleRole);
+        if (data.femaleRole) setFemaleRole(data.femaleRole);
+        if (data.maleName)   setMaleName(data.maleName);
+        if (data.femaleName) setFemaleName(data.femaleName);
+        setInterSegments(data.segments ?? []);
+        setInterChoices(data.choices ?? []);
+        setInterSaveStatus("idle");
+        setInterPhase("choosing");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      } catch { /* fall through to plain story load */ }
+    }
+
+    // Plain story
+    setStory(s.story_text);
     setSaveStatus("idle");
-    setShowDropdown(false);
+    handleInterStop();
     stopStory();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -915,6 +942,7 @@ function CreateAudioTestInner() {
     setInterPhase("generating");
     setInterSegments([]);
     setInterChoices([]);
+    setInterSaveStatus("idle");
     setAudioError("");
     try {
       const res = await fetch("/api/interactive-story", {
@@ -987,6 +1015,57 @@ function CreateAudioTestInner() {
   function stopListening() {
     recognitionRef.current?.stop();
     setIsListening(false);
+  }
+
+  function handleInterPause() {
+    interStoppedRef.current = true;
+    interCurrentAudioRef.current?.pause();
+    interCurrentAudioRef.current = null;
+    setInterPhase("choosing");
+  }
+
+  async function saveInterStory() {
+    if (interSaveStatus === "saving") return;
+    setInterSaveStatus("saving");
+    const date = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+    const name = `Interactive · ${setting} · ${mood} · ${date}`;
+    const storyText = JSON.stringify({
+      __type: "interactive",
+      segments: interSegments,
+      choices: interChoices,
+      category,
+      setting,
+      mood,
+      maleRole,
+      femaleRole,
+      maleName,
+      femaleName,
+    });
+    try {
+      const res = await fetch("/api/saved-stories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          storyText,
+          narratorVoice: narratorVoice?.id ?? "",
+          maleVoice: maleVoice?.id ?? "",
+          femaleVoice: femaleVoice?.id ?? "",
+          setting,
+          mood,
+        }),
+      });
+      if (res.ok) {
+        setInterSaveStatus("saved");
+        if (savedStories.length > 0) fetchSavedStories();
+      } else {
+        setInterSaveStatus("idle");
+        alert("Failed to save story.");
+      }
+    } catch {
+      setInterSaveStatus("idle");
+      alert("Failed to save story.");
+    }
   }
 
   function handleSeek(value: number) {
@@ -1408,8 +1487,11 @@ function CreateAudioTestInner() {
                               onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                             >
                               <div style={{ fontSize: "14px", fontWeight: 600 }}>{s.name}</div>
-                              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginTop: "3px" }}>
+                              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginTop: "3px", display: "flex", gap: "8px", alignItems: "center" }}>
                                 {new Date(s.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                                {s.story_text.trimStart().startsWith('{"__type":"interactive"') && (
+                                  <span style={{ color: "#22d3ee", fontWeight: 700 }}>🎭 Continue</span>
+                                )}
                               </div>
                             </button>
                           ))}
@@ -1446,12 +1528,6 @@ function CreateAudioTestInner() {
                   {setting} · {mood} · {category}
                 </p>
               </div>
-              <button
-                onClick={handleInterStop}
-                style={{ padding: "10px 18px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "14px", fontWeight: 600 }}
-              >
-                ✕ End Story
-              </button>
             </div>
 
             {/* Generating */}
@@ -1460,6 +1536,12 @@ function CreateAudioTestInner() {
                 <div style={{ fontSize: "52px", marginBottom: "20px" }}>✍️</div>
                 <div style={{ fontSize: "22px", fontWeight: 600, color: "#22d3ee" }}>Writing your story...</div>
                 <div style={{ marginTop: "10px", fontSize: "14px", color: "rgba(255,255,255,0.45)" }}>Crafting the scene and your choices</div>
+                <button
+                  onClick={handleInterStop}
+                  style={{ marginTop: "24px", padding: "10px 22px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: "14px", fontWeight: 600 }}
+                >
+                  ✕ Cancel
+                </button>
               </div>
             )}
 
@@ -1469,6 +1551,20 @@ function CreateAudioTestInner() {
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
                   <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 12px rgba(74,222,128,0.6)" }} />
                   <span style={{ fontSize: "14px", fontWeight: 600, color: "#4ade80" }}>Playing — listen for your prompt</span>
+                  <div style={{ marginLeft: "auto", display: "flex", gap: "8px" }}>
+                    <button
+                      onClick={handleInterPause}
+                      style={{ padding: "8px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "white", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+                    >
+                      ⏸ Pause
+                    </button>
+                    <button
+                      onClick={handleInterStop}
+                      style={{ padding: "8px 16px", borderRadius: "12px", border: "1px solid rgba(255,80,80,0.3)", background: "rgba(255,80,80,0.08)", color: "#ff8080", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+                    >
+                      ✕ End
+                    </button>
+                  </div>
                 </div>
                 <div style={{ borderRadius: "16px", background: "rgba(0,0,0,0.3)", padding: "20px", maxHeight: "320px", overflowY: "auto", lineHeight: 1.9, fontSize: "15px" }}>
                   {interSegments[interSegments.length - 1]?.split("\n").map((line, i) => (
@@ -1538,19 +1634,33 @@ function CreateAudioTestInner() {
                     </div>
                   )}
                 </div>
-              </div>
-            )}
 
-            {/* Story history */}
-            {interSegments.length > 1 && (interPhase === "playing" || interPhase === "choosing") && (
-              <div style={{ marginTop: "24px" }}>
-                <div style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", marginBottom: "10px" }}>Story so far</div>
-                {interSegments.slice(0, -1).map((seg, i) => (
-                  <div key={i} style={{ borderRadius: "14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", padding: "14px 18px", marginBottom: "8px", fontSize: "13px", color: "rgba(255,255,255,0.38)", lineHeight: 1.7 }}>
-                    {seg.split("\n").slice(0, 3).map((l, j) => <p key={j} style={{ margin: "2px 0" }}>{l}</p>)}
-                    <p style={{ margin: "4px 0 0", color: "rgba(255,255,255,0.2)" }}>...</p>
-                  </div>
-                ))}
+                {/* Save & End row */}
+                <div style={{ marginTop: "20px", paddingTop: "20px", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                  <button
+                    onClick={saveInterStory}
+                    disabled={interSaveStatus === "saving"}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "14px",
+                      border: interSaveStatus === "saved" ? "1px solid rgba(74,222,128,0.4)" : "1px solid rgba(34,211,238,0.3)",
+                      background: interSaveStatus === "saved" ? "rgba(74,222,128,0.1)" : "rgba(34,211,238,0.08)",
+                      color: interSaveStatus === "saved" ? "#4ade80" : "#22d3ee",
+                      cursor: interSaveStatus === "saving" ? "not-allowed" : "pointer",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      opacity: interSaveStatus === "saving" ? 0.6 : 1,
+                    }}
+                  >
+                    {interSaveStatus === "saved" ? "✓ Saved — continue later" : interSaveStatus === "saving" ? "Saving…" : "💾 Save & Continue Later"}
+                  </button>
+                  <button
+                    onClick={handleInterStop}
+                    style={{ padding: "10px 20px", borderRadius: "14px", border: "1px solid rgba(255,80,80,0.3)", background: "rgba(255,80,80,0.08)", color: "#ff8080", cursor: "pointer", fontSize: "14px", fontWeight: 600 }}
+                  >
+                    ✕ End Story
+                  </button>
+                </div>
               </div>
             )}
           </div>
