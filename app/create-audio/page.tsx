@@ -1192,8 +1192,8 @@ function CreateAudioTestInner() {
               <div
                 style={{
                   borderRadius: "20px",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(216,178,110,0.25)",
+                  background: "linear-gradient(135deg, rgba(21,128,61,0.18) 0%, rgba(20,83,45,0.10) 100%)",
+                  border: "1px solid rgba(74,222,128,0.25)",
                   padding: "24px 20px",
                   cursor: "pointer",
                   backdropFilter: "blur(10px)",
@@ -1201,8 +1201,8 @@ function CreateAudioTestInner() {
                   transition: "border-color 0.2s ease, background 0.2s ease",
                 }}
                 onClick={generateStory}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(216,178,110,0.6)"; (e.currentTarget as HTMLDivElement).style.background = "rgba(216,178,110,0.08)"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(216,178,110,0.25)"; (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.05)"; }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(74,222,128,0.55)"; (e.currentTarget as HTMLDivElement).style.background = "linear-gradient(135deg, rgba(21,128,61,0.28) 0%, rgba(20,83,45,0.18) 100%)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(74,222,128,0.25)"; (e.currentTarget as HTMLDivElement).style.background = "linear-gradient(135deg, rgba(21,128,61,0.18) 0%, rgba(20,83,45,0.10) 100%)"; }}
               >
                 <div style={{ fontSize: "22px", marginBottom: "12px" }}>📖</div>
                 <div style={{ fontSize: "15px", fontWeight: 700, lineHeight: 1.35, color: "white" }}>
@@ -1216,8 +1216,8 @@ function CreateAudioTestInner() {
               <div
                 style={{
                   borderRadius: "20px",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(216,178,110,0.25)",
+                  background: "linear-gradient(135deg, rgba(109,40,217,0.18) 0%, rgba(67,20,150,0.10) 100%)",
+                  border: "1px solid rgba(167,139,250,0.28)",
                   padding: "24px 20px",
                   cursor: "pointer",
                   backdropFilter: "blur(10px)",
@@ -1225,8 +1225,8 @@ function CreateAudioTestInner() {
                   transition: "border-color 0.2s ease, background 0.2s ease",
                 }}
                 onClick={handleInterStart}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(216,178,110,0.6)"; (e.currentTarget as HTMLDivElement).style.background = "rgba(216,178,110,0.08)"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(216,178,110,0.25)"; (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.05)"; }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(167,139,250,0.6)"; (e.currentTarget as HTMLDivElement).style.background = "linear-gradient(135deg, rgba(109,40,217,0.28) 0%, rgba(67,20,150,0.18) 100%)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(167,139,250,0.28)"; (e.currentTarget as HTMLDivElement).style.background = "linear-gradient(135deg, rgba(109,40,217,0.18) 0%, rgba(67,20,150,0.10) 100%)"; }}
               >
                 <div style={{ fontSize: "22px", marginBottom: "12px" }}>🎭</div>
                 <div style={{ fontSize: "15px", fontWeight: 700, lineHeight: 1.35, color: "white" }}>
@@ -1346,7 +1346,7 @@ function CreateAudioTestInner() {
                     color: "#d8b26e",
                   }}
                 >
-                  Voice Casting
+                  Choose your voices
                 </div>
 
                 <div style={{ display: "grid", gap: "16px" }}>
@@ -1380,10 +1380,10 @@ function CreateAudioTestInner() {
                 <button
                   style={{
                     borderRadius: "18px",
-                    background: loading ? "rgba(216,178,110,0.5)" : "#d8b26e",
+                    background: loading ? "rgba(21,128,61,0.5)" : "#15803d",
                     padding: "12px 10px",
                     fontWeight: 700,
-                    color: "black",
+                    color: "white",
                     border: "none",
                     cursor: loading ? "not-allowed" : "pointer",
                     fontSize: "13px",
@@ -1397,15 +1397,15 @@ function CreateAudioTestInner() {
                   {loading ? "Generating…" : "Generate Story"}
                 </button>
 
-                {/* Button 2: Generate Interactive Story */}
+                {/* Button 2: Generate Interactive */}
                 <button
                   style={{
                     borderRadius: "18px",
-                    background: interLoading ? "rgba(255,255,255,0.05)" : (interPhase !== "setup" ? "rgba(216,178,110,0.2)" : "rgba(255,255,255,0.06)"),
+                    background: interLoading ? "rgba(109,40,217,0.25)" : (interPhase !== "setup" ? "rgba(109,40,217,0.35)" : "rgba(109,40,217,0.18)"),
                     padding: "12px 10px",
                     fontWeight: 700,
-                    color: interPhase !== "setup" ? "#d8b26e" : "rgba(255,255,255,0.85)",
-                    border: interPhase !== "setup" ? "1px solid rgba(216,178,110,0.5)" : "1px solid rgba(255,255,255,0.15)",
+                    color: "white",
+                    border: interPhase !== "setup" ? "1px solid rgba(167,139,250,0.55)" : "1px solid rgba(167,139,250,0.25)",
                     cursor: interLoading ? "not-allowed" : "pointer",
                     fontSize: "13px",
                     whiteSpace: "nowrap",
@@ -1416,7 +1416,7 @@ function CreateAudioTestInner() {
                   onClick={handleInterStart}
                   disabled={interLoading}
                 >
-                  {interLoading ? "Writing…" : "Generate Interactive Story"}
+                  {interLoading ? "Writing…" : "Generate Interactive"}
                 </button>
 
                 <div ref={dropdownRef} style={{ position: "relative" }}>
