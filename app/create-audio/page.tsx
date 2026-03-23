@@ -1129,6 +1129,12 @@ function CreateAudioTestInner() {
 
       <a href="/dashboard" style={backBtnStyle}>← Dashboard</a>
 
+      {/* Logo — top right */}
+      <div style={{ position: "fixed", top: "18px", right: "24px", zIndex: 50, display: "flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", padding: "8px 14px", backdropFilter: "blur(10px)" }}>
+        <div style={{ width: "24px", height: "24px", borderRadius: "6px", background: "linear-gradient(135deg, #d8b26e, #a07840)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 900, color: "black" }}>N</div>
+        <span style={{ fontSize: "14px", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>Nakama <span style={{ color: "#d8b26e" }}>AI</span></span>
+      </div>
+
       <div
         style={{
           maxWidth: "1280px",
@@ -1139,28 +1145,11 @@ function CreateAudioTestInner() {
           padding: "32px 24px",
         }}
       >
-        {/* Header */}
-        <div
-          style={{
-            marginBottom: "40px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div>
-            <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.4em", color: "#d8b26e" }}>
-              Nakama
-            </div>
-            <div style={{ marginTop: "8px", fontSize: "32px", fontWeight: 700 }}>Nakama AI · Customize your adventure</div>
-          </div>
-        </div>
-
-        {/* Two-column layout */}
-        <div style={{ display: "grid", gap: "32px", gridTemplateColumns: "1fr 1.1fr" }}>
+        {/* Two-column layout — no top header */}
+        <div style={{ display: "grid", gap: "32px", gridTemplateColumns: "1fr 1.1fr", alignItems: "start" }}>
 
           {/* Left: hero text */}
-          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <div
               style={{
                 marginBottom: "16px",
@@ -1267,7 +1256,7 @@ function CreateAudioTestInner() {
             }}
           >
             <div style={{ marginBottom: "24px" }}>
-              <h2 style={{ margin: 0, fontSize: "32px", fontWeight: 700 }}>Build your scene</h2>
+              <h2 style={{ margin: 0, fontSize: "32px", fontWeight: 700 }}>Customize your adventure</h2>
               <p style={{ marginTop: "8px", fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>
                 Adjust the story ingredients, then choose voices and generate.
               </p>
@@ -1595,25 +1584,23 @@ function CreateAudioTestInner() {
                         ⏸ Pause
                       </button>
                     )}
-                    {interPaused && (
-                      <button
-                        onClick={saveInterStory}
-                        disabled={interSaveStatus === "saving"}
-                        style={{
-                          padding: "8px 16px",
-                          borderRadius: "12px",
-                          border: interSaveStatus === "saved" ? "1px solid rgba(74,222,128,0.4)" : "1px solid rgba(216,178,110,0.35)",
-                          background: interSaveStatus === "saved" ? "rgba(74,222,128,0.1)" : "rgba(216,178,110,0.1)",
-                          color: interSaveStatus === "saved" ? "#4ade80" : "#d8b26e",
-                          cursor: interSaveStatus === "saving" ? "not-allowed" : "pointer",
-                          fontSize: "13px",
-                          fontWeight: 600,
-                          opacity: interSaveStatus === "saving" ? 0.6 : 1,
-                        }}
-                      >
-                        {interSaveStatus === "saved" ? "✓ Saved" : interSaveStatus === "saving" ? "Saving…" : "💾 Save"}
-                      </button>
-                    )}
+                    <button
+                      onClick={saveInterStory}
+                      disabled={interSaveStatus === "saving"}
+                      style={{
+                        padding: "8px 16px",
+                        borderRadius: "12px",
+                        border: interSaveStatus === "saved" ? "1px solid rgba(74,222,128,0.4)" : "1px solid rgba(216,178,110,0.35)",
+                        background: interSaveStatus === "saved" ? "rgba(74,222,128,0.1)" : "rgba(216,178,110,0.1)",
+                        color: interSaveStatus === "saved" ? "#4ade80" : "#d8b26e",
+                        cursor: interSaveStatus === "saving" ? "not-allowed" : "pointer",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        opacity: interSaveStatus === "saving" ? 0.6 : 1,
+                      }}
+                    >
+                      {interSaveStatus === "saved" ? "✓ Saved" : interSaveStatus === "saving" ? "Saving…" : "💾 Save"}
+                    </button>
                     <button
                       onClick={handleInterStop}
                       style={{ padding: "8px 16px", borderRadius: "12px", border: "1px solid rgba(255,80,80,0.3)", background: "rgba(255,80,80,0.08)", color: "#ff8080", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
