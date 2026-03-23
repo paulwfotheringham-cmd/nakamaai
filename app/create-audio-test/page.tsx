@@ -1102,11 +1102,6 @@ function CreateAudioTestInner() {
                   />
                 </div>
 
-                {!narratorVoice && (
-                  <div style={{ marginTop: "12px", fontSize: "12px", color: "rgba(216,178,110,0.7)" }}>
-                    ↑ Select a narrator voice to enable audio playback
-                  </div>
-                )}
               </div>
 
               <button
