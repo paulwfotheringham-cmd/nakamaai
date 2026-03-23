@@ -1160,10 +1160,10 @@ function CreateAudioTestInner() {
         }}
       >
         {/* Three-column layout: [hero + form] | results */}
-        <div style={{ display: "grid", gap: "28px", gridTemplateColumns: "1.75fr 1fr", alignItems: "stretch" }}>
+        <div style={{ display: "flex", gap: "28px", alignItems: "stretch" }}>
 
-          {/* Inner grid: hero | form — stretch against each other only */}
-          <div style={{ display: "grid", gap: "28px", gridTemplateColumns: "0.75fr 1fr", alignItems: "stretch" }}>
+          {/* Inner flex: hero | form — sized to each other only */}
+          <div style={{ flex: "1.75", display: "grid", gap: "28px", gridTemplateColumns: "0.75fr 1fr", alignItems: "stretch" }}>
 
           {/* Left: hero text + tiles stacked */}
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -1539,7 +1539,7 @@ function CreateAudioTestInner() {
           </div>{/* end inner grid */}
 
           {/* Column 3: Results */}
-          <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          <div style={{ flex: "1", display: "flex", flexDirection: "column", minWidth: 0 }}>
 
         {/* Interactive Story result area */}
         {interPhase !== "setup" && (
@@ -2073,7 +2073,7 @@ function CreateAudioTestInner() {
         )}
 
           </div>{/* end column 3 */}
-        </div>{/* end 3-column grid */}
+        </div>{/* end 3-column layout */}
       </div>
     </div>
   );
