@@ -30,6 +30,15 @@ type CartesiaVoice = {
 
 type SelectedVoice = { id: string; title: string };
 
+/** Decode Cartesia TTS data URI (audio/mpeg base64) to raw bytes for merging. */
+function dataUriMp3ToUint8Array(dataUri: string): Uint8Array {
+  const base64 = dataUri.slice(dataUri.indexOf(",") + 1);
+  const binary = atob(base64);
+  const out = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i);
+  return out;
+}
+
 // ─── Voice Browser Modal ──────────────────────────────────────────────────────
 
 const PAGE_SIZE = 20;
@@ -600,6 +609,7 @@ function CreateAudioTestInner() {
 
   const [previewingId, setPreviewingId]   = useState<string | null>(null);
 
+  const [downloadMp3Loading, setDownloadMp3Loading] = useState(false);
   const [saveStatus, setSaveStatus]         = useState<"idle" | "saving" | "saved">("idle");
   const [savedStories, setSavedStories]     = useState<SavedStory[]>([]);
   const [showDropdown, setShowDropdown]           = useState(false);
@@ -929,6 +939,59 @@ function CreateAudioTestInner() {
     setPreparingAudio(false);
     setOverallTime(0);
     setTotalDuration(0);
+  }
+
+  async function downloadStoryMp3() {
+    if (!story.trim()) return;
+    if (!narratorVoice) {
+      setAudioError("Please select a Narrator voice before downloading audio.");
+      return;
+    }
+    setDownloadMp3Loading(true);
+    setAudioError("");
+    try {
+      const lineConfigs = parseLines();
+      const buffers: Uint8Array[] = [];
+      for (const { text, voiceId } of lineConfigs) {
+        if (!voiceId) continue;
+        const res = await fetch("/api/cartesia-tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, voiceId }),
+        });
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error((errData as { error?: string }).error ?? `Audio generation failed (${res.status})`);
+        }
+        const { outputUri } = (await res.json()) as { outputUri: string };
+        buffers.push(dataUriMp3ToUint8Array(outputUri));
+      }
+      if (buffers.length === 0) {
+        setAudioError("No speakable lines found for this story.");
+        return;
+      }
+      const totalLen = buffers.reduce((a, b) => a + b.length, 0);
+      const merged = new Uint8Array(totalLen);
+      let offset = 0;
+      for (const b of buffers) {
+        merged.set(b, offset);
+        offset += b.length;
+      }
+      const blob = new Blob([merged], { type: "audio/mpeg" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `nakama-story-${new Date().toISOString().slice(0, 10)}.mp3`;
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setAudioError(e instanceof Error ? e.message : "Could not build MP3 download.");
+    } finally {
+      setDownloadMp3Loading(false);
+    }
   }
 
   // ── Interactive story functions ───────────────────────────────────────────
@@ -1874,8 +1937,8 @@ function CreateAudioTestInner() {
               <p style={{ marginTop: "4px", marginBottom: "14px", fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
                 Generated from your chosen settings and cast.
               </p>
-              {/* All action buttons on one row */}
-              <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "nowrap" }}>
+              {/* Action buttons */}
+              <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
                 <button
                   style={{
                     borderRadius: "12px",
@@ -1931,6 +1994,26 @@ function CreateAudioTestInner() {
                   disabled={saveStatus === "saving"}
                 >
                   {saveStatus === "saved" ? "✓ Saved" : saveStatus === "saving" ? "Saving…" : "💾 Save Story"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={downloadStoryMp3}
+                  disabled={downloadMp3Loading || preparingAudio}
+                  style={{
+                    borderRadius: "12px",
+                    border: "1px solid rgba(96,165,250,0.35)",
+                    background: downloadMp3Loading ? "rgba(59,130,246,0.15)" : "rgba(59,130,246,0.12)",
+                    padding: "9px 14px",
+                    color: "#93c5fd",
+                    cursor: downloadMp3Loading || preparingAudio ? "not-allowed" : "pointer",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                    opacity: downloadMp3Loading || preparingAudio ? 0.65 : 1,
+                  }}
+                >
+                  {downloadMp3Loading ? "⏳ Building…" : "⬇ Download .mp3"}
                 </button>
 
                 {/* Browse Stories dropdown */}
