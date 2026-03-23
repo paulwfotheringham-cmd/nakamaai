@@ -36,6 +36,22 @@ const PAGE_SIZE = 20;
 const GENDER_TABS = ["female", "male"] as const;
 type GenderTab = typeof GENDER_TABS[number] | "all";
 
+const LANG_NAMES: Record<string, string> = {
+  en: "English", fr: "French", de: "German", es: "Spanish", pt: "Portuguese",
+  zh: "Chinese", ja: "Japanese", ko: "Korean", hi: "Hindi", it: "Italian",
+  nl: "Dutch", pl: "Polish", ru: "Russian", sv: "Swedish", tr: "Turkish",
+  tl: "Tagalog", bg: "Bulgarian", ro: "Romanian", ar: "Arabic", cs: "Czech",
+  el: "Greek", fi: "Finnish", hr: "Croatian", ms: "Malay", sk: "Slovak",
+  da: "Danish", ta: "Tamil", uk: "Ukrainian", hu: "Hungarian", no: "Norwegian",
+  vi: "Vietnamese", bn: "Bengali", th: "Thai", he: "Hebrew", ka: "Georgian",
+  id: "Indonesian", te: "Telugu", gu: "Gujarati", kn: "Kannada", ml: "Malayalam",
+  mr: "Marathi", pa: "Punjabi",
+};
+
+function langLabel(code: string) {
+  return LANG_NAMES[code?.toLowerCase()] ?? code?.toUpperCase() ?? "Unknown";
+}
+
 function VoiceBrowserModal({
   slot,
   lockedGender,
@@ -52,6 +68,7 @@ function VoiceBrowserModal({
   const [allVoices, setAllVoices] = useState<CartesiaVoice[]>([]);
   const [search, setSearch] = useState("");
   const [gender, setGender] = useState<GenderTab>(lockedGender !== "all" ? lockedGender : (defaultGender ?? "female"));
+  const [langFilter, setLangFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [previewingId, setPreviewingId] = useState<string | null>(null);
@@ -72,12 +89,23 @@ function VoiceBrowserModal({
       gender === "all" ||
       (gender === "female" && (g === "female" || g === "feminine")) ||
       (gender === "male"   && (g === "male"   || g === "masculine"));
+    const matchesLang = langFilter === "all" || v.language?.toLowerCase() === langFilter;
     const matchesSearch =
       !search ||
       v.name.toLowerCase().includes(search.toLowerCase()) ||
       v.description?.toLowerCase().includes(search.toLowerCase());
-    return matchesGender && matchesSearch;
+    return matchesGender && matchesLang && matchesSearch;
   });
+
+  // Derive available languages from gender-filtered voices (before lang filter)
+  const genderFiltered = allVoices.filter((v) => {
+    const g = v.gender?.toLowerCase() ?? "";
+    return gender === "all" ||
+      (gender === "female" && (g === "female" || g === "feminine")) ||
+      (gender === "male"   && (g === "male"   || g === "masculine"));
+  });
+  const availableLangs = Array.from(new Set(genderFiltered.map((v) => v.language?.toLowerCase()).filter(Boolean)))
+    .sort((a, b) => langLabel(a!).localeCompare(langLabel(b!))) as string[];
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -90,6 +118,7 @@ function VoiceBrowserModal({
 
   function handleGender(g: GenderTab) {
     setGender(g);
+    setLangFilter("all");
     setPage(1);
   }
 
@@ -195,44 +224,86 @@ function VoiceBrowserModal({
           </button>
         </div>
 
-        {/* Search + gender filter */}
-        <div style={{ padding: "12px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0, display: "flex", gap: "10px", alignItems: "center" }}>
-          <input
-            type="text"
-            placeholder="Search voices by name…"
-            value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            style={{
-              flex: 1,
-              borderRadius: "14px",
-              border: "1px solid rgba(255,255,255,0.12)",
-              background: "rgba(255,255,255,0.06)",
-              color: "white",
-              padding: "10px 16px",
-              fontSize: "15px",
-              outline: "none",
-              boxSizing: "border-box",
-            }}
-          />
-          {lockedGender === "all" && (
-            <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
-              {GENDER_TABS.map((g) => (
+        {/* Search + filters */}
+        <div style={{ padding: "12px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            <input
+              type="text"
+              placeholder="Search voices by name…"
+              value={search}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              style={{
+                flex: 1,
+                borderRadius: "14px",
+                border: "1px solid rgba(255,255,255,0.12)",
+                background: "rgba(255,255,255,0.06)",
+                color: "white",
+                padding: "10px 16px",
+                fontSize: "15px",
+                outline: "none",
+                boxSizing: "border-box",
+              }}
+            />
+            {lockedGender === "all" && (
+              <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+                {GENDER_TABS.map((g) => (
+                  <button
+                    key={g}
+                    onClick={() => handleGender(g)}
+                    style={{
+                      borderRadius: "10px",
+                      border: "1px solid",
+                      borderColor: gender === g ? "#d8b26e" : "rgba(255,255,255,0.1)",
+                      background: gender === g ? "rgba(216,178,110,0.15)" : "rgba(255,255,255,0.04)",
+                      color: gender === g ? "#d8b26e" : "rgba(255,255,255,0.6)",
+                      padding: "6px 14px",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {g === "female" ? "♀ Female" : "♂ Male"}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* Language / accent filter */}
+          {availableLangs.length > 1 && (
+            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+              <button
+                onClick={() => { setLangFilter("all"); setPage(1); }}
+                style={{
+                  borderRadius: "20px",
+                  border: "1px solid",
+                  borderColor: langFilter === "all" ? "#d8b26e" : "rgba(255,255,255,0.1)",
+                  background: langFilter === "all" ? "rgba(216,178,110,0.15)" : "rgba(255,255,255,0.04)",
+                  color: langFilter === "all" ? "#d8b26e" : "rgba(255,255,255,0.55)",
+                  padding: "4px 12px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                All accents
+              </button>
+              {availableLangs.map((code) => (
                 <button
-                  key={g}
-                  onClick={() => handleGender(g)}
+                  key={code}
+                  onClick={() => { setLangFilter(code); setPage(1); }}
                   style={{
-                    borderRadius: "10px",
+                    borderRadius: "20px",
                     border: "1px solid",
-                    borderColor: gender === g ? "#d8b26e" : "rgba(255,255,255,0.1)",
-                    background: gender === g ? "rgba(216,178,110,0.15)" : "rgba(255,255,255,0.04)",
-                    color: gender === g ? "#d8b26e" : "rgba(255,255,255,0.6)",
-                    padding: "6px 14px",
-                    fontSize: "13px",
+                    borderColor: langFilter === code ? "#d8b26e" : "rgba(255,255,255,0.1)",
+                    background: langFilter === code ? "rgba(216,178,110,0.15)" : "rgba(255,255,255,0.04)",
+                    color: langFilter === code ? "#d8b26e" : "rgba(255,255,255,0.55)",
+                    padding: "4px 12px",
+                    fontSize: "12px",
                     fontWeight: 600,
                     cursor: "pointer",
                   }}
                 >
-                  {g === "female" ? "♀ Female" : "♂ Male"}
+                  {langLabel(code)}
                 </button>
               ))}
             </div>
@@ -294,7 +365,7 @@ function VoiceBrowserModal({
                   <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginTop: "2px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
                     {voice.language && (
                       <span style={{ borderRadius: "6px", background: "rgba(255,255,255,0.06)", padding: "1px 6px", fontSize: "11px" }}>
-                        {voice.language.toUpperCase()}
+                        {langLabel(voice.language)}
                       </span>
                     )}
                     {voice.accent && (
