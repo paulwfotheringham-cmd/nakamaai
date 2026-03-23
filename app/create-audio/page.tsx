@@ -602,9 +602,11 @@ function CreateAudioTestInner() {
 
   const [saveStatus, setSaveStatus]         = useState<"idle" | "saving" | "saved">("idle");
   const [savedStories, setSavedStories]     = useState<SavedStory[]>([]);
-  const [showDropdown, setShowDropdown]     = useState(false);
-  const [loadingStories, setLoadingStories] = useState(false);
-  const dropdownRef  = useRef<HTMLDivElement>(null);
+  const [showDropdown, setShowDropdown]           = useState(false);
+  const [showResultDropdown, setShowResultDropdown] = useState(false);
+  const [loadingStories, setLoadingStories]       = useState(false);
+  const dropdownRef       = useRef<HTMLDivElement>(null);
+  const resultDropdownRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -674,6 +676,10 @@ function CreateAudioTestInner() {
   }
 
   async function generateStory() {
+    if (!narratorVoice) {
+      setAudioError("Please select a Narrator Voice before generating your story.");
+      return;
+    }
     setLoading(true);
     setStory("");
     setAudioError("");
@@ -795,6 +801,9 @@ function CreateAudioTestInner() {
     function handler(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setShowDropdown(false);
+      }
+      if (resultDropdownRef.current && !resultDropdownRef.current.contains(e.target as Node)) {
+        setShowResultDropdown(false);
       }
     }
     document.addEventListener("mousedown", handler);
@@ -1146,7 +1155,7 @@ function CreateAudioTestInner() {
         }}
       >
         {/* Three-column layout: hero | form | results */}
-        <div style={{ display: "grid", gap: "28px", gridTemplateColumns: "0.75fr 1fr 1fr", alignItems: "start" }}>
+        <div style={{ display: "grid", gap: "28px", gridTemplateColumns: "0.75fr 1fr 1fr", alignItems: "stretch" }}>
 
           {/* Left: hero text */}
           <div style={{ display: "flex", flexDirection: "column" }}>
@@ -1502,7 +1511,7 @@ function CreateAudioTestInner() {
           </div>
 
           {/* Column 3: Results */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
 
         {/* Interactive Story result area */}
         {interPhase !== "setup" && (
@@ -1514,6 +1523,9 @@ function CreateAudioTestInner() {
               padding: "28px",
               boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
               backdropFilter: "blur(12px)",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             {/* Header bar */}
@@ -1724,6 +1736,9 @@ function CreateAudioTestInner() {
               padding: "24px",
               boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
               backdropFilter: "blur(12px)",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             <div
@@ -1798,6 +1813,57 @@ function CreateAudioTestInner() {
                   {saveStatus === "saved" ? "✓ Story Saved" : saveStatus === "saving" ? "Saving…" : "💾 Save Story"}
                 </button>
 
+                {/* Browse Stories dropdown in result panel */}
+                <div ref={resultDropdownRef} style={{ position: "relative" }}>
+                  <button
+                    style={{
+                      borderRadius: "14px",
+                      border: "1px solid rgba(255,255,255,0.15)",
+                      background: showResultDropdown ? "rgba(216,178,110,0.12)" : "rgba(255,255,255,0.05)",
+                      padding: "10px 16px",
+                      color: showResultDropdown ? "#d8b26e" : "rgba(255,255,255,0.8)",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      whiteSpace: "nowrap",
+                    }}
+                    onClick={async () => {
+                      if (!showResultDropdown && savedStories.length === 0) await fetchSavedStories();
+                      setShowResultDropdown(v => !v);
+                    }}
+                  >
+                    📚 Browse Stories {showResultDropdown ? "▲" : "▼"}
+                  </button>
+                  {showResultDropdown && (
+                    <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, zIndex: 100, minWidth: "280px", maxWidth: "400px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.12)", background: "#1a0f20", boxShadow: "0 20px 60px rgba(0,0,0,0.6)", overflow: "hidden" }}>
+                      <div style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: "12px", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#d8b26e" }}>Saved Stories</div>
+                      {loadingStories ? (
+                        <div style={{ padding: "20px", textAlign: "center", fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>Loading…</div>
+                      ) : savedStories.length === 0 ? (
+                        <div style={{ padding: "20px", textAlign: "center", fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>No saved stories yet.</div>
+                      ) : (
+                        <div style={{ maxHeight: "280px", overflowY: "auto" }}>
+                          {savedStories.map((s) => (
+                            <button key={s.id} onClick={() => { loadSavedStory(s); setShowResultDropdown(false); }} style={{ width: "100%", textAlign: "left", padding: "10px 16px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "white" }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(216,178,110,0.08)"; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                            >
+                              <div style={{ fontSize: "13px", fontWeight: 600 }}>{s.name}</div>
+                              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginTop: "2px", display: "flex", gap: "8px" }}>
+                                {new Date(s.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                                {s.story_text.trimStart().startsWith('{"__type":"interactive"') && <span style={{ color: "#22d3ee", fontWeight: 700 }}>🎭 Continue</span>}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
               </div>
             </div>
 
@@ -1869,7 +1935,7 @@ function CreateAudioTestInner() {
                 border: "1px solid rgba(255,255,255,0.1)",
                 background: "rgba(0,0,0,0.2)",
                 padding: "20px",
-                maxHeight: "60vh",
+                flex: 1,
                 overflowY: "auto",
               }}
             >
@@ -1890,12 +1956,25 @@ function CreateAudioTestInner() {
 
         {/* Empty state — nothing generated yet */}
         {interPhase === "setup" && !story && (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "340px", borderRadius: "28px", border: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)", padding: "40px 24px", textAlign: "center" }}>
-            <div style={{ fontSize: "48px", marginBottom: "16px", opacity: 0.4 }}>✨</div>
-            <div style={{ fontSize: "16px", fontWeight: 600, color: "rgba(255,255,255,0.35)" }}>Your story will appear here</div>
-            <div style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.2)", lineHeight: 1.6 }}>
-              Choose your settings, cast your voices,<br />then hit Generate Story or Generate Interactive.
-            </div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, borderRadius: "28px", border: audioError ? "1px solid rgba(255,80,80,0.3)" : "1px solid rgba(255,255,255,0.06)", background: audioError ? "rgba(255,80,80,0.05)" : "rgba(255,255,255,0.02)", padding: "40px 24px", textAlign: "center" }}>
+            {audioError ? (
+              <>
+                <div style={{ fontSize: "40px", marginBottom: "14px" }}>⚠️</div>
+                <div style={{ fontSize: "15px", fontWeight: 700, color: "#ff8080", marginBottom: "8px" }}>{audioError}</div>
+                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", lineHeight: 1.6 }}>
+                  Use the <strong>Choose your voices</strong> section in the form to browse and select voices.
+                </div>
+                <button onClick={() => setAudioError("")} style={{ marginTop: "16px", padding: "8px 18px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: "13px" }}>Dismiss</button>
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: "48px", marginBottom: "16px", opacity: 0.4 }}>✨</div>
+                <div style={{ fontSize: "16px", fontWeight: 600, color: "rgba(255,255,255,0.35)" }}>Your story will appear here</div>
+                <div style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.2)", lineHeight: 1.6 }}>
+                  Choose your settings, cast your voices,<br />then hit Generate Story or Generate Interactive.
+                </div>
+              </>
+            )}
           </div>
         )}
 
