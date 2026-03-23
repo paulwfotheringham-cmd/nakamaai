@@ -1255,11 +1255,14 @@ function CreateAudioTestInner() {
                 padding: "28px 24px",
                 backdropFilter: "blur(10px)",
                 boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+                textAlign: "center",
               }}
             >
               <div
                 style={{
                   marginBottom: "16px",
+                  marginLeft: "auto",
+                  marginRight: "auto",
                   display: "inline-flex",
                   width: "fit-content",
                   borderRadius: "999px",
@@ -1275,10 +1278,11 @@ function CreateAudioTestInner() {
 
               <h1
                 style={{
-                  fontSize: "44px",
+                  fontSize: "48px",
                   fontWeight: 700,
                   lineHeight: 1.1,
                   margin: 0,
+                  textAlign: "center",
                 }}
               >
                 500+ voices for your{" "}
@@ -1287,11 +1291,12 @@ function CreateAudioTestInner() {
 
               <p
                 style={{
-                  marginTop: "16px",
+                  marginTop: "32px",
                   fontSize: "15px",
-                  lineHeight: 1.6,
+                  lineHeight: 1.65,
                   color: "rgba(255,255,255,0.65)",
-                  margin: "16px 0 0 0",
+                  margin: "32px 0 0 0",
+                  textAlign: "center",
                 }}
               >
                 Browse our curated English voice library — filter by gender, accent, preview any voice live,
