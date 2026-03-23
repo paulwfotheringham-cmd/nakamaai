@@ -10,14 +10,14 @@ export async function POST(req: Request) {
     return Response.json({ error: "GROQ_API_KEY not set" }, { status: 500 });
   }
 
-  const { phase, category, setting, mood, maleRole, femaleRole, maleName, femaleName, history, choice } = await req.json();
+  const { phase, setting, mood, maleRole, femaleRole, maleName, femaleName, history, choice } = await req.json();
 
   let prompt = "";
 
   if (phase === "open") {
     prompt = `You are writing an interactive romantic audio drama. Generate the OPENING scene only — approximately 150 words (about 1 minute of narration).
 
-Story details:${category ? `\n- Category: ${category}` : ""}
+Story details:
 - Setting: ${setting}
 - Mood: ${mood}
 - Male character: ${maleRole} named ${maleName}
