@@ -1396,17 +1396,17 @@ function CreateAudioTestInner() {
                 <button
                   style={{
                     borderRadius: "18px",
-                    background: interLoading ? "rgba(109,40,217,0.25)" : (interPhase !== "setup" ? "rgba(109,40,217,0.35)" : "rgba(109,40,217,0.18)"),
+                    background: interLoading ? "rgba(21,128,61,0.5)" : "#15803d",
                     padding: "12px 10px",
                     fontWeight: 700,
                     color: "white",
-                    border: interPhase !== "setup" ? "1px solid rgba(167,139,250,0.55)" : "1px solid rgba(167,139,250,0.25)",
+                    border: "none",
                     cursor: interLoading ? "not-allowed" : "pointer",
                     fontSize: "13px",
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
-                    opacity: interLoading ? 0.6 : 1,
+                    opacity: interLoading ? 0.7 : 1,
                   }}
                   onClick={handleInterStart}
                   disabled={interLoading}
