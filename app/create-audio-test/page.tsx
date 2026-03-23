@@ -959,7 +959,7 @@ function CreateAudioTestInner() {
               <FeatureCard title="500+ curated voices" text="Hand-picked voice library — filter by male, female, accent and age." />
               <FeatureCard title="Live preview"         text="Hear any voice before committing it to your story." />
               <FeatureCard title="Full cast control"    text="Assign different voices to narrator, male, and female characters." />
-              <FeatureCard title="Ultra-low latency"    text="Industry-leading 40ms latency and highly expressive emotional delivery." />
+              <FeatureCard title="Ultra Fast Generation" text="Create your story and audio in seconds." />
             </div>
           </div>
 
