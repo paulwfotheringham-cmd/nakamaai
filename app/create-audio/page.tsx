@@ -1227,19 +1227,20 @@ function CreateAudioTestInner() {
                 borderRadius: "20px",
                 background: "linear-gradient(135deg, rgba(21,128,61,0.18) 0%, rgba(20,83,45,0.10) 100%)",
                 border: "1px solid rgba(74,222,128,0.25)",
-                padding: "32px 24px",
+                padding: "40px 28px",
                 backdropFilter: "blur(10px)",
                 boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
                 flex: 1,
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "flex-start",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              <div style={{ fontSize: "30px", fontWeight: 800, lineHeight: 1.2, color: "white" }}>
+              <div style={{ fontSize: "36px", fontWeight: 800, lineHeight: 1.15, color: "white", textAlign: "center" }}>
                 Generate your custom story
               </div>
-              <div style={{ marginTop: "16px", fontSize: "18px", color: "rgba(255,255,255,0.6)", lineHeight: 1.65 }}>
+              <div style={{ marginTop: "32px", fontSize: "18px", color: "rgba(255,255,255,0.6)", lineHeight: 1.7, textAlign: "center" }}>
                 Full story from your scene settings, voiced with your cast.
               </div>
             </div>
@@ -1250,19 +1251,20 @@ function CreateAudioTestInner() {
                 borderRadius: "20px",
                 background: "linear-gradient(135deg, rgba(109,40,217,0.18) 0%, rgba(67,20,150,0.10) 100%)",
                 border: "1px solid rgba(167,139,250,0.28)",
-                padding: "32px 24px",
+                padding: "40px 28px",
                 backdropFilter: "blur(10px)",
                 boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
                 flex: 1,
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "flex-start",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              <div style={{ fontSize: "30px", fontWeight: 800, lineHeight: 1.2, color: "white" }}>
+              <div style={{ fontSize: "36px", fontWeight: 800, lineHeight: 1.15, color: "white", textAlign: "center" }}>
                 Generate with interactive features
               </div>
-              <div style={{ marginTop: "16px", fontSize: "18px", color: "rgba(255,255,255,0.6)", lineHeight: 1.65 }}>
+              <div style={{ marginTop: "32px", fontSize: "18px", color: "rgba(255,255,255,0.6)", lineHeight: 1.7, textAlign: "center" }}>
                 Story pauses after each scene — you choose what happens next.
               </div>
             </div>
