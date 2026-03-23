@@ -33,23 +33,25 @@ type SelectedVoice = { id: string; title: string };
 // ─── Voice Browser Modal ──────────────────────────────────────────────────────
 
 const PAGE_SIZE = 20;
-const GENDER_TABS = ["all", "female", "male"] as const;
-type GenderTab = typeof GENDER_TABS[number];
+const GENDER_TABS = ["female", "male"] as const;
+type GenderTab = typeof GENDER_TABS[number] | "all";
 
 function VoiceBrowserModal({
   slot,
   lockedGender,
+  defaultGender,
   onSelect,
   onClose,
 }: {
   slot: string;
   lockedGender: GenderTab;
+  defaultGender?: "female" | "male";
   onSelect: (voice: SelectedVoice) => void;
   onClose: () => void;
 }) {
   const [allVoices, setAllVoices] = useState<CartesiaVoice[]>([]);
   const [search, setSearch] = useState("");
-  const [gender, setGender] = useState<GenderTab>(lockedGender);
+  const [gender, setGender] = useState<GenderTab>(lockedGender !== "all" ? lockedGender : (defaultGender ?? "female"));
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [previewingId, setPreviewingId] = useState<string | null>(null);
@@ -173,7 +175,7 @@ function VoiceBrowserModal({
               Choose Voice — <span style={{ color: "#d8b26e" }}>{slot}</span>
             </div>
             <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginTop: "4px" }}>
-              {loading ? "Loading…" : `${filtered.length.toLocaleString()} of ${allVoices.length.toLocaleString()} voices available`}
+              {loading ? "Loading…" : `${filtered.length.toLocaleString()} voices available`}
             </div>
           </div>
           <button
@@ -228,10 +230,9 @@ function VoiceBrowserModal({
                     fontSize: "13px",
                     fontWeight: 600,
                     cursor: "pointer",
-                    textTransform: "capitalize",
                   }}
                 >
-                  {g === "female" ? "♀ Female" : g === "male" ? "♂ Male" : "All"}
+                  {g === "female" ? "♀ Female" : "♂ Male"}
                 </button>
               ))}
             </div>
@@ -801,6 +802,7 @@ function CreateAudioTestInner() {
         <VoiceBrowserModal
           slot={slotLabel}
           lockedGender={activeBrowserSlot === "male" ? "male" : activeBrowserSlot === "female" ? "female" : "all"}
+          defaultGender={activeBrowserSlot === "narrator" ? "female" : undefined}
           onSelect={handleVoiceSelect}
           onClose={() => setActiveBrowserSlot(null)}
         />
