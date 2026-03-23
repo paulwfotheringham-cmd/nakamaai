@@ -1187,51 +1187,52 @@ function CreateAudioTestInner() {
               and cast your narrator, male character, and female character.
             </p>
 
-            <div style={{ marginTop: "32px", display: "grid", gap: "12px", gridTemplateColumns: "1fr 1fr" }}>
-              <FeatureCard title="500+ curated voices" text="Hand-picked voice library — filter by male, female, accent and age." />
-              <FeatureCard title="Live preview"         text="Hear any voice before committing it to your story." />
-              <FeatureCard title="Full cast control"    text="Assign different voices to narrator, male, and female characters." />
-              <FeatureCard title="Ultra Fast Generation" text="Create your story and audio in seconds." />
-            </div>
-
             {/* Two choice boxes */}
-            <div style={{ marginTop: "24px", display: "grid", gap: "12px", gridTemplateColumns: "1fr 1fr" }}>
+            <div style={{ marginTop: "32px", display: "grid", gap: "14px", gridTemplateColumns: "1fr 1fr" }}>
               <div
                 style={{
-                  borderRadius: "18px",
-                  background: "linear-gradient(135deg, #0e7490 0%, #0891b2 100%)",
+                  borderRadius: "20px",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(216,178,110,0.25)",
                   padding: "24px 20px",
                   cursor: "pointer",
-                  border: "2px solid transparent",
-                  transition: "all 0.2s ease",
+                  backdropFilter: "blur(10px)",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+                  transition: "border-color 0.2s ease, background 0.2s ease",
                 }}
                 onClick={generateStory}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(216,178,110,0.6)"; (e.currentTarget as HTMLDivElement).style.background = "rgba(216,178,110,0.08)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(216,178,110,0.25)"; (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.05)"; }}
               >
-                <div style={{ fontSize: "22px", marginBottom: "10px" }}>📖</div>
-                <div style={{ fontSize: "16px", fontWeight: 700, lineHeight: 1.3 }}>
-                  Choose to generate your custom story
+                <div style={{ fontSize: "22px", marginBottom: "12px" }}>📖</div>
+                <div style={{ fontSize: "15px", fontWeight: 700, lineHeight: 1.35, color: "white" }}>
+                  Generate your custom story
                 </div>
-                <div style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.75)", lineHeight: 1.5 }}>
-                  Full story generated from your scene settings and cast.
+                <div style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.55)", lineHeight: 1.55 }}>
+                  Full story from your scene settings, voiced with your cast.
                 </div>
               </div>
 
               <div
                 style={{
-                  borderRadius: "18px",
-                  background: "linear-gradient(135deg, #0e7490 0%, #0891b2 100%)",
+                  borderRadius: "20px",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(216,178,110,0.25)",
                   padding: "24px 20px",
                   cursor: "pointer",
-                  border: "2px solid transparent",
-                  transition: "all 0.2s ease",
+                  backdropFilter: "blur(10px)",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+                  transition: "border-color 0.2s ease, background 0.2s ease",
                 }}
                 onClick={handleInterStart}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(216,178,110,0.6)"; (e.currentTarget as HTMLDivElement).style.background = "rgba(216,178,110,0.08)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(216,178,110,0.25)"; (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.05)"; }}
               >
-                <div style={{ fontSize: "22px", marginBottom: "10px" }}>🎭</div>
-                <div style={{ fontSize: "16px", fontWeight: 700, lineHeight: 1.3 }}>
-                  Choose to generate your custom story WITH interactive features
+                <div style={{ fontSize: "22px", marginBottom: "12px" }}>🎭</div>
+                <div style={{ fontSize: "15px", fontWeight: 700, lineHeight: 1.35, color: "white" }}>
+                  Generate with interactive features
                 </div>
-                <div style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.75)", lineHeight: 1.5 }}>
+                <div style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.55)", lineHeight: 1.55 }}>
                   Story pauses after each scene — you choose what happens next.
                 </div>
               </div>
@@ -1400,16 +1401,17 @@ function CreateAudioTestInner() {
                 <button
                   style={{
                     borderRadius: "18px",
-                    background: interLoading ? "rgba(14,116,144,0.5)" : (interPhase !== "setup" ? "#0891b2" : "#0e7490"),
+                    background: interLoading ? "rgba(255,255,255,0.05)" : (interPhase !== "setup" ? "rgba(216,178,110,0.2)" : "rgba(255,255,255,0.06)"),
                     padding: "12px 10px",
                     fontWeight: 700,
-                    color: "white",
-                    border: "none",
+                    color: interPhase !== "setup" ? "#d8b26e" : "rgba(255,255,255,0.85)",
+                    border: interPhase !== "setup" ? "1px solid rgba(216,178,110,0.5)" : "1px solid rgba(255,255,255,0.15)",
                     cursor: interLoading ? "not-allowed" : "pointer",
                     fontSize: "13px",
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
+                    opacity: interLoading ? 0.6 : 1,
                   }}
                   onClick={handleInterStart}
                   disabled={interLoading}
