@@ -603,10 +603,12 @@ function CreateAudioTestInner() {
   const [saveStatus, setSaveStatus]         = useState<"idle" | "saving" | "saved">("idle");
   const [savedStories, setSavedStories]     = useState<SavedStory[]>([]);
   const [showDropdown, setShowDropdown]           = useState(false);
-  const [showResultDropdown, setShowResultDropdown] = useState(false);
-  const [loadingStories, setLoadingStories]       = useState(false);
-  const dropdownRef       = useRef<HTMLDivElement>(null);
-  const resultDropdownRef = useRef<HTMLDivElement>(null);
+  const [showResultDropdown, setShowResultDropdown]           = useState(false);
+  const [showInterResultDropdown, setShowInterResultDropdown] = useState(false);
+  const [loadingStories, setLoadingStories]                   = useState(false);
+  const dropdownRef            = useRef<HTMLDivElement>(null);
+  const resultDropdownRef      = useRef<HTMLDivElement>(null);
+  const interResultDropdownRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -804,6 +806,9 @@ function CreateAudioTestInner() {
       }
       if (resultDropdownRef.current && !resultDropdownRef.current.contains(e.target as Node)) {
         setShowResultDropdown(false);
+      }
+      if (interResultDropdownRef.current && !interResultDropdownRef.current.contains(e.target as Node)) {
+        setShowInterResultDropdown(false);
       }
     }
     document.addEventListener("mousedown", handler);
@@ -1616,6 +1621,42 @@ function CreateAudioTestInner() {
                     >
                       {interSaveStatus === "saved" ? "✓ Saved" : interSaveStatus === "saving" ? "Saving…" : "💾 Save"}
                     </button>
+                    <div ref={interResultDropdownRef} style={{ position: "relative" }}>
+                      <button
+                        style={{ padding: "8px 14px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.15)", background: showInterResultDropdown ? "rgba(216,178,110,0.12)" : "rgba(255,255,255,0.05)", color: showInterResultDropdown ? "#d8b26e" : "rgba(255,255,255,0.75)", cursor: "pointer", fontSize: "13px", fontWeight: 600, display: "flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}
+                        onClick={async () => {
+                          if (!showInterResultDropdown && savedStories.length === 0) await fetchSavedStories();
+                          setShowInterResultDropdown(v => !v);
+                        }}
+                      >
+                        📚 {showInterResultDropdown ? "▲" : "▼"}
+                      </button>
+                      {showInterResultDropdown && (
+                        <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, zIndex: 100, minWidth: "260px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.12)", background: "#1a0f20", boxShadow: "0 20px 60px rgba(0,0,0,0.6)", overflow: "hidden" }}>
+                          <div style={{ padding: "8px 14px", borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: "11px", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#d8b26e" }}>Saved Stories</div>
+                          {loadingStories ? (
+                            <div style={{ padding: "16px", textAlign: "center", fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>Loading…</div>
+                          ) : savedStories.length === 0 ? (
+                            <div style={{ padding: "16px", textAlign: "center", fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>No saved stories yet.</div>
+                          ) : (
+                            <div style={{ maxHeight: "240px", overflowY: "auto" }}>
+                              {savedStories.map((s) => (
+                                <button key={s.id} onClick={() => { loadSavedStory(s); setShowInterResultDropdown(false); }} style={{ width: "100%", textAlign: "left", padding: "9px 14px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "white" }}
+                                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(216,178,110,0.08)"; }}
+                                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                                >
+                                  <div style={{ fontSize: "13px", fontWeight: 600 }}>{s.name}</div>
+                                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginTop: "2px", display: "flex", gap: "8px" }}>
+                                    {new Date(s.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                                    {s.story_text.trimStart().startsWith('{"__type":"interactive"') && <span style={{ color: "#22d3ee", fontWeight: 700 }}>🎭 Continue</span>}
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                     <button
                       onClick={handleInterStop}
                       style={{ padding: "8px 16px", borderRadius: "12px", border: "1px solid rgba(255,80,80,0.3)", background: "rgba(255,80,80,0.08)", color: "#ff8080", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
@@ -1708,7 +1749,7 @@ function CreateAudioTestInner() {
                 </div>
 
                 {/* Save & End row */}
-                <div style={{ marginTop: "20px", paddingTop: "20px", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                <div style={{ marginTop: "20px", paddingTop: "20px", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", gap: "10px", justifyContent: "flex-end", alignItems: "center" }}>
                   <button
                     onClick={saveInterStory}
                     disabled={interSaveStatus === "saving"}
@@ -1726,6 +1767,42 @@ function CreateAudioTestInner() {
                   >
                     {interSaveStatus === "saved" ? "✓ Saved — continue later" : interSaveStatus === "saving" ? "Saving…" : "💾 Save & Continue Later"}
                   </button>
+                  <div ref={interResultDropdownRef} style={{ position: "relative" }}>
+                    <button
+                      style={{ padding: "10px 16px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.15)", background: showInterResultDropdown ? "rgba(216,178,110,0.12)" : "rgba(255,255,255,0.05)", color: showInterResultDropdown ? "#d8b26e" : "rgba(255,255,255,0.8)", cursor: "pointer", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px", whiteSpace: "nowrap" }}
+                      onClick={async () => {
+                        if (!showInterResultDropdown && savedStories.length === 0) await fetchSavedStories();
+                        setShowInterResultDropdown(v => !v);
+                      }}
+                    >
+                      📚 Browse Stories {showInterResultDropdown ? "▲" : "▼"}
+                    </button>
+                    {showInterResultDropdown && (
+                      <div style={{ position: "absolute", bottom: "calc(100% + 8px)", right: 0, zIndex: 100, minWidth: "280px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.12)", background: "#1a0f20", boxShadow: "0 20px 60px rgba(0,0,0,0.6)", overflow: "hidden" }}>
+                        <div style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: "12px", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#d8b26e" }}>Saved Stories</div>
+                        {loadingStories ? (
+                          <div style={{ padding: "20px", textAlign: "center", fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>Loading…</div>
+                        ) : savedStories.length === 0 ? (
+                          <div style={{ padding: "20px", textAlign: "center", fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>No saved stories yet.</div>
+                        ) : (
+                          <div style={{ maxHeight: "260px", overflowY: "auto" }}>
+                            {savedStories.map((s) => (
+                              <button key={s.id} onClick={() => { loadSavedStory(s); setShowInterResultDropdown(false); }} style={{ width: "100%", textAlign: "left", padding: "10px 16px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "white" }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(216,178,110,0.08)"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                              >
+                                <div style={{ fontSize: "13px", fontWeight: 600 }}>{s.name}</div>
+                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginTop: "2px", display: "flex", gap: "8px" }}>
+                                  {new Date(s.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                                  {s.story_text.trimStart().startsWith('{"__type":"interactive"') && <span style={{ color: "#22d3ee", fontWeight: 700 }}>🎭 Continue</span>}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                   <button
                     onClick={handleInterStop}
                     style={{ padding: "10px 20px", borderRadius: "14px", border: "1px solid rgba(255,80,80,0.3)", background: "rgba(255,80,80,0.08)", color: "#ff8080", cursor: "pointer", fontSize: "14px", fontWeight: 600 }}
