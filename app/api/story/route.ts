@@ -1,13 +1,14 @@
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "",
+const groq = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY || "",
+  baseURL: "https://api.groq.com/openai/v1",
 });
 
 export async function POST(req: Request) {
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.GROQ_API_KEY) {
     return Response.json(
-      { story: "Error: ANTHROPIC_API_KEY is not set in environment variables." },
+      { story: "Error: GROQ_API_KEY is not set in environment variables." },
       { status: 500 }
     );
   }
@@ -54,17 +55,13 @@ Instructions:
 - Return ONLY the story.`;
 
   try {
-    const response = await anthropic.messages.create({
-      model: "claude-3-5-haiku-20241022",
-      max_tokens: 3000,
+    const response = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
       messages: [{ role: "user", content: prompt }],
+      max_tokens: 3000,
     });
 
-    const story =
-      response.content[0]?.type === "text"
-        ? response.content[0].text
-        : "Failed to generate story.";
-
+    const story = response.choices[0]?.message?.content || "Failed to generate story.";
     return Response.json({ story });
   } catch (error) {
     console.error(error);
