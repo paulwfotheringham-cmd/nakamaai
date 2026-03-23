@@ -17,20 +17,24 @@ type SavedStory = {
   created_at: string;
 };
 
-type FishVoice = {
-  _id: string;
-  title: string;
+type CartesiaVoice = {
+  id: string;
+  name: string;
   description: string;
-  languages: string[];
-  tags: string[];
-  samples: { audio: string }[];
-  cover_image: string | null;
-  author: { nickname: string } | null;
+  language: string;
+  gender: string | null;
+  accent: string | null;
+  age: string | null;
+  is_public: boolean;
 };
 
 type SelectedVoice = { id: string; title: string };
 
 // ─── Voice Browser Modal ──────────────────────────────────────────────────────
+
+const PAGE_SIZE = 20;
+const GENDER_TABS = ["all", "female", "male"] as const;
+type GenderTab = typeof GENDER_TABS[number];
 
 function VoiceBrowserModal({
   slot,
@@ -41,65 +45,82 @@ function VoiceBrowserModal({
   onSelect: (voice: SelectedVoice) => void;
   onClose: () => void;
 }) {
-  const [voices, setVoices] = useState<FishVoice[]>([]);
+  const [allVoices, setAllVoices] = useState<CartesiaVoice[]>([]);
   const [search, setSearch] = useState("");
+  const [gender, setGender] = useState<GenderTab>("all");
   const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [previewingId, setPreviewingId] = useState<string | null>(null);
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
-  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const fetchVoices = useCallback(async (q: string, p: number) => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ page: String(p) });
-      if (q) params.set("search", q);
-      const res = await fetch(`/api/fish-voices?${params}`);
-      const data = await res.json();
-      setVoices(data.items ?? []);
-      setTotal(data.total ?? 0);
-    } catch {
-      setVoices([]);
-    }
-    setLoading(false);
-  }, []);
 
   useEffect(() => {
-    fetchVoices("", 1);
-  }, [fetchVoices]);
+    setLoading(true);
+    fetch("/api/cartesia-voices")
+      .then((r) => r.json())
+      .then((data) => setAllVoices(data.voices ?? []))
+      .catch(() => setAllVoices([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = allVoices.filter((v) => {
+    const matchesGender = gender === "all" || v.gender?.toLowerCase() === gender;
+    const matchesSearch =
+      !search ||
+      v.name.toLowerCase().includes(search.toLowerCase()) ||
+      v.description?.toLowerCase().includes(search.toLowerCase());
+    return matchesGender && matchesSearch;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageVoices = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   function handleSearchChange(value: string) {
     setSearch(value);
     setPage(1);
-    if (searchTimeout.current) clearTimeout(searchTimeout.current);
-    searchTimeout.current = setTimeout(() => fetchVoices(value, 1), 400);
   }
 
-  function handlePage(p: number) {
-    setPage(p);
-    fetchVoices(search, p);
+  function handleGender(g: GenderTab) {
+    setGender(g);
+    setPage(1);
   }
 
-  function previewVoice(voice: FishVoice) {
-    if (previewingId === voice._id) {
+  async function previewVoice(voice: CartesiaVoice) {
+    if (previewingId === voice.id) {
       previewAudioRef.current?.pause();
       previewAudioRef.current = null;
       setPreviewingId(null);
       return;
     }
     previewAudioRef.current?.pause();
-    const sampleUrl = voice.samples?.[0]?.audio;
-    if (!sampleUrl) return;
-    setPreviewingId(voice._id);
-    const audio = new Audio(sampleUrl);
-    previewAudioRef.current = audio;
-    audio.onended = () => setPreviewingId(null);
-    audio.onerror = () => setPreviewingId(null);
-    audio.play().catch(() => setPreviewingId(null));
+    setPreviewingId(voice.id);
+    try {
+      const res = await fetch("/api/cartesia-tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: `Hi, my name is ${voice.name}. I can be your voice to take you on your fantasy journey.`,
+          voiceId: voice.id,
+        }),
+      });
+      if (!res.ok) { setPreviewingId(null); return; }
+      const { outputUri } = await res.json();
+      const audio = new Audio(outputUri);
+      previewAudioRef.current = audio;
+      audio.onended = () => setPreviewingId(null);
+      audio.onerror = () => setPreviewingId(null);
+      audio.play().catch(() => setPreviewingId(null));
+    } catch {
+      setPreviewingId(null);
+    }
   }
 
-  const totalPages = Math.max(1, Math.ceil(total / 20));
+  const genderIcon = (v: CartesiaVoice) => {
+    const g = v.gender?.toLowerCase();
+    if (g === "female") return "♀";
+    if (g === "male") return "♂";
+    return "🎙";
+  };
 
   return (
     <div
@@ -146,7 +167,7 @@ function VoiceBrowserModal({
               Choose Voice — <span style={{ color: "#d8b26e" }}>{slot}</span>
             </div>
             <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginTop: "4px" }}>
-              {total.toLocaleString()} voices available · powered by Fish Audio
+              {loading ? "Loading…" : `${filtered.length.toLocaleString()} of ${allVoices.length.toLocaleString()} voices · powered by Cartesia Sonic 3`}
             </div>
           </div>
           <button
@@ -166,41 +187,63 @@ function VoiceBrowserModal({
           </button>
         </div>
 
-        {/* Search */}
-        <div style={{ padding: "16px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+        {/* Search + gender filter */}
+        <div style={{ padding: "12px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0, display: "flex", gap: "10px", alignItems: "center" }}>
           <input
             type="text"
             placeholder="Search voices by name…"
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             style={{
-              width: "100%",
+              flex: 1,
               borderRadius: "14px",
               border: "1px solid rgba(255,255,255,0.12)",
               background: "rgba(255,255,255,0.06)",
               color: "white",
-              padding: "12px 16px",
+              padding: "10px 16px",
               fontSize: "15px",
               outline: "none",
               boxSizing: "border-box",
             }}
           />
+          <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+            {GENDER_TABS.map((g) => (
+              <button
+                key={g}
+                onClick={() => handleGender(g)}
+                style={{
+                  borderRadius: "10px",
+                  border: "1px solid",
+                  borderColor: gender === g ? "#d8b26e" : "rgba(255,255,255,0.1)",
+                  background: gender === g ? "rgba(216,178,110,0.15)" : "rgba(255,255,255,0.04)",
+                  color: gender === g ? "#d8b26e" : "rgba(255,255,255,0.6)",
+                  padding: "6px 14px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  textTransform: "capitalize",
+                }}
+              >
+                {g === "female" ? "♀ Female" : g === "male" ? "♂ Male" : "All"}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Voice list */}
         <div style={{ overflowY: "auto", flex: 1 }}>
           {loading ? (
             <div style={{ padding: "48px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>
-              Loading voices…
+              Loading voices from Cartesia…
             </div>
-          ) : voices.length === 0 ? (
+          ) : pageVoices.length === 0 ? (
             <div style={{ padding: "48px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>
               No voices found.
             </div>
           ) : (
-            voices.map((voice) => (
+            pageVoices.map((voice) => (
               <div
-                key={voice._id}
+                key={voice.id}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -220,57 +263,71 @@ function VoiceBrowserModal({
                     height: "44px",
                     borderRadius: "50%",
                     flexShrink: 0,
-                    overflow: "hidden",
-                    background: "rgba(216,178,110,0.15)",
+                    background: voice.gender?.toLowerCase() === "female"
+                      ? "rgba(216,130,178,0.2)"
+                      : voice.gender?.toLowerCase() === "male"
+                      ? "rgba(110,160,216,0.2)"
+                      : "rgba(216,178,110,0.15)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     fontSize: "20px",
                   }}
                 >
-                  {voice.cover_image
-                    ? <img src={voice.cover_image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    : "🎙"}
+                  {genderIcon(voice)}
                 </div>
 
                 {/* Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: "15px", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {voice.title}
+                    {voice.name}
                   </div>
                   <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginTop: "2px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                    {voice.author?.nickname && <span>by {voice.author.nickname}</span>}
-                    {voice.languages?.slice(0, 3).map((l) => (
-                      <span key={l} style={{ borderRadius: "6px", background: "rgba(255,255,255,0.06)", padding: "1px 6px", fontSize: "11px" }}>{l}</span>
-                    ))}
-                    {voice.tags?.slice(0, 2).map((t) => (
-                      <span key={t} style={{ borderRadius: "6px", background: "rgba(216,178,110,0.1)", color: "#d8b26e", padding: "1px 6px", fontSize: "11px" }}>{t}</span>
-                    ))}
+                    {voice.language && (
+                      <span style={{ borderRadius: "6px", background: "rgba(255,255,255,0.06)", padding: "1px 6px", fontSize: "11px" }}>
+                        {voice.language.toUpperCase()}
+                      </span>
+                    )}
+                    {voice.gender && (
+                      <span style={{ borderRadius: "6px", background: "rgba(216,178,110,0.1)", color: "#d8b26e", padding: "1px 6px", fontSize: "11px", textTransform: "capitalize" }}>
+                        {voice.gender}
+                      </span>
+                    )}
+                    {voice.accent && (
+                      <span style={{ borderRadius: "6px", background: "rgba(255,255,255,0.06)", padding: "1px 6px", fontSize: "11px", textTransform: "capitalize" }}>
+                        {voice.accent}
+                      </span>
+                    )}
+                    {voice.age && (
+                      <span style={{ borderRadius: "6px", background: "rgba(255,255,255,0.06)", padding: "1px 6px", fontSize: "11px", textTransform: "capitalize" }}>
+                        {voice.age}
+                      </span>
+                    )}
                   </div>
                 </div>
 
                 {/* Actions */}
                 <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
-                  {voice.samples?.[0]?.audio && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); previewVoice(voice); }}
-                      style={{
-                        borderRadius: "10px",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        background: previewingId === voice._id ? "rgba(216,178,110,0.2)" : "rgba(255,255,255,0.06)",
-                        color: previewingId === voice._id ? "#d8b26e" : "rgba(255,255,255,0.7)",
-                        padding: "6px 14px",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {previewingId === voice._id ? "⏹ Stop" : "▶ Play"}
-                    </button>
-                  )}
                   <button
-                    onClick={() => { onSelect({ id: voice._id, title: voice.title }); }}
+                    onClick={(e) => { e.stopPropagation(); previewVoice(voice); }}
+                    style={{
+                      borderRadius: "10px",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: previewingId === voice.id ? "rgba(216,178,110,0.2)" : "rgba(255,255,255,0.06)",
+                      color: previewingId === voice.id ? "#d8b26e" : "rgba(255,255,255,0.7)",
+                      padding: "6px 14px",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      cursor: previewingId !== null && previewingId !== voice.id ? "not-allowed" : "pointer",
+                      whiteSpace: "nowrap",
+                      opacity: previewingId !== null && previewingId !== voice.id ? 0.4 : 1,
+                    }}
+                    disabled={previewingId !== null && previewingId !== voice.id}
+                  >
+                    {previewingId === voice.id ? "⏳ Generating…" : "▶ Preview"}
+                  </button>
+                  <button
+                    onClick={() => { onSelect({ id: voice.id, title: voice.name }); }}
                     style={{
                       borderRadius: "10px",
                       border: "none",
@@ -304,19 +361,19 @@ function VoiceBrowserModal({
           }}
         >
           <button
-            onClick={() => handlePage(Math.max(1, page - 1))}
-            disabled={page <= 1}
-            style={paginationBtnStyle(page <= 1)}
+            onClick={() => setPage(Math.max(1, safePage - 1))}
+            disabled={safePage <= 1}
+            style={paginationBtnStyle(safePage <= 1)}
           >
             ← Prev
           </button>
           <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)" }}>
-            Page {page} of {totalPages}
+            Page {safePage} of {totalPages}
           </span>
           <button
-            onClick={() => handlePage(Math.min(totalPages, page + 1))}
-            disabled={page >= totalPages}
-            style={paginationBtnStyle(page >= totalPages)}
+            onClick={() => setPage(Math.min(totalPages, safePage + 1))}
+            disabled={safePage >= totalPages}
+            style={paginationBtnStyle(safePage >= totalPages)}
           >
             Next →
           </button>
@@ -471,7 +528,7 @@ function CreateAudioTestInner() {
   const segmentsRef      = useRef<{ url: string; duration: number; startTime: number }[]>([]);
   const playActiveRef    = useRef(false);
 
-  // ── Voice preview (uses Fish Audio sample audio via TTS) ──────────────────
+  // ── Voice preview via Cartesia TTS ────────────────────────────────────────
   async function previewSelectedVoice(voice: SelectedVoice) {
     if (previewingId === voice.id) {
       previewAudioRef.current?.pause();
@@ -482,7 +539,7 @@ function CreateAudioTestInner() {
     previewAudioRef.current?.pause();
     setPreviewingId(voice.id);
     try {
-      const res = await fetch("/api/fish-tts", {
+      const res = await fetch("/api/cartesia-tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -635,7 +692,7 @@ function CreateAudioTestInner() {
       if (stoppedRef.current) break;
       if (!voiceId) continue;
       try {
-        const res = await fetch("/api/fish-tts", {
+        const res = await fetch("/api/cartesia-tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text, voiceId }),
@@ -770,7 +827,7 @@ function CreateAudioTestInner() {
             <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.4em", color: "#d8b26e" }}>
               Nakama
             </div>
-            <div style={{ marginTop: "8px", fontSize: "32px", fontWeight: 700 }}>Nakama AI · Fish Audio Test</div>
+            <div style={{ marginTop: "8px", fontSize: "32px", fontWeight: 700 }}>Nakama AI · Cartesia Voice Test</div>
           </div>
           <div
             style={{
@@ -782,9 +839,9 @@ function CreateAudioTestInner() {
               color: "#f1d7a1",
               fontWeight: 600,
             }}
-          >
-            Fish Audio voices
-          </div>
+            >
+              Cartesia Sonic 3 voices
+            </div>
         </div>
 
         {/* Two-column layout */}
@@ -805,7 +862,7 @@ function CreateAudioTestInner() {
                 color: "#f1d7a1",
               }}
             >
-              Premium audio storytelling · Fish Audio voices
+              Premium audio storytelling · Cartesia Sonic 3 voices
             </div>
 
             <h1
@@ -817,7 +874,7 @@ function CreateAudioTestInner() {
                 margin: 0,
               }}
             >
-              Thousands of voices for your{" "}
+              500+ voices for your{" "}
               <span style={{ color: "#d8b26e" }}>story</span>
             </h1>
 
@@ -830,15 +887,15 @@ function CreateAudioTestInner() {
                 color: "rgba(255,255,255,0.7)",
               }}
             >
-              Browse Fish Audio&apos;s full voice library — search, preview, and cast any voice
-              as your narrator, male character, or female character.
+              Browse Cartesia&apos;s curated voice library — filter by gender, preview any voice live,
+              and cast your narrator, male character, and female character.
             </p>
 
             <div style={{ marginTop: "32px", display: "grid", gap: "12px", gridTemplateColumns: "1fr 1fr" }}>
-              <FeatureCard title="Massive library"    text="Thousands of voice models from Fish Audio's community — search by name or style." />
-              <FeatureCard title="Live preview"       text="Hear any voice from the library before committing it to your story." />
-              <FeatureCard title="Full cast control"  text="Assign different Fish Audio voices to narrator, male, and female characters." />
-              <FeatureCard title="Fish Audio TTS"     text="Ultra-low cost synthesis — pennies per story even at scale." />
+              <FeatureCard title="500+ curated voices" text="Cartesia's hand-picked library — filter by male, female, accent and age." />
+              <FeatureCard title="Live preview"         text="Hear any voice via Cartesia Sonic 3 before committing it to your story." />
+              <FeatureCard title="Full cast control"    text="Assign different Cartesia voices to narrator, male, and female characters." />
+              <FeatureCard title="Sonic 3 model"        text="Industry-leading 40ms latency and highly expressive emotional delivery." />
             </div>
           </div>
 
@@ -856,7 +913,7 @@ function CreateAudioTestInner() {
             <div style={{ marginBottom: "24px" }}>
               <h2 style={{ margin: 0, fontSize: "32px", fontWeight: 700 }}>Build your scene</h2>
               <p style={{ marginTop: "8px", fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>
-                Adjust the story ingredients, then choose Fish Audio voices and generate.
+                Adjust the story ingredients, then choose Cartesia voices and generate.
               </p>
             </div>
 
@@ -921,7 +978,7 @@ function CreateAudioTestInner() {
                 />
               </Field>
 
-              {/* Fish Audio Voice Casting */}
+              {/* Cartesia Voice Casting */}
               <div
                 style={{
                   marginTop: "8px",
@@ -941,7 +998,7 @@ function CreateAudioTestInner() {
                     color: "#d8b26e",
                   }}
                 >
-                  Voice Casting · Fish Audio
+                  Voice Casting · Cartesia
                 </div>
 
                 <div style={{ display: "grid", gap: "16px" }}>
@@ -1182,7 +1239,7 @@ function CreateAudioTestInner() {
             {preparingAudio && (
               <div style={{ marginBottom: "20px", borderRadius: "16px", border: "1px solid rgba(216,178,110,0.2)", background: "rgba(216,178,110,0.06)", padding: "14px 16px", fontSize: "13px", color: "#d8b26e", display: "flex", alignItems: "center", gap: "10px" }}>
                 <span style={{ animation: "spin 1s linear infinite", display: "inline-block" }}>⏳</span>
-                Preparing audio via Fish Audio — this takes a moment…
+                Preparing audio via Cartesia — this takes a moment…
               </div>
             )}
 
