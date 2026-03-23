@@ -1652,8 +1652,9 @@ function CreateAudioTestInner() {
             {/* Header bar */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
               <div>
-                <h2 style={{ margin: "0 0 4px", fontSize: "28px", fontWeight: 700 }}>
-                  Your Story, <span style={{ color: "#22d3ee" }}>Your Choices</span>
+                <h2 style={{ margin: "0 0 8px", fontSize: "26px", fontWeight: 700, lineHeight: 1.3 }}>
+                  Your fantasy experience.{" "}
+                  <span style={{ color: "#22d3ee" }}>Guide your journey</span>
                 </h2>
                 <p style={{ margin: 0, fontSize: "14px", color: "rgba(255,255,255,0.5)" }}>
                   {setting} · {mood} · {category}
@@ -1822,25 +1823,79 @@ function CreateAudioTestInner() {
                   <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", marginBottom: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em" }}>
                     Or write / speak your own
                   </div>
-                  <div style={{ display: "flex", gap: "10px" }}>
+                  <div style={{ display: "flex", gap: "10px", alignItems: "stretch" }}>
                     <input
                       value={interCustomChoice}
                       onChange={(e) => setInterCustomChoice(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && interCustomChoice.trim() && handleInterChoice(interCustomChoice.trim())}
                       placeholder="e.g. take me to the balcony..."
-                      style={{ flex: 1, borderRadius: "14px", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.06)", color: "white", padding: "13px 18px", outline: "none", fontSize: "15px" }}
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        height: 48,
+                        boxSizing: "border-box",
+                        borderRadius: "14px",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        background: "rgba(255,255,255,0.06)",
+                        color: "white",
+                        padding: "0 18px",
+                        outline: "none",
+                        fontSize: "15px",
+                      }}
                     />
                     <button
+                      type="button"
                       onClick={isListening ? stopListening : startListening}
-                      style={{ padding: "0 18px", borderRadius: "14px", border: `1px solid ${isListening ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.12)"}`, background: isListening ? "rgba(239,68,68,0.15)" : "rgba(255,255,255,0.06)", color: isListening ? "#f87171" : "white", cursor: "pointer", flexShrink: 0, fontSize: "22px" }}
+                      style={{
+                        width: 48,
+                        minWidth: 48,
+                        height: 48,
+                        boxSizing: "border-box",
+                        padding: 0,
+                        borderRadius: "14px",
+                        border: `1px solid ${isListening ? "rgba(239,68,68,0.45)" : "rgba(255,255,255,0.15)"}`,
+                        background: isListening ? "rgba(239,68,68,0.18)" : "rgba(255,255,255,0.08)",
+                        color: isListening ? "#f87171" : "rgba(255,255,255,0.95)",
+                        cursor: "pointer",
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
                       title={isListening ? "Stop listening" : "Speak your choice"}
+                      aria-label={isListening ? "Stop listening" : "Speak your choice with microphone"}
                     >
-                      {isListening ? "⏹" : "🎙"}
+                      {isListening ? (
+                        <span style={{ fontSize: "18px", lineHeight: 1 }}>⏹</span>
+                      ) : (
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                          <line x1="12" y1="19" x2="12" y2="23" />
+                          <line x1="8" y1="23" x2="16" y2="23" />
+                        </svg>
+                      )}
                     </button>
                     <button
+                      type="button"
                       onClick={() => interCustomChoice.trim() && handleInterChoice(interCustomChoice.trim())}
                       disabled={!interCustomChoice.trim()}
-                      style={{ padding: "0 24px", borderRadius: "14px", border: "none", background: interCustomChoice.trim() ? "#22d3ee" : "rgba(255,255,255,0.06)", color: interCustomChoice.trim() ? "black" : "rgba(255,255,255,0.35)", cursor: interCustomChoice.trim() ? "pointer" : "not-allowed", fontWeight: 700, fontSize: "15px", flexShrink: 0 }}
+                      style={{
+                        height: 48,
+                        boxSizing: "border-box",
+                        padding: "0 22px",
+                        borderRadius: "14px",
+                        border: "none",
+                        background: interCustomChoice.trim() ? "#22d3ee" : "rgba(255,255,255,0.06)",
+                        color: interCustomChoice.trim() ? "black" : "rgba(255,255,255,0.35)",
+                        cursor: interCustomChoice.trim() ? "pointer" : "not-allowed",
+                        fontWeight: 700,
+                        fontSize: "15px",
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
                     >
                       Go →
                     </button>
