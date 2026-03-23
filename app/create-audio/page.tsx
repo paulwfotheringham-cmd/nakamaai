@@ -550,6 +550,10 @@ function VoiceSlot({
   );
 }
 
+// ─── Interactive Story Types ───────────────────────────────────────────────────
+type InterPhase = "setup" | "generating" | "playing" | "choosing";
+const randItem = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
+
 // ─── Categories ──────────────────────────────────────────────────────────────
 
 const CATEGORIES: Record<string, string[]> = {
@@ -622,6 +626,20 @@ function CreateAudioTestInner() {
   const segmentsRef      = useRef<{ url: string; duration: number; startTime: number }[]>([]);
   const playActiveRef    = useRef(false);
 
+  // ── Interactive story state ───────────────────────────────────────────────
+  const [interPhase, setInterPhase]               = useState<InterPhase>("setup");
+  const [interSegments, setInterSegments]         = useState<string[]>([]);
+  const [interChoices, setInterChoices]           = useState<string[]>([]);
+  const [interCustomChoice, setInterCustomChoice] = useState("");
+  const [isListening, setIsListening]             = useState(false);
+  const [interLoading, setInterLoading]           = useState(false);
+  const [maleName]  = useState(() => randItem(["Luca", "Adrian", "Noah", "Julian", "Theo"]));
+  const [femaleName] = useState(() => randItem(["Elena", "Sofia", "Clara", "Mia", "Isla"]));
+  const interStoppedRef      = useRef(false);
+  const interCurrentAudioRef = useRef<HTMLAudioElement | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+
   // ── Voice preview via Cartesia TTS ────────────────────────────────────────
   async function previewSelectedVoice(voice: SelectedVoice) {
     if (previewingId === voice.id) {
@@ -658,6 +676,7 @@ function CreateAudioTestInner() {
     setStory("");
     setAudioError("");
     setSaveStatus("idle");
+    handleInterStop();
     try {
       const response = await fetch("/api/story", {
         method: "POST",
@@ -855,6 +874,121 @@ function CreateAudioTestInner() {
     setTotalDuration(0);
   }
 
+  // ── Interactive story functions ───────────────────────────────────────────
+  async function interSpeakText(text: string, onDone: () => void) {
+    interStoppedRef.current = false;
+    const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+    for (const line of lines) {
+      if (interStoppedRef.current) break;
+      let spokenText = line;
+      let voiceId = narratorVoice?.id ?? "";
+      if (line.startsWith("MALE:"))          { spokenText = line.replace("MALE:", "").trim();      voiceId = maleVoice?.id ?? narratorVoice?.id ?? ""; }
+      else if (line.startsWith("FEMALE:"))   { spokenText = line.replace("FEMALE:", "").trim();    voiceId = femaleVoice?.id ?? narratorVoice?.id ?? ""; }
+      else if (line.startsWith("NARRATOR:")) { spokenText = line.replace("NARRATOR:", "").trim();  voiceId = narratorVoice?.id ?? ""; }
+      if (!voiceId || !spokenText.trim()) continue;
+      try {
+        const res = await fetch("/api/cartesia-tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: spokenText, voiceId }),
+        });
+        if (!res.ok || interStoppedRef.current) continue;
+        const { outputUri } = await res.json();
+        await new Promise<void>((resolve) => {
+          if (interStoppedRef.current) { resolve(); return; }
+          const audio = new Audio(outputUri);
+          interCurrentAudioRef.current = audio;
+          audio.onended = () => resolve();
+          audio.onerror = () => resolve();
+          audio.play().catch(() => resolve());
+        });
+      } catch { /* continue */ }
+    }
+    if (!interStoppedRef.current) onDone();
+  }
+
+  async function handleInterStart() {
+    if (!narratorVoice) { setAudioError("Please select a narrator voice first."); return; }
+    setStory("");
+    stopStory();
+    setInterLoading(true);
+    setInterPhase("generating");
+    setInterSegments([]);
+    setInterChoices([]);
+    setAudioError("");
+    try {
+      const res = await fetch("/api/interactive-story", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phase: "open", category, setting, mood, maleRole, femaleRole, maleName, femaleName, history: "" }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setInterSegments([data.story]);
+      setInterChoices(data.choices);
+      setInterLoading(false);
+      setInterPhase("playing");
+      interSpeakText(data.story, () => { if (!interStoppedRef.current) setInterPhase("choosing"); });
+    } catch (e) {
+      alert("Error: " + (e instanceof Error ? e.message : "Unknown"));
+      setInterPhase("setup");
+      setInterLoading(false);
+    }
+  }
+
+  async function handleInterChoice(chosen: string) {
+    setInterPhase("generating");
+    setInterCustomChoice("");
+    const history = interSegments.join("\n\n");
+    try {
+      const res = await fetch("/api/interactive-story", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phase: "continue", category, setting, mood, maleRole, femaleRole, maleName, femaleName, history, choice: chosen }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setInterSegments((prev) => [...prev, `[Choice: ${chosen}]\n\n${data.story}`]);
+      setInterChoices(data.choices);
+      setInterPhase("playing");
+      interSpeakText(data.story, () => { if (!interStoppedRef.current) setInterPhase("choosing"); });
+    } catch (e) {
+      alert("Error: " + (e instanceof Error ? e.message : "Unknown"));
+      setInterPhase("choosing");
+    }
+  }
+
+  function handleInterStop() {
+    interStoppedRef.current = true;
+    interCurrentAudioRef.current?.pause();
+    interCurrentAudioRef.current = null;
+    setInterPhase("setup");
+    setInterSegments([]);
+    setInterChoices([]);
+    setInterLoading(false);
+  }
+
+  function startListening() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { alert("Voice input not supported. Try Chrome."); return; }
+    const recognition = new SR();
+    recognitionRef.current = recognition;
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (e: any) => { setInterCustomChoice(e.results[0][0].transcript); setIsListening(false); };
+    recognition.onend  = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+    recognition.start();
+    setIsListening(true);
+  }
+
+  function stopListening() {
+    recognitionRef.current?.stop();
+    setIsListening(false);
+  }
+
   function handleSeek(value: number) {
     const segs = segmentsRef.current;
     if (!segs.length) return;
@@ -979,6 +1113,49 @@ function CreateAudioTestInner() {
               <FeatureCard title="Live preview"         text="Hear any voice before committing it to your story." />
               <FeatureCard title="Full cast control"    text="Assign different voices to narrator, male, and female characters." />
               <FeatureCard title="Ultra Fast Generation" text="Create your story and audio in seconds." />
+            </div>
+
+            {/* Two choice boxes */}
+            <div style={{ marginTop: "24px", display: "grid", gap: "12px", gridTemplateColumns: "1fr 1fr" }}>
+              <div
+                style={{
+                  borderRadius: "18px",
+                  background: "linear-gradient(135deg, #0e7490 0%, #0891b2 100%)",
+                  padding: "24px 20px",
+                  cursor: "pointer",
+                  border: "2px solid transparent",
+                  transition: "all 0.2s ease",
+                }}
+                onClick={generateStory}
+              >
+                <div style={{ fontSize: "22px", marginBottom: "10px" }}>📖</div>
+                <div style={{ fontSize: "16px", fontWeight: 700, lineHeight: 1.3 }}>
+                  Choose to generate your custom story
+                </div>
+                <div style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.75)", lineHeight: 1.5 }}>
+                  Full story generated from your scene settings and cast.
+                </div>
+              </div>
+
+              <div
+                style={{
+                  borderRadius: "18px",
+                  background: "linear-gradient(135deg, #0e7490 0%, #0891b2 100%)",
+                  padding: "24px 20px",
+                  cursor: "pointer",
+                  border: "2px solid transparent",
+                  transition: "all 0.2s ease",
+                }}
+                onClick={handleInterStart}
+              >
+                <div style={{ fontSize: "22px", marginBottom: "10px" }}>🎭</div>
+                <div style={{ fontSize: "16px", fontWeight: 700, lineHeight: 1.3 }}>
+                  Choose to generate your custom story WITH interactive features
+                </div>
+                <div style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.75)", lineHeight: 1.5 }}>
+                  Story pauses after each scene — you choose what happens next.
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1118,24 +1295,47 @@ function CreateAudioTestInner() {
 
               </div>
 
-              <div style={{ marginTop: "8px", display: "flex", gap: "10px", alignItems: "stretch" }}>
+              <div style={{ marginTop: "8px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
+                {/* Button 1: Generate Story */}
                 <button
                   style={{
-                    flex: 1,
                     borderRadius: "18px",
-                    background: "#d8b26e",
-                    padding: "12px 20px",
+                    background: loading ? "rgba(216,178,110,0.5)" : "#d8b26e",
+                    padding: "12px 10px",
                     fontWeight: 700,
                     color: "black",
                     border: "none",
                     cursor: loading ? "not-allowed" : "pointer",
-                    fontSize: "14px",
-                    opacity: loading ? 0.7 : 1,
+                    fontSize: "13px",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}
                   onClick={generateStory}
                   disabled={loading}
                 >
                   {loading ? "Generating…" : "Generate Story"}
+                </button>
+
+                {/* Button 2: Generate Interactive Story */}
+                <button
+                  style={{
+                    borderRadius: "18px",
+                    background: interLoading ? "rgba(14,116,144,0.5)" : (interPhase !== "setup" ? "#0891b2" : "#0e7490"),
+                    padding: "12px 10px",
+                    fontWeight: 700,
+                    color: "white",
+                    border: "none",
+                    cursor: interLoading ? "not-allowed" : "pointer",
+                    fontSize: "13px",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                  onClick={handleInterStart}
+                  disabled={interLoading}
+                >
+                  {interLoading ? "Writing…" : "Generate Interactive Story"}
                 </button>
 
                 <div ref={dropdownRef} style={{ position: "relative" }}>
@@ -1157,7 +1357,7 @@ function CreateAudioTestInner() {
                     }}
                     onClick={toggleDropdown}
                   >
-                    📚 Saved Stories {showDropdown ? "▲" : "▼"}
+                    📚 Browse your stories {showDropdown ? "▲" : "▼"}
                   </button>
 
                   {showDropdown && (
@@ -1222,6 +1422,139 @@ function CreateAudioTestInner() {
             </div>
           </div>
         </div>
+
+        {/* Interactive Story result area */}
+        {interPhase !== "setup" && (
+          <div
+            style={{
+              marginTop: "40px",
+              borderRadius: "28px",
+              border: "1px solid rgba(14,116,144,0.35)",
+              background: "rgba(8,60,75,0.25)",
+              padding: "28px",
+              boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
+              backdropFilter: "blur(12px)",
+            }}
+          >
+            {/* Header bar */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+              <div>
+                <h2 style={{ margin: "0 0 4px", fontSize: "28px", fontWeight: 700 }}>
+                  Your Story, <span style={{ color: "#22d3ee" }}>Your Choices</span>
+                </h2>
+                <p style={{ margin: 0, fontSize: "14px", color: "rgba(255,255,255,0.5)" }}>
+                  {setting} · {mood} · {category}
+                </p>
+              </div>
+              <button
+                onClick={handleInterStop}
+                style={{ padding: "10px 18px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "14px", fontWeight: 600 }}
+              >
+                ✕ End Story
+              </button>
+            </div>
+
+            {/* Generating */}
+            {interPhase === "generating" && (
+              <div style={{ textAlign: "center", padding: "48px 32px" }}>
+                <div style={{ fontSize: "52px", marginBottom: "20px" }}>✍️</div>
+                <div style={{ fontSize: "22px", fontWeight: 600, color: "#22d3ee" }}>Writing your story...</div>
+                <div style={{ marginTop: "10px", fontSize: "14px", color: "rgba(255,255,255,0.45)" }}>Crafting the scene and your choices</div>
+              </div>
+            )}
+
+            {/* Playing */}
+            {interPhase === "playing" && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+                  <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 12px rgba(74,222,128,0.6)" }} />
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#4ade80" }}>Playing — listen for your prompt</span>
+                </div>
+                <div style={{ borderRadius: "16px", background: "rgba(0,0,0,0.3)", padding: "20px", maxHeight: "320px", overflowY: "auto", lineHeight: 1.9, fontSize: "15px" }}>
+                  {interSegments[interSegments.length - 1]?.split("\n").map((line, i) => (
+                    <p key={i} style={{ margin: "4px 0", color: line.startsWith("MALE:") ? "#93c5fd" : line.startsWith("FEMALE:") ? "#f9a8d4" : "rgba(255,255,255,0.85)" }}>
+                      {line}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Choosing */}
+            {interPhase === "choosing" && (
+              <div>
+                <div style={{ textAlign: "center", marginBottom: "28px" }}>
+                  <div style={{ fontSize: "36px", marginBottom: "10px" }}>🎭</div>
+                  <h3 style={{ margin: "0 0 6px", fontSize: "24px", fontWeight: 800 }}>What happens next?</h3>
+                  <p style={{ margin: 0, fontSize: "14px", color: "rgba(255,255,255,0.5)" }}>Pick an option, speak your choice, or type your own</p>
+                </div>
+
+                <div style={{ display: "grid", gap: "12px", marginBottom: "24px" }}>
+                  {interChoices.map((choice, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleInterChoice(choice)}
+                      style={{ display: "flex", alignItems: "center", gap: "14px", padding: "16px 20px", borderRadius: "16px", border: "1px solid rgba(34,211,238,0.2)", background: "rgba(34,211,238,0.06)", color: "white", fontSize: "16px", fontWeight: 600, cursor: "pointer", textAlign: "left", width: "100%" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(34,211,238,0.15)"; e.currentTarget.style.borderColor = "rgba(34,211,238,0.45)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(34,211,238,0.06)"; e.currentTarget.style.borderColor = "rgba(34,211,238,0.2)"; }}
+                    >
+                      <span style={{ fontSize: "20px" }}>{(["💋", "🔥", "✨"] as const)[i]}</span>
+                      <span>{choice}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "20px" }}>
+                  <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", marginBottom: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em" }}>
+                    Or write / speak your own
+                  </div>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <input
+                      value={interCustomChoice}
+                      onChange={(e) => setInterCustomChoice(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && interCustomChoice.trim() && handleInterChoice(interCustomChoice.trim())}
+                      placeholder="e.g. take me to the balcony..."
+                      style={{ flex: 1, borderRadius: "14px", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.06)", color: "white", padding: "13px 18px", outline: "none", fontSize: "15px" }}
+                    />
+                    <button
+                      onClick={isListening ? stopListening : startListening}
+                      style={{ padding: "0 18px", borderRadius: "14px", border: `1px solid ${isListening ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.12)"}`, background: isListening ? "rgba(239,68,68,0.15)" : "rgba(255,255,255,0.06)", color: isListening ? "#f87171" : "white", cursor: "pointer", flexShrink: 0, fontSize: "22px" }}
+                      title={isListening ? "Stop listening" : "Speak your choice"}
+                    >
+                      {isListening ? "⏹" : "🎙"}
+                    </button>
+                    <button
+                      onClick={() => interCustomChoice.trim() && handleInterChoice(interCustomChoice.trim())}
+                      disabled={!interCustomChoice.trim()}
+                      style={{ padding: "0 24px", borderRadius: "14px", border: "none", background: interCustomChoice.trim() ? "#22d3ee" : "rgba(255,255,255,0.06)", color: interCustomChoice.trim() ? "black" : "rgba(255,255,255,0.35)", cursor: interCustomChoice.trim() ? "pointer" : "not-allowed", fontWeight: 700, fontSize: "15px", flexShrink: 0 }}
+                    >
+                      Go →
+                    </button>
+                  </div>
+                  {isListening && (
+                    <div style={{ marginTop: "10px", fontSize: "13px", color: "#f87171", display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#f87171", display: "inline-block" }} />
+                      Listening... speak your choice
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Story history */}
+            {interSegments.length > 1 && (interPhase === "playing" || interPhase === "choosing") && (
+              <div style={{ marginTop: "24px" }}>
+                <div style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", marginBottom: "10px" }}>Story so far</div>
+                {interSegments.slice(0, -1).map((seg, i) => (
+                  <div key={i} style={{ borderRadius: "14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", padding: "14px 18px", marginBottom: "8px", fontSize: "13px", color: "rgba(255,255,255,0.38)", lineHeight: 1.7 }}>
+                    {seg.split("\n").slice(0, 3).map((l, j) => <p key={j} style={{ margin: "2px 0" }}>{l}</p>)}
+                    <p style={{ margin: "4px 0 0", color: "rgba(255,255,255,0.2)" }}>...</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Story + player */}
         {story && (
