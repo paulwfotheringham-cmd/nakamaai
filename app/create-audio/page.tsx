@@ -1137,7 +1137,7 @@ function CreateAudioTestInner() {
 
       <div
         style={{
-          maxWidth: "1280px",
+          maxWidth: "1680px",
           margin: "0 auto",
           minHeight: "100vh",
           display: "flex",
@@ -1145,8 +1145,8 @@ function CreateAudioTestInner() {
           padding: "32px 24px",
         }}
       >
-        {/* Two-column layout — no top header */}
-        <div style={{ display: "grid", gap: "32px", gridTemplateColumns: "1fr 1.1fr", alignItems: "start" }}>
+        {/* Three-column layout: hero | form | results */}
+        <div style={{ display: "grid", gap: "28px", gridTemplateColumns: "0.75fr 1fr 1fr", alignItems: "start" }}>
 
           {/* Left: hero text */}
           <div style={{ display: "flex", flexDirection: "column" }}>
@@ -1500,13 +1500,14 @@ function CreateAudioTestInner() {
               </div>
             </div>
           </div>
-        </div>
+
+          {/* Column 3: Results */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
 
         {/* Interactive Story result area */}
         {interPhase !== "setup" && (
           <div
             style={{
-              marginTop: "40px",
               borderRadius: "28px",
               border: "1px solid rgba(14,116,144,0.35)",
               background: "rgba(8,60,75,0.25)",
@@ -1717,7 +1718,6 @@ function CreateAudioTestInner() {
         {story && (
           <div
             style={{
-              marginTop: "40px",
               borderRadius: "28px",
               border: "1px solid rgba(255,255,255,0.1)",
               background: "rgba(255,255,255,0.06)",
@@ -1869,6 +1869,8 @@ function CreateAudioTestInner() {
                 border: "1px solid rgba(255,255,255,0.1)",
                 background: "rgba(0,0,0,0.2)",
                 padding: "20px",
+                maxHeight: "60vh",
+                overflowY: "auto",
               }}
             >
               <p
@@ -1885,6 +1887,20 @@ function CreateAudioTestInner() {
             </div>
           </div>
         )}
+
+        {/* Empty state — nothing generated yet */}
+        {interPhase === "setup" && !story && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "340px", borderRadius: "28px", border: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)", padding: "40px 24px", textAlign: "center" }}>
+            <div style={{ fontSize: "48px", marginBottom: "16px", opacity: 0.4 }}>✨</div>
+            <div style={{ fontSize: "16px", fontWeight: 600, color: "rgba(255,255,255,0.35)" }}>Your story will appear here</div>
+            <div style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.2)", lineHeight: 1.6 }}>
+              Choose your settings, cast your voices,<br />then hit Generate Story or Generate Interactive.
+            </div>
+          </div>
+        )}
+
+          </div>{/* end column 3 */}
+        </div>{/* end 3-column grid */}
       </div>
     </div>
   );
