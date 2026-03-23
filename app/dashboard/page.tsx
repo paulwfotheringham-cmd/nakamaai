@@ -18,7 +18,7 @@ const tiles: Tile[] = [
       "Browse and begin your next immersive audio experience.",
     href: "/fantasy-audio",
     icon: "📚",
-    cta: "Open",
+    cta: "Browse Library",
   },
   {
     title: "Marketplace",
@@ -34,7 +34,7 @@ const tiles: Tile[] = [
       "Manage your details, preferences, and account settings.",
     href: "/profile",
     icon: "👤",
-    cta: "Open",
+    cta: "Settings",
   },
 ];
 
