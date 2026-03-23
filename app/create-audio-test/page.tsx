@@ -640,7 +640,11 @@ function CreateAudioTestInner() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text, voiceId }),
         });
-        if (!res.ok) { setAudioError("Failed to generate audio."); setPreparingAudio(false); setIsPlaying(false); playActiveRef.current = false; return; }
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          setAudioError(errData.error ?? `Audio generation failed (${res.status})`);
+          setPreparingAudio(false); setIsPlaying(false); playActiveRef.current = false; return;
+        }
         const { outputUri } = await res.json();
         urls.push(outputUri);
       } catch {

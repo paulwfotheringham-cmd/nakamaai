@@ -17,33 +17,45 @@ export async function POST(req: NextRequest) {
 
   const safeText = text.trim().slice(0, 3000);
 
-  const body = encode({
+  // Fish Audio TTS uses msgpack-encoded request body.
+  // reference_id is the voice model _id from the /model catalogue.
+  const msgpackBody = encode({
     text: safeText,
-    reference_id: voiceId,
+    reference_id: voiceId ?? null,
     format: "mp3",
     mp3_bitrate: 128,
+    normalize: true,
     streaming: false,
   });
 
-  const response = await fetch("https://api.fish.audio/v1/tts", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.FISH_AUDIO_API_KEY}`,
-      "Content-Type": "application/msgpack",
-    },
-    body,
-  });
+  let response: Response;
+  try {
+    response = await fetch("https://api.fish.audio/v1/tts", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.FISH_AUDIO_API_KEY}`,
+        "Content-Type": "application/msgpack",
+        "model": "speech-1.6",
+      },
+      body: msgpackBody,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("Fish Audio fetch error:", msg);
+    return Response.json({ error: `Network error calling Fish Audio: ${msg}` }, { status: 502 });
+  }
 
   if (!response.ok) {
-    const errorText = await response.text();
+    // Surface the real error so the frontend can display it.
+    const errorText = await response.text().catch(() => "(no body)");
+    console.error(`Fish Audio TTS error ${response.status}:`, errorText);
     return Response.json(
-      { error: `Fish Audio API error: ${errorText}` },
+      { error: `Fish Audio error ${response.status}: ${errorText}` },
       { status: response.status }
     );
   }
 
-  // Fish Audio returns binary audio — convert to base64 data URL so the
-  // client can play it directly without needing a storage bucket.
+  // Response is a binary MP3 stream — read it all then return as data URL.
   const audioBuffer = await response.arrayBuffer();
   const base64 = Buffer.from(audioBuffer).toString("base64");
   const outputUri = `data:audio/mpeg;base64,${base64}`;
