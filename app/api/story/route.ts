@@ -15,7 +15,6 @@ export async function POST(req: Request) {
 
   const {
     category,
-    style,
     setting,
     mood,
     buildUp,
@@ -37,7 +36,6 @@ Target length: 1,600 to 2,000 words.
 
 Story requirements:
 ${category ? `- Category: ${category}` : ""}
-${style ? `- Style / theme: ${style}` : ""}
 - Setting: ${setting}
 - Mood: ${mood}
 - Build-up: ${buildUp}

@@ -568,7 +568,6 @@ const CATEGORY_KEYS = Object.keys(CATEGORIES);
 
 function CreateAudioTestInner() {
   const [category, setCategory]       = useState(CATEGORY_KEYS[0]);
-  const [style, setStyle]             = useState(CATEGORIES[CATEGORY_KEYS[0]][0]);
   const [setting, setSetting]         = useState("office");
   const [mood, setMood]               = useState("romantic");
   const [buildUp, setBuildUp]         = useState("slow burn");
@@ -579,7 +578,6 @@ function CreateAudioTestInner() {
 
   function handleCategoryChange(cat: string) {
     setCategory(cat);
-    setStyle(CATEGORIES[cat][0]);
   }
   const [story, setStory]             = useState("");
   const [loading, setLoading]         = useState(false);
@@ -664,7 +662,7 @@ function CreateAudioTestInner() {
       const response = await fetch("/api/story", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category, style, setting, mood, buildUp, maleRole, femaleRole, storyType, extraDetail }),
+        body: JSON.stringify({ category, setting, mood, buildUp, maleRole, femaleRole, storyType, extraDetail }),
       });
       const data = await response.json();
       setStory(data.story || "");
@@ -1003,22 +1001,13 @@ function CreateAudioTestInner() {
             </div>
 
             <div style={{ display: "grid", gap: "16px" }}>
-              <TwoCol>
-                <Field label="Category">
-                  <select style={inputStyle} value={category} onChange={(e) => handleCategoryChange(e.target.value)}>
-                    {CATEGORY_KEYS.map((c) => (
-                      <option key={c} style={{ color: "black" }}>{c}</option>
-                    ))}
-                  </select>
-                </Field>
-                <Field label="Style">
-                  <select style={inputStyle} value={style} onChange={(e) => setStyle(e.target.value)}>
-                    {CATEGORIES[category].map((s) => (
-                      <option key={s} style={{ color: "black" }}>{s}</option>
-                    ))}
-                  </select>
-                </Field>
-              </TwoCol>
+              <Field label="Category">
+                <select style={inputStyle} value={category} onChange={(e) => handleCategoryChange(e.target.value)}>
+                  {CATEGORY_KEYS.map((c) => (
+                    <option key={c} style={{ color: "black" }}>{c}</option>
+                  ))}
+                </select>
+              </Field>
 
               <TwoCol>
                 <Field label="Setting">
