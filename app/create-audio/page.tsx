@@ -1091,24 +1091,107 @@ function CreateAudioTestInner() {
 
               </div>
 
-              <button
-                style={{
-                  marginTop: "8px",
-                  borderRadius: "18px",
-                  background: "#d8b26e",
-                  padding: "14px 24px",
-                  fontWeight: 700,
-                  color: "black",
-                  border: "none",
-                  cursor: loading ? "not-allowed" : "pointer",
-                  fontSize: "16px",
-                  opacity: loading ? 0.7 : 1,
-                }}
-                onClick={generateStory}
-                disabled={loading}
-              >
-                {loading ? "Generating…" : "Generate Story"}
-              </button>
+              <div style={{ marginTop: "8px", display: "flex", gap: "10px", alignItems: "stretch" }}>
+                <button
+                  style={{
+                    flex: 1,
+                    borderRadius: "18px",
+                    background: "#d8b26e",
+                    padding: "12px 20px",
+                    fontWeight: 700,
+                    color: "black",
+                    border: "none",
+                    cursor: loading ? "not-allowed" : "pointer",
+                    fontSize: "14px",
+                    opacity: loading ? 0.7 : 1,
+                  }}
+                  onClick={generateStory}
+                  disabled={loading}
+                >
+                  {loading ? "Generating…" : "Generate Story"}
+                </button>
+
+                <div ref={dropdownRef} style={{ position: "relative" }}>
+                  <button
+                    style={{
+                      height: "100%",
+                      borderRadius: "18px",
+                      border: "1px solid rgba(255,255,255,0.15)",
+                      background: showDropdown ? "rgba(216,178,110,0.12)" : "rgba(255,255,255,0.06)",
+                      padding: "12px 16px",
+                      color: showDropdown ? "#d8b26e" : "rgba(255,255,255,0.8)",
+                      cursor: "pointer",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      whiteSpace: "nowrap",
+                    }}
+                    onClick={toggleDropdown}
+                  >
+                    📚 Saved Stories {showDropdown ? "▲" : "▼"}
+                  </button>
+
+                  {showDropdown && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: "calc(100% + 8px)",
+                        right: 0,
+                        zIndex: 100,
+                        minWidth: "300px",
+                        maxWidth: "420px",
+                        borderRadius: "16px",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        background: "#1a0f20",
+                        boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: "12px", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#d8b26e" }}>
+                        Saved Stories
+                      </div>
+
+                      {loadingStories ? (
+                        <div style={{ padding: "24px", textAlign: "center", fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>
+                          Loading…
+                        </div>
+                      ) : savedStories.length === 0 ? (
+                        <div style={{ padding: "24px", textAlign: "center", fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>
+                          No saved stories yet.
+                        </div>
+                      ) : (
+                        <div style={{ maxHeight: "320px", overflowY: "auto" }}>
+                          {savedStories.map((s) => (
+                            <button
+                              key={s.id}
+                              onClick={() => loadSavedStory(s)}
+                              style={{
+                                width: "100%",
+                                textAlign: "left",
+                                padding: "12px 16px",
+                                background: "transparent",
+                                border: "none",
+                                borderBottom: "1px solid rgba(255,255,255,0.05)",
+                                cursor: "pointer",
+                                color: "white",
+                              }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(216,178,110,0.08)"; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                            >
+                              <div style={{ fontSize: "14px", fontWeight: 600 }}>{s.name}</div>
+                              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginTop: "3px" }}>
+                                {new Date(s.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1198,84 +1281,6 @@ function CreateAudioTestInner() {
                   {saveStatus === "saved" ? "✓ Story Saved" : saveStatus === "saving" ? "Saving…" : "💾 Save Story"}
                 </button>
 
-                <div ref={dropdownRef} style={{ position: "relative" }}>
-                  <button
-                    style={{
-                      borderRadius: "14px",
-                      border: "1px solid rgba(255,255,255,0.15)",
-                      background: showDropdown ? "rgba(216,178,110,0.12)" : "rgba(255,255,255,0.05)",
-                      padding: "10px 20px",
-                      color: showDropdown ? "#d8b26e" : "white",
-                      cursor: "pointer",
-                      fontSize: "15px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                    }}
-                    onClick={toggleDropdown}
-                  >
-                    📚 Saved Stories {showDropdown ? "▲" : "▼"}
-                  </button>
-
-                  {showDropdown && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "calc(100% + 8px)",
-                        right: 0,
-                        zIndex: 100,
-                        minWidth: "300px",
-                        maxWidth: "420px",
-                        borderRadius: "16px",
-                        border: "1px solid rgba(255,255,255,0.12)",
-                        background: "#1a0f20",
-                        boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
-                        overflow: "hidden",
-                      }}
-                    >
-                      <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: "12px", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#d8b26e" }}>
-                        Saved Stories
-                      </div>
-
-                      {loadingStories ? (
-                        <div style={{ padding: "24px", textAlign: "center", fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>
-                          Loading…
-                        </div>
-                      ) : savedStories.length === 0 ? (
-                        <div style={{ padding: "24px", textAlign: "center", fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>
-                          No saved stories yet.
-                        </div>
-                      ) : (
-                        <div style={{ maxHeight: "320px", overflowY: "auto" }}>
-                          {savedStories.map((s) => (
-                            <button
-                              key={s.id}
-                              onClick={() => loadSavedStory(s)}
-                              style={{
-                                width: "100%",
-                                textAlign: "left",
-                                padding: "12px 16px",
-                                background: "transparent",
-                                border: "none",
-                                borderBottom: "1px solid rgba(255,255,255,0.05)",
-                                cursor: "pointer",
-                                color: "white",
-                              }}
-                              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(216,178,110,0.08)"; }}
-                              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                            >
-                              <div style={{ fontSize: "14px", fontWeight: 600 }}>{s.name}</div>
-                              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginTop: "3px" }}>
-                                {new Date(s.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                                {s.narrator_voice ? ` · Narrator: ${s.narrator_voice}` : ""}
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
               </div>
             </div>
 
