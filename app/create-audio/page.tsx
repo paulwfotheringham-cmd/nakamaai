@@ -633,6 +633,7 @@ function CreateAudioTestInner() {
   const [interCustomChoice, setInterCustomChoice] = useState("");
   const [isListening, setIsListening]             = useState(false);
   const [interLoading, setInterLoading]           = useState(false);
+  const [interPaused, setInterPaused]             = useState(false);
   const [interSaveStatus, setInterSaveStatus]     = useState<"idle" | "saving" | "saved">("idle");
   const [maleName, setMaleName]   = useState(() => randItem(["Luca", "Adrian", "Noah", "Julian", "Theo"]));
   const [femaleName, setFemaleName] = useState(() => randItem(["Elena", "Sofia", "Clara", "Mia", "Isla"]));
@@ -943,6 +944,7 @@ function CreateAudioTestInner() {
     setInterSegments([]);
     setInterChoices([]);
     setInterSaveStatus("idle");
+    setInterPaused(false);
     setAudioError("");
     try {
       const res = await fetch("/api/interactive-story", {
@@ -994,6 +996,7 @@ function CreateAudioTestInner() {
     setInterSegments([]);
     setInterChoices([]);
     setInterLoading(false);
+    setInterPaused(false);
   }
 
   function startListening() {
@@ -1021,7 +1024,20 @@ function CreateAudioTestInner() {
     interStoppedRef.current = true;
     interCurrentAudioRef.current?.pause();
     interCurrentAudioRef.current = null;
-    setInterPhase("choosing");
+    setInterPaused(true);
+    // Phase stays as "playing" — we just stop the audio
+  }
+
+  function handleInterResume() {
+    setInterPaused(false);
+    const currentSegment = interSegments[interSegments.length - 1];
+    if (currentSegment) {
+      interSpeakText(currentSegment, () => {
+        if (!interStoppedRef.current) setInterPhase("choosing");
+      });
+    } else {
+      setInterPhase("choosing");
+    }
   }
 
   async function saveInterStory() {
@@ -1550,16 +1566,54 @@ function CreateAudioTestInner() {
             {/* Playing */}
             {interPhase === "playing" && (
               <div>
+                {/* Status bar */}
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
-                  <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 12px rgba(74,222,128,0.6)" }} />
-                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#4ade80" }}>Playing — listen for your prompt</span>
+                  {interPaused ? (
+                    <>
+                      <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#d8b26e" }} />
+                      <span style={{ fontSize: "14px", fontWeight: 600, color: "#d8b26e" }}>Paused</span>
+                    </>
+                  ) : (
+                    <>
+                      <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 12px rgba(74,222,128,0.6)" }} />
+                      <span style={{ fontSize: "14px", fontWeight: 600, color: "#4ade80" }}>Playing — listen for your prompt</span>
+                    </>
+                  )}
                   <div style={{ marginLeft: "auto", display: "flex", gap: "8px" }}>
-                    <button
-                      onClick={handleInterPause}
-                      style={{ padding: "8px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "white", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
-                    >
-                      ⏸ Pause
-                    </button>
+                    {interPaused ? (
+                      <button
+                        onClick={handleInterResume}
+                        style={{ padding: "8px 16px", borderRadius: "12px", border: "1px solid rgba(74,222,128,0.4)", background: "rgba(74,222,128,0.1)", color: "#4ade80", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+                      >
+                        ▶ Resume
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleInterPause}
+                        style={{ padding: "8px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "white", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+                      >
+                        ⏸ Pause
+                      </button>
+                    )}
+                    {interPaused && (
+                      <button
+                        onClick={saveInterStory}
+                        disabled={interSaveStatus === "saving"}
+                        style={{
+                          padding: "8px 16px",
+                          borderRadius: "12px",
+                          border: interSaveStatus === "saved" ? "1px solid rgba(74,222,128,0.4)" : "1px solid rgba(216,178,110,0.35)",
+                          background: interSaveStatus === "saved" ? "rgba(74,222,128,0.1)" : "rgba(216,178,110,0.1)",
+                          color: interSaveStatus === "saved" ? "#4ade80" : "#d8b26e",
+                          cursor: interSaveStatus === "saving" ? "not-allowed" : "pointer",
+                          fontSize: "13px",
+                          fontWeight: 600,
+                          opacity: interSaveStatus === "saving" ? 0.6 : 1,
+                        }}
+                      >
+                        {interSaveStatus === "saved" ? "✓ Saved" : interSaveStatus === "saving" ? "Saving…" : "💾 Save"}
+                      </button>
+                    )}
                     <button
                       onClick={handleInterStop}
                       style={{ padding: "8px 16px", borderRadius: "12px", border: "1px solid rgba(255,80,80,0.3)", background: "rgba(255,80,80,0.08)", color: "#ff8080", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
@@ -1568,6 +1622,8 @@ function CreateAudioTestInner() {
                     </button>
                   </div>
                 </div>
+
+                {/* Current segment text */}
                 <div style={{ borderRadius: "16px", background: "rgba(0,0,0,0.3)", padding: "20px", maxHeight: "320px", overflowY: "auto", lineHeight: 1.9, fontSize: "15px" }}>
                   {interSegments[interSegments.length - 1]?.split("\n").map((line, i) => (
                     <p key={i} style={{ margin: "4px 0", color: line.startsWith("MALE:") ? "#93c5fd" : line.startsWith("FEMALE:") ? "#f9a8d4" : "rgba(255,255,255,0.85)" }}>
@@ -1575,6 +1631,18 @@ function CreateAudioTestInner() {
                     </p>
                   ))}
                 </div>
+
+                {/* Paused: show option to advance to choices */}
+                {interPaused && interChoices.length > 0 && (
+                  <div style={{ marginTop: "16px", textAlign: "center" }}>
+                    <button
+                      onClick={() => { setInterPaused(false); setInterPhase("choosing"); }}
+                      style={{ padding: "10px 24px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "14px", fontWeight: 600 }}
+                    >
+                      Skip to choices →
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
