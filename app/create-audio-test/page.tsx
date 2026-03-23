@@ -38,16 +38,18 @@ type GenderTab = typeof GENDER_TABS[number];
 
 function VoiceBrowserModal({
   slot,
+  lockedGender,
   onSelect,
   onClose,
 }: {
   slot: string;
+  lockedGender: GenderTab;
   onSelect: (voice: SelectedVoice) => void;
   onClose: () => void;
 }) {
   const [allVoices, setAllVoices] = useState<CartesiaVoice[]>([]);
   const [search, setSearch] = useState("");
-  const [gender, setGender] = useState<GenderTab>("all");
+  const [gender, setGender] = useState<GenderTab>(lockedGender);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [previewingId, setPreviewingId] = useState<string | null>(null);
@@ -210,28 +212,30 @@ function VoiceBrowserModal({
               boxSizing: "border-box",
             }}
           />
-          <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
-            {GENDER_TABS.map((g) => (
-              <button
-                key={g}
-                onClick={() => handleGender(g)}
-                style={{
-                  borderRadius: "10px",
-                  border: "1px solid",
-                  borderColor: gender === g ? "#d8b26e" : "rgba(255,255,255,0.1)",
-                  background: gender === g ? "rgba(216,178,110,0.15)" : "rgba(255,255,255,0.04)",
-                  color: gender === g ? "#d8b26e" : "rgba(255,255,255,0.6)",
-                  padding: "6px 14px",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  textTransform: "capitalize",
-                }}
-              >
-                {g === "female" ? "♀ Female" : g === "male" ? "♂ Male" : "All"}
-              </button>
-            ))}
-          </div>
+          {lockedGender === "all" && (
+            <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+              {GENDER_TABS.map((g) => (
+                <button
+                  key={g}
+                  onClick={() => handleGender(g)}
+                  style={{
+                    borderRadius: "10px",
+                    border: "1px solid",
+                    borderColor: gender === g ? "#d8b26e" : "rgba(255,255,255,0.1)",
+                    background: gender === g ? "rgba(216,178,110,0.15)" : "rgba(255,255,255,0.04)",
+                    color: gender === g ? "#d8b26e" : "rgba(255,255,255,0.6)",
+                    padding: "6px 14px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {g === "female" ? "♀ Female" : g === "male" ? "♂ Male" : "All"}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Voice list */}
@@ -796,6 +800,7 @@ function CreateAudioTestInner() {
       {activeBrowserSlot && (
         <VoiceBrowserModal
           slot={slotLabel}
+          lockedGender={activeBrowserSlot === "male" ? "male" : activeBrowserSlot === "female" ? "female" : "all"}
           onSelect={handleVoiceSelect}
           onClose={() => setActiveBrowserSlot(null)}
         />
