@@ -24,9 +24,9 @@ const tiles: Tile[] = [
     title: "Marketplace",
     description:
       "Explore and discover fantasy audio experiences from the community.",
+    href: "/marketplace",
     icon: "🛍️",
-    disabled: true,
-    cta: "Coming soon",
+    cta: "Enter",
   },
   {
     title: "Profile",
