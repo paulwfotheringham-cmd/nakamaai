@@ -63,7 +63,11 @@ function VoiceBrowserModal({
   }, []);
 
   const filtered = allVoices.filter((v) => {
-    const matchesGender = gender === "all" || v.gender?.toLowerCase() === gender;
+    const g = v.gender?.toLowerCase() ?? "";
+    const matchesGender =
+      gender === "all" ||
+      (gender === "female" && (g === "female" || g === "feminine")) ||
+      (gender === "male"   && (g === "male"   || g === "masculine"));
     const matchesSearch =
       !search ||
       v.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -286,11 +290,6 @@ function VoiceBrowserModal({
                     {voice.language && (
                       <span style={{ borderRadius: "6px", background: "rgba(255,255,255,0.06)", padding: "1px 6px", fontSize: "11px" }}>
                         {voice.language.toUpperCase()}
-                      </span>
-                    )}
-                    {voice.gender && (
-                      <span style={{ borderRadius: "6px", background: "rgba(216,178,110,0.1)", color: "#d8b26e", padding: "1px 6px", fontSize: "11px", textTransform: "capitalize" }}>
-                        {voice.gender}
                       </span>
                     )}
                     {voice.accent && (
