@@ -904,21 +904,8 @@ function CreateAudioTestInner() {
             <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.4em", color: "#d8b26e" }}>
               Nakama
             </div>
-            <div style={{ marginTop: "8px", fontSize: "32px", fontWeight: 700 }}>Nakama AI · Audio Test</div>
+            <div style={{ marginTop: "8px", fontSize: "32px", fontWeight: 700 }}>Nakama AI · Customize your adventure</div>
           </div>
-          <div
-            style={{
-              borderRadius: "12px",
-              border: "1px solid rgba(216,178,110,0.3)",
-              background: "rgba(216,178,110,0.1)",
-              padding: "6px 14px",
-              fontSize: "12px",
-              color: "#f1d7a1",
-              fontWeight: 600,
-            }}
-            >
-              AI voices
-            </div>
         </div>
 
         {/* Two-column layout */}
