@@ -1,7 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 type SavedStory = {
   id: string;
@@ -15,31 +17,557 @@ type SavedStory = {
   created_at: string;
 };
 
-const VOICES = [
-  { id: "Scarlett", label: "Scarlett", desc: "Young Female · bright & warm",    gender: "female" },
-  { id: "Liv",      label: "Liv",      desc: "Young Female · light & breezy",   gender: "female" },
-  { id: "Amy",      label: "Amy",      desc: "Mature Female · measured & rich",  gender: "female" },
-  { id: "Dan",      label: "Dan",      desc: "Young Male · natural & smooth",   gender: "male" },
-  { id: "Will",     label: "Will",     desc: "Mature Male · deep & deliberate", gender: "male" },
-];
+type CartesiaVoice = {
+  id: string;
+  name: string;
+  description: string;
+  language: string;
+  gender: string | null;
+  accent: string | null;
+  age: string | null;
+  is_public: boolean;
+};
 
-const MALE_VOICES   = VOICES.filter((v) => v.gender === "male");
-const FEMALE_VOICES = VOICES.filter((v) => v.gender === "female");
+type SelectedVoice = { id: string; title: string };
 
-function CreateAudioPageInner() {
-  const [setting, setSetting]       = useState("office");
-  const [mood, setMood]             = useState("romantic");
-  const [buildUp, setBuildUp]       = useState("slow burn");
-  const [maleRole, setMaleRole]     = useState("boss");
-  const [femaleRole, setFemaleRole] = useState("assistant");
-  const [storyType, setStoryType]   = useState("romantic encounter");
+// ─── Voice Browser Modal ──────────────────────────────────────────────────────
+
+const PAGE_SIZE = 20;
+const GENDER_TABS = ["female", "male"] as const;
+type GenderTab = typeof GENDER_TABS[number] | "all";
+
+const LANG_NAMES: Record<string, string> = {
+  en: "English", fr: "French", de: "German", es: "Spanish", pt: "Portuguese",
+  zh: "Chinese", ja: "Japanese", ko: "Korean", hi: "Hindi", it: "Italian",
+  nl: "Dutch", pl: "Polish", ru: "Russian", sv: "Swedish", tr: "Turkish",
+  tl: "Tagalog", bg: "Bulgarian", ro: "Romanian", ar: "Arabic", cs: "Czech",
+  el: "Greek", fi: "Finnish", hr: "Croatian", ms: "Malay", sk: "Slovak",
+  da: "Danish", ta: "Tamil", uk: "Ukrainian", hu: "Hungarian", no: "Norwegian",
+  vi: "Vietnamese", bn: "Bengali", th: "Thai", he: "Hebrew", ka: "Georgian",
+  id: "Indonesian", te: "Telugu", gu: "Gujarati", kn: "Kannada", ml: "Malayalam",
+  mr: "Marathi", pa: "Punjabi",
+};
+
+function langLabel(code: string) {
+  return LANG_NAMES[code?.toLowerCase()] ?? code?.toUpperCase() ?? "Unknown";
+}
+
+function VoiceBrowserModal({
+  slot,
+  lockedGender,
+  defaultGender,
+  onSelect,
+  onClose,
+}: {
+  slot: string;
+  lockedGender: GenderTab;
+  defaultGender?: "female" | "male";
+  onSelect: (voice: SelectedVoice) => void;
+  onClose: () => void;
+}) {
+  const [allVoices, setAllVoices] = useState<CartesiaVoice[]>([]);
+  const [search, setSearch] = useState("");
+  const [gender, setGender] = useState<GenderTab>(lockedGender !== "all" ? lockedGender : (defaultGender ?? "female"));
+  const [langFilter, setLangFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [previewingId, setPreviewingId] = useState<string | null>(null);
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch("/api/cartesia-voices")
+      .then((r) => r.json())
+      .then((data) => setAllVoices(data.voices ?? []))
+      .catch(() => setAllVoices([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = allVoices.filter((v) => {
+    const g = v.gender?.toLowerCase() ?? "";
+    const matchesGender =
+      gender === "all" ||
+      (gender === "female" && (g === "female" || g === "feminine")) ||
+      (gender === "male"   && (g === "male"   || g === "masculine"));
+    const matchesLang = langFilter === "all" || v.language?.toLowerCase() === langFilter;
+    const matchesSearch =
+      !search ||
+      v.name.toLowerCase().includes(search.toLowerCase()) ||
+      v.description?.toLowerCase().includes(search.toLowerCase());
+    return matchesGender && matchesLang && matchesSearch;
+  });
+
+  // Derive available languages from gender-filtered voices (before lang filter)
+  const genderFiltered = allVoices.filter((v) => {
+    const g = v.gender?.toLowerCase() ?? "";
+    return gender === "all" ||
+      (gender === "female" && (g === "female" || g === "feminine")) ||
+      (gender === "male"   && (g === "male"   || g === "masculine"));
+  });
+  const availableLangs = Array.from(new Set(genderFiltered.map((v) => v.language?.toLowerCase()).filter(Boolean)))
+    .sort((a, b) => langLabel(a!).localeCompare(langLabel(b!))) as string[];
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageVoices = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  function handleSearchChange(value: string) {
+    setSearch(value);
+    setPage(1);
+  }
+
+  function handleGender(g: GenderTab) {
+    setGender(g);
+    setLangFilter("all");
+    setPage(1);
+  }
+
+  async function previewVoice(voice: CartesiaVoice) {
+    if (previewingId === voice.id) {
+      previewAudioRef.current?.pause();
+      previewAudioRef.current = null;
+      setPreviewingId(null);
+      return;
+    }
+    previewAudioRef.current?.pause();
+    setPreviewingId(voice.id);
+    try {
+      const res = await fetch("/api/cartesia-tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: `Hi, my name is ${voice.name}. I can be your voice to take you on your fantasy journey.`,
+          voiceId: voice.id,
+        }),
+      });
+      if (!res.ok) { setPreviewingId(null); return; }
+      const { outputUri } = await res.json();
+      const audio = new Audio(outputUri);
+      previewAudioRef.current = audio;
+      audio.onended = () => setPreviewingId(null);
+      audio.onerror = () => setPreviewingId(null);
+      audio.play().catch(() => setPreviewingId(null));
+    } catch {
+      setPreviewingId(null);
+    }
+  }
+
+  const genderIcon = (v: CartesiaVoice) => {
+    const g = v.gender?.toLowerCase();
+    if (g === "female") return "♀";
+    if (g === "male") return "♂";
+    return "🎙";
+  };
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 200,
+        background: "rgba(0,0,0,0.75)",
+        backdropFilter: "blur(6px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "24px",
+      }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "760px",
+          maxHeight: "85vh",
+          borderRadius: "24px",
+          border: "1px solid rgba(255,255,255,0.12)",
+          background: "#12091a",
+          boxShadow: "0 32px 80px rgba(0,0,0,0.7)",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        {/* Modal header */}
+        <div
+          style={{
+            padding: "20px 24px",
+            borderBottom: "1px solid rgba(255,255,255,0.08)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexShrink: 0,
+          }}
+        >
+          <div>
+            <div style={{ fontSize: "18px", fontWeight: 700 }}>
+              Choose Voice — <span style={{ color: "#d8b26e" }}>{slot}</span>
+            </div>
+            <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginTop: "4px" }}>
+              {loading ? "Loading…" : `${filtered.length.toLocaleString()} voices available`}
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: "10px",
+              color: "rgba(255,255,255,0.7)",
+              cursor: "pointer",
+              padding: "6px 12px",
+              fontSize: "18px",
+              lineHeight: 1,
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Search + filters */}
+        <div style={{ padding: "12px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            <input
+              type="text"
+              placeholder="Search voices by name…"
+              value={search}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              style={{
+                flex: 1,
+                borderRadius: "14px",
+                border: "1px solid rgba(255,255,255,0.12)",
+                background: "rgba(255,255,255,0.06)",
+                color: "white",
+                padding: "10px 16px",
+                fontSize: "15px",
+                outline: "none",
+                boxSizing: "border-box",
+              }}
+            />
+            {lockedGender === "all" && (
+              <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+                {GENDER_TABS.map((g) => (
+                  <button
+                    key={g}
+                    onClick={() => handleGender(g)}
+                    style={{
+                      borderRadius: "10px",
+                      border: "1px solid",
+                      borderColor: gender === g ? "#d8b26e" : "rgba(255,255,255,0.1)",
+                      background: gender === g ? "rgba(216,178,110,0.15)" : "rgba(255,255,255,0.04)",
+                      color: gender === g ? "#d8b26e" : "rgba(255,255,255,0.6)",
+                      padding: "6px 14px",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {g === "female" ? "♀ Female" : "♂ Male"}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* Language / accent filter */}
+          {availableLangs.length > 1 && (
+            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+              <button
+                onClick={() => { setLangFilter("all"); setPage(1); }}
+                style={{
+                  borderRadius: "20px",
+                  border: "1px solid",
+                  borderColor: langFilter === "all" ? "#d8b26e" : "rgba(255,255,255,0.1)",
+                  background: langFilter === "all" ? "rgba(216,178,110,0.15)" : "rgba(255,255,255,0.04)",
+                  color: langFilter === "all" ? "#d8b26e" : "rgba(255,255,255,0.55)",
+                  padding: "4px 12px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                All accents
+              </button>
+              {availableLangs.map((code) => (
+                <button
+                  key={code}
+                  onClick={() => { setLangFilter(code); setPage(1); }}
+                  style={{
+                    borderRadius: "20px",
+                    border: "1px solid",
+                    borderColor: langFilter === code ? "#d8b26e" : "rgba(255,255,255,0.1)",
+                    background: langFilter === code ? "rgba(216,178,110,0.15)" : "rgba(255,255,255,0.04)",
+                    color: langFilter === code ? "#d8b26e" : "rgba(255,255,255,0.55)",
+                    padding: "4px 12px",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  {langLabel(code)}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Voice list */}
+        <div style={{ overflowY: "auto", flex: 1 }}>
+          {loading ? (
+            <div style={{ padding: "48px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>
+              Loading voices…
+            </div>
+          ) : pageVoices.length === 0 ? (
+            <div style={{ padding: "48px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>
+              No voices found.
+            </div>
+          ) : (
+            pageVoices.map((voice) => (
+              <div
+                key={voice.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  padding: "14px 24px",
+                  borderBottom: "1px solid rgba(255,255,255,0.05)",
+                  cursor: "pointer",
+                  transition: "background 0.15s",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(216,178,110,0.06)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+              >
+                {/* Avatar */}
+                <div
+                  style={{
+                    width: "44px",
+                    height: "44px",
+                    borderRadius: "50%",
+                    flexShrink: 0,
+                    background: voice.gender?.toLowerCase() === "female"
+                      ? "rgba(216,130,178,0.2)"
+                      : voice.gender?.toLowerCase() === "male"
+                      ? "rgba(110,160,216,0.2)"
+                      : "rgba(216,178,110,0.15)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "20px",
+                  }}
+                >
+                  {genderIcon(voice)}
+                </div>
+
+                {/* Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: "15px", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {voice.name}
+                  </div>
+                  <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginTop: "2px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                    {voice.language && (
+                      <span style={{ borderRadius: "6px", background: "rgba(255,255,255,0.06)", padding: "1px 6px", fontSize: "11px" }}>
+                        {langLabel(voice.language)}
+                      </span>
+                    )}
+                    {voice.accent && (
+                      <span style={{ borderRadius: "6px", background: "rgba(255,255,255,0.06)", padding: "1px 6px", fontSize: "11px", textTransform: "capitalize" }}>
+                        {voice.accent}
+                      </span>
+                    )}
+                    {voice.age && (
+                      <span style={{ borderRadius: "6px", background: "rgba(255,255,255,0.06)", padding: "1px 6px", fontSize: "11px", textTransform: "capitalize" }}>
+                        {voice.age}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); previewVoice(voice); }}
+                    style={{
+                      borderRadius: "10px",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: previewingId === voice.id ? "rgba(216,178,110,0.2)" : "rgba(255,255,255,0.06)",
+                      color: previewingId === voice.id ? "#d8b26e" : "rgba(255,255,255,0.7)",
+                      padding: "6px 14px",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      cursor: previewingId !== null && previewingId !== voice.id ? "not-allowed" : "pointer",
+                      whiteSpace: "nowrap",
+                      opacity: previewingId !== null && previewingId !== voice.id ? 0.4 : 1,
+                    }}
+                    disabled={previewingId !== null && previewingId !== voice.id}
+                  >
+                    {previewingId === voice.id ? "⏳ Generating…" : "▶ Preview"}
+                  </button>
+                  <button
+                    onClick={() => { onSelect({ id: voice.id, title: voice.name }); }}
+                    style={{
+                      borderRadius: "10px",
+                      border: "none",
+                      background: "#d8b26e",
+                      color: "black",
+                      padding: "6px 14px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Select
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Pagination */}
+        <div
+          style={{
+            padding: "14px 24px",
+            borderTop: "1px solid rgba(255,255,255,0.06)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            flexShrink: 0,
+          }}
+        >
+          <button
+            onClick={() => setPage(Math.max(1, safePage - 1))}
+            disabled={safePage <= 1}
+            style={paginationBtnStyle(safePage <= 1)}
+          >
+            ← Prev
+          </button>
+          <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)" }}>
+            Page {safePage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setPage(Math.min(totalPages, safePage + 1))}
+            disabled={safePage >= totalPages}
+            style={paginationBtnStyle(safePage >= totalPages)}
+          >
+            Next →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function paginationBtnStyle(disabled: boolean): React.CSSProperties {
+  return {
+    borderRadius: "10px",
+    border: "1px solid rgba(255,255,255,0.1)",
+    background: disabled ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.07)",
+    color: disabled ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.8)",
+    padding: "7px 16px",
+    fontSize: "13px",
+    fontWeight: 600,
+    cursor: disabled ? "not-allowed" : "pointer",
+  };
+}
+
+// ─── Voice Slot Picker ────────────────────────────────────────────────────────
+
+function VoiceSlot({
+  label,
+  selected,
+  previewingId,
+  onBrowse,
+  onPreview,
+}: {
+  label: string;
+  selected: SelectedVoice | null;
+  previewingId: string | null;
+  onBrowse: () => void;
+  onPreview: () => void;
+}) {
+  const isPreviewing = selected && previewingId === selected.id;
+  return (
+    <div style={{ display: "grid", gap: "8px" }}>
+      <span style={{ fontSize: "14px", fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>{label}</span>
+      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <div
+          style={{
+            flex: 1,
+            borderRadius: "16px",
+            border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(255,255,255,0.06)",
+            color: selected ? "white" : "rgba(255,255,255,0.35)",
+            padding: "14px 16px",
+            fontSize: "15px",
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {selected ? selected.title : "No voice selected"}
+        </div>
+        {selected && (
+          <button
+            onClick={onPreview}
+            style={{
+              flexShrink: 0,
+              borderRadius: "14px",
+              border: "1px solid rgba(255,255,255,0.12)",
+              background: isPreviewing ? "rgba(216,178,110,0.2)" : "rgba(255,255,255,0.06)",
+              color: isPreviewing ? "#d8b26e" : "rgba(255,255,255,0.7)",
+              padding: "0 16px",
+              height: "50px",
+              fontSize: "13px",
+              fontWeight: 600,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {isPreviewing ? "⏹ Stop" : "▶ Preview"}
+          </button>
+        )}
+        <button
+          onClick={onBrowse}
+          style={{
+            flexShrink: 0,
+            borderRadius: "14px",
+            border: "1px solid rgba(216,178,110,0.35)",
+            background: "rgba(216,178,110,0.1)",
+            color: "#d8b26e",
+            padding: "0 16px",
+            height: "50px",
+            fontSize: "13px",
+            fontWeight: 600,
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Browse
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Page ─────────────────────────────────────────────────────────────────
+
+function CreateAudioTestInner() {
+  const [setting, setSetting]         = useState("office");
+  const [mood, setMood]               = useState("romantic");
+  const [buildUp, setBuildUp]         = useState("slow burn");
+  const [maleRole, setMaleRole]       = useState("boss");
+  const [femaleRole, setFemaleRole]   = useState("assistant");
+  const [storyType, setStoryType]     = useState("romantic encounter");
   const [extraDetail, setExtraDetail] = useState("");
-  const [story, setStory]           = useState("");
-  const [loading, setLoading]       = useState(false);
+  const [story, setStory]             = useState("");
+  const [loading, setLoading]         = useState(false);
 
-  const [narratorVoice, setNarratorVoice] = useState("Amy");
-  const [maleVoice, setMaleVoice]         = useState("Will");
-  const [femaleVoice, setFemaleVoice]     = useState("Scarlett");
+  const [narratorVoice, setNarratorVoice] = useState<SelectedVoice | null>(null);
+  const [maleVoice, setMaleVoice]         = useState<SelectedVoice | null>(null);
+  const [femaleVoice, setFemaleVoice]     = useState<SelectedVoice | null>(null);
+
+  const [activeBrowserSlot, setActiveBrowserSlot] = useState<"narrator" | "male" | "female" | null>(null);
 
   const [isPlaying, setIsPlaying]           = useState(false);
   const [preparingAudio, setPreparingAudio] = useState(false);
@@ -47,7 +575,7 @@ function CreateAudioPageInner() {
   const [overallTime, setOverallTime]       = useState(0);
   const [totalDuration, setTotalDuration]   = useState(0);
 
-  const [previewingVoice, setPreviewingVoice] = useState<string | null>(null);
+  const [previewingId, setPreviewingId]   = useState<string | null>(null);
 
   const [saveStatus, setSaveStatus]         = useState<"idle" | "saving" | "saved">("idle");
   const [savedStories, setSavedStories]     = useState<SavedStory[]>([]);
@@ -56,7 +584,6 @@ function CreateAudioPageInner() {
   const dropdownRef  = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
 
-  // Auto-load a saved story if ?story_id= is in the URL
   useEffect(() => {
     const id = searchParams.get("story_id");
     if (!id) return;
@@ -70,44 +597,40 @@ function CreateAudioPageInner() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const stoppedRef        = useRef(false);
-  const currentAudioRef   = useRef<HTMLAudioElement | null>(null);
-  const previewAudioRef   = useRef<HTMLAudioElement | null>(null);
-  const segmentsRef       = useRef<{ url: string; duration: number; startTime: number }[]>([]);
-  const playActiveRef     = useRef(false);
+  const stoppedRef       = useRef(false);
+  const currentAudioRef  = useRef<HTMLAudioElement | null>(null);
+  const previewAudioRef  = useRef<HTMLAudioElement | null>(null);
+  const segmentsRef      = useRef<{ url: string; duration: number; startTime: number }[]>([]);
+  const playActiveRef    = useRef(false);
 
-  const PREVIEW_LINES: Record<string, string> = {
-    Scarlett: "Hi, my name is Scarlett. I can be your voice to take you on your fantasy journey.",
-    Liv:      "Hi, my name is Liv. I can be your voice to take you on your fantasy journey.",
-    Amy:      "Hi, my name is Amy. I can be your voice to take you on your fantasy journey.",
-    Dan:      "Hi, my name is Dan. I can be your voice to take you on your fantasy journey.",
-    Will:     "Hi, my name is Will. I can be your voice to take you on your fantasy journey.",
-  };
-
-  async function previewVoice(voiceId: string) {
-    if (previewingVoice === voiceId) {
+  // ── Voice preview via Cartesia TTS ────────────────────────────────────────
+  async function previewSelectedVoice(voice: SelectedVoice) {
+    if (previewingId === voice.id) {
       previewAudioRef.current?.pause();
       previewAudioRef.current = null;
-      setPreviewingVoice(null);
+      setPreviewingId(null);
       return;
     }
     previewAudioRef.current?.pause();
-    setPreviewingVoice(voiceId);
+    setPreviewingId(voice.id);
     try {
-      const res = await fetch("/api/tts", {
+      const res = await fetch("/api/cartesia-tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: PREVIEW_LINES[voiceId], voiceId }),
+        body: JSON.stringify({
+          text: `Hi, my name is ${voice.title}. I can be your voice to take you on your fantasy journey.`,
+          voiceId: voice.id,
+        }),
       });
-      if (!res.ok) { setPreviewingVoice(null); return; }
+      if (!res.ok) { setPreviewingId(null); return; }
       const { outputUri } = await res.json();
       const audio = new Audio(outputUri);
       previewAudioRef.current = audio;
-      audio.onended = () => setPreviewingVoice(null);
-      audio.onerror = () => setPreviewingVoice(null);
-      audio.play().catch(() => setPreviewingVoice(null));
+      audio.onended = () => setPreviewingId(null);
+      audio.onerror = () => setPreviewingId(null);
+      audio.play().catch(() => setPreviewingId(null));
     } catch {
-      setPreviewingVoice(null);
+      setPreviewingId(null);
     }
   }
 
@@ -152,12 +675,15 @@ function CreateAudioPageInner() {
         body: JSON.stringify({
           name: autoName(),
           storyText: story,
-          narratorVoice, maleVoice, femaleVoice, setting, mood,
+          narratorVoice: narratorVoice?.id ?? "",
+          maleVoice: maleVoice?.id ?? "",
+          femaleVoice: femaleVoice?.id ?? "",
+          setting,
+          mood,
         }),
       });
       if (res.ok) {
         setSaveStatus("saved");
-        // Refresh the saved stories list if dropdown was previously loaded
         if (savedStories.length > 0) fetchSavedStories();
       } else {
         setSaveStatus("idle");
@@ -188,18 +714,17 @@ function CreateAudioPageInner() {
 
   function loadSavedStory(s: SavedStory) {
     setStory(s.story_text);
-    if (s.narrator_voice) setNarratorVoice(s.narrator_voice);
-    if (s.male_voice) setMaleVoice(s.male_voice);
-    if (s.female_voice) setFemaleVoice(s.female_voice);
+    if (s.narrator_voice) setNarratorVoice({ id: s.narrator_voice, title: s.narrator_voice });
+    if (s.male_voice)     setMaleVoice({ id: s.male_voice, title: s.male_voice });
+    if (s.female_voice)   setFemaleVoice({ id: s.female_voice, title: s.female_voice });
     if (s.setting) setSetting(s.setting);
-    if (s.mood) setMood(s.mood);
+    if (s.mood)    setMood(s.mood);
     setSaveStatus("idle");
     setShowDropdown(false);
     stopStory();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -216,16 +741,17 @@ function CreateAudioPageInner() {
       .map((l) => l.trim())
       .filter(Boolean)
       .map((line) => {
-        let text = line, voiceId = narratorVoice;
-        if (line.startsWith("MALE:"))      { text = line.replace("MALE:", "").trim();      voiceId = maleVoice; }
-        else if (line.startsWith("FEMALE:"))   { text = line.replace("FEMALE:", "").trim();    voiceId = femaleVoice; }
-        else if (line.startsWith("NARRATOR:")) { text = line.replace("NARRATOR:", "").trim();  voiceId = narratorVoice; }
+        let text = line, voiceId = narratorVoice?.id ?? "";
+        if (line.startsWith("MALE:"))      { text = line.replace("MALE:", "").trim();      voiceId = maleVoice?.id ?? narratorVoice?.id ?? ""; }
+        else if (line.startsWith("FEMALE:"))   { text = line.replace("FEMALE:", "").trim();    voiceId = femaleVoice?.id ?? narratorVoice?.id ?? ""; }
+        else if (line.startsWith("NARRATOR:")) { text = line.replace("NARRATOR:", "").trim();  voiceId = narratorVoice?.id ?? ""; }
         return { text, voiceId };
       });
   }
 
   async function speakStory() {
     if (!story.trim() || isPlaying || preparingAudio) return;
+    if (!narratorVoice) { setAudioError("Please select a narrator voice first."); return; }
 
     stoppedRef.current = false;
     playActiveRef.current = true;
@@ -236,17 +762,21 @@ function CreateAudioPageInner() {
 
     const lineConfigs = parseLines();
 
-    // 1. Generate all audio URLs sequentially (respects rate limits)
     const urls: string[] = [];
     for (const { text, voiceId } of lineConfigs) {
       if (stoppedRef.current) break;
+      if (!voiceId) continue;
       try {
-        const res = await fetch("/api/tts", {
+        const res = await fetch("/api/cartesia-tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text, voiceId }),
         });
-        if (!res.ok) { setAudioError("Failed to generate audio."); setPreparingAudio(false); setIsPlaying(false); playActiveRef.current = false; return; }
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          setAudioError(errData.error ?? `Audio generation failed (${res.status})`);
+          setPreparingAudio(false); setIsPlaying(false); playActiveRef.current = false; return;
+        }
         const { outputUri } = await res.json();
         urls.push(outputUri);
       } catch {
@@ -256,7 +786,6 @@ function CreateAudioPageInner() {
 
     if (stoppedRef.current) { setPreparingAudio(false); setIsPlaying(false); playActiveRef.current = false; return; }
 
-    // 2. Preload all durations in parallel
     const durations = await Promise.all(
       urls.map((url) => new Promise<number>((resolve) => {
         const a = new Audio(url);
@@ -265,7 +794,6 @@ function CreateAudioPageInner() {
       }))
     );
 
-    // 3. Build segments with cumulative start times
     let accumulated = 0;
     const segments = urls.map((url, i) => {
       const seg = { url, duration: durations[i], startTime: accumulated };
@@ -279,7 +807,6 @@ function CreateAudioPageInner() {
     setPreparingAudio(false);
     setIsPlaying(true);
 
-    // 4. Play each segment, tracking overall timeline position
     for (const seg of segments) {
       if (stoppedRef.current) break;
       await new Promise<void>((resolve) => {
@@ -312,7 +839,6 @@ function CreateAudioPageInner() {
   function handleSeek(value: number) {
     const segs = segmentsRef.current;
     if (!segs.length) return;
-    // Find which segment the seek position falls in
     const target = segs.findLast((s) => s.startTime <= value) ?? segs[0];
     const offsetInSeg = value - target.startTime;
     if (currentAudioRef.current) {
@@ -320,6 +846,19 @@ function CreateAudioPageInner() {
       setOverallTime(value);
     }
   }
+
+  function handleVoiceSelect(voice: SelectedVoice) {
+    if (activeBrowserSlot === "narrator") setNarratorVoice(voice);
+    if (activeBrowserSlot === "male")     setMaleVoice(voice);
+    if (activeBrowserSlot === "female")   setFemaleVoice(voice);
+    setActiveBrowserSlot(null);
+  }
+
+  const slotLabel = activeBrowserSlot === "narrator"
+    ? "Narrator Voice"
+    : activeBrowserSlot === "male"
+    ? "Male Character Voice"
+    : "Female Character Voice";
 
   return (
     <div
@@ -330,6 +869,16 @@ function CreateAudioPageInner() {
         fontFamily: "Arial, Helvetica, sans-serif",
       }}
     >
+      {activeBrowserSlot && (
+        <VoiceBrowserModal
+          slot={slotLabel}
+          lockedGender={activeBrowserSlot === "male" ? "male" : activeBrowserSlot === "female" ? "female" : "all"}
+          defaultGender={activeBrowserSlot === "narrator" ? "female" : undefined}
+          onSelect={handleVoiceSelect}
+          onClose={() => setActiveBrowserSlot(null)}
+        />
+      )}
+
       <a href="/dashboard" style={backBtnStyle}>← Dashboard</a>
 
       <div
@@ -355,7 +904,7 @@ function CreateAudioPageInner() {
             <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.4em", color: "#d8b26e" }}>
               Nakama
             </div>
-            <div style={{ marginTop: "8px", fontSize: "32px", fontWeight: 700 }}>Nakama AI</div>
+            <div style={{ marginTop: "8px", fontSize: "32px", fontWeight: 700 }}>Nakama AI · Customize your adventure</div>
           </div>
         </div>
 
@@ -389,8 +938,8 @@ function CreateAudioPageInner() {
                 margin: 0,
               }}
             >
-              Create custom romantic audio stories with{" "}
-              <span style={{ color: "#d8b26e" }}>Nakama</span>
+              500+ voices for your{" "}
+              <span style={{ color: "#d8b26e" }}>story</span>
             </h1>
 
             <p
@@ -402,15 +951,15 @@ function CreateAudioPageInner() {
                 color: "rgba(255,255,255,0.7)",
               }}
             >
-              Shape the setting, mood, pacing, characters, and voice casting.
-              Generate a private story scene and listen to it like a mini audio drama.
+              Browse our curated English voice library — filter by gender, accent, preview any voice live,
+              and cast your narrator, male character, and female character.
             </p>
 
             <div style={{ marginTop: "32px", display: "grid", gap: "12px", gridTemplateColumns: "1fr 1fr" }}>
-              <FeatureCard title="Guided story design"  text="Choose the tone, setting, and romantic arc before generating." />
-              <FeatureCard title="Voice casting"        text="Assign one of 5 natural AI voices to narrator, male, and female characters." />
-              <FeatureCard title="Audio playback"       text="Listen to every line in sequence with your selected cast." />
-              <FeatureCard title="Fast iteration"       text="Change one detail and instantly create a new version." />
+              <FeatureCard title="500+ curated voices" text="Hand-picked voice library — filter by male, female, accent and age." />
+              <FeatureCard title="Live preview"         text="Hear any voice before committing it to your story." />
+              <FeatureCard title="Full cast control"    text="Assign different voices to narrator, male, and female characters." />
+              <FeatureCard title="Ultra Fast Generation" text="Create your story and audio in seconds." />
             </div>
           </div>
 
@@ -428,7 +977,7 @@ function CreateAudioPageInner() {
             <div style={{ marginBottom: "24px" }}>
               <h2 style={{ margin: 0, fontSize: "32px", fontWeight: 700 }}>Build your scene</h2>
               <p style={{ marginTop: "8px", fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>
-                Adjust the story ingredients, then generate and listen.
+                Adjust the story ingredients, then choose voices and generate.
               </p>
             </div>
 
@@ -493,7 +1042,7 @@ function CreateAudioPageInner() {
                 />
               </Field>
 
-              {/* Voice Casting */}
+              {/* Cartesia Voice Casting */}
               <div
                 style={{
                   marginTop: "8px",
@@ -513,33 +1062,30 @@ function CreateAudioPageInner() {
                     color: "#d8b26e",
                   }}
                 >
-                  Voice Casting · AI Voices
+                  Voice Casting
                 </div>
 
                 <div style={{ display: "grid", gap: "16px" }}>
-                  <VoicePicker
+                  <VoiceSlot
                     label="Narrator Voice"
-                    voices={VOICES}
                     selected={narratorVoice}
-                    onSelect={setNarratorVoice}
-                    previewingVoice={previewingVoice}
-                    onPreview={previewVoice}
+                    previewingId={previewingId}
+                    onBrowse={() => setActiveBrowserSlot("narrator")}
+                    onPreview={() => narratorVoice && previewSelectedVoice(narratorVoice)}
                   />
-                  <VoicePicker
+                  <VoiceSlot
                     label="Male Character Voice"
-                    voices={MALE_VOICES}
                     selected={maleVoice}
-                    onSelect={setMaleVoice}
-                    previewingVoice={previewingVoice}
-                    onPreview={previewVoice}
+                    previewingId={previewingId}
+                    onBrowse={() => setActiveBrowserSlot("male")}
+                    onPreview={() => maleVoice && previewSelectedVoice(maleVoice)}
                   />
-                  <VoicePicker
+                  <VoiceSlot
                     label="Female Character Voice"
-                    voices={FEMALE_VOICES}
                     selected={femaleVoice}
-                    onSelect={setFemaleVoice}
-                    previewingVoice={previewingVoice}
-                    onPreview={previewVoice}
+                    previewingId={previewingId}
+                    onBrowse={() => setActiveBrowserSlot("female")}
+                    onPreview={() => femaleVoice && previewSelectedVoice(femaleVoice)}
                   />
                 </div>
 
@@ -598,7 +1144,6 @@ function CreateAudioPageInner() {
               </div>
 
               <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-                {/* Listen */}
                 <button
                   style={{
                     borderRadius: "14px",
@@ -616,7 +1161,6 @@ function CreateAudioPageInner() {
                   🔊 Listen
                 </button>
 
-                {/* Stop */}
                 <button
                   style={{
                     borderRadius: "14px",
@@ -632,7 +1176,6 @@ function CreateAudioPageInner() {
                   ⏹ Stop
                 </button>
 
-                {/* Save Story */}
                 <button
                   style={{
                     borderRadius: "14px",
@@ -655,7 +1198,6 @@ function CreateAudioPageInner() {
                   {saveStatus === "saved" ? "✓ Story Saved" : saveStatus === "saving" ? "Saving…" : "💾 Save Story"}
                 </button>
 
-                {/* Saved Stories dropdown */}
                 <div ref={dropdownRef} style={{ position: "relative" }}>
                   <button
                     style={{
@@ -753,7 +1295,6 @@ function CreateAudioPageInner() {
               </div>
             )}
 
-            {/* Preparing audio state */}
             {preparingAudio && (
               <div style={{ marginBottom: "20px", borderRadius: "16px", border: "1px solid rgba(216,178,110,0.2)", background: "rgba(216,178,110,0.06)", padding: "14px 16px", fontSize: "13px", color: "#d8b26e", display: "flex", alignItems: "center", gap: "10px" }}>
                 <span style={{ animation: "spin 1s linear infinite", display: "inline-block" }}>⏳</span>
@@ -761,7 +1302,6 @@ function CreateAudioPageInner() {
               </div>
             )}
 
-            {/* Single unified audio progress bar */}
             {isPlaying && totalDuration > 0 && (
               <div
                 style={{
@@ -828,6 +1368,8 @@ function CreateAudioPageInner() {
   );
 }
 
+// ─── Shared sub-components ────────────────────────────────────────────────────
+
 function TwoCol({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "1fr 1fr" }}>
@@ -858,59 +1400,6 @@ function FeatureCard({ title, text }: { title: string; text: string }) {
       <div style={{ fontSize: "14px", fontWeight: 700, color: "white" }}>{title}</div>
       <div style={{ marginTop: "6px", fontSize: "14px", lineHeight: 1.6, color: "rgba(255,255,255,0.6)" }}>{text}</div>
     </div>
-  );
-}
-
-function VoicePicker({
-  label,
-  voices,
-  selected,
-  onSelect,
-  previewingVoice,
-  onPreview,
-}: {
-  label: string;
-  voices: { id: string; label: string; desc: string; gender: string }[];
-  selected: string;
-  onSelect: (id: string) => void;
-  previewingVoice: string | null;
-  onPreview: (id: string) => void;
-}) {
-  const isPreviewing = previewingVoice === selected;
-  return (
-    <Field label={label}>
-      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-        <select
-          style={{ ...inputStyle, flex: 1 }}
-          value={selected}
-          onChange={(e) => onSelect(e.target.value)}
-        >
-          {voices.map((v) => (
-            <option key={v.id} value={v.id} style={{ color: "black" }}>
-              {v.label} — {v.desc}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={() => onPreview(selected)}
-          style={{
-            flexShrink: 0,
-            borderRadius: "14px",
-            border: "1px solid rgba(255,255,255,0.12)",
-            background: isPreviewing ? "rgba(216,178,110,0.2)" : "rgba(255,255,255,0.06)",
-            color: isPreviewing ? "#d8b26e" : "rgba(255,255,255,0.7)",
-            padding: "0 16px",
-            height: "50px",
-            fontSize: "13px",
-            fontWeight: 600,
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {isPreviewing ? "⏹ Stop" : "▶ Preview"}
-        </button>
-      </div>
-    </Field>
   );
 }
 
@@ -948,7 +1437,7 @@ const inputStyle: React.CSSProperties = {
 export default function CreateAudioPage() {
   return (
     <Suspense>
-      <CreateAudioPageInner />
+      <CreateAudioTestInner />
     </Suspense>
   );
 }
