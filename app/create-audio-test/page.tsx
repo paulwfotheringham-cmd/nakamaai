@@ -173,7 +173,7 @@ function VoiceBrowserModal({
               Choose Voice — <span style={{ color: "#d8b26e" }}>{slot}</span>
             </div>
             <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginTop: "4px" }}>
-              {loading ? "Loading…" : `${filtered.length.toLocaleString()} of ${allVoices.length.toLocaleString()} voices · powered by Cartesia Sonic 3`}
+              {loading ? "Loading…" : `${filtered.length.toLocaleString()} of ${allVoices.length.toLocaleString()} voices available`}
             </div>
           </div>
           <button
@@ -242,7 +242,7 @@ function VoiceBrowserModal({
         <div style={{ overflowY: "auto", flex: 1 }}>
           {loading ? (
             <div style={{ padding: "48px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>
-              Loading voices from Cartesia…
+              Loading voices…
             </div>
           ) : pageVoices.length === 0 ? (
             <div style={{ padding: "48px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>
@@ -831,7 +831,7 @@ function CreateAudioTestInner() {
             <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.4em", color: "#d8b26e" }}>
               Nakama
             </div>
-            <div style={{ marginTop: "8px", fontSize: "32px", fontWeight: 700 }}>Nakama AI · Cartesia Voice Test</div>
+            <div style={{ marginTop: "8px", fontSize: "32px", fontWeight: 700 }}>Nakama AI · Audio Test</div>
           </div>
           <div
             style={{
@@ -844,7 +844,7 @@ function CreateAudioTestInner() {
               fontWeight: 600,
             }}
             >
-              Cartesia Sonic 3 voices
+              AI voices
             </div>
         </div>
 
@@ -866,7 +866,7 @@ function CreateAudioTestInner() {
                 color: "#f1d7a1",
               }}
             >
-              Premium audio storytelling · Cartesia Sonic 3 voices
+              Premium audio storytelling
             </div>
 
             <h1
@@ -891,15 +891,15 @@ function CreateAudioTestInner() {
                 color: "rgba(255,255,255,0.7)",
               }}
             >
-              Browse Cartesia&apos;s curated voice library — filter by gender, preview any voice live,
+              Browse our curated voice library — filter by gender, preview any voice live,
               and cast your narrator, male character, and female character.
             </p>
 
             <div style={{ marginTop: "32px", display: "grid", gap: "12px", gridTemplateColumns: "1fr 1fr" }}>
-              <FeatureCard title="500+ curated voices" text="Cartesia's hand-picked library — filter by male, female, accent and age." />
-              <FeatureCard title="Live preview"         text="Hear any voice via Cartesia Sonic 3 before committing it to your story." />
-              <FeatureCard title="Full cast control"    text="Assign different Cartesia voices to narrator, male, and female characters." />
-              <FeatureCard title="Sonic 3 model"        text="Industry-leading 40ms latency and highly expressive emotional delivery." />
+              <FeatureCard title="500+ curated voices" text="Hand-picked voice library — filter by male, female, accent and age." />
+              <FeatureCard title="Live preview"         text="Hear any voice before committing it to your story." />
+              <FeatureCard title="Full cast control"    text="Assign different voices to narrator, male, and female characters." />
+              <FeatureCard title="Ultra-low latency"    text="Industry-leading 40ms latency and highly expressive emotional delivery." />
             </div>
           </div>
 
@@ -917,7 +917,7 @@ function CreateAudioTestInner() {
             <div style={{ marginBottom: "24px" }}>
               <h2 style={{ margin: 0, fontSize: "32px", fontWeight: 700 }}>Build your scene</h2>
               <p style={{ marginTop: "8px", fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>
-                Adjust the story ingredients, then choose Cartesia voices and generate.
+                Adjust the story ingredients, then choose voices and generate.
               </p>
             </div>
 
@@ -1002,7 +1002,7 @@ function CreateAudioTestInner() {
                     color: "#d8b26e",
                   }}
                 >
-                  Voice Casting · Cartesia
+                  Voice Casting
                 </div>
 
                 <div style={{ display: "grid", gap: "16px" }}>
@@ -1243,7 +1243,7 @@ function CreateAudioTestInner() {
             {preparingAudio && (
               <div style={{ marginBottom: "20px", borderRadius: "16px", border: "1px solid rgba(216,178,110,0.2)", background: "rgba(216,178,110,0.06)", padding: "14px 16px", fontSize: "13px", color: "#d8b26e", display: "flex", alignItems: "center", gap: "10px" }}>
                 <span style={{ animation: "spin 1s linear infinite", display: "inline-block" }}>⏳</span>
-                Preparing audio via Cartesia — this takes a moment…
+                Preparing audio — this takes a moment…
               </div>
             )}
 
