@@ -1539,7 +1539,7 @@ function CreateAudioTestInner() {
           </div>{/* end inner grid */}
 
           {/* Column 3: Results */}
-          <div style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
+          <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
 
         {/* Interactive Story result area */}
         {interPhase !== "setup" && (
@@ -1554,6 +1554,7 @@ function CreateAudioTestInner() {
               flex: 1,
               display: "flex",
               flexDirection: "column",
+              overflow: "hidden",
             }}
           >
             {/* Header bar */}
