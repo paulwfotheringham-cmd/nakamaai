@@ -1233,11 +1233,11 @@ function CreateAudioTestInner() {
                 justifyContent: "flex-start",
               }}
             >
-              <div style={{ fontSize: "28px", marginBottom: "16px" }}>📖</div>
-              <div style={{ fontSize: "17px", fontWeight: 700, lineHeight: 1.35, color: "white" }}>
+              <div style={{ fontSize: "36px", marginBottom: "18px" }}>📖</div>
+              <div style={{ fontSize: "22px", fontWeight: 700, lineHeight: 1.3, color: "white" }}>
                 Generate your custom story
               </div>
-              <div style={{ marginTop: "10px", fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>
+              <div style={{ marginTop: "12px", fontSize: "16px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>
                 Full story from your scene settings, voiced with your cast.
               </div>
             </div>
@@ -1257,11 +1257,11 @@ function CreateAudioTestInner() {
                 justifyContent: "flex-start",
               }}
             >
-              <div style={{ fontSize: "28px", marginBottom: "16px" }}>🎭</div>
-              <div style={{ fontSize: "17px", fontWeight: 700, lineHeight: 1.35, color: "white" }}>
+              <div style={{ fontSize: "36px", marginBottom: "18px" }}>🎭</div>
+              <div style={{ fontSize: "22px", fontWeight: 700, lineHeight: 1.3, color: "white" }}>
                 Generate with interactive features
               </div>
-              <div style={{ marginTop: "10px", fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>
+              <div style={{ marginTop: "12px", fontSize: "16px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>
                 Story pauses after each scene — you choose what happens next.
               </div>
             </div>
@@ -1838,34 +1838,24 @@ function CreateAudioTestInner() {
               flexDirection: "column",
             }}
           >
-            <div
-              style={{
-                marginBottom: "16px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "16px",
-                flexWrap: "wrap",
-              }}
-            >
-              <div>
-                <h2 style={{ margin: 0, fontSize: "32px", fontWeight: 700 }}>Your Story</h2>
-                <p style={{ marginTop: "6px", fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>
-                  Generated from your chosen settings and cast.
-                </p>
-              </div>
-
-              <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+            <div style={{ marginBottom: "16px" }}>
+              <h2 style={{ margin: 0, fontSize: "28px", fontWeight: 700 }}>Your Story</h2>
+              <p style={{ marginTop: "4px", marginBottom: "14px", fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+                Generated from your chosen settings and cast.
+              </p>
+              {/* All action buttons on one row */}
+              <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "nowrap" }}>
                 <button
                   style={{
-                    borderRadius: "14px",
+                    borderRadius: "12px",
                     background: (isPlaying || preparingAudio) ? "rgba(255,255,255,0.1)" : "#d8b26e",
-                    padding: "10px 20px",
+                    padding: "9px 16px",
                     fontWeight: 700,
                     color: (isPlaying || preparingAudio) ? "rgba(255,255,255,0.4)" : "black",
                     border: "none",
                     cursor: (isPlaying || preparingAudio) ? "not-allowed" : "pointer",
-                    fontSize: "15px",
+                    fontSize: "13px",
+                    whiteSpace: "nowrap",
                   }}
                   onClick={speakStory}
                   disabled={isPlaying || preparingAudio}
@@ -1875,13 +1865,14 @@ function CreateAudioTestInner() {
 
                 <button
                   style={{
-                    borderRadius: "14px",
+                    borderRadius: "12px",
                     border: "1px solid rgba(255,255,255,0.15)",
                     background: "rgba(255,255,255,0.05)",
-                    padding: "10px 20px",
+                    padding: "9px 16px",
                     color: "white",
                     cursor: "pointer",
-                    fontSize: "15px",
+                    fontSize: "13px",
+                    whiteSpace: "nowrap",
                   }}
                   onClick={stopStory}
                 >
@@ -1890,41 +1881,42 @@ function CreateAudioTestInner() {
 
                 <button
                   style={{
-                    borderRadius: "14px",
+                    borderRadius: "12px",
                     border: saveStatus === "saved"
                       ? "1px solid rgba(74,222,128,0.4)"
                       : "1px solid rgba(255,255,255,0.15)",
                     background: saveStatus === "saved"
                       ? "rgba(74,222,128,0.12)"
                       : "rgba(255,255,255,0.05)",
-                    padding: "10px 20px",
+                    padding: "9px 16px",
                     color: saveStatus === "saved" ? "#4ade80" : "white",
                     cursor: saveStatus === "saving" ? "not-allowed" : "pointer",
-                    fontSize: "15px",
+                    fontSize: "13px",
                     fontWeight: saveStatus === "saved" ? 700 : 400,
                     opacity: saveStatus === "saving" ? 0.6 : 1,
+                    whiteSpace: "nowrap",
                   }}
                   onClick={saveStory}
                   disabled={saveStatus === "saving"}
                 >
-                  {saveStatus === "saved" ? "✓ Story Saved" : saveStatus === "saving" ? "Saving…" : "💾 Save Story"}
+                  {saveStatus === "saved" ? "✓ Saved" : saveStatus === "saving" ? "Saving…" : "💾 Save Story"}
                 </button>
 
-                {/* Browse Stories dropdown in result panel */}
+                {/* Browse Stories dropdown */}
                 <div ref={resultDropdownRef} style={{ position: "relative" }}>
                   <button
                     style={{
-                      borderRadius: "14px",
+                      borderRadius: "12px",
                       border: "1px solid rgba(255,255,255,0.15)",
                       background: showResultDropdown ? "rgba(216,178,110,0.12)" : "rgba(255,255,255,0.05)",
-                      padding: "10px 16px",
+                      padding: "9px 14px",
                       color: showResultDropdown ? "#d8b26e" : "rgba(255,255,255,0.8)",
                       cursor: "pointer",
-                      fontSize: "14px",
+                      fontSize: "13px",
                       fontWeight: 600,
                       display: "flex",
                       alignItems: "center",
-                      gap: "6px",
+                      gap: "5px",
                       whiteSpace: "nowrap",
                     }}
                     onClick={async () => {
@@ -1960,7 +1952,6 @@ function CreateAudioTestInner() {
                     </div>
                   )}
                 </div>
-
               </div>
             </div>
 
