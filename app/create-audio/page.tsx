@@ -1144,9 +1144,9 @@ function CreateAudioTestInner() {
       <a href="/dashboard" style={backBtnStyle}>← Dashboard</a>
 
       {/* Logo — top right */}
-      <div style={{ position: "fixed", top: "18px", right: "24px", zIndex: 50, display: "flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", padding: "8px 14px", backdropFilter: "blur(10px)" }}>
-        <div style={{ width: "24px", height: "24px", borderRadius: "6px", background: "linear-gradient(135deg, #d8b26e, #a07840)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 900, color: "black" }}>N</div>
-        <span style={{ fontSize: "14px", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>Nakama <span style={{ color: "#d8b26e" }}>AI</span></span>
+      <div style={{ position: "fixed", top: "14px", right: "24px", zIndex: 50 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/Nakama-AI-July25-White.png" alt="Nakama AI" style={{ height: "40px", width: "auto", display: "block" }} />
       </div>
 
       <div
@@ -1233,11 +1233,11 @@ function CreateAudioTestInner() {
                 justifyContent: "flex-start",
               }}
             >
-              <div style={{ fontSize: "36px", marginBottom: "18px" }}>📖</div>
-              <div style={{ fontSize: "22px", fontWeight: 700, lineHeight: 1.3, color: "white" }}>
+              <div style={{ fontSize: "44px", marginBottom: "20px" }}>📖</div>
+              <div style={{ fontSize: "30px", fontWeight: 800, lineHeight: 1.2, color: "white" }}>
                 Generate your custom story
               </div>
-              <div style={{ marginTop: "12px", fontSize: "16px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>
+              <div style={{ marginTop: "16px", fontSize: "18px", color: "rgba(255,255,255,0.6)", lineHeight: 1.65 }}>
                 Full story from your scene settings, voiced with your cast.
               </div>
             </div>
@@ -1257,11 +1257,11 @@ function CreateAudioTestInner() {
                 justifyContent: "flex-start",
               }}
             >
-              <div style={{ fontSize: "36px", marginBottom: "18px" }}>🎭</div>
-              <div style={{ fontSize: "22px", fontWeight: 700, lineHeight: 1.3, color: "white" }}>
+              <div style={{ fontSize: "44px", marginBottom: "20px" }}>🎭</div>
+              <div style={{ fontSize: "30px", fontWeight: 800, lineHeight: 1.2, color: "white" }}>
                 Generate with interactive features
               </div>
-              <div style={{ marginTop: "12px", fontSize: "16px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>
+              <div style={{ marginTop: "16px", fontSize: "18px", color: "rgba(255,255,255,0.6)", lineHeight: 1.65 }}>
                 Story pauses after each scene — you choose what happens next.
               </div>
             </div>
