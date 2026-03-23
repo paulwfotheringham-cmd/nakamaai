@@ -1200,14 +1200,9 @@ function CreateAudioTestInner() {
                   background: "linear-gradient(135deg, rgba(21,128,61,0.18) 0%, rgba(20,83,45,0.10) 100%)",
                   border: "1px solid rgba(74,222,128,0.25)",
                   padding: "24px 20px",
-                  cursor: "pointer",
                   backdropFilter: "blur(10px)",
                   boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
-                  transition: "border-color 0.2s ease, background 0.2s ease",
                 }}
-                onClick={generateStory}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(74,222,128,0.55)"; (e.currentTarget as HTMLDivElement).style.background = "linear-gradient(135deg, rgba(21,128,61,0.28) 0%, rgba(20,83,45,0.18) 100%)"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(74,222,128,0.25)"; (e.currentTarget as HTMLDivElement).style.background = "linear-gradient(135deg, rgba(21,128,61,0.18) 0%, rgba(20,83,45,0.10) 100%)"; }}
               >
                 <div style={{ fontSize: "22px", marginBottom: "12px" }}>📖</div>
                 <div style={{ fontSize: "15px", fontWeight: 700, lineHeight: 1.35, color: "white" }}>
@@ -1224,14 +1219,9 @@ function CreateAudioTestInner() {
                   background: "linear-gradient(135deg, rgba(109,40,217,0.18) 0%, rgba(67,20,150,0.10) 100%)",
                   border: "1px solid rgba(167,139,250,0.28)",
                   padding: "24px 20px",
-                  cursor: "pointer",
                   backdropFilter: "blur(10px)",
                   boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
-                  transition: "border-color 0.2s ease, background 0.2s ease",
                 }}
-                onClick={handleInterStart}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(167,139,250,0.6)"; (e.currentTarget as HTMLDivElement).style.background = "linear-gradient(135deg, rgba(109,40,217,0.28) 0%, rgba(67,20,150,0.18) 100%)"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(167,139,250,0.28)"; (e.currentTarget as HTMLDivElement).style.background = "linear-gradient(135deg, rgba(109,40,217,0.18) 0%, rgba(67,20,150,0.10) 100%)"; }}
               >
                 <div style={{ fontSize: "22px", marginBottom: "12px" }}>🎭</div>
                 <div style={{ fontSize: "15px", fontWeight: 700, lineHeight: 1.35, color: "white" }}>
