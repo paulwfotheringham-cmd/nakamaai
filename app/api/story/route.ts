@@ -1,13 +1,15 @@
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 
-const groq = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY || "",
-  baseURL: "https://api.groq.com/openai/v1",
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || "",
 });
 
 export async function POST(req: Request) {
-  if (!process.env.GROQ_API_KEY) {
-    return Response.json({ story: "Error: GROQ_API_KEY is not set in environment variables." }, { status: 500 });
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return Response.json(
+      { story: "Error: ANTHROPIC_API_KEY is not set in environment variables." },
+      { status: 500 }
+    );
   }
 
   const {
@@ -20,10 +22,10 @@ export async function POST(req: Request) {
     extraDetail,
   } = await req.json();
 
-  const maleNames = ["Luca", "Adrian", "Noah", "Julian", "Theo"];
+  const maleNames   = ["Luca", "Adrian", "Noah", "Julian", "Theo"];
   const femaleNames = ["Elena", "Sofia", "Clara", "Mia", "Isla"];
 
-  const maleName = maleNames[Math.floor(Math.random() * maleNames.length)];
+  const maleName   = maleNames[Math.floor(Math.random() * maleNames.length)];
   const femaleName = femaleNames[Math.floor(Math.random() * femaleNames.length)];
 
   const prompt = `Write a full romantic audio story that will take about 10 minutes to read aloud.
@@ -52,13 +54,17 @@ Instructions:
 - Return ONLY the story.`;
 
   try {
-    const response = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [{ role: "user", content: prompt }],
+    const response = await anthropic.messages.create({
+      model: "claude-3-5-haiku-20241022",
       max_tokens: 3000,
+      messages: [{ role: "user", content: prompt }],
     });
 
-    const story = response.choices[0]?.message?.content || "Failed to generate story.";
+    const story =
+      response.content[0]?.type === "text"
+        ? response.content[0].text
+        : "Failed to generate story.";
+
     return Response.json({ story });
   } catch (error) {
     console.error(error);
