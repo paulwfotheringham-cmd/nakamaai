@@ -17,7 +17,8 @@ export async function POST(req: NextRequest) {
       method: "POST",
       headers: {
         "X-API-Key": process.env.CARTESIA_API_KEY,
-        "Cartesia-Version": "2024-06-10",
+        // MP3 output requires `bit_rate`; see https://docs.cartesia.ai/api-reference/tts/bytes
+        "Cartesia-Version": "2025-04-16",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -29,8 +30,8 @@ export async function POST(req: NextRequest) {
         },
         output_format: {
           container: "mp3",
-          encoding: "mp3",
           sample_rate: 44100,
+          bit_rate: 128000,
         },
       }),
     });
