@@ -5,11 +5,21 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "CARTESIA_API_KEY not set" }, { status: 500 });
   }
 
-  const { text, voiceId } = await req.json();
+  const { text, voiceId, language: langIn } = await req.json();
 
   if (!text?.trim()) {
     return Response.json({ error: "No text provided." }, { status: 400 });
   }
+
+  if (!voiceId || typeof voiceId !== "string" || !voiceId.trim()) {
+    return Response.json({ error: "No voice id provided." }, { status: 400 });
+  }
+
+  const language = (() => {
+    if (typeof langIn !== "string" || !langIn.trim()) return "en";
+    const m = langIn.trim().toLowerCase().match(/^([a-z]{2})/);
+    return m ? m[1] : "en";
+  })();
 
   let res: Response;
   try {
@@ -24,9 +34,10 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model_id: "sonic-3",
         transcript: text.trim().slice(0, 15000),
+        language,
         voice: {
           mode: "id",
-          id: voiceId,
+          id: voiceId.trim(),
         },
         output_format: {
           container: "mp3",
@@ -52,7 +63,12 @@ export async function POST(req: NextRequest) {
 
   const audioBuffer = await res.arrayBuffer();
   const base64 = Buffer.from(audioBuffer).toString("base64");
-  const outputUri = `data:audio/mpeg;base64,${base64}`;
+  const upstreamType = res.headers.get("content-type")?.split(";")[0]?.trim();
+  const mime =
+    upstreamType && upstreamType.startsWith("audio/")
+      ? upstreamType
+      : "audio/mpeg";
+  const outputUri = `data:${mime};base64,${base64}`;
 
   return Response.json({ outputUri });
 }

@@ -67,12 +67,14 @@ function VoiceBrowserModal({
   defaultGender,
   onSelect,
   onClose,
+  onPreviewError,
 }: {
   slot: string;
   lockedGender: GenderTab;
   defaultGender?: "female" | "male";
   onSelect: (voice: SelectedVoice) => void;
   onClose: () => void;
+  onPreviewError?: (message: string) => void;
 }) {
   const [allVoices, setAllVoices] = useState<CartesiaVoice[]>([]);
   const [search, setSearch] = useState("");
@@ -147,16 +149,29 @@ function VoiceBrowserModal({
         body: JSON.stringify({
           text: `Hi, my name is ${voice.name}. I can be your voice to take you on your fantasy journey.`,
           voiceId: voice.id,
+          language: voice.language || "en",
         }),
       });
-      if (!res.ok) { setPreviewingId(null); return; }
-      const { outputUri } = await res.json();
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        onPreviewError?.(errData.error ?? `Voice preview failed (${res.status}).`);
+        setPreviewingId(null);
+        return;
+      }
+      const { outputUri } = (await res.json()) as { outputUri: string };
       const audio = new Audio(outputUri);
       previewAudioRef.current = audio;
       audio.onended = () => setPreviewingId(null);
-      audio.onerror = () => setPreviewingId(null);
-      audio.play().catch(() => setPreviewingId(null));
+      audio.onerror = () => {
+        onPreviewError?.("Could not play preview audio in this browser.");
+        setPreviewingId(null);
+      };
+      await audio.play().catch(() => {
+        onPreviewError?.("Playback was blocked or failed. Try clicking Preview again.");
+        setPreviewingId(null);
+      });
     } catch {
+      onPreviewError?.("Voice preview request failed.");
       setPreviewingId(null);
     }
   }
@@ -217,6 +232,9 @@ function VoiceBrowserModal({
             </div>
           </div>
           <button
+            type="button"
+            title="Close"
+            aria-label="Close voice browser"
             onClick={onClose}
             style={{
               background: "rgba(255,255,255,0.06)",
@@ -257,7 +275,9 @@ function VoiceBrowserModal({
               <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
                 {GENDER_TABS.map((g) => (
                   <button
+                    type="button"
                     key={g}
+                    title={g === "female" ? "Show female-presenting voices" : "Show male-presenting voices"}
                     onClick={() => handleGender(g)}
                     style={{
                       borderRadius: "10px",
@@ -281,6 +301,8 @@ function VoiceBrowserModal({
           {availableLangs.length > 1 && (
             <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
               <button
+                type="button"
+                title="Show voices in any language or accent"
                 onClick={() => { setLangFilter("all"); setPage(1); }}
                 style={{
                   borderRadius: "20px",
@@ -298,7 +320,9 @@ function VoiceBrowserModal({
               </button>
               {availableLangs.map((code) => (
                 <button
+                  type="button"
                   key={code}
+                  title={`Filter list to ${langLabel(code)} voices only`}
                   onClick={() => { setLangFilter(code); setPage(1); }}
                   style={{
                     borderRadius: "20px",
@@ -393,6 +417,8 @@ function VoiceBrowserModal({
                 {/* Actions */}
                 <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
                   <button
+                    type="button"
+                    title={`Play a short audio sample of “${voice.name}”`}
                     onClick={(e) => { e.stopPropagation(); previewVoice(voice); }}
                     style={{
                       borderRadius: "10px",
@@ -411,6 +437,8 @@ function VoiceBrowserModal({
                     {previewingId === voice.id ? "⏳ Generating…" : "▶ Preview"}
                   </button>
                   <button
+                    type="button"
+                    title={`Select “${voice.name}” for this role`}
                     onClick={() => { onSelect({ id: voice.id, title: voice.name }); }}
                     style={{
                       borderRadius: "10px",
@@ -455,6 +483,8 @@ function VoiceBrowserModal({
             Page {safePage} of {totalPages}
           </span>
           <button
+            type="button"
+            title="Next page of voices"
             onClick={() => setPage(Math.min(totalPages, safePage + 1))}
             disabled={safePage >= totalPages}
             style={paginationBtnStyle(safePage >= totalPages)}
@@ -518,6 +548,8 @@ function VoiceSlot({
         </div>
         {selected && (
           <button
+            type="button"
+            title={isPreviewing ? "Stop the voice preview" : `Play a sample using “${selected.title}”`}
             onClick={onPreview}
             style={{
               flexShrink: 0,
@@ -537,6 +569,8 @@ function VoiceSlot({
           </button>
         )}
         <button
+          type="button"
+          title="Open the voice library to pick a different voice for this role"
           onClick={onBrowse}
           style={{
             flexShrink: 0,
@@ -692,16 +726,29 @@ function CreateAudioTestInner() {
         body: JSON.stringify({
           text: `Hi, my name is ${voice.title}. I can be your voice to take you on your fantasy journey.`,
           voiceId: voice.id,
+          language: "en",
         }),
       });
-      if (!res.ok) { setPreviewingId(null); return; }
-      const { outputUri } = await res.json();
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        setAudioError(errData.error ?? `Voice preview failed (${res.status}).`);
+        setPreviewingId(null);
+        return;
+      }
+      const { outputUri } = (await res.json()) as { outputUri: string };
       const audio = new Audio(outputUri);
       previewAudioRef.current = audio;
       audio.onended = () => setPreviewingId(null);
-      audio.onerror = () => setPreviewingId(null);
-      audio.play().catch(() => setPreviewingId(null));
+      audio.onerror = () => {
+        setAudioError("Could not play preview audio in this browser.");
+        setPreviewingId(null);
+      };
+      await audio.play().catch(() => {
+        setAudioError("Playback was blocked or failed. Try clicking Preview again.");
+        setPreviewingId(null);
+      });
     } catch {
+      setAudioError("Voice preview request failed.");
       setPreviewingId(null);
     }
   }
@@ -879,7 +926,7 @@ function CreateAudioTestInner() {
         const res = await fetch("/api/cartesia-tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, voiceId }),
+          body: JSON.stringify({ text, voiceId, language: "en" }),
         });
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
@@ -961,7 +1008,7 @@ function CreateAudioTestInner() {
         const res = await fetch("/api/cartesia-tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, voiceId }),
+          body: JSON.stringify({ text, voiceId, language: "en" }),
         });
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
@@ -1014,7 +1061,7 @@ function CreateAudioTestInner() {
         const res = await fetch("/api/cartesia-tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: spokenText, voiceId }),
+          body: JSON.stringify({ text: spokenText, voiceId, language: "en" }),
         });
         if (!res.ok || interStoppedRef.current) continue;
         const { outputUri } = await res.json();
@@ -1220,6 +1267,7 @@ function CreateAudioTestInner() {
           defaultGender={activeBrowserSlot === "narrator" ? "female" : undefined}
           onSelect={handleVoiceSelect}
           onClose={() => setActiveBrowserSlot(null)}
+          onPreviewError={(msg) => setAudioError(msg)}
         />
       )}
 
@@ -1494,21 +1542,22 @@ function CreateAudioTestInner() {
 
               </div>
 
-              <div style={{ marginTop: "8px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
-                {/* Button 1: Generate Story */}
+              <div style={{ marginTop: "8px", display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
+                {/* Generate Story — full width row */}
                 <button
+                  type="button"
+                  title="Creates one complete story from your settings and plays it with your narrator and character voices. Requires a narrator voice."
                   style={{
+                    width: "100%",
                     borderRadius: "18px",
                     background: loading ? "rgba(21,128,61,0.5)" : "#15803d",
-                    padding: "12px 10px",
+                    padding: "12px 16px",
                     fontWeight: 700,
                     color: "white",
                     border: "none",
                     cursor: loading ? "not-allowed" : "pointer",
-                    fontSize: "13px",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
+                    fontSize: "14px",
+                    boxSizing: "border-box",
                   }}
                   onClick={generateStory}
                   disabled={loading}
@@ -1516,20 +1565,21 @@ function CreateAudioTestInner() {
                   {loading ? "Generating…" : "Generate Story"}
                 </button>
 
-                {/* Button 2: Generate Interactive */}
+                {/* Generate Interactive — full width row below */}
                 <button
+                  type="button"
+                  title="Starts a branching story: after each scene you choose what happens next. Pauses for your decision and can use voice input."
                   style={{
+                    width: "100%",
                     borderRadius: "18px",
                     background: interLoading ? "rgba(21,128,61,0.5)" : "#15803d",
-                    padding: "12px 10px",
+                    padding: "12px 16px",
                     fontWeight: 700,
                     color: "white",
                     border: "none",
                     cursor: interLoading ? "not-allowed" : "pointer",
-                    fontSize: "13px",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
+                    fontSize: "14px",
+                    boxSizing: "border-box",
                     opacity: interLoading ? 0.7 : 1,
                   }}
                   onClick={handleInterStart}
@@ -1538,10 +1588,12 @@ function CreateAudioTestInner() {
                   {interLoading ? "Writing…" : "Generate Interactive"}
                 </button>
 
-                <div ref={dropdownRef} style={{ position: "relative" }}>
+                <div ref={dropdownRef} style={{ position: "relative", width: "100%" }}>
                   <button
+                    type="button"
+                    title="Open a list of stories you saved earlier. Click one to load it back into the player."
                     style={{
-                      height: "100%",
+                      width: "100%",
                       borderRadius: "18px",
                       border: "1px solid rgba(255,255,255,0.15)",
                       background: showDropdown ? "rgba(216,178,110,0.12)" : "rgba(255,255,255,0.06)",
@@ -1552,8 +1604,9 @@ function CreateAudioTestInner() {
                       fontWeight: 600,
                       display: "flex",
                       alignItems: "center",
+                      justifyContent: "center",
                       gap: "6px",
-                      whiteSpace: "nowrap",
+                      boxSizing: "border-box",
                     }}
                     onClick={toggleDropdown}
                   >
@@ -1592,7 +1645,9 @@ function CreateAudioTestInner() {
                         <div style={{ maxHeight: "320px", overflowY: "auto" }}>
                           {savedStories.map((s) => (
                             <button
+                              type="button"
                               key={s.id}
+                              title={`Load saved story: ${s.name}`}
                               onClick={() => loadSavedStory(s)}
                               style={{
                                 width: "100%",
@@ -1679,6 +1734,8 @@ function CreateAudioTestInner() {
                 <div style={{ fontSize: "22px", fontWeight: 600, color: "#22d3ee" }}>Writing your story...</div>
                 <div style={{ marginTop: "10px", fontSize: "14px", color: "rgba(255,255,255,0.45)" }}>Crafting the scene and your choices</div>
                 <button
+                  type="button"
+                  title="Stop generating and return to the form"
                   onClick={handleInterStop}
                   style={{ marginTop: "24px", padding: "10px 22px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: "14px", fontWeight: 600 }}
                 >
@@ -1706,6 +1763,8 @@ function CreateAudioTestInner() {
                   <div style={{ marginLeft: "auto", display: "flex", gap: "8px", alignItems: "center" }}>
                     {interPaused ? (
                       <button
+                        type="button"
+                        title="Resume playback from where you paused"
                         onClick={handleInterResume}
                         style={{ padding: "9px 18px", borderRadius: "12px", border: "1px solid rgba(74,222,128,0.4)", background: "rgba(74,222,128,0.1)", color: "#4ade80", cursor: "pointer", fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
                       >
@@ -1713,6 +1772,8 @@ function CreateAudioTestInner() {
                       </button>
                     ) : (
                       <button
+                        type="button"
+                        title="Pause audio so you can read the text or take a break"
                         onClick={handleInterPause}
                         style={{ padding: "9px 18px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.18)", background: "rgba(255,255,255,0.07)", color: "white", cursor: "pointer", fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
                       >
@@ -1720,6 +1781,8 @@ function CreateAudioTestInner() {
                       </button>
                     )}
                     <button
+                      type="button"
+                      title="Save this interactive session so you can load it later from Browse"
                       onClick={saveInterStory}
                       disabled={interSaveStatus === "saving"}
                       style={{
@@ -1739,6 +1802,8 @@ function CreateAudioTestInner() {
                     </button>
                     <div ref={interResultDropdownRef} style={{ position: "relative" }}>
                       <button
+                        type="button"
+                        title="Load a previously saved story while listening"
                         style={{ padding: "9px 18px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.18)", background: showInterResultDropdown ? "rgba(216,178,110,0.12)" : "rgba(255,255,255,0.07)", color: showInterResultDropdown ? "#d8b26e" : "white", cursor: "pointer", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px", whiteSpace: "nowrap" }}
                         onClick={async () => {
                           if (!showInterResultDropdown && savedStories.length === 0) await fetchSavedStories();
@@ -1757,7 +1822,7 @@ function CreateAudioTestInner() {
                           ) : (
                             <div style={{ maxHeight: "240px", overflowY: "auto" }}>
                               {savedStories.map((s) => (
-                                <button key={s.id} onClick={() => { loadSavedStory(s); setShowInterResultDropdown(false); }} style={{ width: "100%", textAlign: "left", padding: "9px 14px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "white" }}
+                                <button type="button" key={s.id} title={`Load: ${s.name}`} onClick={() => { loadSavedStory(s); setShowInterResultDropdown(false); }} style={{ width: "100%", textAlign: "left", padding: "9px 14px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "white" }}
                                   onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(216,178,110,0.08)"; }}
                                   onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                                 >
@@ -1774,6 +1839,8 @@ function CreateAudioTestInner() {
                       )}
                     </div>
                     <button
+                      type="button"
+                      title="Stop audio and exit the interactive story"
                       onClick={handleInterStop}
                       style={{ padding: "9px 18px", borderRadius: "12px", border: "1px solid rgba(255,80,80,0.3)", background: "rgba(255,80,80,0.08)", color: "#ff8080", cursor: "pointer", fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
                     >
@@ -1795,6 +1862,8 @@ function CreateAudioTestInner() {
                 {interPaused && interChoices.length > 0 && (
                   <div style={{ marginTop: "12px", textAlign: "center", flexShrink: 0 }}>
                     <button
+                      type="button"
+                      title="Jump to the choice screen without waiting for audio to finish"
                       onClick={() => { setInterPaused(false); setInterPhase("choosing"); }}
                       style={{ padding: "10px 24px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "14px", fontWeight: 600 }}
                     >
@@ -1818,7 +1887,9 @@ function CreateAudioTestInner() {
                 <div style={{ display: "grid", gap: "12px", marginBottom: "20px" }}>
                   {interChoices.map((choice, i) => (
                     <button
+                      type="button"
                       key={i}
+                      title={`Continue the story with: ${choice}`}
                       onClick={() => handleInterChoice(choice)}
                       style={{ display: "flex", alignItems: "center", gap: "14px", padding: "16px 20px", borderRadius: "16px", border: "1px solid rgba(34,211,238,0.2)", background: "rgba(34,211,238,0.06)", color: "white", fontSize: "16px", fontWeight: 600, cursor: "pointer", textAlign: "left", width: "100%" }}
                       onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(34,211,238,0.15)"; e.currentTarget.style.borderColor = "rgba(34,211,238,0.45)"; }}
@@ -1889,6 +1960,7 @@ function CreateAudioTestInner() {
                     </button>
                     <button
                       type="button"
+                      title={interCustomChoice.trim() ? "Submit your custom choice and generate the next scene" : "Type a choice first"}
                       onClick={() => interCustomChoice.trim() && handleInterChoice(interCustomChoice.trim())}
                       disabled={!interCustomChoice.trim()}
                       style={{
@@ -1923,6 +1995,8 @@ function CreateAudioTestInner() {
                 {/* Save & End row */}
                 <div style={{ marginTop: "12px", paddingTop: "16px", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", gap: "10px", justifyContent: "flex-end", alignItems: "center", flexShrink: 0, flexWrap: "wrap" }}>
                   <button
+                    type="button"
+                    title="Save progress now and pick up this interactive story another time"
                     onClick={saveInterStory}
                     disabled={interSaveStatus === "saving"}
                     style={{
@@ -1941,6 +2015,8 @@ function CreateAudioTestInner() {
                   </button>
                   <div ref={interResultDropdownRef} style={{ position: "relative" }}>
                     <button
+                      type="button"
+                      title="Open your list of saved stories"
                       style={{ padding: "10px 16px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.15)", background: showInterResultDropdown ? "rgba(216,178,110,0.12)" : "rgba(255,255,255,0.05)", color: showInterResultDropdown ? "#d8b26e" : "rgba(255,255,255,0.8)", cursor: "pointer", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px", whiteSpace: "nowrap" }}
                       onClick={async () => {
                         if (!showInterResultDropdown && savedStories.length === 0) await fetchSavedStories();
@@ -1959,7 +2035,7 @@ function CreateAudioTestInner() {
                         ) : (
                           <div style={{ maxHeight: "260px", overflowY: "auto" }}>
                             {savedStories.map((s) => (
-                              <button key={s.id} onClick={() => { loadSavedStory(s); setShowInterResultDropdown(false); }} style={{ width: "100%", textAlign: "left", padding: "10px 16px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "white" }}
+                              <button type="button" key={s.id} title={`Load: ${s.name}`} onClick={() => { loadSavedStory(s); setShowInterResultDropdown(false); }} style={{ width: "100%", textAlign: "left", padding: "10px 16px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "white" }}
                                 onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(216,178,110,0.08)"; }}
                                 onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                               >
@@ -1976,6 +2052,8 @@ function CreateAudioTestInner() {
                     )}
                   </div>
                   <button
+                    type="button"
+                    title="Stop and leave the interactive story"
                     onClick={handleInterStop}
                     style={{ padding: "10px 20px", borderRadius: "14px", border: "1px solid rgba(255,80,80,0.3)", background: "rgba(255,80,80,0.08)", color: "#ff8080", cursor: "pointer", fontSize: "14px", fontWeight: 600 }}
                   >
@@ -2013,6 +2091,8 @@ function CreateAudioTestInner() {
               {/* Action buttons */}
               <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
                 <button
+                  type="button"
+                  title="Generate and play the full story audio with your cast voices"
                   style={{
                     borderRadius: "12px",
                     background: (isPlaying || preparingAudio) ? "rgba(255,255,255,0.1)" : "#d8b26e",
@@ -2031,6 +2111,8 @@ function CreateAudioTestInner() {
                 </button>
 
                 <button
+                  type="button"
+                  title="Stop playback (you can press Listen again to restart)"
                   style={{
                     borderRadius: "12px",
                     border: "1px solid rgba(255,255,255,0.15)",
@@ -2047,6 +2129,8 @@ function CreateAudioTestInner() {
                 </button>
 
                 <button
+                  type="button"
+                  title="Save this story text and voice picks to your account"
                   style={{
                     borderRadius: "12px",
                     border: saveStatus === "saved"
@@ -2071,6 +2155,7 @@ function CreateAudioTestInner() {
 
                 <button
                   type="button"
+                  title="Merge all spoken lines into one MP3 file and download to your device"
                   onClick={downloadStoryMp3}
                   disabled={downloadMp3Loading || preparingAudio}
                   style={{
@@ -2092,6 +2177,8 @@ function CreateAudioTestInner() {
                 {/* Browse Stories dropdown */}
                 <div ref={resultDropdownRef} style={{ position: "relative" }}>
                   <button
+                    type="button"
+                    title="Load a different saved story into this panel"
                     style={{
                       borderRadius: "12px",
                       border: "1px solid rgba(255,255,255,0.15)",
@@ -2123,7 +2210,7 @@ function CreateAudioTestInner() {
                       ) : (
                         <div style={{ maxHeight: "280px", overflowY: "auto" }}>
                           {savedStories.map((s) => (
-                            <button key={s.id} onClick={() => { loadSavedStory(s); setShowResultDropdown(false); }} style={{ width: "100%", textAlign: "left", padding: "10px 16px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "white" }}
+                            <button type="button" key={s.id} title={`Load: ${s.name}`} onClick={() => { loadSavedStory(s); setShowResultDropdown(false); }} style={{ width: "100%", textAlign: "left", padding: "10px 16px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer", color: "white" }}
                               onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(216,178,110,0.08)"; }}
                               onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                             >
@@ -2239,7 +2326,7 @@ function CreateAudioTestInner() {
                 <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", lineHeight: 1.6 }}>
                   Use the <strong>Choose your voices</strong> section in the form to browse and select voices.
                 </div>
-                <button onClick={() => setAudioError("")} style={{ marginTop: "16px", padding: "8px 18px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: "13px" }}>Dismiss</button>
+                <button type="button" title="Clear this error message" onClick={() => setAudioError("")} style={{ marginTop: "16px", padding: "8px 18px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: "13px" }}>Dismiss</button>
               </>
             ) : (
               <>
