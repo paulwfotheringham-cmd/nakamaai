@@ -127,8 +127,6 @@ const rows: Row[] = [
 
 const visibleCount = 3;
 
-const CATEGORY_ALL = "all";
-
 function ArrowButton({
   direction,
   onClick,
@@ -203,7 +201,6 @@ function CategoryThumbnail({ row }: { row: Row }) {
 }
 
 export default function FantasyAudioPage() {
-  const [categoryFilter, setCategoryFilter] = useState<string>(CATEGORY_ALL);
   const [positions, setPositions] = useState<number[]>(rows.map(() => 0));
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -265,33 +262,6 @@ export default function FantasyAudioPage() {
       };
     });
   }, []);
-
-  const displayedRowEntries = useMemo(() => {
-    if (categoryFilter === CATEGORY_ALL) {
-      return rows.map((row, rowIndex) => ({ row, rowIndex }));
-    }
-    const idx = rows.findIndex((r) => r.title === categoryFilter);
-    if (idx === -1) {
-      return rows.map((row, rowIndex) => ({ row, rowIndex }));
-    }
-    return [{ row: rows[idx], rowIndex: idx }];
-  }, [categoryFilter]);
-
-  useEffect(() => {
-    if (!currentlyPlaying) return;
-    const allowedItems =
-      categoryFilter === CATEGORY_ALL
-        ? new Set(rows.flatMap((r) => r.items))
-        : new Set(rows.find((r) => r.title === categoryFilter)?.items ?? []);
-    if (!allowedItems.has(currentlyPlaying)) {
-      audioRef.current?.pause();
-      audioRef.current = null;
-      setCurrentlyPlaying(null);
-      setIsPlaying(false);
-      setCurrentTime(0);
-      setDuration(0);
-    }
-  }, [categoryFilter, currentlyPlaying]);
 
   const handleTileClick = (item: string) => {
     if (audioFiles[item]) {
@@ -415,33 +385,14 @@ export default function FantasyAudioPage() {
               </p>
             </div>
 
-            <div className="fantasy-panel-top-right">
-              <div className="fantasy-category-filter">
-                <label htmlFor="fantasy-category-select">Category</label>
-                <select
-                  id="fantasy-category-select"
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="fantasy-category-select"
-                >
-                  <option value={CATEGORY_ALL}>All categories</option>
-                  {rows.map((r) => (
-                    <option key={r.title} value={r.title}>
-                      {r.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="fantasy-note">
-                <span className="fantasy-note-dot" />
-                Browse by mood, setting, or dynamic
-              </div>
+            <div className="fantasy-note">
+              <span className="fantasy-note-dot" />
+              Browse by mood, setting, or dynamic
             </div>
           </div>
 
           <div className="fantasy-rows">
-            {displayedRowEntries.map(({ row, rowIndex }) => (
+            {rows.map((row, rowIndex) => (
               <div key={row.title} className="fantasy-row">
                 <CategoryThumbnail row={row} />
 
@@ -453,7 +404,7 @@ export default function FantasyAudioPage() {
                 </div>
 
                 <div className="fantasy-tiles">
-                  {visibleRows[rowIndex].map((item, itemIndex) => (
+                                    {visibleRows[rowIndex].map((item, itemIndex) => (
                     <div key={`${row.title}-${item}-${itemIndex}`} className="fantasy-tile-wrap">
                       <button
                         type="button"
@@ -640,65 +591,10 @@ export default function FantasyAudioPage() {
           z-index: 1;
           display: flex;
           justify-content: space-between;
-          align-items: flex-start;
-          gap: 20px;
+          align-items: center;
+          gap: 16px;
           margin-bottom: 22px;
           flex-wrap: wrap;
-        }
-
-        .fantasy-panel-top-right {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 12px;
-        }
-
-        .fantasy-category-filter {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 6px;
-        }
-
-        .fantasy-category-filter label {
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.45);
-        }
-
-        .fantasy-category-select {
-          min-width: min(280px, 85vw);
-          padding: 12px 40px 12px 16px;
-          border-radius: 14px;
-          border: 1px solid rgba(216, 178, 110, 0.35);
-          background: rgba(0, 0, 0, 0.35);
-          color: #f7f5f2;
-          font-size: 15px;
-          font-weight: 600;
-          cursor: pointer;
-          appearance: none;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23d8b26e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-position: right 14px center;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-        }
-
-        .fantasy-category-select:hover {
-          border-color: rgba(216, 178, 110, 0.55);
-          background-color: rgba(216, 178, 110, 0.06);
-        }
-
-        .fantasy-category-select:focus {
-          outline: none;
-          border-color: #d8b26e;
-          box-shadow: 0 0 0 2px rgba(216, 178, 110, 0.25);
-        }
-
-        .fantasy-category-select option {
-          background: #1a1224;
-          color: #f7f5f2;
         }
 
         .fantasy-panel-top h2 {
