@@ -15,6 +15,7 @@ type Row = {
   icon?: ReactNode;
 };
 
+/* Category/item labels: keep in sync with lib/fantasy-audio-category-options.ts (admin uploads). */
 const rows: Row[] = [
   {
     title: "Anime / Hentai",
