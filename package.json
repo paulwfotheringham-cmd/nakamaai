@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "check-xtts": "node scripts/check-xtts.mjs"
+    "check-xtts": "node scripts/check-xtts.mjs",
+    "restart-runpod-xtts": "node scripts/runpod-restart-xtts.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
