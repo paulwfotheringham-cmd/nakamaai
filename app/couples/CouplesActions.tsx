@@ -1,19 +1,23 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 const options = [
   {
     id: "catalogue",
     label: "Choose from our catalogue of erotic audibles for couples.",
+    href: "/fantasy-audio" as const,
   },
   {
     id: "create-ai",
     label: "Create your own fantasy using Nakama AI",
+    href: "/create-audio" as const,
   },
   {
     id: "write-own",
     label: "Write your own fantasy.",
+    href: undefined,
   },
 ] as const;
 
@@ -53,11 +57,21 @@ export default function CouplesActions() {
         );
 
         const cardClass =
-          "w-full rounded-2xl border border-white/10 bg-white/5 p-5";
+          "block w-full rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:border-white/20 hover:bg-white/10";
+
+        if (opt.href) {
+          return (
+            <li key={opt.id}>
+              <Link href={opt.href} className={cardClass}>
+                {inner}
+              </Link>
+            </li>
+          );
+        }
 
         return (
           <li key={opt.id}>
-            <div className={cardClass}>{inner}</div>
+            <div className={`${cardClass} cursor-default`}>{inner}</div>
           </li>
         );
       })}
