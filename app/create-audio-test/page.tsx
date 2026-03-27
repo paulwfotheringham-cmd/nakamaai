@@ -3,10 +3,9 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-const VOICES_API =
-  process.env.NEXT_PUBLIC_TTS_BACKEND === "xtts" ? "/api/xtts-voices" : "/api/cartesia-voices";
-const TTS_API =
-  process.env.NEXT_PUBLIC_TTS_BACKEND === "xtts" ? "/api/xtts-tts" : "/api/cartesia-tts";
+/** This page talks only to `/api/xtts-voices` and `/api/xtts-tts` (self-hosted XTTS). */
+const VOICES_API = "/api/xtts-voices";
+const TTS_API = "/api/xtts-tts";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -22,7 +21,7 @@ type SavedStory = {
   created_at: string;
 };
 
-type CartesiaVoice = {
+type TtsVoice = {
   id: string;
   name: string;
   description: string;
@@ -70,7 +69,7 @@ function VoiceBrowserModal({
   onSelect: (voice: SelectedVoice) => void;
   onClose: () => void;
 }) {
-  const [allVoices, setAllVoices] = useState<CartesiaVoice[]>([]);
+  const [allVoices, setAllVoices] = useState<TtsVoice[]>([]);
   const [search, setSearch] = useState("");
   const [gender, setGender] = useState<GenderTab>(lockedGender !== "all" ? lockedGender : (defaultGender ?? "female"));
   const [langFilter, setLangFilter] = useState("all");
@@ -127,7 +126,7 @@ function VoiceBrowserModal({
     setPage(1);
   }
 
-  async function previewVoice(voice: CartesiaVoice) {
+  async function previewVoice(voice: TtsVoice) {
     if (previewingId === voice.id) {
       previewAudioRef.current?.pause();
       previewAudioRef.current = null;
@@ -157,7 +156,7 @@ function VoiceBrowserModal({
     }
   }
 
-  const genderIcon = (v: CartesiaVoice) => {
+  const genderIcon = (v: TtsVoice) => {
     const g = v.gender?.toLowerCase();
     if (g === "female") return "♀";
     if (g === "male") return "♂";
@@ -589,6 +588,14 @@ function CreateAudioTestInner() {
   const dropdownRef  = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
 
+  /** Pre-select `naughty` (pod /speakers/naughty.wav) until the user picks others. */
+  useEffect(() => {
+    const v = { id: "naughty", title: "naughty" };
+    setNarratorVoice((n) => n ?? v);
+    setMaleVoice((m) => m ?? v);
+    setFemaleVoice((f) => f ?? v);
+  }, []);
+
   useEffect(() => {
     const id = searchParams.get("story_id");
     if (!id) return;
@@ -608,7 +615,7 @@ function CreateAudioTestInner() {
   const segmentsRef      = useRef<{ url: string; duration: number; startTime: number }[]>([]);
   const playActiveRef    = useRef(false);
 
-  // ── Voice preview via Cartesia TTS ────────────────────────────────────────
+  // ── Voice preview (XTTS) ─────────────────────────────────────────────────
   async function previewSelectedVoice(voice: SelectedVoice) {
     if (previewingId === voice.id) {
       previewAudioRef.current?.pause();
@@ -943,7 +950,7 @@ function CreateAudioTestInner() {
                 margin: 0,
               }}
             >
-              500+ voices for your{" "}
+              Reference voices for your{" "}
               <span style={{ color: "#d8b26e" }}>story</span>
             </h1>
 
@@ -956,12 +963,12 @@ function CreateAudioTestInner() {
                 color: "rgba(255,255,255,0.7)",
               }}
             >
-              Browse our curated English voice library — filter by gender, accent, preview any voice live,
-              and cast your narrator, male character, and female character.
+              Voices come from your XTTS server (reference WAVs on the pod). Filter, preview, and cast
+              narrator, male, and female roles.
             </p>
 
             <div style={{ marginTop: "32px", display: "grid", gap: "12px", gridTemplateColumns: "1fr 1fr" }}>
-              <FeatureCard title="500+ curated voices" text="Hand-picked voice library — filter by male, female, accent and age." />
+              <FeatureCard title="XTTS reference voices" text="Each voice maps to a WAV on your speaker directory — clone-style synthesis." />
               <FeatureCard title="Live preview"         text="Hear any voice before committing it to your story." />
               <FeatureCard title="Full cast control"    text="Assign different voices to narrator, male, and female characters." />
               <FeatureCard title="Ultra Fast Generation" text="Create your story and audio in seconds." />
@@ -1047,7 +1054,7 @@ function CreateAudioTestInner() {
                 />
               </Field>
 
-              {/* Cartesia Voice Casting */}
+              {/* Voice casting (XTTS) */}
               <div
                 style={{
                   marginTop: "8px",

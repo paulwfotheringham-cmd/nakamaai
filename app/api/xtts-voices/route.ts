@@ -15,6 +15,16 @@ type Voice = {
 
 const DEFAULT_VOICES: Voice[] = [
   {
+    id: "naughty",
+    name: "naughty",
+    description: "Reference WAV on the pod (/speakers/naughty.wav). Match id to filename without .wav.",
+    language: "en",
+    gender: "female",
+    accent: null,
+    age: null,
+    is_public: true,
+  },
+  {
     id: "werewolf",
     name: "werewolf",
     description: "Reference WAV on the pod (e.g. /speakers/werewolf.wav). Match id to filename without .wav.",
