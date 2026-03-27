@@ -28,3 +28,8 @@ First build can take **30–90+ minutes** (large CUDA + Coqui image).
 See root **`.env.example`**. The routes **`/api/xtts-tts`** and **`/api/xtts-voices`** proxy to `XTTS_SERVER_URL`.
 
 Your UI must call those routes (or point `fetch` at them) instead of Cartesia when using XTTS.
+
+## Troubleshooting
+
+- **`500` with `"EOF when reading a line"`** — Coqui’s phonemizer shells out to **espeak-ng**. If it is missing in the container, synthesis can fail with that message. This image installs `espeak-ng` via `apt`. Rebuild and redeploy the image, or on an existing pod: `apt-get update && apt-get install -y espeak-ng` (then restart the API process).
+- **Reference clips** — Use a short WAV (roughly **10–60 seconds**) per speaker. Very long files (hundreds of MB) are unnecessary for cloning and can stress VRAM or I/O.
