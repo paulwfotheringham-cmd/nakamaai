@@ -26,7 +26,9 @@ RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel \
         --extra-index-url https://download.pytorch.org/whl/cu121
 
 COPY server.py .
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 8000
 
-CMD ["python", "-m", "uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["/entrypoint.sh"]

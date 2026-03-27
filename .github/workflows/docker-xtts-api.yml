@@ -1,4 +1,5 @@
 # Build and push the XTTS API image (no local Docker required on your PC).
+# Image includes espeak-ng + entrypoint fallback for phonemizer (XTTS).
 #
 # Required repo secrets:
 #   DOCKERHUB_USERNAME
