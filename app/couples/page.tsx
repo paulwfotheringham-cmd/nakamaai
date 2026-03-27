@@ -1,4 +1,5 @@
 import Image from "next/image";
+import CouplesActions from "./CouplesActions";
 
 export default function CouplesPage() {
   return (
@@ -31,14 +32,7 @@ export default function CouplesPage() {
           <h1 className="text-balance text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl lg:text-[2.75rem] xl:text-5xl">
             Experience New Adventures. Together
           </h1>
-          <div className="mt-10">
-            <button
-              type="button"
-              className="inline-flex items-center justify-center rounded-xl border border-[rgba(216,178,110,0.35)] bg-[rgba(216,178,110,0.15)] px-8 py-3.5 text-base font-semibold text-[#f1d7a1] transition hover:bg-[rgba(216,178,110,0.22)]"
-            >
-              Start Now
-            </button>
-          </div>
+          <CouplesActions />
         </section>
       </div>
     </main>
