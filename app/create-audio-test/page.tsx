@@ -34,6 +34,10 @@ type TtsVoice = {
 
 type SelectedVoice = { id: string; title: string };
 
+type VoiceCastSlot = "narrator" | "male" | "female";
+
+type CastPreviewState = { slot: VoiceCastSlot; status: "loading" | "playing" };
+
 // ─── Voice Browser Modal ──────────────────────────────────────────────────────
 
 const PAGE_SIZE = 20;
@@ -480,17 +484,20 @@ function paginationBtnStyle(disabled: boolean): React.CSSProperties {
 function VoiceSlot({
   label,
   selected,
-  previewingId,
+  castSlot,
+  castPreview,
   onBrowse,
   onPreview,
 }: {
   label: string;
   selected: SelectedVoice | null;
-  previewingId: string | null;
+  castSlot: VoiceCastSlot;
+  castPreview: CastPreviewState | null;
   onBrowse: () => void;
   onPreview: () => void;
 }) {
-  const isPreviewing = selected && previewingId === selected.id;
+  const isLoading = castPreview?.slot === castSlot && castPreview.status === "loading";
+  const isPlaying = castPreview?.slot === castSlot && castPreview.status === "playing";
   return (
     <div style={{ display: "grid", gap: "8px" }}>
       <span style={{ fontSize: "14px", fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>{label}</span>
@@ -514,21 +521,23 @@ function VoiceSlot({
         {selected && (
           <button
             onClick={onPreview}
+            title={isLoading ? "Click to cancel" : undefined}
             style={{
               flexShrink: 0,
               borderRadius: "14px",
               border: "1px solid rgba(255,255,255,0.12)",
-              background: isPreviewing ? "rgba(216,178,110,0.2)" : "rgba(255,255,255,0.06)",
-              color: isPreviewing ? "#d8b26e" : "rgba(255,255,255,0.7)",
+              background: isPlaying || isLoading ? "rgba(216,178,110,0.2)" : "rgba(255,255,255,0.06)",
+              color: isPlaying || isLoading ? "#d8b26e" : "rgba(255,255,255,0.7)",
               padding: "0 16px",
               height: "50px",
               fontSize: "13px",
               fontWeight: 600,
               cursor: "pointer",
               whiteSpace: "nowrap",
+              opacity: isLoading ? 0.85 : 1,
             }}
           >
-            {isPreviewing ? "⏹ Stop" : "▶ Preview"}
+            {isLoading ? "⏳ Generating…" : isPlaying ? "⏹ Stop" : "▶ Preview"}
           </button>
         )}
         <button
@@ -579,7 +588,8 @@ function CreateAudioTestInner() {
   const [overallTime, setOverallTime]       = useState(0);
   const [totalDuration, setTotalDuration]   = useState(0);
 
-  const [previewingId, setPreviewingId]   = useState<string | null>(null);
+  const [castPreview, setCastPreview]     = useState<CastPreviewState | null>(null);
+  const [voicePreviewError, setVoicePreviewError] = useState("");
 
   const [saveStatus, setSaveStatus]         = useState<"idle" | "saving" | "saved">("idle");
   const [savedStories, setSavedStories]     = useState<SavedStory[]>([]);
@@ -611,38 +621,88 @@ function CreateAudioTestInner() {
 
   const stoppedRef       = useRef(false);
   const currentAudioRef  = useRef<HTMLAudioElement | null>(null);
-  const previewAudioRef  = useRef<HTMLAudioElement | null>(null);
+  const previewAudioRef   = useRef<HTMLAudioElement | null>(null);
+  const previewAbortRef   = useRef<AbortController | null>(null);
   const segmentsRef      = useRef<{ url: string; duration: number; startTime: number }[]>([]);
   const playActiveRef    = useRef(false);
 
-  // ── Voice preview (XTTS) ─────────────────────────────────────────────────
-  async function previewSelectedVoice(voice: SelectedVoice) {
-    if (previewingId === voice.id) {
+  useEffect(() => {
+    return () => {
+      previewAbortRef.current?.abort();
       previewAudioRef.current?.pause();
-      previewAudioRef.current = null;
-      setPreviewingId(null);
-      return;
+    };
+  }, []);
+
+  // ── Voice preview (XTTS) — tracked by cast slot so same voice_id in 3 roles still works ──
+  async function previewCastVoice(slot: VoiceCastSlot, voice: SelectedVoice) {
+    setVoicePreviewError("");
+    if (castPreview?.slot === slot) {
+      if (castPreview.status === "playing") {
+        previewAudioRef.current?.pause();
+        previewAudioRef.current = null;
+        setCastPreview(null);
+        return;
+      }
+      if (castPreview.status === "loading") {
+        previewAbortRef.current?.abort();
+        previewAbortRef.current = null;
+        setCastPreview(null);
+        return;
+      }
     }
+
+    previewAbortRef.current?.abort();
     previewAudioRef.current?.pause();
-    setPreviewingId(voice.id);
+    previewAudioRef.current = null;
+
+    const ac = new AbortController();
+    previewAbortRef.current = ac;
+    setCastPreview({ slot, status: "loading" });
+
+    const text = `Hi, I'm ${voice.title}. This is a short preview.`;
     try {
       const res = await fetch(TTS_API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: `Hi, my name is ${voice.title}. I can be your voice to take you on your fantasy journey.`,
-          voiceId: voice.id,
-        }),
+        body: JSON.stringify({ text, voiceId: voice.id }),
+        signal: ac.signal,
       });
-      if (!res.ok) { setPreviewingId(null); return; }
-      const { outputUri } = await res.json();
+      const data = (await res.json().catch(() => ({}))) as { outputUri?: string; error?: string };
+      if (ac.signal.aborted) return;
+      if (!res.ok) {
+        setCastPreview(null);
+        setVoicePreviewError(data.error ?? `Preview failed (${res.status}). Check XTTS_SERVER_URL and Runpod.`);
+        return;
+      }
+      const outputUri = data.outputUri;
+      if (!outputUri || typeof outputUri !== "string") {
+        setCastPreview(null);
+        setVoicePreviewError("No audio returned from the server.");
+        return;
+      }
       const audio = new Audio(outputUri);
       previewAudioRef.current = audio;
-      audio.onended = () => setPreviewingId(null);
-      audio.onerror = () => setPreviewingId(null);
-      audio.play().catch(() => setPreviewingId(null));
-    } catch {
-      setPreviewingId(null);
+      setCastPreview({ slot, status: "playing" });
+      audio.onended = () => {
+        setCastPreview(null);
+        previewAudioRef.current = null;
+      };
+      audio.onerror = () => {
+        setCastPreview(null);
+        previewAudioRef.current = null;
+        setVoicePreviewError("Could not play audio in the browser (format or size issue).");
+      };
+      await audio.play().catch(() => {
+        setCastPreview(null);
+        previewAudioRef.current = null;
+        setVoicePreviewError("Playback was blocked or failed. Try again.");
+      });
+    } catch (e) {
+      if ((e as Error).name === "AbortError") return;
+      setCastPreview(null);
+      setVoicePreviewError(e instanceof Error ? e.message : "Preview request failed.");
+    } finally {
+      if (previewAbortRef.current === ac) previewAbortRef.current = null;
     }
   }
 
@@ -1081,25 +1141,44 @@ function CreateAudioTestInner() {
                   <VoiceSlot
                     label="Narrator Voice"
                     selected={narratorVoice}
-                    previewingId={previewingId}
+                    castSlot="narrator"
+                    castPreview={castPreview}
                     onBrowse={() => setActiveBrowserSlot("narrator")}
-                    onPreview={() => narratorVoice && previewSelectedVoice(narratorVoice)}
+                    onPreview={() => narratorVoice && previewCastVoice("narrator", narratorVoice)}
                   />
                   <VoiceSlot
                     label="Male Character Voice"
                     selected={maleVoice}
-                    previewingId={previewingId}
+                    castSlot="male"
+                    castPreview={castPreview}
                     onBrowse={() => setActiveBrowserSlot("male")}
-                    onPreview={() => maleVoice && previewSelectedVoice(maleVoice)}
+                    onPreview={() => maleVoice && previewCastVoice("male", maleVoice)}
                   />
                   <VoiceSlot
                     label="Female Character Voice"
                     selected={femaleVoice}
-                    previewingId={previewingId}
+                    castSlot="female"
+                    castPreview={castPreview}
                     onBrowse={() => setActiveBrowserSlot("female")}
-                    onPreview={() => femaleVoice && previewSelectedVoice(femaleVoice)}
+                    onPreview={() => femaleVoice && previewCastVoice("female", femaleVoice)}
                   />
                 </div>
+                {voicePreviewError ? (
+                  <div
+                    style={{
+                      marginTop: "12px",
+                      fontSize: "13px",
+                      lineHeight: 1.5,
+                      color: "#f0a8a8",
+                      padding: "10px 12px",
+                      borderRadius: "12px",
+                      background: "rgba(180,60,60,0.15)",
+                      border: "1px solid rgba(240,120,120,0.25)",
+                    }}
+                  >
+                    {voicePreviewError}
+                  </div>
+                ) : null}
 
               </div>
 
