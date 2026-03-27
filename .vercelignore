@@ -1,0 +1,3 @@
+# Local test assets — huge; XTTS uses WAVs on Runpod /speakers, not these.
+public/werewolf.wav
+public/werewolf_10min.wav

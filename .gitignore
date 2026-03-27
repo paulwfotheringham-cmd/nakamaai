@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# Large local WAVs (not for Vercel; speaker refs live on XTTS pod)
+/public/werewolf.wav
+/public/werewolf_10min.wav
+
 # debug
 npm-debug.log*
 yarn-debug.log*
