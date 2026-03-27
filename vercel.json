@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "app/api/xtts-tts/route.ts": {
+      "maxDuration": 300
+    }
+  }
+}

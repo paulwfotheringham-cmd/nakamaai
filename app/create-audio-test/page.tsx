@@ -3,6 +3,11 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
+const VOICES_API =
+  process.env.NEXT_PUBLIC_TTS_BACKEND === "xtts" ? "/api/xtts-voices" : "/api/cartesia-voices";
+const TTS_API =
+  process.env.NEXT_PUBLIC_TTS_BACKEND === "xtts" ? "/api/xtts-tts" : "/api/cartesia-tts";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type SavedStory = {
@@ -76,7 +81,7 @@ function VoiceBrowserModal({
 
   useEffect(() => {
     setLoading(true);
-    fetch("/api/cartesia-voices")
+    fetch(VOICES_API)
       .then((r) => r.json())
       .then((data) => setAllVoices(data.voices ?? []))
       .catch(() => setAllVoices([]))
@@ -132,7 +137,7 @@ function VoiceBrowserModal({
     previewAudioRef.current?.pause();
     setPreviewingId(voice.id);
     try {
-      const res = await fetch("/api/cartesia-tts", {
+      const res = await fetch(TTS_API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -614,7 +619,7 @@ function CreateAudioTestInner() {
     previewAudioRef.current?.pause();
     setPreviewingId(voice.id);
     try {
-      const res = await fetch("/api/cartesia-tts", {
+      const res = await fetch(TTS_API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -767,7 +772,7 @@ function CreateAudioTestInner() {
       if (stoppedRef.current) break;
       if (!voiceId) continue;
       try {
-        const res = await fetch("/api/cartesia-tts", {
+        const res = await fetch(TTS_API, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text, voiceId }),
