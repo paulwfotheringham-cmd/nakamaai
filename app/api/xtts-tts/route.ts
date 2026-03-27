@@ -51,10 +51,24 @@ export async function POST(req: NextRequest) {
 
   const ct = upstream.headers.get("content-type") ?? "";
   if (!upstream.ok) {
-    const errBody = ct.includes("application/json")
-      ? JSON.stringify(await upstream.json().catch(() => ({})))
-      : await upstream.text();
-    const t = errBody;
+    let t = "";
+    if (ct.includes("application/json")) {
+      const j = (await upstream.json().catch(() => null)) as Record<string, unknown> | null;
+      if (j && typeof j.detail === "string") {
+        t = j.detail;
+      } else if (j && Array.isArray(j.detail)) {
+        t = j.detail.map((x) => (typeof x === "object" && x && "msg" in x ? String((x as { msg: string }).msg) : JSON.stringify(x))).join("; ");
+      } else if (j) {
+        t = JSON.stringify(j);
+      }
+    } else {
+      t = await upstream.text();
+    }
+    t = (t || "").trim();
+    if (!t && upstream.status === 404) {
+      t =
+        "Not found (no error body). Usual causes: (1) XTTS_SERVER_URL in Vercel does not match your pod’s current proxy URL after a restart; (2) POST path is wrong — default is /tts (set XTTS_TTS_PATH if your server differs); (3) reference WAV missing — on the pod, /speakers/{voiceId}.wav must exist (e.g. curl GET {base}/health to confirm speaker_dir).";
+    }
     if (
       t.includes("ERR_NGROK_") ||
       /endpoint .+ is offline/i.test(t) ||
