@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 
 const fantasyScenes = [
   {
-    title: "MOOR",
+    title: "GOTHIC",
     subtitle: "A windswept moor with a brooding stranger",
     image: "/scenes/moor.jpg",
   },
@@ -41,7 +41,7 @@ const fantasyScenes = [
 
 const sceneAmbience: Record<string, string> = {
   // Temporary hosted placeholders; replace with /public/audio/ambience/*.mp3 anytime.
-  MOOR: "https://cdn.pixabay.com/audio/2022/10/16/audio_12b862f76b.mp3",
+  GOTHIC: "https://cdn.pixabay.com/audio/2022/10/16/audio_12b862f76b.mp3",
   PIRATE: "https://cdn.pixabay.com/audio/2022/03/10/audio_c8b09af0ab.mp3",
   ROME: "https://cdn.pixabay.com/audio/2021/08/08/audio_dc39d58f77.mp3",
   WEREWOLF: "https://cdn.pixabay.com/audio/2022/02/23/audio_febc508f3e.mp3",
@@ -58,7 +58,7 @@ function SceneAtmosphere({
 }) {
   const baseOpacity = isActive ? "opacity-100" : "opacity-45";
 
-  if (title === "MOOR") {
+  if (title === "GOTHIC") {
     return (
       <div className={`pointer-events-none absolute inset-0 ${baseOpacity}`}>
         <div className="fog-layer-1 absolute -inset-x-10 bottom-0 h-28 rounded-full bg-stone-200/20 blur-2xl" />
@@ -145,7 +145,7 @@ const browseServices = [
   {
     title: "FORBIDDEN CHAT DESIRES",
     description:
-      "Real time, voice to voice or messaging. Uncensored ability to choose or make your own.",
+      "Real time, voice to voice or messaging.",
     poster: "/tiles/tile4.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
@@ -171,46 +171,17 @@ function ServiceHoverVideoCard({
   title,
   description,
   poster,
-  videoSrc,
 }: {
   title: string;
   description: string;
   poster: string;
-  videoSrc: string;
 }) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-
   return (
-    <div
-      className="group relative aspect-[3/4] w-full overflow-hidden rounded-xl border border-stone-800 bg-black shadow-lg"
-      onMouseEnter={() => {
-        const v = videoRef.current;
-        if (!v) return;
-        void v.play().catch(() => {
-          /* autoplay policies: ignore */
-        });
-      }}
-      onMouseLeave={() => {
-        const v = videoRef.current;
-        if (!v) return;
-        v.pause();
-        v.currentTime = 0;
-      }}
-    >
+    <div className="group relative aspect-[3/4] w-full overflow-hidden rounded-xl border border-stone-800 bg-black shadow-lg">
       <img
         src={poster}
         alt=""
-        className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-0"
-      />
-      <video
-        ref={videoRef}
-        className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-        src={videoSrc}
-        poster={poster}
-        muted
-        loop
-        playsInline
-        preload="metadata"
+        className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent px-3 pb-3 pt-16">
         <h3 className="mt-0.5 whitespace-nowrap text-[10px] font-semibold leading-snug tracking-wide text-amber-100/95 sm:text-[11px]">
@@ -326,160 +297,158 @@ export default function Page() {
 
       <div className="mx-auto max-w-7xl px-6 py-10">
         {/* HERO */}
-        <section className="grid gap-8 lg:grid-cols-2">
+        <section className="rounded-[2rem] border border-stone-600/80 bg-zinc-950/85 p-3 shadow-[0_0_0_1px_rgba(245,158,11,0.12),0_26px_62px_rgba(0,0,0,0.5)] sm:p-4">
+          <div className="grid gap-2 lg:grid-cols-[1.12fr_0.88fr]">
+            {/* LEFT SIDE */}
+            <div className="space-y-6">
+              <div className="rounded-2xl bg-zinc-950/72 p-6 sm:p-7">
+                <p className="mb-4 text-xs uppercase tracking-widest text-stone-300">
+                  PREMIUM AUDIO ADULT EXPERIENCES. BUILT EXCLUSIVELY FOR WOMAN
+                </p>
+                <p className="font-serif text-3xl font-bold tracking-wide text-amber-300">
+                  Nakama Nights
+                </p>
+                <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-amber-200/80">
+                  MORE THAN JUST AUDIOBOOKS
+                </p>
 
-          {/* LEFT SIDE */}
-          <div className="space-y-6">
-            <div className="rounded-2xl border border-stone-800 bg-zinc-950/80 p-6">
-              <p className="mb-3 font-serif text-3xl font-bold tracking-wide text-amber-300">
-                Nakama Nights
-              </p>
-              <h1 className="font-serif text-5xl leading-[1.06] text-white sm:text-6xl">
-                Your Fantasy.<br />
-                Your Rules.<br />
-                <span className="text-amber-200">Your Pleasure.</span>
-              </h1>
-              <p className="mt-5 text-xs uppercase tracking-widest text-stone-300">
-                Built exclusively for women.
-              </p>
-            </div>
-
-            <div id="browse-services" className="scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-6">
-              <h2 className="font-serif text-2xl leading-tight text-white sm:text-3xl">
-                Browse services
-              </h2>
-              <p className="mt-3 text-base text-stone-500">
-                Hover a tile for a quick video preview.
-              </p>
-              <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-3">
-                {browseServices.map((s) => (
-                  <ServiceHoverVideoCard key={s.title} {...s} />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div className="relative overflow-hidden rounded-2xl border border-fuchsia-400/30 bg-[radial-gradient(circle_at_20%_10%,rgba(245,158,11,0.18),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(217,70,239,0.18),transparent_35%),linear-gradient(180deg,rgba(30,10,40,0.75)_0%,rgba(9,10,17,0.95)_70%)] p-6 shadow-[0_0_55px_rgba(217,70,239,0.15)]">
-              <div className="pointer-events-none absolute -left-12 top-8 h-24 w-24 rounded-full bg-amber-300/20 blur-2xl" />
-              <div className="pointer-events-none absolute -right-10 bottom-6 h-28 w-28 rounded-full bg-fuchsia-400/20 blur-2xl" />
-              <p className="relative text-[11px] font-semibold uppercase tracking-[0.3em] text-fuchsia-200">
-                Premium Adult Audio Experience
-              </p>
-              <p className="relative mt-3 text-[11px] leading-relaxed text-amber-100">
-                The world's first premium adult immersive audio adventure platform.
-              </p>
-              <div className="relative mt-4 space-y-2 text-[12px] leading-relaxed text-stone-100">
-                <p>Nakama is not just an audiobook. It is not another generic content application.</p>
-                <p>Whatever your fantasy - Nakama takes you there - and you decide where it takes you.</p>
-                <p>For the first time ever, you are not just a listener. You are the author, the character, and the experience.</p>
-                <p>Your privacy and security are guaranteed by Nakama.</p>
-                <p className="font-semibold text-amber-200">Nakama is exclusive. Nakama is premium. Nakama is yours.</p>
-              </div>
-              <a
-                href="#signup"
-                className="relative mt-5 inline-flex rounded-full border border-fuchsia-300/60 bg-gradient-to-r from-amber-200 to-fuchsia-200 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-black transition hover:brightness-110"
-              >
-                JOIN NAKAMA NOW
-              </a>
-            </div>
-
-            <div className="mt-16 border-t border-red-500/70 pt-6 lg:mt-[9.2rem]">
-              <p className="text-xs font-bold uppercase tracking-[0.24em] text-amber-300">
-                Top Fantasies
-              </p>
-              <div
-                className="relative mt-10 min-h-[430px] w-full overflow-x-hidden overflow-y-visible pb-2 sm:min-h-[460px]"
-                onMouseMove={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  setMouse({
-                    x: (e.clientX - rect.left) / rect.width - 0.5,
-                    y: (e.clientY - rect.top) / rect.height - 0.5,
-                  });
-                }}
-              >
-                <div className="absolute inset-0 flex items-center justify-center">
-
-                  {fantasyScenes.map((scene, index) => {
-                    const offset = index - activeScene;
-                    const isActive = index === activeScene;
-
-                    return (
-                      <div
-                        key={index}
-                        onClick={() => {
-                          setActiveScene(index);
-                          playAmbienceForTitle(scene.title);
-                        }}
-                        onMouseEnter={() => playAmbienceForTitle(scene.title)}
-                        className="absolute cursor-pointer transition-all duration-500 ease-out"
-                        style={{
-                          transform: `
-                          translateX(${offset * 150}px)
-                          scale(${isActive ? 1 : 0.83})
-                          ${isActive ? `translate(${mouse.x * 20}px, ${mouse.y * 12}px)` : ""}
-                        `,
-                          zIndex: 10 - Math.abs(offset),
-                          opacity: isActive ? 1 : 0.22,
-                        }}
-                      >
-                        <div className="relative flex w-[300px] flex-col rounded-xl border border-stone-700 bg-zinc-950 shadow-xl sm:w-[340px]">
-
-                          <div className="relative h-[220px] shrink-0 overflow-hidden rounded-t-xl sm:h-[240px]">
-                            <img
-                              src={scene.image}
-                              alt=""
-                              className="absolute inset-0 h-full w-full object-cover"
-                            />
-                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
-                            <SceneAtmosphere title={scene.title} isActive={isActive} />
-                          </div>
-
-                          <div className="relative z-10 shrink-0 rounded-b-xl border-t border-stone-800/90 bg-zinc-950 px-4 py-4">
-                            <p className="break-words text-pretty text-left font-serif text-[14px] italic leading-relaxed tracking-[0.03em] text-stone-400 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
-                              {scene.subtitle}
-                            </p>
-                            <h3 className="mt-2 text-left font-serif text-base leading-tight tracking-wide text-amber-200 sm:text-lg">
-                              {scene.title}
-                            </h3>
-                          </div>
-
-                        </div>
-                      </div>
-                    );
-                  })}
-
+                <div className="mt-5 space-y-3">
+                  <div>
+                    <p className="font-serif text-5xl leading-[1.06] text-white sm:text-6xl">
+                      Your Fantasy.
+                    </p>
+                    <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-stone-400">
+                      YOUR JOURNEY. WE TAKE YOU THERE. UP TO YOU FROM THERE ON
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-serif text-5xl leading-[1.06] text-white sm:text-6xl">
+                      Your Rules.
+                    </p>
+                    <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-stone-400">
+                      YOU ARE NO JUST A LISTENER. YOU ARE THE AUTHOR, THE CHARACTER AND THE EXPERIENCE
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-serif text-5xl leading-[1.06] text-amber-200 sm:text-6xl">
+                      Your Pleasure.
+                    </p>
+                    <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-amber-200/80">
+                      NAKAMA NIGHTS IS EXCLUSIVE. WE ARE PREMIUM. NAKAMA NIGHTS IS YOURS
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="sr-only">
-              {fantasyScenes.map((scene) => (
-                <audio
-                  key={`ambience-${scene.title}`}
-                  ref={(el) => {
-                    audioRefs.current[scene.title] = el;
-                  }}
-                  src={sceneAmbience[scene.title]}
-                  preload="none"
-                />
-              ))}
+
+            {/* RIGHT IMAGE */}
+            <div className="relative min-h-[440px] overflow-hidden rounded-2xl bg-zinc-950/55 shadow-2xl">
+              <img
+                src="/scenes/moor.jpg"
+                alt="Moor scene placeholder"
+                className="absolute inset-0 h-full w-full object-cover object-center opacity-92"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_35%_46%,rgba(0,0,0,0.04),rgba(0,0,0,0.46)_74%)]" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-zinc-950/60 via-zinc-950/24 to-zinc-950/66" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/76 via-black/24 to-black/38" />
+              <div className="absolute inset-x-0 bottom-4 flex justify-center px-4 sm:bottom-5">
+                <a
+                  href="#signup"
+                  className="inline-flex rounded-full border border-amber-200 bg-white px-5 py-2 text-xs font-semibold uppercase tracking-wide text-amber-500 transition hover:bg-amber-50"
+                >
+                  JOIN NAKAMA NOW
+                </a>
+              </div>
             </div>
-
           </div>
+        </section>
 
-          {/* RIGHT — Sign up / Sign in */}
+        <section className="mt-14 pt-6">
+          <p className="font-serif text-2xl leading-tight text-white sm:text-3xl">
+            Suggested fantasies
+          </p>
+          <div
+            className="relative mt-10 min-h-[430px] w-full overflow-x-hidden overflow-y-visible pb-2 sm:min-h-[460px]"
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              setMouse({
+                x: (e.clientX - rect.left) / rect.width - 0.5,
+                y: (e.clientY - rect.top) / rect.height - 0.5,
+              });
+            }}
+          >
+            <div className="absolute inset-0 flex items-center justify-center">
+
+              {fantasyScenes.map((scene, index) => {
+                const offset = index - activeScene;
+                const isActive = index === activeScene;
+
+                return (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      setActiveScene(index);
+                      playAmbienceForTitle(scene.title);
+                    }}
+                    onMouseEnter={() => playAmbienceForTitle(scene.title)}
+                    className="absolute cursor-pointer transition-all duration-500 ease-out"
+                    style={{
+                      transform: `
+                        translateX(${offset * 150}px)
+                        scale(${isActive ? 1 : 0.83})
+                        ${isActive ? `translate(${mouse.x * 20}px, ${mouse.y * 12}px)` : ""}
+                      `,
+                      zIndex: 10 - Math.abs(offset),
+                      opacity: isActive ? 1 : 0.22,
+                    }}
+                  >
+                    <div className="relative flex w-[300px] flex-col rounded-xl border border-stone-700 bg-zinc-950 shadow-xl sm:w-[340px]">
+                      <div className="relative h-[220px] shrink-0 overflow-hidden rounded-t-xl sm:h-[240px]">
+                        <img
+                          src={scene.image}
+                          alt=""
+                          className="absolute inset-0 h-full w-full object-cover"
+                        />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+                        <SceneAtmosphere title={scene.title} isActive={isActive} />
+                      </div>
+
+                      <div className="relative z-10 shrink-0 rounded-b-xl border-t border-stone-800/90 bg-zinc-950 px-4 py-4">
+                        <p className="break-words text-pretty text-left font-serif text-[14px] italic leading-relaxed tracking-[0.03em] text-stone-400 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
+                          {scene.subtitle}
+                        </p>
+                        <h3 className="mt-2 text-left font-serif text-base leading-tight tracking-wide text-amber-200 sm:text-lg">
+                          {scene.title}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section id="browse-services" className="mt-8 scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-6">
+          <h2 className="font-serif text-2xl leading-tight text-white sm:text-3xl">
+            Browse services
+          </h2>
+          <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+            {browseServices.map((s) => (
+              <ServiceHoverVideoCard key={s.title} {...s} />
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-10 flex justify-center">
           <div
             id="signup"
-            className="h-fit scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-8 shadow-xl lg:sticky lg:top-8"
+            className="w-full max-w-xl scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-8 shadow-xl"
           >
 
             <h2 className="font-serif text-3xl text-white">
               Begin your fantasy
             </h2>
-
-            <p className="mt-2 text-sm text-stone-400">
-              10 days free trial
-            </p>
 
             <p className="mt-2 text-sm text-stone-400">
               Join Nakama Nights now
@@ -503,24 +472,39 @@ export default function Page() {
 
               <button
                 type="submit"
-                className="w-full rounded-full bg-white py-3 text-sm font-semibold text-black transition hover:bg-stone-200"
+                className="w-full rounded-full bg-stone-300 py-3 text-sm font-semibold text-black transition hover:bg-stone-400"
               >
                 Create account
               </button>
             </form>
+            <p className="mt-3 text-center text-xs uppercase tracking-wide text-stone-400">
+              10 days free trial
+            </p>
 
             <div className="mt-6 border-t border-stone-800 pt-5">
               <Link
                 href="/login"
-                className="text-sm font-medium text-amber-300 underline-offset-4 transition hover:text-amber-200 hover:underline"
+                className="inline-flex rounded-full border border-amber-300/40 bg-amber-300/10 px-4 py-1.5 text-sm font-medium text-amber-200 transition hover:border-amber-200/70 hover:bg-amber-300/20 hover:text-amber-100"
               >
                 Existing members - click here to login
               </Link>
             </div>
 
           </div>
-
         </section>
+
+        <div className="sr-only">
+          {fantasyScenes.map((scene) => (
+            <audio
+              key={`ambience-${scene.title}`}
+              ref={(el) => {
+                audioRefs.current[scene.title] = el;
+              }}
+              src={sceneAmbience[scene.title]}
+              preload="none"
+            />
+          ))}
+        </div>
       </div>
 
       <style jsx global>{`
