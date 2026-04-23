@@ -106,7 +106,7 @@ export default function DashboardCouplesPage() {
         ← Home
       </a>
       <img
-        src="/nakama-nights-logo.png"
+        src="/Nakama-AI-July25-White.png"
         alt="Nakama logo"
         style={{
           position: "absolute",

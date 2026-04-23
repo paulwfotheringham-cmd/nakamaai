@@ -82,7 +82,7 @@ export default function DashboardPage() {
       <a href="/" className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-white/75 backdrop-blur-md">← Home</a>
       {/* LOGO (top-right corner) */}
       <img
-        src="/nakama-nights-logo.png"
+        src="/Nakama-AI-July25-White.png"
         alt="Nakama logo"
         style={{
           position: "absolute",

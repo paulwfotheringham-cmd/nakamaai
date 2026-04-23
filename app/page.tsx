@@ -357,7 +357,7 @@ export default function Page() {
             className="shrink-0 rounded-lg bg-gradient-to-b from-stone-900/95 to-black/90 px-3 py-2 ring-1 ring-amber-400/25 transition hover:ring-amber-400/40"
           >
             <img
-              src="/nakama-nights-logo.png"
+              src="/Nakama-AI-July25-White.png"
               alt="Nakama Nights"
               className="block h-11 w-auto object-contain object-left sm:h-[52px] md:h-14"
             />
@@ -395,7 +395,7 @@ export default function Page() {
           <div className="relative z-10 max-w-3xl p-6 sm:p-8 lg:p-10">
             <div className="inline-block max-w-full rounded-2xl bg-black/55 px-5 py-4 ring-1 ring-amber-400/20 backdrop-blur-sm sm:px-6 sm:py-5">
               <img
-                src="/nakama-nights-logo.png"
+                src="/Nakama-AI-July25-White.png"
                 alt="Nakama Nights"
                 className="h-auto w-full max-w-[280px] object-contain sm:max-w-[360px] lg:max-w-[420px]"
                 fetchPriority="high"
@@ -618,7 +618,7 @@ export default function Page() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="shrink-0 rounded-lg bg-gradient-to-b from-stone-900/95 to-black/90 px-3 py-2 ring-1 ring-amber-400/25">
               <img
-                src="/nakama-nights-logo.png"
+                src="/Nakama-AI-July25-White.png"
                 alt="Nakama Nights"
                 className="block h-11 w-auto object-contain sm:h-[52px]"
               />

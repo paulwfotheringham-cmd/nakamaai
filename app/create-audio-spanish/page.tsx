@@ -1228,7 +1228,7 @@ function CreateAudioSpanishInner() {
       {/* Logo — top right */}
       <div style={{ position: "fixed", top: "14px", right: "24px", zIndex: 50 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/nakama-nights-logo.png" alt="Nakama AI" style={{ height: "40px", width: "auto", display: "block" }} />
+        <img src="/Nakama-AI-July25-White.png" alt="Nakama AI" style={{ height: "40px", width: "auto", display: "block" }} />
       </div>
 
       <div

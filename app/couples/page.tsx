@@ -11,7 +11,7 @@ export default function CouplesPage() {
         ← Home
       </a>
       <img
-        src="/nakama-nights-logo.png"
+        src="/Nakama-AI-July25-White.png"
         alt="Nakama logo"
         className="absolute right-8 top-6 z-20 h-[52px] w-auto sm:h-[63px]"
       />
