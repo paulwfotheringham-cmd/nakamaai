@@ -313,9 +313,6 @@ export default function Page() {
             <p className="mt-2 text-xs uppercase tracking-[0.22em] text-stone-300">
               PREMIUM AUDIO ADULT EXPERIENCES. BUILT EXCLUSIVELY FOR WOMAN
             </p>
-            <p className="mt-2 text-[10px] uppercase tracking-[0.24em] text-stone-400">
-              YOUR JOURNEY. WE TAKE YOU THERE. UP TO YOU FROM THERE ON
-            </p>
             <p className="mt-2 text-[10px] uppercase tracking-[0.24em] text-amber-200/80">
               MORE THAN JUST AUDIOBOOKS
             </p>
@@ -325,13 +322,16 @@ export default function Page() {
                 <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
                   Your Fantasy<span className="-ml-1">.</span>
                 </p>
+                <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-stone-400">
+                  YOUR JOURNEY. WE TAKE YOU THERE. THE REST IS UP TO YOU
+                </p>
               </div>
               <div>
                 <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
                   Your Rules.
                 </p>
                 <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-stone-400">
-                  YOU ARE NO JUST A LISTENER. YOU ARE THE AUTHOR, THE CHARACTER AND THE EXPERIENCE
+                  YOU ARE NOT JUST A LISTENER. YOU ARE THE AUTHOR, THE CHARACTER AND THE EXPERIENCE.
                 </p>
               </div>
               <div>
