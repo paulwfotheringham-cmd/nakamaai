@@ -9,37 +9,37 @@ import { useEffect, useRef, useState } from "react";
 const fantasyScenes = [
   {
     title: "GOTHIC",
-    displayTitle: "CHANGE TITLE 1",
+    displayTitle: "GOTHIC",
     subtitle: "A windswept moor with a brooding stranger",
     image: "/scenes/moor.jpg",
   },
   {
     title: "PIRATE",
-    displayTitle: "CHANGE TITLE 2",
+    displayTitle: "HISTORICAL",
     subtitle: "A pirate ship on the high seas",
     image: "/scenes/pirate.jpg",
   },
   {
     title: "ROME",
-    displayTitle: "CHANGE TITLE 3",
+    displayTitle: "HISTORICAL",
     subtitle: "A secret love in ancient Rome",
     image: "/scenes/rome.jpg",
   },
   {
     title: "WEREWOLF",
-    displayTitle: "CHANGE TITLE 4",
+    displayTitle: "SUPERNATURAL",
     subtitle: "A werewolf who only comes out at night",
     image: "/scenes/werewolf.jpg",
   },
   {
     title: "ALIEN",
-    displayTitle: "CHANGE TITLE 5",
+    displayTitle: "ALIEN",
     subtitle: "An alien encounter on a distant world",
     image: "/scenes/alien.jpg",
   },
   {
     title: "OFFICE",
-    displayTitle: "CHANGE TITLE 6",
+    displayTitle: "MODERN",
     subtitle: "A dangerous attraction in the office",
     image: "/scenes/office.jpg",
   },
