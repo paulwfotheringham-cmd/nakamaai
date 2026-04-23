@@ -307,27 +307,27 @@ export default function Page() {
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/72 via-black/26 to-black/36" />
 
           <div className="relative z-10 max-w-3xl p-6 sm:p-8 lg:p-10">
-            <p className="mb-4 text-xs uppercase tracking-widest text-stone-300">
-              PREMIUM AUDIO ADULT EXPERIENCES. BUILT EXCLUSIVELY FOR WOMAN
-            </p>
-            <p className="font-serif text-3xl font-bold tracking-wide text-amber-300">
+            <p className="font-serif text-5xl font-bold tracking-wide text-amber-300 sm:text-6xl">
               Nakama Nights
             </p>
-            <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-amber-200/80">
+            <p className="mt-2 text-xs uppercase tracking-[0.22em] text-stone-300">
+              PREMIUM AUDIO ADULT EXPERIENCES. BUILT EXCLUSIVELY FOR WOMAN
+            </p>
+            <p className="mt-2 text-[10px] uppercase tracking-[0.24em] text-stone-400">
+              YOUR JOURNEY. WE TAKE YOU THERE. UP TO YOU FROM THERE ON
+            </p>
+            <p className="mt-2 text-[10px] uppercase tracking-[0.24em] text-amber-200/80">
               MORE THAN JUST AUDIOBOOKS
             </p>
 
-            <div className="mt-5 space-y-3">
+            <div className="mt-8 space-y-3">
               <div>
-                <p className="font-serif text-5xl leading-[1.06] text-white sm:text-6xl">
-                  Your Fantasy.
-                </p>
-                <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-stone-400">
-                  YOUR JOURNEY. WE TAKE YOU THERE. UP TO YOU FROM THERE ON
+                <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
+                  Your Fantasy<span className="-ml-1">.</span>
                 </p>
               </div>
               <div>
-                <p className="font-serif text-5xl leading-[1.06] text-white sm:text-6xl">
+                <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
                   Your Rules.
                 </p>
                 <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-stone-400">
@@ -335,7 +335,7 @@ export default function Page() {
                 </p>
               </div>
               <div>
-                <p className="font-serif text-5xl leading-[1.06] text-amber-200 sm:text-6xl">
+                <p className="font-serif text-4xl leading-[1.08] text-amber-200 sm:text-5xl">
                   Your Pleasure.
                 </p>
                 <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-amber-200/80">
@@ -346,7 +346,7 @@ export default function Page() {
 
             <a
               href="#signup"
-              className="mt-5 inline-flex rounded-full border border-amber-200 bg-white px-5 py-2 text-xs font-semibold uppercase tracking-wide text-amber-500 transition hover:bg-amber-50"
+              className="mt-12 inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
             >
               JOIN NAKAMA NOW
             </a>
@@ -355,7 +355,7 @@ export default function Page() {
 
         <section className="mt-14 pt-6">
           <p className="font-serif text-2xl leading-tight text-white sm:text-3xl">
-            Suggested fantasies
+            Nakama Nights Favourite Fantasies
           </p>
           <div
             className="relative mt-10 min-h-[430px] w-full overflow-x-hidden overflow-y-visible pb-2 sm:min-h-[460px]"
@@ -421,7 +421,7 @@ export default function Page() {
 
         <section id="browse-services" className="mt-8 scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-6">
           <h2 className="font-serif text-2xl leading-tight text-white sm:text-3xl">
-            Browse services
+            Nakama Nights Services
           </h2>
           <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
             {browseServices.map((s) => (
