@@ -393,19 +393,19 @@ export default function Page() {
             <p className="font-serif text-5xl font-bold tracking-wide text-amber-300 sm:text-6xl">
               Nakama Nights
             </p>
-            <p className="mt-2 text-xs uppercase tracking-[0.22em] text-stone-300">
+            <p className="mt-5 text-xs uppercase tracking-[0.22em] text-stone-300">
               PREMIUM AUDIO ADULT EXPERIENCES. BUILT EXCLUSIVELY FOR WOMAN
             </p>
-            <p className="mt-2 text-[10px] uppercase tracking-[0.24em] text-amber-200/80">
+            <p className="mt-2 text-xs uppercase tracking-[0.22em] text-amber-200/80">
               MORE THAN JUST AUDIOBOOKS
             </p>
 
-            <div className="mt-8 space-y-3">
+            <div className="mt-8 flex flex-col gap-6">
               <div>
                 <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
                   Your Fantasy<span className="-ml-1">.</span>
                 </p>
-                <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-stone-400">
+                <p className="mt-4 text-[10px] uppercase tracking-[0.24em] text-stone-400">
                   YOUR JOURNEY. WE TAKE YOU THERE. THE REST IS UP TO YOU
                 </p>
               </div>
@@ -414,10 +414,11 @@ export default function Page() {
                   Your Rules.
                 </p>
                 <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-stone-400">
-                  YOU ARE NOT JUST A LISTENER. YOU ARE THE AUTHOR, THE CHARACTER AND THE EXPERIENCE.
+                  YOU ARE NOT JUST A LISTENER. YOU ARE THE AUTHOR, THE CHARACTER{" "}
+                  <span className="ml-2 sm:ml-4">AND THE EXPERIENCE.</span>
                 </p>
               </div>
-              <div>
+              <div className="pt-4 sm:pt-6">
                 <p className="font-serif text-4xl leading-[1.08] text-amber-200 sm:text-5xl">
                   Your Pleasure.
                 </p>
