@@ -340,6 +340,9 @@ export default function Page() {
             </button>
 
             {/* Carousel — taller cards so captions are not clipped */}
+            <p className="mt-6 text-xs font-bold uppercase tracking-[0.24em] text-amber-300">
+              Top Fantasies
+            </p>
             <div
               className="relative mt-10 min-h-[500px] w-full overflow-x-hidden overflow-y-visible pb-2 sm:min-h-[520px]"
               onMouseMove={(e) => {
