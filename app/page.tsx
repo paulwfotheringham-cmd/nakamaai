@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /* ---------------- SCENES ---------------- */
 
@@ -38,6 +38,83 @@ const fantasyScenes = [
     image: "/scenes/office.jpg",
   },
 ];
+
+const sceneAmbience: Record<string, string> = {
+  // Temporary hosted placeholders; replace with /public/audio/ambience/*.mp3 anytime.
+  MOOR: "https://cdn.pixabay.com/audio/2022/10/16/audio_12b862f76b.mp3",
+  PIRATE: "https://cdn.pixabay.com/audio/2022/03/10/audio_c8b09af0ab.mp3",
+  ROME: "https://cdn.pixabay.com/audio/2021/08/08/audio_dc39d58f77.mp3",
+  WEREWOLF: "https://cdn.pixabay.com/audio/2022/02/23/audio_febc508f3e.mp3",
+  ALIEN: "https://cdn.pixabay.com/audio/2022/01/18/audio_d1718ab41b.mp3",
+  OFFICE: "https://cdn.pixabay.com/audio/2022/03/15/audio_c9fde3e71b.mp3",
+};
+
+function SceneAtmosphere({
+  title,
+  isActive,
+}: {
+  title: string;
+  isActive: boolean;
+}) {
+  const baseOpacity = isActive ? "opacity-100" : "opacity-45";
+
+  if (title === "MOOR") {
+    return (
+      <div className={`pointer-events-none absolute inset-0 ${baseOpacity}`}>
+        <div className="fog-layer-1 absolute -inset-x-8 bottom-0 h-24 rounded-full bg-stone-200/10 blur-2xl" />
+        <div className="fog-layer-2 absolute -inset-x-12 bottom-6 h-20 rounded-full bg-stone-300/10 blur-xl" />
+      </div>
+    );
+  }
+
+  if (title === "PIRATE") {
+    return (
+      <div className={`pointer-events-none absolute inset-0 ${baseOpacity}`}>
+        <div className="storm-rain absolute inset-0 bg-[linear-gradient(115deg,transparent_0%,rgba(180,190,220,0.15)_40%,transparent_70%)]" />
+        <div className="sail-shadow absolute left-1/2 top-4 h-24 w-16 -translate-x-1/2 rounded-full bg-black/30 blur-md" />
+      </div>
+    );
+  }
+
+  if (title === "ROME") {
+    return (
+      <div className={`pointer-events-none absolute inset-0 ${baseOpacity}`}>
+        <div className="candle-glow absolute inset-x-6 bottom-10 h-20 rounded-full bg-amber-200/20 blur-2xl" />
+        <div className="spark-drift absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(251,191,36,0.18),transparent_45%)]" />
+      </div>
+    );
+  }
+
+  if (title === "WEREWOLF") {
+    return (
+      <div className={`pointer-events-none absolute inset-0 ${baseOpacity}`}>
+        <div className="moon-pulse absolute right-5 top-4 h-14 w-14 rounded-full bg-slate-200/25 blur-md" />
+        <div className="mist-drift absolute -inset-x-8 bottom-2 h-20 rounded-full bg-slate-300/10 blur-2xl" />
+      </div>
+    );
+  }
+
+  if (title === "ALIEN") {
+    return (
+      <div className={`pointer-events-none absolute inset-0 ${baseOpacity}`}>
+        <div className="alien-cloud-1 absolute -left-8 top-6 h-24 w-24 rounded-full bg-fuchsia-300/20 blur-2xl" />
+        <div className="alien-cloud-2 absolute right-0 top-14 h-20 w-28 rounded-full bg-cyan-300/20 blur-2xl" />
+        <div className="alien-cloud-3 absolute left-10 bottom-10 h-16 w-24 rounded-full bg-violet-300/15 blur-xl" />
+      </div>
+    );
+  }
+
+  if (title === "OFFICE") {
+    return (
+      <div className={`pointer-events-none absolute inset-0 ${baseOpacity}`}>
+        <div className="office-blinds absolute inset-0 bg-[repeating-linear-gradient(0deg,rgba(255,255,255,0.08)_0px,rgba(255,255,255,0.08)_2px,transparent_2px,transparent_10px)]" />
+        <div className="office-scan absolute inset-y-0 left-0 w-10 bg-white/10 blur-md" />
+      </div>
+    );
+  }
+
+  return null;
+}
 
 /* Short CC0 / permissive samples for hover previews (replace with your own clips in /public when ready). */
 const browseServices = [
@@ -146,6 +223,44 @@ export default function Page() {
   const [email, setEmail] = useState("");
   const [memberEmail, setMemberEmail] = useState("");
   const [memberPassword, setMemberPassword] = useState("");
+  const [ambientEnabled, setAmbientEnabled] = useState(false);
+  const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
+
+  function stopAllAmbience() {
+    Object.values(audioRefs.current).forEach((audio) => {
+      if (!audio) return;
+      audio.pause();
+      audio.currentTime = 0;
+    });
+  }
+
+  function playAmbienceForTitle(title: string) {
+    if (!ambientEnabled) return;
+
+    const target = audioRefs.current[title];
+    if (!target) return;
+
+    Object.entries(audioRefs.current).forEach(([sceneTitle, audio]) => {
+      if (!audio || sceneTitle === title) return;
+      audio.pause();
+      audio.currentTime = 0;
+    });
+
+    target.volume = 0.12;
+    target.loop = true;
+    void target.play().catch(() => {
+      // Ignore autoplay or missing-file failures; visuals still work.
+    });
+  }
+
+  useEffect(() => {
+    if (!ambientEnabled) {
+      stopAllAmbience();
+      return;
+    }
+    playAmbienceForTitle(fantasyScenes[activeScene]?.title ?? "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ambientEnabled, activeScene]);
 
   function handleCreateAccount(e: React.FormEvent) {
     e.preventDefault();
@@ -221,6 +336,13 @@ export default function Page() {
             <p className="mt-4 text-xs uppercase tracking-widest text-stone-500">
               Built exclusively for women. No judgment. Immersive audio for you.
             </p>
+            <button
+              type="button"
+              onClick={() => setAmbientEnabled((prev) => !prev)}
+              className="mt-4 inline-flex items-center rounded-full border border-stone-700 px-3 py-1.5 text-[11px] uppercase tracking-wider text-stone-300 transition hover:border-stone-500 hover:text-stone-100"
+            >
+              Ambient {ambientEnabled ? "On" : "Off"}
+            </button>
 
             {/* Carousel — taller cards so captions are not clipped */}
             <div
@@ -242,7 +364,11 @@ export default function Page() {
                   return (
                     <div
                       key={index}
-                      onClick={() => setActiveScene(index)}
+                      onClick={() => {
+                        setActiveScene(index);
+                        playAmbienceForTitle(scene.title);
+                      }}
+                      onMouseEnter={() => playAmbienceForTitle(scene.title)}
                       className="absolute cursor-pointer transition-all duration-500 ease-out"
                       style={{
                         transform: `
@@ -263,10 +389,11 @@ export default function Page() {
                             className="absolute inset-0 h-full w-full object-cover"
                           />
                           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+                          <SceneAtmosphere title={scene.title} isActive={isActive} />
                         </div>
 
                         <div className="relative z-10 shrink-0 rounded-b-xl border-t border-stone-800/90 bg-zinc-950 px-4 py-4">
-                          <p className="break-words text-pretty text-left text-sm font-normal leading-relaxed text-stone-300">
+                          <p className="break-words text-pretty text-left font-serif text-[15px] italic leading-relaxed tracking-[0.03em] text-stone-400 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
                             {scene.subtitle}
                           </p>
                           <h3 className="mt-2 text-left font-serif text-xl leading-tight text-amber-200 sm:text-2xl">
@@ -280,6 +407,18 @@ export default function Page() {
                 })}
 
               </div>
+            </div>
+            <div className="sr-only">
+              {fantasyScenes.map((scene) => (
+                <audio
+                  key={`ambience-${scene.title}`}
+                  ref={(el) => {
+                    audioRefs.current[scene.title] = el;
+                  }}
+                  src={sceneAmbience[scene.title]}
+                  preload="none"
+                />
+              ))}
             </div>
 
             {/* CTA */}
@@ -427,6 +566,163 @@ export default function Page() {
 
         </section>
       </div>
+
+      <style jsx global>{`
+        .fog-layer-1 {
+          animation: fogDriftA 8s ease-in-out infinite alternate;
+        }
+        .fog-layer-2 {
+          animation: fogDriftB 10s ease-in-out infinite alternate;
+        }
+        .storm-rain {
+          animation: rainSweep 1.8s linear infinite;
+        }
+        .sail-shadow {
+          transform-origin: top center;
+          animation: sailSwing 3.2s ease-in-out infinite;
+        }
+        .candle-glow {
+          animation: emberPulse 2.2s ease-in-out infinite;
+        }
+        .spark-drift {
+          animation: sparkFloat 6s linear infinite;
+        }
+        .moon-pulse {
+          animation: moonGlow 2.8s ease-in-out infinite;
+        }
+        .mist-drift {
+          animation: fogDriftA 9s ease-in-out infinite alternate;
+        }
+        .alien-cloud-1 {
+          animation: alienCloudA 7s ease-in-out infinite alternate;
+        }
+        .alien-cloud-2 {
+          animation: alienCloudB 9s ease-in-out infinite alternate;
+        }
+        .alien-cloud-3 {
+          animation: alienCloudA 11s ease-in-out infinite alternate-reverse;
+        }
+        .office-blinds {
+          animation: blindsFlicker 5s ease-in-out infinite;
+        }
+        .office-scan {
+          animation: scanPass 4.6s ease-in-out infinite;
+        }
+
+        @keyframes fogDriftA {
+          from {
+            transform: translateX(-8px);
+          }
+          to {
+            transform: translateX(8px);
+          }
+        }
+        @keyframes fogDriftB {
+          from {
+            transform: translateX(10px);
+          }
+          to {
+            transform: translateX(-6px);
+          }
+        }
+        @keyframes rainSweep {
+          from {
+            transform: translateX(-22px);
+            opacity: 0.35;
+          }
+          to {
+            transform: translateX(22px);
+            opacity: 0.12;
+          }
+        }
+        @keyframes sailSwing {
+          0%,
+          100% {
+            transform: translateX(-50%) rotate(-5deg);
+          }
+          50% {
+            transform: translateX(-50%) rotate(5deg);
+          }
+        }
+        @keyframes emberPulse {
+          0%,
+          100% {
+            opacity: 0.45;
+            transform: scale(0.95);
+          }
+          50% {
+            opacity: 0.7;
+            transform: scale(1.05);
+          }
+        }
+        @keyframes sparkFloat {
+          0% {
+            transform: translateY(8px);
+            opacity: 0.2;
+          }
+          50% {
+            opacity: 0.35;
+          }
+          100% {
+            transform: translateY(-10px);
+            opacity: 0.15;
+          }
+        }
+        @keyframes moonGlow {
+          0%,
+          100% {
+            opacity: 0.35;
+          }
+          50% {
+            opacity: 0.65;
+          }
+        }
+        @keyframes alienCloudA {
+          from {
+            transform: translateX(-6px) translateY(0px);
+          }
+          to {
+            transform: translateX(8px) translateY(-6px);
+          }
+        }
+        @keyframes alienCloudB {
+          from {
+            transform: translateX(6px) translateY(3px);
+          }
+          to {
+            transform: translateX(-8px) translateY(-5px);
+          }
+        }
+        @keyframes blindsFlicker {
+          0%,
+          100% {
+            opacity: 0.18;
+          }
+          48% {
+            opacity: 0.28;
+          }
+          52% {
+            opacity: 0.12;
+          }
+        }
+        @keyframes scanPass {
+          0% {
+            transform: translateX(-30px);
+            opacity: 0;
+          }
+          20% {
+            opacity: 0.25;
+          }
+          80% {
+            opacity: 0.25;
+          }
+          100% {
+            transform: translateX(320px);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }
+
