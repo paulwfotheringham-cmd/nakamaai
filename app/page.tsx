@@ -61,8 +61,9 @@ function SceneAtmosphere({
   if (title === "MOOR") {
     return (
       <div className={`pointer-events-none absolute inset-0 ${baseOpacity}`}>
-        <div className="fog-layer-1 absolute -inset-x-8 bottom-0 h-24 rounded-full bg-stone-200/10 blur-2xl" />
-        <div className="fog-layer-2 absolute -inset-x-12 bottom-6 h-20 rounded-full bg-stone-300/10 blur-xl" />
+        <div className="fog-layer-1 absolute -inset-x-10 bottom-0 h-28 rounded-full bg-stone-200/20 blur-2xl" />
+        <div className="fog-layer-2 absolute -inset-x-14 bottom-6 h-24 rounded-full bg-stone-300/20 blur-xl" />
+        <div className="fog-layer-3 absolute -inset-x-8 bottom-10 h-16 rounded-full bg-slate-200/15 blur-lg" />
       </div>
     );
   }
@@ -70,8 +71,9 @@ function SceneAtmosphere({
   if (title === "PIRATE") {
     return (
       <div className={`pointer-events-none absolute inset-0 ${baseOpacity}`}>
-        <div className="storm-rain absolute inset-0 bg-[linear-gradient(115deg,transparent_0%,rgba(180,190,220,0.15)_40%,transparent_70%)]" />
-        <div className="sail-shadow absolute left-1/2 top-4 h-24 w-16 -translate-x-1/2 rounded-full bg-black/30 blur-md" />
+        <div className="storm-rain absolute inset-0 bg-[linear-gradient(115deg,transparent_0%,rgba(180,190,220,0.26)_40%,transparent_70%)]" />
+        <div className="sail-shadow absolute left-1/2 top-4 h-24 w-16 -translate-x-1/2 rounded-full bg-black/50 blur-md" />
+        <div className="sea-glow absolute inset-x-4 bottom-0 h-12 bg-cyan-300/20 blur-xl" />
       </div>
     );
   }
@@ -89,7 +91,7 @@ function SceneAtmosphere({
     return (
       <div className={`pointer-events-none absolute inset-0 ${baseOpacity}`}>
         <div className="moon-pulse absolute right-5 top-4 h-14 w-14 rounded-full bg-slate-200/25 blur-md" />
-        <div className="mist-drift absolute -inset-x-8 bottom-2 h-20 rounded-full bg-slate-300/10 blur-2xl" />
+        <div className="mist-drift absolute -inset-x-8 bottom-2 h-20 rounded-full bg-slate-300/20 blur-2xl" />
       </div>
     );
   }
@@ -109,6 +111,7 @@ function SceneAtmosphere({
       <div className={`pointer-events-none absolute inset-0 ${baseOpacity}`}>
         <div className="office-blinds absolute inset-0 bg-[repeating-linear-gradient(0deg,rgba(255,255,255,0.08)_0px,rgba(255,255,255,0.08)_2px,transparent_2px,transparent_10px)]" />
         <div className="office-scan absolute inset-y-0 left-0 w-10 bg-white/10 blur-md" />
+        <div className="office-light absolute right-8 top-4 h-16 w-24 rounded-full bg-yellow-100/25 blur-xl" />
       </div>
     );
   }
@@ -119,37 +122,46 @@ function SceneAtmosphere({
 /* Short CC0 / permissive samples for hover previews (replace with your own clips in /public when ready). */
 const browseServices = [
   {
-    title: "Guided story design",
-    tag: "Design",
-    poster: "/scenes/moor.jpg",
+    title: "AUDIOBOOKS",
+    description: "Lose yourself in curated fantasy scenes",
+    poster: "/tiles/tile1.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "Voice customization",
-    tag: "Voices",
-    poster: "/scenes/pirate.jpg",
+    title: "BUILD ADVENTURE",
+    description: "Create your own fantasy with tone and heat on your terms",
+    poster: "/tiles/tile2.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "Private audio scenes",
-    tag: "Scenes",
-    poster: "/scenes/rome.jpg",
+    title: "INTERACTIVE ADVENTURES",
+    description: "Control your fantasy as it plays in real time",
+    poster: "/tiles/tile3.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "Fast iteration",
-    tag: "Iterate",
-    poster: "/scenes/werewolf.jpg",
+    title: "FORBIDDEN CHAT DESIRES",
+    description:
+      "Real time, voice to voice or messaging. Uncensored ability to choose or make your own.",
+    poster: "/tiles/tile4.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "Couples play",
-    tag: "Couples",
-    poster: "/scenes/office.jpg",
+    title: "REINGITE FOR COUPLES",
+    description: "Date Night Mode. Surprise Mode. The Reconnection Series.",
+    poster: "/tiles/tile5.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "CHARACTER & VOICES",
+    description:
+      "Create your character that will always be with you. In the voice you most desire",
+    poster: "/tiles/tile6.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
@@ -157,12 +169,12 @@ const browseServices = [
 
 function ServiceHoverVideoCard({
   title,
-  tag,
+  description,
   poster,
   videoSrc,
 }: {
   title: string;
-  tag: string;
+  description: string;
   poster: string;
   videoSrc: string;
 }) {
@@ -201,12 +213,12 @@ function ServiceHoverVideoCard({
         preload="metadata"
       />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent px-3 pb-3 pt-16">
-        <p className="text-[10px] font-medium uppercase tracking-wider text-stone-400">
-          {tag}
-        </p>
-        <h3 className="mt-0.5 text-sm font-semibold leading-snug text-amber-100/95 sm:text-[15px]">
+        <h3 className="mt-0.5 whitespace-nowrap text-[10px] font-semibold leading-snug tracking-wide text-amber-100/95 sm:text-[11px]">
           {title}
         </h3>
+        <p className="mt-1 text-[11px] leading-snug text-stone-200/90">
+          {description}
+        </p>
       </div>
     </div>
   );
@@ -305,105 +317,139 @@ export default function Page() {
 
           <a
             href="#signup"
-            className="rounded-full border border-stone-600 px-4 py-2 text-xs uppercase tracking-wide text-stone-300 transition hover:border-stone-500 hover:text-white"
+            className="rounded-full border border-amber-200 bg-white px-6 py-2.5 text-sm font-semibold uppercase tracking-wide text-amber-500 transition hover:bg-amber-50"
           >
             Begin your journey
           </a>
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-6 py-12">
+      <div className="mx-auto max-w-7xl px-6 py-10">
         {/* HERO */}
-        <section className="grid gap-12 lg:grid-cols-2">
+        <section className="grid gap-8 lg:grid-cols-2">
 
           {/* LEFT SIDE */}
-          <div>
+          <div className="space-y-6">
+            <div className="rounded-2xl border border-stone-800 bg-zinc-950/80 p-6">
+              <p className="mb-3 font-serif text-3xl font-bold tracking-wide text-amber-300">
+                Nakama Nights
+              </p>
+              <h1 className="font-serif text-5xl leading-[1.06] text-white sm:text-6xl">
+                Your Fantasy.<br />
+                Your Rules.<br />
+                <span className="text-amber-200">Your Pleasure.</span>
+              </h1>
+              <p className="mt-5 text-xs uppercase tracking-widest text-stone-300">
+                Built exclusively for women.
+              </p>
+            </div>
 
-            <p className="mb-3 font-serif text-xl font-bold tracking-wide text-amber-300 sm:text-2xl">
-              Nakama Nights
-            </p>
-            <h1 className="font-serif text-4xl leading-tight text-white">
-              Your Fantasy.<br />
-              Your Rules.<br />
-              <span className="text-amber-200">Your Pleasure.</span>
-            </h1>
+            <div id="browse-services" className="scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-6">
+              <h2 className="font-serif text-2xl leading-tight text-white sm:text-3xl">
+                Browse services
+              </h2>
+              <p className="mt-3 text-base text-stone-500">
+                Hover a tile for a quick video preview.
+              </p>
+              <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-3">
+                {browseServices.map((s) => (
+                  <ServiceHoverVideoCard key={s.title} {...s} />
+                ))}
+              </div>
+            </div>
+          </div>
 
-            <p className="mt-4 text-xs uppercase tracking-widest text-stone-500">
-              Built exclusively for women. No judgment. Immersive audio for you.
-            </p>
-            <button
-              type="button"
-              onClick={() => setAmbientEnabled((prev) => !prev)}
-              className="mt-4 inline-flex items-center rounded-full border border-stone-700 px-3 py-1.5 text-[11px] uppercase tracking-wider text-stone-300 transition hover:border-stone-500 hover:text-stone-100"
-            >
-              Ambient {ambientEnabled ? "On" : "Off"}
-            </button>
+          <div className="space-y-6">
+            <div className="relative overflow-hidden rounded-2xl border border-fuchsia-400/30 bg-[radial-gradient(circle_at_20%_10%,rgba(245,158,11,0.18),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(217,70,239,0.18),transparent_35%),linear-gradient(180deg,rgba(30,10,40,0.75)_0%,rgba(9,10,17,0.95)_70%)] p-6 shadow-[0_0_55px_rgba(217,70,239,0.15)]">
+              <div className="pointer-events-none absolute -left-12 top-8 h-24 w-24 rounded-full bg-amber-300/20 blur-2xl" />
+              <div className="pointer-events-none absolute -right-10 bottom-6 h-28 w-28 rounded-full bg-fuchsia-400/20 blur-2xl" />
+              <p className="relative text-[11px] font-semibold uppercase tracking-[0.3em] text-fuchsia-200">
+                Premium Adult Audio Experience
+              </p>
+              <p className="relative mt-3 text-[11px] leading-relaxed text-amber-100">
+                The world's first premium adult immersive audio adventure platform.
+              </p>
+              <div className="relative mt-4 space-y-2 text-[12px] leading-relaxed text-stone-100">
+                <p>Nakama is not just an audiobook. It is not another generic content application.</p>
+                <p>Whatever your fantasy - Nakama takes you there - and you decide where it takes you.</p>
+                <p>For the first time ever, you are not just a listener. You are the author, the character, and the experience.</p>
+                <p>Your privacy and security are guaranteed by Nakama.</p>
+                <p className="font-semibold text-amber-200">Nakama is exclusive. Nakama is premium. Nakama is yours.</p>
+              </div>
+              <a
+                href="#signup"
+                className="relative mt-5 inline-flex rounded-full border border-fuchsia-300/60 bg-gradient-to-r from-amber-200 to-fuchsia-200 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-black transition hover:brightness-110"
+              >
+                JOIN NAKAMA NOW
+              </a>
+            </div>
 
-            {/* Carousel — taller cards so captions are not clipped */}
-            <p className="mt-6 text-xs font-bold uppercase tracking-[0.24em] text-amber-300">
-              Top Fantasies
-            </p>
-            <div
-              className="relative mt-10 min-h-[500px] w-full overflow-x-hidden overflow-y-visible pb-2 sm:min-h-[520px]"
-              onMouseMove={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                setMouse({
-                  x: (e.clientX - rect.left) / rect.width - 0.5,
-                  y: (e.clientY - rect.top) / rect.height - 0.5,
-                });
-              }}
-            >
-              <div className="absolute inset-0 flex items-center justify-center">
+            <div className="mt-16 border-t border-red-500/70 pt-6 lg:mt-[9.2rem]">
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-amber-300">
+                Top Fantasies
+              </p>
+              <div
+                className="relative mt-10 min-h-[430px] w-full overflow-x-hidden overflow-y-visible pb-2 sm:min-h-[460px]"
+                onMouseMove={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setMouse({
+                    x: (e.clientX - rect.left) / rect.width - 0.5,
+                    y: (e.clientY - rect.top) / rect.height - 0.5,
+                  });
+                }}
+              >
+                <div className="absolute inset-0 flex items-center justify-center">
 
-                {fantasyScenes.map((scene, index) => {
-                  const offset = index - activeScene;
-                  const isActive = index === activeScene;
+                  {fantasyScenes.map((scene, index) => {
+                    const offset = index - activeScene;
+                    const isActive = index === activeScene;
 
-                  return (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        setActiveScene(index);
-                        playAmbienceForTitle(scene.title);
-                      }}
-                      onMouseEnter={() => playAmbienceForTitle(scene.title)}
-                      className="absolute cursor-pointer transition-all duration-500 ease-out"
-                      style={{
-                        transform: `
-                        translateX(${offset * 155}px)
-                        scale(${isActive ? 1 : 0.85})
-                        ${isActive ? `translate(${mouse.x * 12}px, ${mouse.y * 8}px)` : ""}
-                      `,
-                        zIndex: 10 - Math.abs(offset),
-                        opacity: isActive ? 1 : 0.25,
-                      }}
-                    >
-                      <div className="relative flex w-[300px] flex-col rounded-xl border border-stone-700 bg-zinc-950 shadow-xl sm:w-[340px]">
+                    return (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          setActiveScene(index);
+                          playAmbienceForTitle(scene.title);
+                        }}
+                        onMouseEnter={() => playAmbienceForTitle(scene.title)}
+                        className="absolute cursor-pointer transition-all duration-500 ease-out"
+                        style={{
+                          transform: `
+                          translateX(${offset * 150}px)
+                          scale(${isActive ? 1 : 0.83})
+                          ${isActive ? `translate(${mouse.x * 20}px, ${mouse.y * 12}px)` : ""}
+                        `,
+                          zIndex: 10 - Math.abs(offset),
+                          opacity: isActive ? 1 : 0.22,
+                        }}
+                      >
+                        <div className="relative flex w-[300px] flex-col rounded-xl border border-stone-700 bg-zinc-950 shadow-xl sm:w-[340px]">
 
-                        <div className="relative h-[220px] shrink-0 overflow-hidden rounded-t-xl sm:h-[240px]">
-                          <img
-                            src={scene.image}
-                            alt=""
-                            className="absolute inset-0 h-full w-full object-cover"
-                          />
-                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
-                          <SceneAtmosphere title={scene.title} isActive={isActive} />
+                          <div className="relative h-[220px] shrink-0 overflow-hidden rounded-t-xl sm:h-[240px]">
+                            <img
+                              src={scene.image}
+                              alt=""
+                              className="absolute inset-0 h-full w-full object-cover"
+                            />
+                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+                            <SceneAtmosphere title={scene.title} isActive={isActive} />
+                          </div>
+
+                          <div className="relative z-10 shrink-0 rounded-b-xl border-t border-stone-800/90 bg-zinc-950 px-4 py-4">
+                            <p className="break-words text-pretty text-left font-serif text-[14px] italic leading-relaxed tracking-[0.03em] text-stone-400 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
+                              {scene.subtitle}
+                            </p>
+                            <h3 className="mt-2 text-left font-serif text-base leading-tight tracking-wide text-amber-200 sm:text-lg">
+                              {scene.title}
+                            </h3>
+                          </div>
+
                         </div>
-
-                        <div className="relative z-10 shrink-0 rounded-b-xl border-t border-stone-800/90 bg-zinc-950 px-4 py-4">
-                          <p className="break-words text-pretty text-left font-serif text-[15px] italic leading-relaxed tracking-[0.03em] text-stone-400 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
-                            {scene.subtitle}
-                          </p>
-                          <h3 className="mt-2 text-left font-serif text-xl leading-tight text-amber-200 sm:text-2xl">
-                            {scene.title}
-                          </h3>
-                        </div>
-
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
 
+                </div>
               </div>
             </div>
             <div className="sr-only">
@@ -417,46 +463,6 @@ export default function Page() {
                   preload="none"
                 />
               ))}
-            </div>
-
-            {/* CTA */}
-            <div className="mt-10 flex flex-wrap gap-4">
-              <a
-                href="#signup"
-                className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-stone-200"
-              >
-                Start free trial
-              </a>
-              <a
-                href="#browse-services"
-                className="rounded-full border border-stone-600 px-6 py-3 text-sm text-stone-300 transition hover:border-stone-500 hover:text-white"
-              >
-                Explore services
-              </a>
-            </div>
-
-            {/* Browse services — 5 columns, hover video */}
-            <div id="browse-services" className="mt-14 scroll-mt-28">
-              <h2 className="font-serif text-2xl text-white sm:text-3xl">
-                Browse services
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm text-stone-500">
-                Hover a tile for a quick video preview.
-              </p>
-
-              <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-                {browseServices.map((s) => (
-                  <ServiceHoverVideoCard key={s.title} {...s} />
-                ))}
-              </div>
-            </div>
-
-            {/* FEATURES */}
-            <div className="mt-14 grid grid-cols-2 gap-4 text-sm text-stone-400">
-              <p>Lose yourself in curated steamy audio scenes.</p>
-              <p>Create your own story — characters, tone, and heat level.</p>
-              <p>Control your adventure in real time.</p>
-              <p>Uncensored AI conversation. Voice or text.</p>
             </div>
 
           </div>
@@ -522,26 +528,32 @@ export default function Page() {
           animation: fogDriftA 8s ease-in-out infinite alternate;
         }
         .fog-layer-2 {
-          animation: fogDriftB 10s ease-in-out infinite alternate;
+          animation: fogDriftB 6.5s ease-in-out infinite alternate;
+        }
+        .fog-layer-3 {
+          animation: fogDriftC 4.8s ease-in-out infinite alternate;
         }
         .storm-rain {
-          animation: rainSweep 1.8s linear infinite;
+          animation: rainSweep 1.1s linear infinite;
         }
         .sail-shadow {
           transform-origin: top center;
-          animation: sailSwing 3.2s ease-in-out infinite;
+          animation: sailSwing 1.8s ease-in-out infinite;
+        }
+        .sea-glow {
+          animation: seaPulse 2s ease-in-out infinite;
         }
         .candle-glow {
-          animation: emberPulse 2.2s ease-in-out infinite;
+          animation: emberPulse 1.6s ease-in-out infinite;
         }
         .spark-drift {
-          animation: sparkFloat 6s linear infinite;
+          animation: sparkFloat 3.8s linear infinite;
         }
         .moon-pulse {
           animation: moonGlow 2.8s ease-in-out infinite;
         }
         .mist-drift {
-          animation: fogDriftA 9s ease-in-out infinite alternate;
+          animation: mistRoll 4.2s ease-in-out infinite alternate;
         }
         .alien-cloud-1 {
           animation: alienCloudA 7s ease-in-out infinite alternate;
@@ -556,7 +568,10 @@ export default function Page() {
           animation: blindsFlicker 5s ease-in-out infinite;
         }
         .office-scan {
-          animation: scanPass 4.6s ease-in-out infinite;
+          animation: scanPass 2.8s ease-in-out infinite;
+        }
+        .office-light {
+          animation: officeFlicker 1.25s ease-in-out infinite;
         }
 
         @keyframes fogDriftA {
@@ -569,40 +584,52 @@ export default function Page() {
         }
         @keyframes fogDriftB {
           from {
-            transform: translateX(10px);
+            transform: translateX(14px);
           }
           to {
-            transform: translateX(-6px);
+            transform: translateX(-12px);
+          }
+        }
+        @keyframes fogDriftC {
+          from {
+            transform: translateX(-18px) translateY(2px);
+          }
+          to {
+            transform: translateX(16px) translateY(-4px);
           }
         }
         @keyframes rainSweep {
           from {
-            transform: translateX(-22px);
-            opacity: 0.35;
+            transform: translateX(-28px);
+            opacity: 0.42;
           }
           to {
-            transform: translateX(22px);
-            opacity: 0.12;
+            transform: translateX(28px);
+            opacity: 0.2;
           }
         }
         @keyframes sailSwing {
           0%,
           100% {
-            transform: translateX(-50%) rotate(-5deg);
+            transform: translateX(-50%) rotate(-11deg);
           }
           50% {
-            transform: translateX(-50%) rotate(5deg);
+            transform: translateX(-50%) rotate(10deg);
           }
+        }
+        @keyframes seaPulse {
+          0%, 100% { opacity: 0.2; transform: scaleX(0.95); }
+          50% { opacity: 0.35; transform: scaleX(1.08); }
         }
         @keyframes emberPulse {
           0%,
           100% {
-            opacity: 0.45;
-            transform: scale(0.95);
+            opacity: 0.38;
+            transform: scale(0.92);
           }
           50% {
-            opacity: 0.7;
-            transform: scale(1.05);
+            opacity: 0.82;
+            transform: scale(1.1);
           }
         }
         @keyframes sparkFloat {
@@ -629,10 +656,10 @@ export default function Page() {
         }
         @keyframes alienCloudA {
           from {
-            transform: translateX(-6px) translateY(0px);
+            transform: translateX(-10px) translateY(0px);
           }
           to {
-            transform: translateX(8px) translateY(-6px);
+            transform: translateX(14px) translateY(-7px);
           }
         }
         @keyframes alienCloudB {
@@ -670,6 +697,17 @@ export default function Page() {
             transform: translateX(320px);
             opacity: 0;
           }
+        }
+        @keyframes mistRoll {
+          from { transform: translateX(-20px) translateY(0px); opacity: 0.2; }
+          to { transform: translateX(20px) translateY(-6px); opacity: 0.36; }
+        }
+        @keyframes officeFlicker {
+          0%, 100% { opacity: 0.14; }
+          20% { opacity: 0.35; }
+          45% { opacity: 0.08; }
+          65% { opacity: 0.28; }
+          82% { opacity: 0.16; }
         }
       `}</style>
     </div>
