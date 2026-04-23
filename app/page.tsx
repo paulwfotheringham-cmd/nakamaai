@@ -219,10 +219,7 @@ export default function Page() {
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
   const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [memberEmail, setMemberEmail] = useState("");
-  const [memberPassword, setMemberPassword] = useState("");
   const [ambientEnabled, setAmbientEnabled] = useState(false);
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
 
@@ -267,11 +264,6 @@ export default function Page() {
     const params = new URLSearchParams();
     if (email) params.set("email", email);
     router.push(`/select-plan?${params.toString()}`);
-  }
-
-  function handleMemberEnter(e: React.FormEvent) {
-    e.preventDefault();
-    router.push("/login");
   }
 
   return (
@@ -327,6 +319,9 @@ export default function Page() {
           {/* LEFT SIDE */}
           <div>
 
+            <p className="mb-3 font-serif text-xl font-bold tracking-wide text-amber-300 sm:text-2xl">
+              Nakama Nights
+            </p>
             <h1 className="font-serif text-4xl leading-tight text-white">
               Your Fantasy.<br />
               Your Rules.<br />
@@ -477,89 +472,41 @@ export default function Page() {
               10 days free trial
             </p>
 
-            <div className="mt-8 border-b border-stone-800 pb-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
-                Sign up
-              </p>
-              <p className="mt-2 text-sm text-stone-400">
-                Create your account, then pick a plan.
-              </p>
+            <p className="mt-2 text-sm text-stone-400">
+              Join Nakama Nights now
+            </p>
 
-              <form onSubmit={handleCreateAccount} className="mt-5 space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <input
-                    placeholder="First name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2 text-white placeholder:text-stone-600"
-                  />
-                  <input
-                    placeholder="Last name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2 text-white placeholder:text-stone-600"
-                  />
-                </div>
+            <form onSubmit={handleCreateAccount} className="mt-6 space-y-3">
+              <input
+                placeholder="Your name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
+              />
 
-                <input
-                  placeholder="Email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2 text-white placeholder:text-stone-600"
-                />
+              <input
+                placeholder="Your email address"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
+              />
 
-                <button
-                  type="submit"
-                  className="w-full rounded-full bg-white py-3 text-sm font-semibold text-black transition hover:bg-stone-200"
-                >
-                  Create account & choose plan
-                </button>
-              </form>
-            </div>
+              <button
+                type="submit"
+                className="w-full rounded-full bg-white py-3 text-sm font-semibold text-black transition hover:bg-stone-200"
+              >
+                Create account
+              </button>
+            </form>
 
-            <div className="mt-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
-                Sign in
-              </p>
-              <p className="mt-2 text-sm text-stone-400">
-                Already a member? Sign in with email and password.
-              </p>
-
-              <form onSubmit={handleMemberEnter} className="mt-5 space-y-3">
-                <input
-                  placeholder="Email"
-                  type="email"
-                  autoComplete="email"
-                  value={memberEmail}
-                  onChange={(e) => setMemberEmail(e.target.value)}
-                  className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2 text-white placeholder:text-stone-600"
-                />
-                <input
-                  placeholder="Password"
-                  type="password"
-                  autoComplete="current-password"
-                  value={memberPassword}
-                  onChange={(e) => setMemberPassword(e.target.value)}
-                  className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2 text-white placeholder:text-stone-600"
-                />
-
-                <div className="flex items-center justify-between gap-3">
-                  <Link
-                    href="/login"
-                    className="text-xs text-stone-500 underline-offset-4 transition hover:text-stone-300 hover:underline"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full rounded-full border border-stone-600 py-2.5 text-sm text-stone-200 transition hover:border-stone-500 hover:bg-white/5"
-                >
-                  Enter
-                </button>
-              </form>
+            <div className="mt-6 border-t border-stone-800 pt-5">
+              <Link
+                href="/login"
+                className="text-sm font-medium text-amber-300 underline-offset-4 transition hover:text-amber-200 hover:underline"
+              >
+                Existing members - click here to login
+              </Link>
             </div>
 
           </div>
