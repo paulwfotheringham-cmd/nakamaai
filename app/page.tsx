@@ -9,33 +9,117 @@ import { useEffect, useRef, useState } from "react";
 const fantasyScenes = [
   {
     title: "GOTHIC",
+    displayTitle: "CHANGE TITLE 1",
     subtitle: "A windswept moor with a brooding stranger",
     image: "/scenes/moor.jpg",
   },
   {
     title: "PIRATE",
+    displayTitle: "CHANGE TITLE 2",
     subtitle: "A pirate ship on the high seas",
     image: "/scenes/pirate.jpg",
   },
   {
     title: "ROME",
+    displayTitle: "CHANGE TITLE 3",
     subtitle: "A secret love in ancient Rome",
     image: "/scenes/rome.jpg",
   },
   {
     title: "WEREWOLF",
+    displayTitle: "CHANGE TITLE 4",
     subtitle: "A werewolf who only comes out at night",
     image: "/scenes/werewolf.jpg",
   },
   {
     title: "ALIEN",
+    displayTitle: "CHANGE TITLE 5",
     subtitle: "An alien encounter on a distant world",
     image: "/scenes/alien.jpg",
   },
   {
     title: "OFFICE",
+    displayTitle: "CHANGE TITLE 6",
     subtitle: "A dangerous attraction in the office",
     image: "/scenes/office.jpg",
+  },
+  {
+    title: "NEW_TILE_1",
+    displayTitle: "NEW TILE 1",
+    subtitle: "For all new tiles.",
+    image: "/scenes/moor.jpg",
+  },
+  {
+    title: "NEW_TILE_2",
+    displayTitle: "NEW TILE 2",
+    subtitle: "For all new tiles.",
+    image: "/scenes/pirate.jpg",
+  },
+  {
+    title: "NEW_TILE_3",
+    displayTitle: "NEW TILE 3",
+    subtitle: "For all new tiles.",
+    image: "/scenes/rome.jpg",
+  },
+  {
+    title: "NEW_TILE_4",
+    displayTitle: "NEW TILE 4",
+    subtitle: "For all new tiles.",
+    image: "/scenes/werewolf.jpg",
+  },
+  {
+    title: "NEW_TILE_5",
+    displayTitle: "NEW TILE 5",
+    subtitle: "For all new tiles.",
+    image: "/scenes/alien.jpg",
+  },
+  {
+    title: "NEW_TILE_6",
+    displayTitle: "NEW TILE 6",
+    subtitle: "For all new tiles.",
+    image: "/scenes/office.jpg",
+  },
+  {
+    title: "NEW_TILE_7",
+    displayTitle: "NEW TILE 7",
+    subtitle: "For all new tiles.",
+    image: "/scenes/moor.jpg",
+  },
+  {
+    title: "NEW_TILE_8",
+    displayTitle: "NEW TILE 8",
+    subtitle: "For all new tiles.",
+    image: "/scenes/pirate.jpg",
+  },
+  {
+    title: "NEW_TILE_9",
+    displayTitle: "NEW TILE 9",
+    subtitle: "For all new tiles.",
+    image: "/scenes/rome.jpg",
+  },
+  {
+    title: "NEW_TILE_10",
+    displayTitle: "NEW TILE 10",
+    subtitle: "For all new tiles.",
+    image: "/scenes/werewolf.jpg",
+  },
+  {
+    title: "NEW_TILE_11",
+    displayTitle: "NEW TILE 11",
+    subtitle: "For all new tiles.",
+    image: "/scenes/alien.jpg",
+  },
+  {
+    title: "NEW_TILE_12",
+    displayTitle: "NEW TILE 12",
+    subtitle: "For all new tiles.",
+    image: "/scenes/office.jpg",
+  },
+  {
+    title: "NEW_TILE_13",
+    displayTitle: "NEW TILE 13",
+    subtitle: "For all new tiles.",
+    image: "/scenes/moor.jpg",
   },
 ];
 
@@ -122,28 +206,28 @@ function SceneAtmosphere({
 /* Short CC0 / permissive samples for hover previews (replace with your own clips in /public when ready). */
 const browseServices = [
   {
-    title: "CHANGE TITLE 1",
+    title: "AUDIOBOOKS",
     description: "Lose yourself in curated fantasy scenes",
     poster: "/tiles/tile1.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "CHANGE TITLE 2",
+    title: "BUILD ADVENTURE",
     description: "Create your own fantasy with tone and heat on your terms",
     poster: "/tiles/tile2.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "CHANGE TITLE 3",
+    title: "INTERACTIVE ADVENTURES",
     description: "Control your fantasy as it plays in real time",
     poster: "/tiles/tile3.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "CHANGE TITLE 4",
+    title: "FORBIDDEN CHAT DESIRES",
     description:
       "Real time, voice to voice or messaging.",
     poster: "/tiles/tile4.jpg",
@@ -151,108 +235,17 @@ const browseServices = [
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "CHANGE TITLE 5",
+    title: "REINGITE FOR COUPLES",
     description: "Date Night Mode. Surprise Mode. The Reconnection Series.",
     poster: "/tiles/tile5.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "CHANGE TITLE 6",
+    title: "CHARACTER & VOICES",
     description:
       "Create your character that will always be with you. In the voice you most desire",
     poster: "/tiles/tile6.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "NEW TILE 1",
-    description: "For all new tiles.",
-    poster: "/tiles/tile1.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "NEW TILE 2",
-    description: "For all new tiles.",
-    poster: "/tiles/tile2.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "NEW TILE 3",
-    description: "For all new tiles.",
-    poster: "/tiles/tile3.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "NEW TILE 4",
-    description: "For all new tiles.",
-    poster: "/tiles/tile4.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "NEW TILE 5",
-    description: "For all new tiles.",
-    poster: "/tiles/tile5.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "NEW TILE 6",
-    description: "For all new tiles.",
-    poster: "/tiles/tile6.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "NEW TILE 7",
-    description: "For all new tiles.",
-    poster: "/tiles/tile1.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "NEW TILE 8",
-    description: "For all new tiles.",
-    poster: "/tiles/tile2.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "NEW TILE 9",
-    description: "For all new tiles.",
-    poster: "/tiles/tile3.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "NEW TILE 10",
-    description: "For all new tiles.",
-    poster: "/tiles/tile4.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "NEW TILE 11",
-    description: "For all new tiles.",
-    poster: "/tiles/tile5.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "NEW TILE 12",
-    description: "For all new tiles.",
-    poster: "/tiles/tile6.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "NEW TILE 13",
-    description: "For all new tiles.",
-    poster: "/tiles/tile1.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
@@ -497,7 +490,7 @@ export default function Page() {
                           {scene.subtitle}
                         </p>
                         <h3 className="mt-2 text-left font-serif text-base leading-tight tracking-wide text-amber-200 sm:text-lg">
-                          {scene.title}
+                          {scene.displayTitle ?? scene.title}
                         </h3>
                       </div>
                     </div>
