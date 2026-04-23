@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-type PlanKey = "tease" | "protagonist";
+type PlanKey = "tease" | "protagonist" | "nights" | "teaser";
 
 const planConfig: Record<
   PlanKey,
-  { name: string; price: string; description: string }
+  { name: string; price: string; description: string; trial?: boolean }
 > = {
   tease: {
     name: "The Tease",
@@ -19,6 +19,18 @@ const planConfig: Record<
     name: "The Protagonist",
     price: "$14.99 / month",
     description: "Our most popular tier. Dive deep into your fantasies.",
+  },
+  nights: {
+    name: "Nakama Nights",
+    price: "$14.99 / month",
+    description: "Dive deep into your fantasies.",
+  },
+  teaser: {
+    name: "The Teaser",
+    price: "Free for 10 days",
+    description:
+      "10-day free trial — full platform access. No charge today; cancel anytime before day 10.",
+    trial: true,
   },
 };
 
@@ -37,7 +49,12 @@ export default function FakeCheckoutPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const value = params.get("plan");
-    if (value === "tease" || value === "protagonist") {
+    if (
+      value === "tease" ||
+      value === "protagonist" ||
+      value === "nights" ||
+      value === "teaser"
+    ) {
       setPlan(value);
     }
   }, []);
@@ -67,11 +84,14 @@ export default function FakeCheckoutPage() {
         <div className="mb-10">
           <p className="text-sm font-medium text-zinc-400">Dev checkout</p>
           <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">
-            Complete your subscription
+            {selectedPlan.trial
+              ? "Start your free trial"
+              : "Complete your subscription"}
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-300">
-            This is a fake billing page for development and testing only. No
-            real payment will be taken.
+            {selectedPlan.trial
+              ? "Fake checkout for the 10-day teaser plan. No real payment will be taken; use any test card details."
+              : "This is a fake billing page for development and testing only. No real payment will be taken."}
           </p>
         </div>
 
@@ -132,7 +152,11 @@ export default function FakeCheckoutPage() {
                   disabled={submitting}
                   className="rounded-2xl bg-[#d2b56f] px-5 py-4 text-center text-base font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {submitting ? "Processing..." : "Complete signup"}
+                  {submitting
+                    ? "Processing..."
+                    : selectedPlan.trial
+                      ? "Start free trial"
+                      : "Complete signup"}
                 </button>
               </div>
             </form>
@@ -148,8 +172,10 @@ export default function FakeCheckoutPage() {
               <p className="mt-3 text-zinc-300">{selectedPlan.description}</p>
 
               <div className="mt-8 flex items-end justify-between border-b border-white/10 pb-6">
-                <span className="text-zinc-400">Subscription</span>
-                <span className="text-3xl font-semibold">
+                <span className="text-zinc-400">
+                  {selectedPlan.trial ? "Trial" : "Subscription"}
+                </span>
+                <span className="text-right text-2xl font-semibold sm:text-3xl">
                   {selectedPlan.price}
                 </span>
               </div>
