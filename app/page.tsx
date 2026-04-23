@@ -1,393 +1,184 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+/* ---------------- SCENES ---------------- */
+
+const fantasyScenes = [
+  { title: "MOOR", subtitle: "A windswept moor", image: "/scenes/moor.jpg" },
+  { title: "PIRATE", subtitle: "A pirate ship", image: "/scenes/pirate.jpg" },
+  { title: "ROME", subtitle: "A secret love", image: "/scenes/rome.jpg" },
+  { title: "WEREWOLF", subtitle: "A creature of night", image: "/scenes/werewolf.jpg" },
+  { title: "ALIEN", subtitle: "A distant world", image: "/scenes/alien.jpg" },
+  { title: "OFFICE", subtitle: "A dangerous attraction", image: "/scenes/office.jpg" },
+];
 
 export default function Page() {
   const router = useRouter();
 
-  const [name, setName] = useState("");
+  const [activeScene, setActiveScene] = useState(2);
+  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [memberEmail, setMemberEmail] = useState("");
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleCreateAccount(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-
-    router.push(
-      `/set-password?email=${encodeURIComponent(
-        email
-      )}&name=${encodeURIComponent(name)}`
-    );
+    const params = new URLSearchParams();
+    if (email) params.set("email", email);
+    router.push(`/select-plan?${params.toString()}`);
   }
 
   return (
-    <main
-      style={{
-        position: "relative",
-        minHeight: "100vh",
-        overflow: "hidden",
-        background: "#07040d",
-        color: "white",
-      }}
-    >
-      {/* LOGO (top-right corner) */}
-      <img
-        src="/Nakama-AI-July25-White.png"
-        alt="Nakama logo"
-        style={{
-          position: "absolute",
-          top: "24px",
-          right: "32px",
-          height: "84px",
-          zIndex: 20,
-        }}
-      />
+    <div className="min-h-screen bg-black text-stone-200">
 
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "radial-gradient(circle at top center, rgba(120, 52, 120, 0.22), transparent 45%)",
-          pointerEvents: "none",
-        }}
-      />
+      {/* HEADER */}
+      <header className="border-b border-stone-800 bg-black/90">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <img src="/Nakama-AI-July25-White.png" className="h-8" />
+          <a className="rounded-full border border-stone-600 px-4 py-2 text-xs uppercase text-stone-300">
+            Begin your journey
+          </a>
+        </div>
+      </header>
 
-      <div
-        style={{
-          position: "relative",
-          zIndex: 10,
-          maxWidth: "1280px",
-          margin: "0 auto",
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "96px",
-          padding: "56px 32px",
-          flexWrap: "wrap",
-        }}
-      >
-        <section
-          style={{
-            flex: 1,
-            maxWidth: "700px",
-            minWidth: "320px",
-          }}
-        >
-          <p
-            style={{
-              margin: "0 0 24px 0",
-              fontSize: "13px",
-              letterSpacing: "0.42em",
-              textTransform: "uppercase",
-              color: "#c9a96a",
-            }}
-          >
-            Nakama
-          </p>
+      {/* HERO */}
+      <section className="mx-auto max-w-7xl px-6 py-12 grid lg:grid-cols-2 gap-12">
 
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              marginBottom: "28px",
-              borderRadius: "999px",
-              border: "1px solid rgba(201,169,106,0.28)",
-              background: "rgba(64, 43, 33, 0.45)",
-              padding: "12px 20px",
-              fontSize: "14px",
-              color: "#e5c888",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
-            }}
-          >
-            Premium fantasy audio experiences
-          </div>
+        {/* LEFT SIDE */}
+        <div className="relative">
 
-          <h1
-            style={{
-              margin: 0,
-              fontSize: "clamp(64px, 7vw, 98px)",
-              lineHeight: 0.98,
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              color: "#f7f5f2",
-            }}
-          >
-            Ready to turn
-            <br />
-            up the heat?
+          <h1 className="font-serif text-4xl leading-tight text-white">
+            Your Fantasy.<br />
+            Your Rules.<br />
+            <span className="text-amber-200">Your Pleasure.</span>
           </h1>
 
-          <p
-            style={{
-              margin: "34px 0 0 0",
-              maxWidth: "720px",
-              fontSize: "22px",
-              lineHeight: 1.55,
-              color: "rgba(255,255,255,0.78)",
-            }}
-          >
-            Nakama Nights
-          </p>
-
-          <p
-            style={{
-              margin: "18px 0 0 0",
-              maxWidth: "720px",
-              fontSize: "22px",
-              lineHeight: 1.55,
-              color: "rgba(255,255,255,0.78)",
-            }}
-          >
-            Whisper your wildest fantasies.
-          </p>
-
-          <p
-            style={{
-              margin: "18px 0 0 0",
-              maxWidth: "720px",
-              fontSize: "20px",
-              lineHeight: 1.55,
-              color: "rgba(255,255,255,0.72)",
-            }}
-          >
-            Join Nakama today and transform your reading time into an
-            unforgettable auditory experience.
-          </p>
-
-          <p
-            style={{
-              margin: "28px 0 0 0",
-              maxWidth: "720px",
-              fontSize: "18px",
-              lineHeight: 1.6,
-              color: "rgba(255,255,255,0.62)",
-            }}
-          >
-            We&apos;re the only professional service dedicated exclusively to
-            bringing your romantic fantasies to life through sound. We convert
-            your favourite romantic books into breathtaking, sexy audio stories.
-          </p>
-
-          <p
-            style={{
-              margin: "20px 0 0 0",
-              fontSize: "16px",
-              fontWeight: 600,
-              letterSpacing: "0.08em",
-              color: "#d2b56f",
-            }}
-          >
-            100% private. 100% yours.
-          </p>
-
+          {/* 🔥 FIXED CAROUSEL */}
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-              gap: "18px",
-              marginTop: "42px",
-              maxWidth: "640px",
+            className="relative mt-10 h-[360px] w-full overflow-hidden"
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              setMouse({
+                x: (e.clientX - rect.left) / rect.width - 0.5,
+                y: (e.clientY - rect.top) / rect.height - 0.5,
+              });
             }}
           >
-            {[
-              {
-                title: "Guided story design",
-                text: "Pick the setting, tone, pacing, and story type.",
-              },
-              {
-                title: "Voice customization",
-                text: "Assign different voices to different characters.",
-              },
-              {
-                title: "Private audio scenes",
-                text: "Generate scenes made for listening, not just reading.",
-              },
-              {
-                title: "Fast iteration",
-                text: "Adjust one detail and instantly create a new version.",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                style={{
-                  borderRadius: "22px",
-                  border: "1px solid rgba(255,255,255,0.09)",
-                  background:
-                    "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.03))",
-                  padding: "22px 20px",
-                  boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
-                  backdropFilter: "blur(6px)",
-                }}
-              >
-                <h3
-                  style={{
-                    margin: "0 0 12px 0",
-                    fontSize: "17px",
-                    lineHeight: 1.2,
-                    fontWeight: 700,
-                    color: "#ffffff",
-                  }}
-                >
-                  {item.title}
-                </h3>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "15px",
-                    lineHeight: 1.6,
-                    color: "rgba(255,255,255,0.66)",
-                  }}
-                >
-                  {item.text}
-                </p>
-              </div>
-            ))}
+            <div className="relative h-full w-full flex items-center justify-center">
+
+              {fantasyScenes.map((scene, index) => {
+                const offset = index - activeScene;
+                const isActive = index === activeScene;
+
+                return (
+                  <div
+                    key={index}
+                    onClick={() => setActiveScene(index)}
+                    className="absolute transition-all duration-500 ease-out cursor-pointer"
+                    style={{
+                      transform: `
+                        translateX(${offset * 120}px)
+                        translateY(${Math.abs(offset) * 10}px)
+                        scale(${isActive ? 1 : 0.85})
+                        ${isActive ? `translate(${mouse.x * 10}px, ${mouse.y * 6}px)` : ""}
+                      `,
+                      zIndex: 10 - Math.abs(offset),
+                      opacity: isActive ? 1 : 0.3,
+                    }}
+                  >
+                    <div className="relative w-[220px] sm:w-[260px] overflow-hidden rounded-xl border border-stone-700 bg-black shadow-xl">
+
+                      <img
+                        src={scene.image}
+                        className="h-[300px] w-full object-cover"
+                      />
+
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+
+                      {/* subtle glow */}
+                      <div className="absolute inset-0 opacity-0 hover:opacity-100 transition bg-[radial-gradient(circle,rgba(255,200,150,0.15),transparent)]" />
+
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <p className="text-[10px] tracking-widest text-stone-400 uppercase">
+                          {scene.subtitle}
+                        </p>
+                        <h3 className="mt-1 text-lg font-serif text-amber-200">
+                          {scene.title}
+                        </h3>
+                      </div>
+
+                    </div>
+                  </div>
+                );
+              })}
+
+            </div>
           </div>
-        </section>
 
-        <aside
-          style={{
-            width: "100%",
-            maxWidth: "520px",
-            flex: "0 0 520px",
-          }}
-        >
-          <div
-            style={{
-              borderRadius: "34px",
-              border: "1px solid rgba(255,255,255,0.09)",
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.035))",
-              padding: "38px",
-              boxShadow: "0 22px 80px rgba(0,0,0,0.35)",
-              backdropFilter: "blur(12px)",
-            }}
-          >
-            <p
-              style={{
-                margin: "0 0 22px 0",
-                fontSize: "13px",
-                letterSpacing: "0.34em",
-                textTransform: "uppercase",
-                color: "#c9a96a",
-              }}
-            >
-              Get started
-            </p>
-
-            <h2
-              style={{
-                margin: "0 0 18px 0",
-                fontSize: "58px",
-                lineHeight: 0.98,
-                letterSpacing: "-0.035em",
-                fontWeight: 700,
-                color: "#f7f5f2",
-              }}
-            >
-              Join Nakama
-            </h2>
-
-            <p
-              style={{
-                margin: "0 0 28px 0",
-                fontSize: "19px",
-                lineHeight: 1.6,
-                color: "rgba(255,255,255,0.68)",
-              }}
-            >
-              Create your account and sign up for a subscription or a FREE 7 day
-              trial.
-            </p>
-
-            <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                style={{
-                  width: "100%",
-                  height: "58px",
-                  marginBottom: "14px",
-                  borderRadius: "18px",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  background: "rgba(255,255,255,0.04)",
-                  padding: "0 18px",
-                  color: "white",
-                  boxSizing: "border-box",
-                  fontSize: "16px",
-                  outline: "none",
-                }}
-              />
-
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                style={{
-                  width: "100%",
-                  height: "58px",
-                  marginBottom: "18px",
-                  borderRadius: "18px",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  background: "rgba(255,255,255,0.04)",
-                  padding: "0 18px",
-                  color: "white",
-                  boxSizing: "border-box",
-                  fontSize: "16px",
-                  outline: "none",
-                }}
-              />
-
-              <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  width: "100%",
-                  height: "60px",
-                  border: "none",
-                  borderRadius: "18px",
-                  background: "#d2b56f",
-                  color: "#111111",
-                  fontSize: "18px",
-                  fontWeight: 700,
-                  cursor: loading ? "default" : "pointer",
-                  opacity: loading ? 0.7 : 1,
-                }}
-              >
-                {loading ? "Continuing..." : "Create Account"}
-              </button>
-            </form>
-
-            <p
-              style={{
-                margin: "18px 0 0 0",
-                fontSize: "14px",
-                color: "rgba(255,255,255,0.62)",
-              }}
-            >
-              Already have an account?{" "}
-              <a
-                href="/login"
-                style={{
-                  color: "#d2b56f",
-                  textDecoration: "none",
-                  fontWeight: 600,
-                }}
-              >
-                Log in
-              </a>
-            </p>
+          {/* CTA */}
+          <div className="mt-10 flex gap-4">
+            <a className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black">
+              Start free trial
+            </a>
+            <a className="rounded-full border border-stone-600 px-6 py-3 text-sm text-stone-300">
+              Explore services
+            </a>
           </div>
-        </aside>
-      </div>
-    </main>
+
+        </div>
+
+        {/* RIGHT SIDE FORM (RESTORED PROPERLY) */}
+        <div className="rounded-2xl border border-stone-800 bg-zinc-950/80 p-8 shadow-xl">
+
+          <h2 className="font-serif text-3xl text-white">
+            Begin your fantasy
+          </h2>
+
+          <form onSubmit={handleCreateAccount} className="mt-6 space-y-3">
+            <input
+              placeholder="First name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2 text-white"
+            />
+            <input
+              placeholder="Last name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2 text-white"
+            />
+            <input
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2 text-white"
+            />
+
+            <button className="w-full rounded-full bg-white py-3 text-black">
+              Create account
+            </button>
+          </form>
+
+          <div className="mt-6 border-t border-stone-800 pt-4">
+            <input
+              placeholder="Email"
+              value={memberEmail}
+              onChange={(e) => setMemberEmail(e.target.value)}
+              className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2 text-white"
+            />
+            <button className="mt-2 w-full rounded-full border border-stone-600 py-2 text-stone-300">
+              Enter
+            </button>
+          </div>
+
+        </div>
+
+      </section>
+    </div>
   );
 }
