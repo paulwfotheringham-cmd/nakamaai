@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "check-xtts": "node scripts/check-xtts.mjs",
-    "restart-runpod-xtts": "node scripts/runpod-restart-xtts.mjs"
+    "restart-runpod-xtts": "node scripts/runpod-restart-xtts.mjs",
+    "supabase:auth-urls": "node scripts/update-supabase-auth-urls.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
