@@ -122,28 +122,28 @@ function SceneAtmosphere({
 /* Short CC0 / permissive samples for hover previews (replace with your own clips in /public when ready). */
 const browseServices = [
   {
-    title: "AUDIOBOOKS",
+    title: "CHANGE TITLE 1",
     description: "Lose yourself in curated fantasy scenes",
     poster: "/tiles/tile1.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "BUILD ADVENTURE",
+    title: "CHANGE TITLE 2",
     description: "Create your own fantasy with tone and heat on your terms",
     poster: "/tiles/tile2.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "INTERACTIVE ADVENTURES",
+    title: "CHANGE TITLE 3",
     description: "Control your fantasy as it plays in real time",
     poster: "/tiles/tile3.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "FORBIDDEN CHAT DESIRES",
+    title: "CHANGE TITLE 4",
     description:
       "Real time, voice to voice or messaging.",
     poster: "/tiles/tile4.jpg",
@@ -151,17 +151,108 @@ const browseServices = [
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "REINGITE FOR COUPLES",
+    title: "CHANGE TITLE 5",
     description: "Date Night Mode. Surprise Mode. The Reconnection Series.",
     poster: "/tiles/tile5.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
   {
-    title: "CHARACTER & VOICES",
+    title: "CHANGE TITLE 6",
     description:
       "Create your character that will always be with you. In the voice you most desire",
     poster: "/tiles/tile6.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "NEW TILE 1",
+    description: "For all new tiles.",
+    poster: "/tiles/tile1.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "NEW TILE 2",
+    description: "For all new tiles.",
+    poster: "/tiles/tile2.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "NEW TILE 3",
+    description: "For all new tiles.",
+    poster: "/tiles/tile3.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "NEW TILE 4",
+    description: "For all new tiles.",
+    poster: "/tiles/tile4.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "NEW TILE 5",
+    description: "For all new tiles.",
+    poster: "/tiles/tile5.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "NEW TILE 6",
+    description: "For all new tiles.",
+    poster: "/tiles/tile6.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "NEW TILE 7",
+    description: "For all new tiles.",
+    poster: "/tiles/tile1.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "NEW TILE 8",
+    description: "For all new tiles.",
+    poster: "/tiles/tile2.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "NEW TILE 9",
+    description: "For all new tiles.",
+    poster: "/tiles/tile3.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "NEW TILE 10",
+    description: "For all new tiles.",
+    poster: "/tiles/tile4.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "NEW TILE 11",
+    description: "For all new tiles.",
+    poster: "/tiles/tile5.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "NEW TILE 12",
+    description: "For all new tiles.",
+    poster: "/tiles/tile6.jpg",
+    videoSrc:
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  },
+  {
+    title: "NEW TILE 13",
+    description: "For all new tiles.",
+    poster: "/tiles/tile1.jpg",
     videoSrc:
       "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   },
