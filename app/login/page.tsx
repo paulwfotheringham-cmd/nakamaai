@@ -35,8 +35,11 @@ export default function LoginPage() {
       return;
     }
 
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+      "https://nakamanights.com";
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "https://nakamaai.vercel.app/set-password",
+      redirectTo: `${siteUrl}/set-password`,
     });
 
     if (error) {
