@@ -297,69 +297,59 @@ export default function Page() {
 
       <div className="mx-auto max-w-7xl px-6 py-10">
         {/* HERO */}
-        <section className="rounded-[2rem] border border-stone-600/80 bg-zinc-950/85 p-3 shadow-[0_0_0_1px_rgba(245,158,11,0.12),0_26px_62px_rgba(0,0,0,0.5)] sm:p-4">
-          <div className="grid gap-2 lg:grid-cols-[1.12fr_0.88fr]">
-            {/* LEFT SIDE */}
-            <div className="space-y-6">
-              <div className="rounded-2xl bg-zinc-950/72 p-6 sm:p-7">
-                <p className="mb-4 text-xs uppercase tracking-widest text-stone-300">
-                  PREMIUM AUDIO ADULT EXPERIENCES. BUILT EXCLUSIVELY FOR WOMAN
+        <section className="relative overflow-hidden rounded-[2rem] border border-stone-700/65 bg-zinc-950 shadow-[0_0_0_1px_rgba(245,158,11,0.08),0_26px_62px_rgba(0,0,0,0.5)]">
+          <img
+            src="/scenes/moor.jpg"
+            alt="Moor scene placeholder"
+            className="absolute inset-0 h-full w-full object-cover object-center opacity-90"
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/88 via-black/58 to-black/22" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/72 via-black/26 to-black/36" />
+
+          <div className="relative z-10 max-w-3xl p-6 sm:p-8 lg:p-10">
+            <p className="mb-4 text-xs uppercase tracking-widest text-stone-300">
+              PREMIUM AUDIO ADULT EXPERIENCES. BUILT EXCLUSIVELY FOR WOMAN
+            </p>
+            <p className="font-serif text-3xl font-bold tracking-wide text-amber-300">
+              Nakama Nights
+            </p>
+            <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-amber-200/80">
+              MORE THAN JUST AUDIOBOOKS
+            </p>
+
+            <div className="mt-5 space-y-3">
+              <div>
+                <p className="font-serif text-5xl leading-[1.06] text-white sm:text-6xl">
+                  Your Fantasy.
                 </p>
-                <p className="font-serif text-3xl font-bold tracking-wide text-amber-300">
-                  Nakama Nights
+                <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-stone-400">
+                  YOUR JOURNEY. WE TAKE YOU THERE. UP TO YOU FROM THERE ON
+                </p>
+              </div>
+              <div>
+                <p className="font-serif text-5xl leading-[1.06] text-white sm:text-6xl">
+                  Your Rules.
+                </p>
+                <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-stone-400">
+                  YOU ARE NO JUST A LISTENER. YOU ARE THE AUTHOR, THE CHARACTER AND THE EXPERIENCE
+                </p>
+              </div>
+              <div>
+                <p className="font-serif text-5xl leading-[1.06] text-amber-200 sm:text-6xl">
+                  Your Pleasure.
                 </p>
                 <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-amber-200/80">
-                  MORE THAN JUST AUDIOBOOKS
+                  NAKAMA NIGHTS IS EXCLUSIVE. WE ARE PREMIUM. NAKAMA NIGHTS IS YOURS
                 </p>
-
-                <div className="mt-5 space-y-3">
-                  <div>
-                    <p className="font-serif text-5xl leading-[1.06] text-white sm:text-6xl">
-                      Your Fantasy.
-                    </p>
-                    <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-stone-400">
-                      YOUR JOURNEY. WE TAKE YOU THERE. UP TO YOU FROM THERE ON
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-serif text-5xl leading-[1.06] text-white sm:text-6xl">
-                      Your Rules.
-                    </p>
-                    <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-stone-400">
-                      YOU ARE NO JUST A LISTENER. YOU ARE THE AUTHOR, THE CHARACTER AND THE EXPERIENCE
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-serif text-5xl leading-[1.06] text-amber-200 sm:text-6xl">
-                      Your Pleasure.
-                    </p>
-                    <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-amber-200/80">
-                      NAKAMA NIGHTS IS EXCLUSIVE. WE ARE PREMIUM. NAKAMA NIGHTS IS YOURS
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
 
-            {/* RIGHT IMAGE */}
-            <div className="relative min-h-[440px] overflow-hidden rounded-2xl bg-zinc-950/55 shadow-2xl">
-              <img
-                src="/scenes/moor.jpg"
-                alt="Moor scene placeholder"
-                className="absolute inset-0 h-full w-full object-cover object-center opacity-92"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_35%_46%,rgba(0,0,0,0.04),rgba(0,0,0,0.46)_74%)]" />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-zinc-950/60 via-zinc-950/24 to-zinc-950/66" />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/76 via-black/24 to-black/38" />
-              <div className="absolute inset-x-0 bottom-4 flex justify-center px-4 sm:bottom-5">
-                <a
-                  href="#signup"
-                  className="inline-flex rounded-full border border-amber-200 bg-white px-5 py-2 text-xs font-semibold uppercase tracking-wide text-amber-500 transition hover:bg-amber-50"
-                >
-                  JOIN NAKAMA NOW
-                </a>
-              </div>
-            </div>
+            <a
+              href="#signup"
+              className="mt-5 inline-flex rounded-full border border-amber-200 bg-white px-5 py-2 text-xs font-semibold uppercase tracking-wide text-amber-500 transition hover:bg-amber-50"
+            >
+              JOIN NAKAMA NOW
+            </a>
           </div>
         </section>
 
