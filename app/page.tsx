@@ -407,7 +407,7 @@ export default function Page() {
 
         <section id="browse-services" className="mt-8 scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-6">
           <h2 className="font-serif text-2xl leading-tight text-white sm:text-3xl">
-            Nakama Nights Playground
+            Nakama Nights Universe
           </h2>
           <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
             {browseServices.map((s) => (
