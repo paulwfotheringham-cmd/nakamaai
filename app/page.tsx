@@ -203,6 +203,9 @@ export default function Page() {
 
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
   const [ambientEnabled, setAmbientEnabled] = useState(false);
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
 
@@ -247,6 +250,15 @@ export default function Page() {
     const params = new URLSearchParams();
     if (email) params.set("email", email);
     router.push(`/select-plan?${params.toString()}`);
+  }
+
+  function handleContactSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const subject = encodeURIComponent(`Nakama Nights Contact - ${contactName}`);
+    const body = encodeURIComponent(
+      `Name: ${contactName}\nEmail: ${contactEmail}\n\nMessage:\n${contactMessage}`
+    );
+    window.location.href = `mailto:info@nakamanights.com?subject=${subject}&body=${body}`;
   }
 
   return (
@@ -416,10 +428,10 @@ export default function Page() {
           </div>
         </section>
 
-        <section className="mt-10 flex justify-center">
+        <section className="mt-10 grid gap-6 lg:grid-cols-2">
           <div
             id="signup"
-            className="w-full max-w-xl scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-8 shadow-xl"
+            className="w-full scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-8 shadow-xl"
           >
 
             <h2 className="font-serif text-3xl text-white">
@@ -467,7 +479,104 @@ export default function Page() {
             </div>
 
           </div>
+
+          <div className="w-full rounded-2xl border border-stone-800 bg-zinc-950/80 p-8 shadow-xl">
+            <h2 className="font-serif text-3xl text-white">Contact us</h2>
+            <p className="mt-2 text-sm text-stone-400">
+              Ask us anything about Nakama Nights.
+            </p>
+
+            <form onSubmit={handleContactSubmit} className="mt-6 space-y-3">
+              <input
+                placeholder="Name"
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                required
+                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
+              />
+              <input
+                placeholder="Email"
+                type="email"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                required
+                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
+              />
+              <textarea
+                placeholder="Message"
+                value={contactMessage}
+                onChange={(e) => setContactMessage(e.target.value)}
+                required
+                rows={5}
+                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
+              />
+              <button
+                type="submit"
+                className="w-full rounded-full border border-amber-200/50 bg-amber-100/90 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700 transition hover:bg-amber-100"
+              >
+                Send message
+              </button>
+            </form>
+          </div>
         </section>
+
+        <footer className="mt-14 border-t border-stone-800 py-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="shrink-0">
+              <img
+                src="/Nakama-AI-July25-White.png"
+                alt="Nakama"
+                className="h-8"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-stone-400">
+              <Link href="/terms" className="transition hover:text-stone-100">
+                T&amp;Cs
+              </Link>
+              <Link href="/privacy" className="transition hover:text-stone-100">
+                Privacy
+              </Link>
+              <a
+                href="mailto:info@nakamanights.com"
+                className="transition hover:text-stone-100"
+              >
+                Contact
+              </a>
+              <Link
+                href="/faq-support"
+                className="transition hover:text-stone-100"
+              >
+                FAQ &amp; Support
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-4 text-stone-400">
+              <a
+                href="https://www.instagram.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition hover:text-stone-100"
+                aria-label="Instagram"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current">
+                  <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5a4.25 4.25 0 0 0 4.25 4.25h8.5a4.25 4.25 0 0 0 4.25-4.25v-8.5a4.25 4.25 0 0 0-4.25-4.25h-8.5Zm8.9 1.2a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5Z" />
+                </svg>
+              </a>
+              <a
+                href="https://www.tiktok.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition hover:text-stone-100"
+                aria-label="TikTok"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current">
+                  <path d="M14.5 3h2.1c.2 1.6 1.1 3 2.6 3.8 1 .6 2.1.9 3.3.9v2.2a8.1 8.1 0 0 1-3.2-.7v6.2a6.4 6.4 0 1 1-5.5-6.3v2.2a4.2 4.2 0 1 0 3.3 4.1V3h-2.6Z" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </footer>
 
         <div className="sr-only">
           {fantasyScenes.map((scene) => (
