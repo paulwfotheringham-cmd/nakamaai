@@ -352,10 +352,7 @@ export default function Page() {
       {/* HEADER */}
       <header className="border-b border-stone-800 bg-black/90">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-4">
-          <Link
-            href="/"
-            className="shrink-0 rounded-lg bg-gradient-to-b from-stone-900/95 to-black/90 px-3 py-2 ring-1 ring-amber-400/25 transition hover:ring-amber-400/40"
-          >
+          <Link href="/" className="shrink-0">
             <img
               src="/Nakama-AI-July25-White.png"
               alt="Nakama Nights"
@@ -393,14 +390,12 @@ export default function Page() {
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/72 via-black/26 to-black/36" />
 
           <div className="relative z-10 max-w-3xl p-6 sm:p-8 lg:p-10">
-            <div className="inline-block max-w-full rounded-2xl bg-black/55 px-5 py-4 ring-1 ring-amber-400/20 backdrop-blur-sm sm:px-6 sm:py-5">
-              <img
-                src="/Nakama-AI-July25-White.png"
-                alt="Nakama Nights"
-                className="h-auto w-full max-w-[280px] object-contain sm:max-w-[360px] lg:max-w-[420px]"
-                fetchPriority="high"
-              />
-            </div>
+            <img
+              src="/Nakama-AI-July25-White.png"
+              alt="Nakama Nights"
+              className="h-auto w-full max-w-[280px] object-contain drop-shadow-[0_4px_28px_rgba(0,0,0,0.65)] sm:max-w-[360px] lg:max-w-[420px]"
+              fetchPriority="high"
+            />
             <p className="mt-6 text-xs uppercase tracking-[0.22em] text-stone-300 sm:mt-8">
               PREMIUM AUDIO ADULT EXPERIENCES. BUILT EXCLUSIVELY FOR WOMAN
             </p>
@@ -616,7 +611,7 @@ export default function Page() {
 
         <footer className="mt-14 border-t border-stone-800 py-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="shrink-0 rounded-lg bg-gradient-to-b from-stone-900/95 to-black/90 px-3 py-2 ring-1 ring-amber-400/25">
+            <div className="shrink-0">
               <img
                 src="/Nakama-AI-July25-White.png"
                 alt="Nakama Nights"
