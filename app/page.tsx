@@ -263,6 +263,13 @@ export default function Page() {
             />
           </Link>
 
+          <Link
+            href="/select-plan"
+            className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
+          >
+            10 Day Free Trial
+          </Link>
+
           <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-stone-400 sm:flex-1">
             <a
               href="#browse-services"
@@ -288,7 +295,7 @@ export default function Page() {
 
           <a
             href="#signup"
-            className="rounded-full border border-amber-200 bg-white px-6 py-2.5 text-sm font-semibold uppercase tracking-wide text-amber-500 transition hover:bg-amber-50"
+            className="rounded-full border border-amber-200/50 bg-amber-100/90 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
           >
             Begin your journey
           </a>
