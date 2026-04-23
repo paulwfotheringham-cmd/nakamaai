@@ -301,9 +301,9 @@ export default function Page() {
           <img
             src="/scenes/moor.jpg"
             alt="Moor scene placeholder"
-            className="absolute inset-0 h-full w-full object-cover object-center opacity-90"
+            className="absolute inset-0 h-full w-full object-cover object-[22%_center] opacity-90 lg:object-[18%_center]"
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/88 via-black/58 to-black/22" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/22" />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/72 via-black/26 to-black/36" />
 
           <div className="relative z-10 max-w-3xl p-6 sm:p-8 lg:p-10">
