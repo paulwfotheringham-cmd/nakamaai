@@ -1,6 +1,27 @@
 import Link from "next/link";
 
-export default function SelectPlanPage() {
+type SelectPlanPageProps = {
+  searchParams?: {
+    name?: string | string[];
+    email?: string | string[];
+  };
+};
+
+function readParam(value?: string | string[]) {
+  if (Array.isArray(value)) return value[0] ?? "";
+  return value ?? "";
+}
+
+export default function SelectPlanPage({ searchParams }: SelectPlanPageProps) {
+  const name = readParam(searchParams?.name);
+  const email = readParam(searchParams?.email);
+  const passthrough = new URLSearchParams();
+  if (name) passthrough.set("name", name);
+  if (email) passthrough.set("email", email);
+  const suffix = passthrough.toString();
+  const nightsHref = `/fake-checkout?plan=nights${suffix ? `&${suffix}` : ""}`;
+  const teaserHref = `/fake-checkout?plan=teaser${suffix ? `&${suffix}` : ""}`;
+
   const featuresNights = [
     "Cancel anytime",
     "Full History",
@@ -100,12 +121,12 @@ export default function SelectPlanPage() {
               ))}
             </ul>
 
-            <Link
-              href="/fake-checkout?plan=nights"
+            <a
+              href={nightsHref}
               className="mt-8 inline-flex w-full shrink-0 items-center justify-center rounded-full border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-6 py-3.5 text-center text-sm font-semibold text-zinc-950 shadow-md transition hover:from-amber-100 hover:to-amber-500 sm:py-4 sm:text-[15px]"
             >
               Select plan
-            </Link>
+            </a>
           </article>
 
           {/* The Teaser */}
@@ -140,12 +161,12 @@ export default function SelectPlanPage() {
               ))}
             </ul>
 
-            <Link
-              href="/fake-checkout?plan=teaser"
+            <a
+              href={teaserHref}
               className="mt-8 inline-flex w-full shrink-0 items-center justify-center rounded-full border border-amber-800/50 bg-transparent px-6 py-3.5 text-center text-sm font-semibold text-amber-100/95 transition hover:border-amber-600/60 hover:bg-amber-950/30 sm:py-4 sm:text-[15px]"
             >
               Select plan
-            </Link>
+            </a>
           </article>
         </div>
       </section>
