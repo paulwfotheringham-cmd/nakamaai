@@ -354,7 +354,7 @@ export default function Page() {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-4">
           <Link href="/" className="shrink-0">
             <img
-              src="/Nakama-AI-July25-White.png"
+              src="/nakama-nights-logo.png"
               alt="Nakama"
               className="h-8"
             />
@@ -610,7 +610,7 @@ export default function Page() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="shrink-0">
               <img
-                src="/Nakama-AI-July25-White.png"
+                src="/nakama-nights-logo.png"
                 alt="Nakama"
                 className="h-8"
               />

@@ -10,7 +10,7 @@ export default function MarketplacePage() {
 
       {/* Logo */}
       <img
-        src="/Nakama-AI-July25-White.png"
+        src="/nakama-nights-logo.png"
         alt="Nakama logo"
         style={{
           position: "absolute",

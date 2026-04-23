@@ -67,7 +67,7 @@ export default function SelectPlanPage({ searchParams }: SelectPlanPageProps) {
       </Link>
 
       <img
-        src="/Nakama-AI-July25-White.png"
+        src="/nakama-nights-logo.png"
         alt="Nakama AI"
         className="pointer-events-none absolute right-8 top-6 z-20 h-[52px] w-auto sm:h-[63px]"
       />
