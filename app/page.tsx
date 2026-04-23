@@ -224,7 +224,7 @@ export default function Page() {
 
             {/* Carousel — taller cards so captions are not clipped */}
             <div
-              className="relative mt-10 min-h-[460px] w-full overflow-hidden sm:min-h-[480px]"
+              className="relative mt-10 min-h-[500px] w-full overflow-x-hidden overflow-y-visible pb-2 sm:min-h-[520px]"
               onMouseMove={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
                 setMouse({
@@ -246,7 +246,7 @@ export default function Page() {
                       className="absolute cursor-pointer transition-all duration-500 ease-out"
                       style={{
                         transform: `
-                        translateX(${offset * 140}px)
+                        translateX(${offset * 155}px)
                         scale(${isActive ? 1 : 0.85})
                         ${isActive ? `translate(${mouse.x * 12}px, ${mouse.y * 8}px)` : ""}
                       `,
@@ -254,22 +254,22 @@ export default function Page() {
                         opacity: isActive ? 1 : 0.25,
                       }}
                     >
-                      <div className="relative flex w-[260px] flex-col overflow-hidden rounded-xl border border-stone-700 bg-zinc-950 shadow-xl sm:w-[300px]">
+                      <div className="relative flex w-[300px] flex-col rounded-xl border border-stone-700 bg-zinc-950 shadow-xl sm:w-[340px]">
 
-                        <div className="relative h-[240px] shrink-0 sm:h-[260px]">
+                        <div className="relative h-[220px] shrink-0 overflow-hidden rounded-t-xl sm:h-[240px]">
                           <img
                             src={scene.image}
                             alt=""
                             className="absolute inset-0 h-full w-full object-cover"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
                         </div>
 
-                        <div className="relative z-10 shrink-0 border-t border-stone-800/80 bg-zinc-950 px-4 py-3">
-                          <p className="text-left text-[11px] font-medium leading-snug tracking-wide text-stone-300 sm:text-xs">
+                        <div className="relative z-10 shrink-0 rounded-b-xl border-t border-stone-800/90 bg-zinc-950 px-4 py-4">
+                          <p className="break-words text-pretty text-left text-sm font-normal leading-relaxed text-stone-300">
                             {scene.subtitle}
                           </p>
-                          <h3 className="mt-1.5 text-left font-serif text-lg leading-tight text-amber-200 sm:text-xl">
+                          <h3 className="mt-2 text-left font-serif text-xl leading-tight text-amber-200 sm:text-2xl">
                             {scene.title}
                           </h3>
                         </div>
