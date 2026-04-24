@@ -431,12 +431,15 @@ export default function Page() {
               <p className="font-serif text-lg font-semibold uppercase tracking-[0.22em] text-amber-200/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] sm:text-xl">
                 NEW TO THIS?
               </p>
-              <div className="mt-3 space-y-2 text-[11px] font-medium leading-relaxed tracking-[0.14em] text-stone-200/90 sm:text-xs">
-                <p className="normal-case">
-                  You&apos;re not alone. Most of our users are exploring this for
-                  the first time.
+              <div className="mt-3 space-y-2">
+                <p className="text-xs font-medium tracking-[0.24em] text-stone-300 sm:text-sm">
+                  You&apos;re not alone. Most of our users are exploring this{" "}
+                  <span className="whitespace-nowrap">for the</span>
                 </p>
-                <p className="normal-case">
+                <p className="text-xs font-medium tracking-[0.24em] text-stone-300 sm:text-sm">
+                  first time.
+                </p>
+                <p className="text-xs font-medium tracking-[0.24em] text-stone-300 sm:text-sm">
                   Start with a simple story - no pressure,{" "}
                   <span className="whitespace-nowrap">just curiosity.</span>
                 </p>
