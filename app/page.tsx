@@ -349,7 +349,7 @@ export default function Page() {
             <img
               src="/Nakama-AI-July25-White.png"
               alt="Nakama Nights"
-              className="block h-[4.4rem] w-auto object-contain object-left sm:h-[5.3rem] md:h-[5.9rem]"
+              className="block h-[5.1rem] w-auto object-contain object-left sm:h-[6.1rem] md:h-[6.8rem]"
             />
           </Link>
 
@@ -396,7 +396,10 @@ export default function Page() {
                   Your Fantasy<span className="-ml-1">.</span>
                 </p>
                 <p className="mt-4 text-xs font-medium uppercase tracking-[0.24em] text-stone-300 sm:text-sm">
-                  A NEW KIND OF EXPERIENCE. MORE THAN JUST AUDIOBOOKS. PRIVATE AND IMMERSIVE
+                  <span className="block">
+                    A NEW KIND OF EXPERIENCE. MORE THAN JUST AUDIOBOOKS. PRIVATE
+                  </span>
+                  <span className="mt-1 block">AND IMMERSIVE</span>
                 </p>
               </div>
               <div>
@@ -425,19 +428,17 @@ export default function Page() {
             </a>
 
             <div className="mt-8 max-w-md">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">
-                New to this?
+              <p className="font-serif text-lg font-semibold uppercase tracking-[0.22em] text-amber-200/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] sm:text-xl">
+                NEW TO THIS?
               </p>
-              <p className="mt-2 text-sm leading-relaxed text-stone-300">
-                You&apos;re not alone.
-                <br />
-                Most of our users are exploring this for the first time.
-                <br />
-                Start with a simple story — no pressure, just curiosity.
-              </p>
+              <div className="mt-3 space-y-2 text-[11px] font-medium uppercase leading-relaxed tracking-[0.22em] text-stone-200/90 sm:text-xs">
+                <p>You&apos;re not alone.</p>
+                <p>Most of our users are exploring this for the first time.</p>
+                <p>Start with a simple story — no pressure, just curiosity.</p>
+              </div>
               <a
                 href="#signup"
-                className="mt-5 inline-flex rounded-full border border-amber-200/40 bg-black/35 px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-100/95 shadow-[0_10px_28px_rgba(0,0,0,0.25)] backdrop-blur-sm transition hover:border-amber-200/70 hover:bg-black/55 hover:text-amber-50"
+                className="mt-6 inline-flex rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200"
               >
                 [ Try your first experience ]
               </a>
