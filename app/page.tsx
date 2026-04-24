@@ -427,25 +427,42 @@ export default function Page() {
               JOIN NAKAMA NOW
             </a>
 
-            <div className="mt-8 max-w-md">
-              <p className="font-serif text-lg font-semibold uppercase tracking-[0.22em] text-amber-200/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] sm:text-xl">
-                NEW TO THIS?
-              </p>
-              <div className="mt-3 space-y-2">
-                <p className="whitespace-nowrap text-[10px] font-medium tracking-[0.18em] text-stone-300 sm:text-xs sm:tracking-[0.24em] md:text-sm">
-                  You&apos;re not alone. Most of our users are exploring this for
-                  the first time.
-                </p>
-                <p className="whitespace-nowrap text-[10px] font-medium tracking-[0.18em] text-stone-300 sm:text-xs sm:tracking-[0.24em] md:text-sm">
-                  Start with a simple story - no pressure, just curiosity.
-                </p>
+            <div className="mt-10 w-full max-w-5xl rounded-2xl border border-amber-200/25 bg-black/35 px-4 py-4 shadow-[0_18px_46px_rgba(0,0,0,0.35)] backdrop-blur-sm sm:px-6 sm:py-5">
+              <div className="flex flex-col gap-5 md:flex-row md:items-center md:gap-8">
+                <div className="flex shrink-0 items-center gap-3 md:border-r md:border-stone-700/80 md:pr-8">
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    className="h-4 w-4 shrink-0 text-amber-300"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M12 2.2 13.4 8.2 19.5 8.2 14.5 12 16.5 18 12 14.2 7.5 18 9.5 12 4.5 8.2 10.6 8.2Z"
+                    />
+                  </svg>
+                  <p className="font-serif text-sm font-semibold uppercase tracking-[0.22em] text-amber-200/95 sm:text-base">
+                    NEW TO THIS?
+                  </p>
+                </div>
+
+                <div className="min-w-0 flex-1 space-y-1.5 text-sm leading-relaxed text-stone-100 sm:text-[15px]">
+                  <p>
+                    You&apos;re not alone. Most of our users are exploring this for
+                    the first time.
+                  </p>
+                  <p>Start with a simple story - no pressure, just curiosity.</p>
+                  <p>Everything is private. Everything is yours.</p>
+                </div>
+
+                <div className="shrink-0 md:pl-2">
+                  <a
+                    href="#signup"
+                    className="inline-flex w-full items-center justify-center rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200 md:w-auto md:px-7 md:text-xs md:tracking-[0.18em]"
+                  >
+                    [ TRY YOUR FIRST EXPERIENCE ]
+                  </a>
+                </div>
               </div>
-              <a
-                href="#signup"
-                className="mt-6 inline-flex rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200"
-              >
-                [ TRY YOUR FIRST EXPERIENCE ]
-              </a>
             </div>
           </div>
         </section>
