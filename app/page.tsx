@@ -262,7 +262,7 @@ function ServiceHoverVideoCard({
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent px-3 pb-3 pt-16">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent px-3 pb-2 pt-24">
         <h3 className="mt-0.5 min-h-[2.2rem] text-[10px] font-semibold leading-snug tracking-wide text-amber-100/95 sm:text-[11px]">
           {title}
         </h3>
@@ -453,14 +453,14 @@ export default function Page() {
               });
             }}
           >
-            <div className="pointer-events-none absolute inset-x-0 top-1/2 z-20 flex -translate-y-1/2 items-center justify-between px-2 sm:px-3">
+            <div className="pointer-events-none absolute inset-x-0 top-1/2 z-30 flex -translate-y-1/2 items-center justify-between px-2 sm:px-3">
               <button
                 type="button"
                 aria-label="Previous fantasy"
                 onClick={goToPreviousScene}
-                className="pointer-events-auto inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-400/35 bg-black/35 text-stone-100/85 backdrop-blur-sm transition hover:border-amber-200/60 hover:bg-black/55 hover:text-amber-100 sm:h-10 sm:w-10"
+                className="pointer-events-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-amber-200/45 bg-black/55 text-amber-100 shadow-[0_4px_14px_rgba(0,0,0,0.45)] backdrop-blur-sm transition hover:border-amber-200/80 hover:bg-black/75 sm:h-11 sm:w-11"
               >
-                <span aria-hidden="true" className="-ml-0.5 text-lg leading-none">
+                <span aria-hidden="true" className="-ml-0.5 text-xl leading-none">
                   ‹
                 </span>
               </button>
@@ -468,9 +468,9 @@ export default function Page() {
                 type="button"
                 aria-label="Next fantasy"
                 onClick={goToNextScene}
-                className="pointer-events-auto inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-400/35 bg-black/35 text-stone-100/85 backdrop-blur-sm transition hover:border-amber-200/60 hover:bg-black/55 hover:text-amber-100 sm:h-10 sm:w-10"
+                className="pointer-events-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-amber-200/45 bg-black/55 text-amber-100 shadow-[0_4px_14px_rgba(0,0,0,0.45)] backdrop-blur-sm transition hover:border-amber-200/80 hover:bg-black/75 sm:h-11 sm:w-11"
               >
-                <span aria-hidden="true" className="ml-0.5 text-lg leading-none">
+                <span aria-hidden="true" className="ml-0.5 text-xl leading-none">
                   ›
                 </span>
               </button>
@@ -525,6 +525,26 @@ export default function Page() {
                 );
               })}
             </div>
+          </div>
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              aria-label="Previous fantasy"
+              onClick={goToPreviousScene}
+              className="inline-flex items-center gap-1 rounded-full border border-amber-200/50 bg-black/45 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-amber-100 transition hover:bg-black/65"
+            >
+              <span aria-hidden="true" className="text-base leading-none">‹</span>
+              Previous
+            </button>
+            <button
+              type="button"
+              aria-label="Next fantasy"
+              onClick={goToNextScene}
+              className="inline-flex items-center gap-1 rounded-full border border-amber-200/50 bg-black/45 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-amber-100 transition hover:bg-black/65"
+            >
+              Next
+              <span aria-hidden="true" className="text-base leading-none">›</span>
+            </button>
           </div>
         </section>
 
