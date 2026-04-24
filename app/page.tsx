@@ -395,11 +395,8 @@ export default function Page() {
                 <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
                   Your Fantasy<span className="-ml-1">.</span>
                 </p>
-                <p className="mt-4 text-xs font-medium uppercase tracking-[0.24em] text-stone-300 sm:text-sm">
-                  <span className="block">
-                    A NEW KIND OF EXPERIENCE. MORE THAN JUST AUDIOBOOKS. PRIVATE
-                  </span>
-                  <span className="mt-1 block">AND IMMERSIVE</span>
+                <p className="mt-4 whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.18em] text-stone-300 sm:text-xs sm:tracking-[0.24em] md:text-sm">
+                  A NEW EXPERIENCE. NOT JUST AUDIOBOOKS. PRIVATE AND IMMERSIVE
                 </p>
               </div>
               <div>
