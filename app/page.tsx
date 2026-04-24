@@ -262,7 +262,7 @@ function ServiceHoverVideoCard({
   poster: string;
 }) {
   return (
-    <div className="group relative aspect-[3/4] w-full overflow-hidden rounded-xl border border-stone-800 bg-black shadow-lg">
+    <div className="group relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-black shadow-lg">
       <img
         src={poster}
         alt=""
@@ -503,7 +503,7 @@ export default function Page() {
           </div>
         </section>
 
-        <section id="browse-services" className="mt-8 scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-6">
+        <section id="browse-services" className="mt-8 scroll-mt-28 rounded-2xl bg-zinc-950/80 p-6">
           <h2 className="font-serif text-2xl leading-tight text-white sm:text-3xl">
             Nakama Nights Universe
           </h2>
