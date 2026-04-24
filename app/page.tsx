@@ -287,16 +287,6 @@ export default function Page() {
   const [contactMessage, setContactMessage] = useState("");
   const [ambientEnabled, setAmbientEnabled] = useState(false);
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
-  const totalScenes = fantasyScenes.length;
-
-  function goToPreviousScene() {
-    setActiveScene((prev) => (prev - 1 + totalScenes) % totalScenes);
-  }
-
-  function goToNextScene() {
-    setActiveScene((prev) => (prev + 1) % totalScenes);
-  }
-
   function stopAllAmbience() {
     Object.values(audioRefs.current).forEach((audio) => {
       if (!audio) return;
@@ -453,29 +443,6 @@ export default function Page() {
               });
             }}
           >
-            <div className="pointer-events-none absolute inset-x-0 top-1/2 z-30 flex -translate-y-1/2 items-center justify-between px-2 sm:px-3">
-              <button
-                type="button"
-                aria-label="Previous fantasy"
-                onClick={goToPreviousScene}
-                className="pointer-events-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-amber-200/45 bg-black/55 text-amber-100 shadow-[0_4px_14px_rgba(0,0,0,0.45)] backdrop-blur-sm transition hover:border-amber-200/80 hover:bg-black/75 sm:h-11 sm:w-11"
-              >
-                <span aria-hidden="true" className="-ml-0.5 text-xl leading-none">
-                  ‹
-                </span>
-              </button>
-              <button
-                type="button"
-                aria-label="Next fantasy"
-                onClick={goToNextScene}
-                className="pointer-events-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-amber-200/45 bg-black/55 text-amber-100 shadow-[0_4px_14px_rgba(0,0,0,0.45)] backdrop-blur-sm transition hover:border-amber-200/80 hover:bg-black/75 sm:h-11 sm:w-11"
-              >
-                <span aria-hidden="true" className="ml-0.5 text-xl leading-none">
-                  ›
-                </span>
-              </button>
-            </div>
-
             <div className="absolute inset-0 flex items-center justify-center">
 
               {fantasyScenes.map((scene, index) => {
