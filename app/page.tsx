@@ -396,7 +396,7 @@ export default function Page() {
             <p className="font-serif text-5xl font-bold tracking-wide text-amber-300 sm:text-6xl">
               Nakama Nights
             </p>
-            <p className="mt-5 text-sm font-medium uppercase tracking-[0.22em] text-stone-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] sm:text-base">
+            <p className="mt-5 text-sm font-medium uppercase tracking-[0.16em] text-stone-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] sm:whitespace-nowrap sm:text-base">
               PREMIUM AUDIO ADULT EXPERIENCES. BUILT EXCLUSIVELY FOR WOMAN
             </p>
             <p className="mt-2 text-sm font-medium uppercase tracking-[0.22em] text-amber-200/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] sm:text-base">
@@ -425,7 +425,7 @@ export default function Page() {
                   Your Pleasure.
                 </p>
                 <p className="mt-3 text-xs font-medium uppercase tracking-[0.24em] text-amber-200/90 sm:text-sm">
-                  NAKAMA NIGHTS IS EXCLUSIVE. WE ARE PREMIUM. NAKAMA NIGHTS IS YOURS
+                  NAKAMA NIGHTS IS EXCLUSIVE. IT IS PREMIUM. IT IS YOURS
                 </p>
               </div>
             </div>
