@@ -399,7 +399,7 @@ export default function Page() {
                   Your Fantasy<span className="-ml-1">.</span>
                 </p>
                 <p className="mt-4 text-xs font-medium uppercase tracking-[0.24em] text-stone-300 sm:text-sm">
-                  YOUR JOURNEY. WE TAKE YOU THERE. THE REST IS UP TO YOU
+                  A new kind of experience designed for women - private, immersive, and entirely yours
                 </p>
               </div>
               <div>
