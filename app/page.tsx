@@ -514,7 +514,7 @@ export default function Page() {
           </div>
         </section>
 
-        <section className="mt-10 grid gap-6 lg:grid-cols-2">
+        <section className="mt-16 grid gap-6 sm:mt-20 lg:mt-24 lg:grid-cols-2">
           <div
             id="signup"
             className="w-full scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-8 shadow-xl"
