@@ -431,12 +431,14 @@ export default function Page() {
               <p className="font-serif text-lg font-semibold uppercase tracking-[0.22em] text-amber-200/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] sm:text-xl">
                 NEW TO THIS?
               </p>
-              <div className="mt-3 space-y-2 text-[11px] font-medium uppercase leading-relaxed tracking-[0.22em] text-stone-200/90 sm:text-xs">
-                <p>
-                  YOU&apos;RE NOT ALONE. MOST OF OUR USERS ARE EXPLORING THIS FOR
-                  THE FIRST TIME.
+              <div className="mt-3 space-y-2 text-[11px] font-medium leading-relaxed tracking-[0.14em] text-stone-200/90 sm:text-xs">
+                <p className="normal-case">
+                  You&apos;re not alone. Most of our users are exploring this for
+                  the first time.
                 </p>
-                <p>START WITH A SIMPLE STORY - NO PRESSURE, JUST CURIOSITY.</p>
+                <p className="normal-case">
+                  Start with a simple story - no pressure, just{"\u00a0"}curiosity.
+                </p>
               </div>
               <a
                 href="#signup"
