@@ -432,15 +432,15 @@ export default function Page() {
                 NEW TO THIS?
               </p>
               <div className="mt-3 space-y-2 text-[11px] font-medium uppercase leading-relaxed tracking-[0.22em] text-stone-200/90 sm:text-xs">
-                <p>You&apos;re not alone.</p>
-                <p>Most of our users are exploring this for the first time.</p>
-                <p>Start with a simple story — no pressure, just curiosity.</p>
+                <p>YOU&apos;RE NOT ALONE.</p>
+                <p>MOST OF OUR USERS ARE EXPLORING THIS FOR THE FIRST TIME.</p>
+                <p>START WITH A SIMPLE STORY - NO PRESSURE, JUST CURIOSITY.</p>
               </div>
               <a
                 href="#signup"
                 className="mt-6 inline-flex rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200"
               >
-                [ Try your first experience ]
+                [ TRY YOUR FIRST EXPERIENCE ]
               </a>
             </div>
           </div>
