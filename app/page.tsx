@@ -47,80 +47,74 @@ const fantasyScenes = [
     title: "NEW_TILE_1",
     displayTitle: "ANIME / HENTAI",
     subtitle: "Fun with your hero",
-    image: "/scenes/moor.jpg",
+    image: "/tiles/anime.jpg",
   },
   {
     title: "NEW_TILE_2",
     displayTitle: "SUPERNATURAL",
     subtitle: "Meet the Darkest Vampire",
-    image: "/scenes/pirate.jpg",
+    image: "/tiles/vampire.jpg",
   },
   {
     title: "NEW_TILE_3",
     displayTitle: "SUPERNATURAL",
     subtitle: "Horny Dragons",
-    image: "/scenes/rome.jpg",
+    image: "/tiles/dragon.jpg",
   },
   {
     title: "NEW_TILE_4",
     displayTitle: "SCI FI",
     subtitle:
       "The space commander has requested your presence in his Quarters",
-    image: "/scenes/werewolf.jpg",
-  },
-  {
-    title: "NEW_TILE_5",
-    displayTitle: "MODERN",
-    subtitle: "An intense and naughty holiday romance",
-    image: "/scenes/alien.jpg",
+    image: "/tiles/space.jpg",
   },
   {
     title: "NEW_TILE_6",
     displayTitle: "MODERN",
     subtitle: "Kinky play with a sugar daddy",
-    image: "/scenes/office.jpg",
+    image: "/tiles/daddy.jpg",
   },
   {
     title: "NEW_TILE_7",
     displayTitle: "MODERN",
     subtitle: "A slow and passionate story to excite and pleasure",
-    image: "/scenes/moor.jpg",
+    image: "/tiles/slowburn.jpg",
   },
   {
     title: "NEW_TILE_8",
     displayTitle: "MODERN",
     subtitle: "Your nemesis who becomes your lover",
-    image: "/scenes/pirate.jpg",
+    image: "/tiles/lover.jpg",
   },
   {
     title: "NEW_TILE_9",
     displayTitle: "DARK & EROTIC",
     subtitle: "Taboo's uncovered",
-    image: "/scenes/rome.jpg",
+    image: "/tiles/taboo.jpg",
   },
   {
     title: "NEW_TILE_10",
     displayTitle: "DARK & EROTIC",
     subtitle: "BDSM and Fetish",
-    image: "/scenes/werewolf.jpg",
+    image: "/tiles/bdsm.jpg",
   },
   {
     title: "NEW_TILE_11",
     displayTitle: "DARK & EROTIC",
     subtitle: "Powerplay",
-    image: "/scenes/alien.jpg",
+    image: "/tiles/powerplay.jpg",
   },
   {
     title: "NEW_TILE_12",
     displayTitle: "MODERN",
     subtitle: "Holiday romance on an executive yacht",
-    image: "/scenes/office.jpg",
+    image: "/tiles/boat.jpg",
   },
   {
     title: "NEW_TILE_13",
     displayTitle: "MODERN",
     subtitle: "Voyerurism – A public beach encounter",
-    image: "/scenes/moor.jpg",
+    image: "/tiles/voyeur.jpg",
   },
 ];
 
@@ -269,10 +263,10 @@ function ServiceHoverVideoCard({
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent px-3 pb-3 pt-16">
-        <h3 className="mt-0.5 whitespace-nowrap text-[10px] font-semibold leading-snug tracking-wide text-amber-100/95 sm:text-[11px]">
+        <h3 className="mt-0.5 min-h-[2.2rem] text-[10px] font-semibold leading-snug tracking-wide text-amber-100/95 sm:text-[11px]">
           {title}
         </h3>
-        <p className="mt-1 text-[11px] leading-snug text-stone-200/90">
+        <p className="mt-1 min-h-[3.4rem] text-[11px] leading-snug text-stone-200/90">
           {description}
         </p>
       </div>
@@ -356,7 +350,7 @@ export default function Page() {
             <img
               src="/Nakama-AI-July25-White.png"
               alt="Nakama Nights"
-              className="block h-14 w-auto object-contain object-left sm:h-[4.25rem] md:h-[4.75rem]"
+              className="block h-[4.4rem] w-auto object-contain object-left sm:h-[5.3rem] md:h-[5.9rem]"
             />
           </Link>
 
@@ -393,10 +387,10 @@ export default function Page() {
             <p className="font-serif text-5xl font-bold tracking-wide text-amber-300 sm:text-6xl">
               Nakama Nights
             </p>
-            <p className="mt-5 text-xs uppercase tracking-[0.22em] text-stone-300">
+            <p className="mt-5 text-sm font-medium uppercase tracking-[0.22em] text-stone-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] sm:text-base">
               PREMIUM AUDIO ADULT EXPERIENCES. BUILT EXCLUSIVELY FOR WOMAN
             </p>
-            <p className="mt-2 text-xs uppercase tracking-[0.22em] text-amber-200/80">
+            <p className="mt-2 text-sm font-medium uppercase tracking-[0.22em] text-amber-200/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] sm:text-base">
               MORE THAN JUST AUDIOBOOKS
             </p>
 
@@ -405,7 +399,7 @@ export default function Page() {
                 <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
                   Your Fantasy<span className="-ml-1">.</span>
                 </p>
-                <p className="mt-4 text-[10px] uppercase tracking-[0.24em] text-stone-400">
+                <p className="mt-4 text-xs font-medium uppercase tracking-[0.24em] text-stone-300 sm:text-sm">
                   YOUR JOURNEY. WE TAKE YOU THERE. THE REST IS UP TO YOU
                 </p>
               </div>
@@ -413,16 +407,15 @@ export default function Page() {
                 <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
                   Your Rules.
                 </p>
-                <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-stone-400">
-                  YOU ARE NOT JUST A LISTENER. YOU ARE THE AUTHOR, THE CHARACTER{" "}
-                  <span className="ml-2 sm:ml-4">AND THE EXPERIENCE.</span>
+                <p className="mt-4 text-xs font-medium uppercase tracking-[0.24em] text-stone-300 sm:text-sm">
+                  YOU ARE NOT JUST A LISTENER. YOU ARE THE AUTHOR, THE CHARACTER AND THE EXPERIENCE.
                 </p>
               </div>
               <div className="pt-4 sm:pt-6">
                 <p className="font-serif text-4xl leading-[1.08] text-amber-200 sm:text-5xl">
                   Your Pleasure.
                 </p>
-                <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-amber-200/80">
+                <p className="mt-3 text-xs font-medium uppercase tracking-[0.24em] text-amber-200/90 sm:text-sm">
                   NAKAMA NIGHTS IS EXCLUSIVE. WE ARE PREMIUM. NAKAMA NIGHTS IS YOURS
                 </p>
               </div>
