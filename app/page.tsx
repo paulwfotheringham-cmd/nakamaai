@@ -423,6 +423,25 @@ export default function Page() {
             >
               JOIN NAKAMA NOW
             </a>
+
+            <div className="mt-8 max-w-md">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">
+                New to this?
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-stone-300">
+                You&apos;re not alone.
+                <br />
+                Most of our users are exploring this for the first time.
+                <br />
+                Start with a simple story — no pressure, just curiosity.
+              </p>
+              <a
+                href="#signup"
+                className="mt-5 inline-flex rounded-full border border-amber-200/40 bg-black/35 px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-100/95 shadow-[0_10px_28px_rgba(0,0,0,0.25)] backdrop-blur-sm transition hover:border-amber-200/70 hover:bg-black/55 hover:text-amber-50"
+              >
+                [ Try your first experience ]
+              </a>
+            </div>
           </div>
         </section>
 
