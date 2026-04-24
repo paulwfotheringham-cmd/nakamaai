@@ -437,7 +437,8 @@ export default function Page() {
                   the first time.
                 </p>
                 <p className="normal-case">
-                  Start with a simple story - no pressure, just{"\u00a0"}curiosity.
+                  Start with a simple story - no pressure,{" "}
+                  <span className="whitespace-nowrap">just curiosity.</span>
                 </p>
               </div>
               <a
