@@ -262,11 +262,11 @@ function ServiceHoverVideoCard({
         alt=""
         className="h-36 w-full object-cover sm:h-40"
       />
-      <div className="px-3 pb-3 pt-2">
+      <div className="px-3 pb-4 pt-7">
         <h3 className="min-h-[2.2rem] text-[10px] font-semibold leading-snug tracking-wide text-amber-100/95 sm:text-[11px]">
           {title}
         </h3>
-        <p className="mt-1 min-h-[3.6rem] text-[11px] leading-snug text-stone-300/90">
+        <p className="mt-2 min-h-[3.6rem] text-[11px] leading-snug text-stone-300/90">
           {description}
         </p>
       </div>
@@ -430,19 +430,19 @@ export default function Page() {
 
           <div className="relative z-10 mt-10 w-full border-t border-amber-200/25 bg-black/90 px-6 sm:px-8 lg:px-10">
             <div className="flex flex-col gap-6 py-5 md:flex-row md:items-start md:gap-10 md:py-6">
-              <div className="flex w-full shrink-0 flex-col gap-4 md:w-[280px]">
+              <div className="flex w-full shrink-0 flex-col items-start gap-4 md:w-[280px]">
                 <p className="font-serif text-base font-semibold uppercase tracking-[0.22em] text-amber-200 sm:text-lg">
                   NEW TO THIS?
                 </p>
                 <a
                   href="#signup"
-                  className="inline-flex w-full items-center justify-center rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200 md:w-auto md:px-7 md:text-xs"
+                  className="inline-flex w-full max-w-full items-center justify-center rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-5 py-2.5 pl-[0.18rem] text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200 md:w-fit md:self-start md:px-6 md:py-3 md:pl-[0.22rem] md:text-[11px] lg:text-xs"
                 >
                   TRY YOUR FIRST EXPERIENCE
                 </a>
               </div>
 
-              <div className="min-w-0 flex-1 space-y-2">
+              <div className="min-w-0 flex-1 space-y-3 md:space-y-4 md:pt-1">
                 <p className="text-xs font-medium uppercase leading-snug tracking-[0.18em] text-stone-100 md:whitespace-nowrap md:text-[11px] md:tracking-[0.22em] lg:text-sm lg:tracking-[0.24em]">
                   You&apos;re not alone. Most of our users are exploring this for the first time.
                 </p>
