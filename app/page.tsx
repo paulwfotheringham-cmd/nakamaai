@@ -432,8 +432,10 @@ export default function Page() {
                 NEW TO THIS?
               </p>
               <div className="mt-3 space-y-2 text-[11px] font-medium uppercase leading-relaxed tracking-[0.22em] text-stone-200/90 sm:text-xs">
-                <p>YOU&apos;RE NOT ALONE.</p>
-                <p>MOST OF OUR USERS ARE EXPLORING THIS FOR THE FIRST TIME.</p>
+                <p>
+                  YOU&apos;RE NOT ALONE. MOST OF OUR USERS ARE EXPLORING THIS FOR
+                  THE FIRST TIME.
+                </p>
                 <p>START WITH A SIMPLE STORY - NO PRESSURE, JUST CURIOSITY.</p>
               </div>
               <a
