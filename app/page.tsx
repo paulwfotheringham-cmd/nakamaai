@@ -432,16 +432,12 @@ export default function Page() {
                 NEW TO THIS?
               </p>
               <div className="mt-3 space-y-2">
-                <p className="text-xs font-medium tracking-[0.24em] text-stone-300 sm:text-sm">
-                  You&apos;re not alone. Most of our users are exploring this{" "}
-                  <span className="whitespace-nowrap">for the</span>
+                <p className="whitespace-nowrap text-[10px] font-medium tracking-[0.18em] text-stone-300 sm:text-xs sm:tracking-[0.24em] md:text-sm">
+                  You&apos;re not alone. Most of our users are exploring this for
+                  the first time.
                 </p>
-                <p className="text-xs font-medium tracking-[0.24em] text-stone-300 sm:text-sm">
-                  first time.
-                </p>
-                <p className="text-xs font-medium tracking-[0.24em] text-stone-300 sm:text-sm">
-                  Start with a simple story - no pressure,{" "}
-                  <span className="whitespace-nowrap">just curiosity.</span>
+                <p className="whitespace-nowrap text-[10px] font-medium tracking-[0.18em] text-stone-300 sm:text-xs sm:tracking-[0.24em] md:text-sm">
+                  Start with a simple story - no pressure, just curiosity.
                 </p>
               </div>
               <a
