@@ -256,17 +256,17 @@ function ServiceHoverVideoCard({
   poster: string;
 }) {
   return (
-    <div className="group relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-black shadow-lg">
+    <div className="group relative w-full overflow-hidden rounded-xl border border-stone-800 bg-black shadow-lg">
       <img
         src={poster}
         alt=""
-        className="absolute inset-0 h-full w-full object-cover"
+        className="h-36 w-full object-cover sm:h-40"
       />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent px-3 pb-2 pt-24">
-        <h3 className="mt-0.5 min-h-[2.2rem] text-[10px] font-semibold leading-snug tracking-wide text-amber-100/95 sm:text-[11px]">
+      <div className="px-3 pb-3 pt-2">
+        <h3 className="min-h-[2.2rem] text-[10px] font-semibold leading-snug tracking-wide text-amber-100/95 sm:text-[11px]">
           {title}
         </h3>
-        <p className="mt-1 min-h-[3.4rem] text-[11px] leading-snug text-stone-200/90">
+        <p className="mt-1 min-h-[3.6rem] text-[11px] leading-snug text-stone-300/90">
           {description}
         </p>
       </div>
@@ -525,26 +525,6 @@ export default function Page() {
                 );
               })}
             </div>
-          </div>
-          <div className="mt-4 flex items-center justify-center gap-3">
-            <button
-              type="button"
-              aria-label="Previous fantasy"
-              onClick={goToPreviousScene}
-              className="inline-flex items-center gap-1 rounded-full border border-amber-200/50 bg-black/45 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-amber-100 transition hover:bg-black/65"
-            >
-              <span aria-hidden="true" className="text-base leading-none">‹</span>
-              Previous
-            </button>
-            <button
-              type="button"
-              aria-label="Next fantasy"
-              onClick={goToNextScene}
-              className="inline-flex items-center gap-1 rounded-full border border-amber-200/50 bg-black/45 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-amber-100 transition hover:bg-black/65"
-            >
-              Next
-              <span aria-hidden="true" className="text-base leading-none">›</span>
-            </button>
           </div>
         </section>
 
