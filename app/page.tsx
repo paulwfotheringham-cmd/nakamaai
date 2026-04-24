@@ -429,32 +429,29 @@ export default function Page() {
           </div>
 
           <div className="relative z-10 mt-10 w-full border-t border-amber-200/25 bg-black/90 px-6 sm:px-8 lg:px-10">
-            <div className="flex flex-col gap-5 py-5 md:flex-row md:items-center md:gap-10 md:py-6">
-              <div className="shrink-0 md:w-[230px]">
+            <div className="flex flex-col gap-6 py-5 md:flex-row md:items-start md:gap-10 md:py-6">
+              <div className="flex w-full shrink-0 flex-col gap-4 md:w-[280px]">
                 <p className="font-serif text-base font-semibold uppercase tracking-[0.22em] text-amber-200 sm:text-lg">
                   NEW TO THIS?
                 </p>
+                <a
+                  href="#signup"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200 md:w-auto md:px-7 md:text-xs"
+                >
+                  TRY YOUR FIRST EXPERIENCE
+                </a>
               </div>
 
               <div className="min-w-0 flex-1 space-y-2">
-                <p className="text-xs font-medium leading-snug tracking-[0.18em] text-stone-100 md:whitespace-nowrap md:text-[11px] md:tracking-[0.22em] lg:text-sm lg:tracking-[0.24em]">
+                <p className="text-xs font-medium uppercase leading-snug tracking-[0.18em] text-stone-100 md:whitespace-nowrap md:text-[11px] md:tracking-[0.22em] lg:text-sm lg:tracking-[0.24em]">
                   You&apos;re not alone. Most of our users are exploring this for the first time.
                 </p>
-                <p className="text-xs font-medium leading-snug tracking-[0.18em] text-stone-100 md:whitespace-nowrap md:text-[11px] md:tracking-[0.22em] lg:text-sm lg:tracking-[0.24em]">
+                <p className="text-xs font-medium uppercase leading-snug tracking-[0.18em] text-stone-100 md:whitespace-nowrap md:text-[11px] md:tracking-[0.22em] lg:text-sm lg:tracking-[0.24em]">
                   Start with a simple story - no pressure, just curiosity.
                 </p>
-                <p className="text-xs font-medium leading-snug tracking-[0.18em] text-stone-100 md:whitespace-nowrap md:text-[11px] md:tracking-[0.22em] lg:text-sm lg:tracking-[0.24em]">
+                <p className="text-xs font-medium uppercase leading-snug tracking-[0.18em] text-stone-100 md:whitespace-nowrap md:text-[11px] md:tracking-[0.22em] lg:text-sm lg:tracking-[0.24em]">
                   Everything is private. Everything is yours.
                 </p>
-              </div>
-
-              <div className="shrink-0 md:pl-2">
-                <a
-                  href="#signup"
-                  className="inline-flex w-full items-center justify-center rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-7 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200 md:w-auto md:px-8 md:text-xs"
-                >
-                  [ TRY YOUR FIRST EXPERIENCE ]
-                </a>
               </div>
             </div>
           </div>
