@@ -389,9 +389,6 @@ export default function Page() {
             <p className="mt-5 text-sm font-medium uppercase tracking-[0.16em] text-stone-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] sm:whitespace-nowrap sm:text-base">
               PREMIUM AUDIO ADULT EXPERIENCES. BUILT EXCLUSIVELY FOR WOMAN
             </p>
-            <p className="mt-2 text-sm font-medium uppercase tracking-[0.22em] text-amber-200/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] sm:text-base">
-              MORE THAN JUST AUDIOBOOKS
-            </p>
 
             <div className="mt-8 flex flex-col gap-6">
               <div>
@@ -399,7 +396,7 @@ export default function Page() {
                   Your Fantasy<span className="-ml-1">.</span>
                 </p>
                 <p className="mt-4 text-xs font-medium uppercase tracking-[0.24em] text-stone-300 sm:text-sm">
-                  A new kind of experience designed for women - private, immersive, and entirely yours
+                  A NEW KIND OF EXPERIENCE. MORE THAN JUST AUDIOBOOKS. PRIVATE AND IMMERSIVE
                 </p>
               </div>
               <div>
@@ -407,7 +404,7 @@ export default function Page() {
                   Your Rules.
                 </p>
                 <p className="mt-4 text-xs font-medium uppercase tracking-[0.24em] text-stone-300 sm:text-sm">
-                  YOU ARE NOT JUST A LISTENER. YOU ARE THE AUTHOR, THE CHARACTER AND THE EXPERIENCE.
+                  EXPLORE. BECOME. CONTROL. CONNECT
                 </p>
               </div>
               <div className="pt-4 sm:pt-6">
