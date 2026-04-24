@@ -356,7 +356,7 @@ export default function Page() {
             <img
               src="/Nakama-AI-July25-White.png"
               alt="Nakama Nights"
-              className="block h-11 w-auto object-contain object-left sm:h-[52px] md:h-14"
+              className="block h-14 w-auto object-contain object-left sm:h-[4.25rem] md:h-[4.75rem]"
             />
           </Link>
 
@@ -390,13 +390,10 @@ export default function Page() {
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/72 via-black/26 to-black/36" />
 
           <div className="relative z-10 max-w-3xl p-6 sm:p-8 lg:p-10">
-            <img
-              src="/Nakama-AI-July25-White.png"
-              alt="Nakama Nights"
-              className="h-auto w-full max-w-[280px] object-contain drop-shadow-[0_4px_28px_rgba(0,0,0,0.65)] sm:max-w-[360px] lg:max-w-[420px]"
-              fetchPriority="high"
-            />
-            <p className="mt-6 text-xs uppercase tracking-[0.22em] text-stone-300 sm:mt-8">
+            <p className="font-serif text-5xl font-bold tracking-wide text-amber-300 sm:text-6xl">
+              Nakama Nights
+            </p>
+            <p className="mt-5 text-xs uppercase tracking-[0.22em] text-stone-300">
               PREMIUM AUDIO ADULT EXPERIENCES. BUILT EXCLUSIVELY FOR WOMAN
             </p>
             <p className="mt-2 text-xs uppercase tracking-[0.22em] text-amber-200/80">
