@@ -1,9 +1,8 @@
 ﻿"use client";
 
-import * as React from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, OrbitControls, useGLTF } from "@react-three/drei";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { setSpeakingMorphTargets } from "../lib/avatar/lipsync";
 
@@ -13,35 +12,6 @@ type GuideHead3DProps = {
   modelUrl?: string | null;
 };
 
-type ModelErrorBoundaryProps = {
-  onError: () => void;
-  children: React.ReactNode;
-};
-
-type ModelErrorBoundaryState = {
-  hasError: boolean;
-};
-
-class ModelErrorBoundary extends React.Component<ModelErrorBoundaryProps, ModelErrorBoundaryState> {
-  constructor(props: ModelErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch() {
-    this.props.onError();
-  }
-
-  render() {
-    if (this.state.hasError) return null;
-    return this.props.children;
-  }
-}
-
 function FallbackHead2D({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking: boolean }) {
   return (
     <div className="relative h-full w-full overflow-hidden">
@@ -50,22 +20,6 @@ function FallbackHead2D({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking
         alt="Guide"
         className="absolute inset-0 h-full w-full object-cover object-top"
       />
-      <div
-        aria-hidden="true"
-        className={`absolute left-1/2 top-[67%] h-[13%] w-[34%] -translate-x-1/2 overflow-hidden rounded-[999px] ${
-          isSpeaking ? "mouth-active" : "mouth-idle"
-        }`}
-      >
-        <div
-          className="h-full w-full bg-cover bg-no-repeat"
-          style={{
-            backgroundImage: `url(${imageSrc})`,
-            backgroundSize: "300% 760%",
-            backgroundPosition: "50% 87%",
-            filter: "contrast(1.12) saturate(1.15)",
-          }}
-        />
-      </div>
       <div className="absolute inset-x-0 bottom-0 h-[22%] bg-gradient-to-t from-[#081411] to-transparent" />
     </div>
   );
@@ -125,9 +79,9 @@ function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boo
         const name = bone.name.toLowerCase();
         if (name.includes("jaw") || name.includes("mouth")) {
           const jawTarget = isSpeaking
-            ? 0.08 + Math.abs(Math.sin(t * 17)) * 0.16
+            ? 0.14 + Math.abs(Math.sin(t * 18)) * 0.28
             : 0.02;
-          bone.rotation.x = THREE.MathUtils.lerp(bone.rotation.x, jawTarget, isSpeaking ? 0.35 : 0.15);
+          bone.rotation.x = THREE.MathUtils.lerp(bone.rotation.x, jawTarget, isSpeaking ? 0.45 : 0.2);
         }
       }
     });
@@ -142,12 +96,10 @@ function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boo
 
 export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHead3DProps) {
   const hasModel = typeof modelUrl === "string" && modelUrl.trim().length > 0;
-  const [modelFailed, setModelFailed] = useState(false);
-  const showModel = hasModel && !modelFailed;
 
   return (
     <div className="relative h-[300px] w-[190px] shrink-0 overflow-hidden rounded-[24px] border border-emerald-300/15 bg-[#081411]">
-      {showModel ? (
+      {hasModel ? (
         <div className="absolute right-2 top-2 z-20 rounded-full bg-black/55 px-2 py-1 text-[10px] tracking-wide text-emerald-200">
           3D MODEL ACTIVE
         </div>
@@ -157,7 +109,7 @@ export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHea
         </div>
       )}
 
-      {showModel ? (
+      {hasModel ? (
         <Canvas camera={{ position: [0, 0.2, 2.2], fov: 34 }} shadows dpr={[1, 2]}>
           <color attach="background" args={["#081411"]} />
           <ambientLight intensity={0.5} />
@@ -165,36 +117,17 @@ export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHea
           <directionalLight position={[2, 3, 3]} intensity={1.35} color="#f7fff8" castShadow />
           <pointLight position={[-2.2, 0.9, 1.8]} intensity={0.95} color="#57ffcb" />
 
-          <ModelErrorBoundary onError={() => setModelFailed(true)}>
-            <Suspense fallback={null}>
-              <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.35}>
-                <ModelHead modelUrl={modelUrl!} isSpeaking={isSpeaking} />
-              </Float>
-            </Suspense>
-          </ModelErrorBoundary>
+          <Suspense fallback={null}>
+            <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.35}>
+              <ModelHead modelUrl={modelUrl!} isSpeaking={isSpeaking} />
+            </Float>
+          </Suspense>
 
           <OrbitControls enableZoom={false} enablePan={false} minPolarAngle={1.25} maxPolarAngle={1.9} />
         </Canvas>
       ) : (
         <FallbackHead2D imageSrc={imageSrc} isSpeaking={isSpeaking} />
       )}
-
-      <style jsx>{`
-        @keyframes mouthTalk {
-          0% { transform: translateX(-50%) scaleY(0.86); }
-          50% { transform: translateX(-50%) scaleY(1.16); }
-          100% { transform: translateX(-50%) scaleY(0.86); }
-        }
-        .mouth-active {
-          animation: mouthTalk 120ms ease-in-out infinite;
-          box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35) inset, 0 0 12px rgba(20, 12, 8, 0.35);
-        }
-        .mouth-idle {
-          transform: translateX(-50%) scaleY(0.86);
-          opacity: 0.86;
-          box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25) inset;
-        }
-      `}</style>
     </div>
   );
 }

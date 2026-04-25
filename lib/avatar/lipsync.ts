@@ -20,36 +20,36 @@ export function setSpeakingMorphTargets(mesh: THREE.Mesh, isSpeaking: boolean, t
   const influences = mesh.morphTargetInfluences;
   if (!dict || !influences) return;
 
-  let mouthIndex = -1;
+  const mouthIndices: number[] = [];
 
   for (const alias of MOUTH_MORPH_ALIASES) {
     const candidate = dict[alias];
     if (typeof candidate === "number") {
-      mouthIndex = candidate;
-      break;
+      mouthIndices.push(candidate);
     }
   }
 
-  // Fallback: pick the first morph target that looks like mouth/jaw.
-  if (mouthIndex < 0) {
+  // Fallback: include all targets that look mouth/jaw related.
+  if (mouthIndices.length === 0) {
     for (const [key, idx] of Object.entries(dict)) {
       const k = key.toLowerCase();
       if (k.includes("mouth") || k.includes("jaw") || k.includes("viseme") || k.includes("open")) {
-        mouthIndex = idx;
-        break;
+        mouthIndices.push(idx);
       }
     }
   }
 
-  if (mouthIndex < 0) return;
+  if (mouthIndices.length === 0) return;
 
   const targetValue = isSpeaking
-    ? 0.28 + Math.abs(Math.sin(timeSeconds * 18)) * 0.72
+    ? 0.45 + Math.abs(Math.sin(timeSeconds * 18)) * 0.55
     : 0.02;
 
-  influences[mouthIndex] = THREE.MathUtils.lerp(
-    influences[mouthIndex] ?? 0,
-    targetValue,
-    isSpeaking ? 0.35 : 0.2,
-  );
+  for (const idx of mouthIndices) {
+    influences[idx] = THREE.MathUtils.lerp(
+      influences[idx] ?? 0,
+      targetValue,
+      isSpeaking ? 0.45 : 0.2,
+    );
+  }
 }
