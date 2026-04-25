@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, OrbitControls, useGLTF } from "@react-three/drei";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { setSpeakingMorphTargets } from "../lib/avatar/lipsync";
 
