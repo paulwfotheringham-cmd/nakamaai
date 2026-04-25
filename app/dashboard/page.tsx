@@ -1,6 +1,5 @@
 import Link from "next/link";
 import CreateAudioTile from "./CreateAudioTile";
-import ConvertEbookTile from "./ConvertEbookTile";
 
 type Tile = {
   title: string;
@@ -106,9 +105,8 @@ export default function DashboardPage() {
               Pick what you want to do in Nakama
             </h2>
             <p className="mt-3 text-base leading-7 text-zinc-300">
-              Choose fantasy audio, create your own fantasy audio, convert an
-              ebook into fantasy audio, explore the marketplace, or manage your
-              profile.
+              Choose fantasy audio, create your own fantasy audio, explore the
+              marketplace, or manage your profile.
             </p>
           </div>
         </div>
@@ -116,7 +114,6 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           <TileCard key={tiles[0].title} tile={tiles[0]} />
           <CreateAudioTile />
-          <ConvertEbookTile />
           {tiles.slice(1).map((tile) => (
             <TileCard key={tile.title} tile={tile} />
           ))}
