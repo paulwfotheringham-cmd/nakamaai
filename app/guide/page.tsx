@@ -2,9 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 
+const lines = [
+  "Hello… I've been waiting for you.",
+  "Let me take care of you tonight.",
+] as const;
+
+const FIRST_LINE_MS = 2200;
+const FADE_OUT_MS = 580;
+const BETWEEN_LINES_MS = 160;
+
 export default function GuidePage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [lineIndex, setLineIndex] = useState(0);
+  const [isLineExiting, setIsLineExiting] = useState(false);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -32,6 +43,27 @@ export default function GuidePage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isSpeaking) return;
+
+    setLineIndex(0);
+    setIsLineExiting(false);
+
+    const exitTimer = setTimeout(() => setIsLineExiting(true), FIRST_LINE_MS);
+    const secondLineTimer = setTimeout(() => {
+      setLineIndex(1);
+      setIsLineExiting(false);
+    }, FIRST_LINE_MS + FADE_OUT_MS + BETWEEN_LINES_MS);
+
+    return () => {
+      clearTimeout(exitTimer);
+      clearTimeout(secondLineTimer);
+    };
+  }, [isSpeaking]);
+
+  const subtitleClass =
+    "pointer-events-none px-6 pb-16 text-center font-serif text-lg font-light tracking-[0.14em] text-white/58 sm:text-xl md:text-2xl md:tracking-[0.16em]";
+
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-black">
       <audio
@@ -53,8 +85,17 @@ export default function GuidePage() {
       </div>
 
       {isSpeaking ? (
-        <p className="animate-subtitle-in pointer-events-none px-6 pb-16 text-center font-serif text-lg font-light tracking-[0.14em] text-white/58 sm:text-xl md:text-2xl md:tracking-[0.16em]">
-          Hello… I&apos;ve been waiting for you.
+        <p
+          key={lineIndex}
+          className={`${subtitleClass} ${
+            lineIndex === 1
+              ? "animate-subtitle-in"
+              : isLineExiting
+                ? "animate-subtitle-out"
+                : "animate-subtitle-in"
+          }`}
+        >
+          {lines[lineIndex]}
         </p>
       ) : null}
     </div>
