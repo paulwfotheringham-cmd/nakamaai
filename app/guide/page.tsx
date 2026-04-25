@@ -42,9 +42,12 @@ export default function GuidePage() {
   useEffect(() => {
     if (!isSpeaking) return;
 
+    // show first line clearly first
+    setLineIndex(0);
+
     const t = setTimeout(() => {
       setLineIndex(1);
-    }, 2200);
+    }, 3000); // longer so user actually sees it
 
     return () => clearTimeout(t);
   }, [isSpeaking]);
