@@ -7,11 +7,17 @@ export default function OnboardingPage() {
   const router = useRouter();
 
   const [guide, setGuide] = useState("GUIDE1.png");
-  const [voice, setVoice] = useState("Deep, Calm");
+  const [voice, setVoice] = useState("Donny - Steady Presence");
   const [tone, setTone] = useState("Relaxed");
 
   const guides = ["GUIDE1.png", "GUIDE2.png", "GUIDE3.png", "GUIDE4.png", "GUIDE5.png"];
-  const voices = ["Deep, Calm", "Confident, Smooth", "Playful, Teasing", "Dark, Intense"];
+  const voices = [
+    { id: "donny", name: "Donny - Steady Presence" },
+    { id: "clint", name: "Clint - Rugged Actor" },
+    { id: "damon", name: "Damon - Commanding Narrator" },
+    { id: "cameron", name: "Cameron - Chill Companion" },
+    { id: "alex", name: "Alex - Smooth Operator" }
+  ];
   const tones = ["Relaxed", "Playful", "Intense"];
 
   const handleSave = () => {
@@ -58,12 +64,12 @@ export default function OnboardingPage() {
           <div className={`${box} w-[140px]`}>SELECT VOICE</div>
 
           {voices.map((v) => (
-            <div key={v} className="flex flex-col gap-2">
+            <div key={v.id} className="flex flex-col gap-2">
               <button
-                onClick={() => setVoice(v)}
-                className={`${box} ${voice === v ? active : ""}`}
+                onClick={() => setVoice(v.name)}
+                className={`${box} ${voice === v.name ? active : ""}`}
               >
-                {v}
+                {v.name}
               </button>
 
               <button className="text-xs px-3 py-1 bg-[#1c4e63] border border-white/20">
