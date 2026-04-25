@@ -10,7 +10,6 @@ const lines = [
 const FIRST_LINE_MS = 2200;
 const FADE_OUT_MS = 580;
 const BETWEEN_LINES_MS = 160;
-const TAP_PROMPT_DELAY_MS = 800;
 
 export default function GuidePage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -18,7 +17,6 @@ export default function GuidePage() {
   const [lineIndex, setLineIndex] = useState(0);
   const [isLineExiting, setIsLineExiting] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [showTapPrompt, setShowTapPrompt] = useState(false);
   const [guideImage, setGuideImage] = useState("/guides/GUIDE1.png");
 
   useEffect(() => {
@@ -60,7 +58,6 @@ export default function GuidePage() {
     setLineIndex(0);
     setIsLineExiting(false);
     setHasInteracted(false);
-    setShowTapPrompt(false);
 
     const exitTimer = setTimeout(() => setIsLineExiting(true), FIRST_LINE_MS);
     const secondLineTimer = setTimeout(() => {
@@ -74,27 +71,17 @@ export default function GuidePage() {
     };
   }, [isSpeaking]);
 
-  useEffect(() => {
-    if (!isSpeaking || hasInteracted || lineIndex !== 1) return;
-    const t = setTimeout(() => setShowTapPrompt(true), TAP_PROMPT_DELAY_MS);
-    return () => clearTimeout(t);
-  }, [isSpeaking, lineIndex, hasInteracted]);
-
-  const handleScreenClick = () => {
-    if (!showTapPrompt || hasInteracted) return;
-    setHasInteracted(true);
-    setShowTapPrompt(false);
-  };
-
   const subtitleClass =
-    "pointer-events-none px-6 text-center font-serif text-lg font-light tracking-[0.14em] text-white/58 sm:text-xl md:text-2xl md:tracking-[0.16em]";
+    "px-6 text-center font-serif text-lg font-light tracking-[0.14em] text-white/58 sm:text-xl md:text-2xl md:tracking-[0.16em]";
 
   return (
     <div
-      className={`relative flex min-h-screen flex-col overflow-hidden bg-black ${
-        showTapPrompt && !hasInteracted ? "cursor-pointer" : ""
-      }`}
-      onClick={handleScreenClick}
+      className="relative flex min-h-screen flex-col overflow-hidden bg-black cursor-pointer"
+      onClick={() => {
+        if (!hasInteracted) {
+          setHasInteracted(true);
+        }
+      }}
     >
       <audio
         ref={audioRef}
@@ -115,8 +102,12 @@ export default function GuidePage() {
       </div>
 
       {isSpeaking ? (
-        <div className="pointer-events-none flex flex-col items-center px-6 pb-16">
-          {!hasInteracted ? (
+        <div className="flex flex-col items-center px-6 pb-16">
+          {hasInteracted ? (
+            <p key="after-tap" className={`${subtitleClass} animate-subtitle-in`}>
+              Good… just relax.
+            </p>
+          ) : (
             <p
               key={lineIndex}
               className={`${subtitleClass} ${
@@ -129,17 +120,7 @@ export default function GuidePage() {
             >
               {lines[lineIndex]}
             </p>
-          ) : (
-            <p key="after-tap" className={`${subtitleClass} animate-subtitle-in`}>
-              Good… just relax.
-            </p>
           )}
-
-          {showTapPrompt && !hasInteracted ? (
-            <p className="animate-tap-hint-in mt-5 text-center text-[11px] font-medium uppercase tracking-[0.22em] text-white/40">
-              Tap to continue
-            </p>
-          ) : null}
         </div>
       ) : null}
     </div>
