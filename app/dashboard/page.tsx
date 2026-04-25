@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import CreateAudioTile from "./CreateAudioTile";
 
@@ -70,13 +70,14 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="w-[500px] flex flex-col items-center justify-center gap-6">
+          <div className="w-[420px] flex flex-col items-center justify-start gap-6 pt-10">
             <img
               src={guideImage}
+              alt="Guide"
               className="h-[400px] object-contain animate-alive"
             />
 
-            <div className="w-full h-[300px] bg-green-500 flex items-center justify-center">
+            <div className="w-full h-[260px] rounded-xl bg-green-500/90 flex items-center justify-center text-black font-semibold">
               CHATBOX
             </div>
           </div>
