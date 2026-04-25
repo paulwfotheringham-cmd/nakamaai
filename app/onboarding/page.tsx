@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,6 +21,10 @@ export default function OnboardingPage() {
   ];
   const tones = ["Relaxed", "Playful", "Intense"];
 
+  const selectedGuide = guide;
+  const selectedVoice = voice;
+  const selectedTone = tone;
+
   const playPreview = async (voiceName: string) => {
     console.log("CLICKED PREVIEW:", voiceName);
 
@@ -32,7 +36,7 @@ export default function OnboardingPage() {
         },
         body: JSON.stringify({
           voice: voiceName,
-          text: "Hello… I've been waiting for you.",
+          text: "Helloâ€¦ I've been waiting for you.",
         }),
       });
 
@@ -73,12 +77,11 @@ export default function OnboardingPage() {
   };
 
   const handleSave = () => {
-    localStorage.setItem("selectedGuide", guide);
-    localStorage.setItem("selectedVoice", voice);
-    localStorage.setItem("selectedTone", tone);
-
-    router.push("/guide");
-  };
+  localStorage.setItem("selectedGuide", selectedGuide || "");
+  localStorage.setItem("selectedVoice", selectedVoice || "");
+  localStorage.setItem("selectedTone", selectedTone || "");
+  router.push("/dashboard");
+};
 
   const box =
     "px-4 py-3 text-sm font-semibold border border-white/20 bg-[#1c4e63] text-white";
@@ -160,7 +163,7 @@ export default function OnboardingPage() {
         <div className="pt-6">
           <button
             onClick={handleSave}
-            className="bg-yellow-400 text-black px-6 py-3 font-bold"
+            className="bg-yellow-500 px-6 py-3 text-black font-bold"
           >
             SAVE
           </button>
@@ -172,3 +175,4 @@ export default function OnboardingPage() {
     </div>
   );
 }
+
