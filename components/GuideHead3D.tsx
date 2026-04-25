@@ -82,7 +82,7 @@ export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHea
   const hasModel = typeof modelUrl === "string" && modelUrl.trim().length > 0;
 
   return (
-    <div className="relative h-[420px] w-[280px] shrink-0 overflow-hidden rounded-[28px] border border-emerald-300/15 bg-[#081411]">
+    <div className="relative h-[300px] w-[190px] shrink-0 overflow-hidden rounded-[24px] border border-emerald-300/15 bg-[#081411]">
       {hasModel ? (
         <div className="absolute right-2 top-2 z-20 rounded-full bg-black/55 px-2 py-1 text-[10px] tracking-wide text-emerald-200">
           3D MODEL ACTIVE
