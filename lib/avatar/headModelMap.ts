@@ -1,4 +1,5 @@
 ﻿const GUIDE_MODEL_MAP: Record<string, string | null> = {
+  // Point these to real rigged head models in /public/models/heads/*.glb when ready.
   "imageedit_14_7182524648.png": null,
   "imageedit_15_8566388634.png": null,
   "imageedit_17_9927503197.png": null,

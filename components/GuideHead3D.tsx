@@ -1,9 +1,10 @@
 ﻿"use client";
 
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { Float, OrbitControls } from "@react-three/drei";
+import { Float, OrbitControls, useGLTF } from "@react-three/drei";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
+import { setSpeakingMorphTargets } from "../lib/avatar/lipsync";
 
 type GuideHead3DProps = {
   imageSrc: string;
@@ -62,14 +63,57 @@ function FallbackHead({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking: 
   );
 }
 
+function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boolean }) {
+  const groupRef = useRef<THREE.Group>(null);
+  const gltf = useGLTF(modelUrl);
+
+  useMemo(() => {
+    gltf.scene.traverse((obj) => {
+      if ((obj as THREE.Mesh).isMesh) {
+        const mesh = obj as THREE.Mesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+      }
+    });
+  }, [gltf.scene]);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+
+    if (groupRef.current) {
+      groupRef.current.rotation.y = Math.sin(t * 0.6) * 0.1;
+      groupRef.current.rotation.x = Math.sin(t * 0.5) * 0.05;
+      groupRef.current.position.y = 0.1 + Math.sin(t * 1.1) * 0.035;
+    }
+
+    gltf.scene.traverse((obj) => {
+      if ((obj as THREE.Mesh).isMesh) {
+        setSpeakingMorphTargets(obj as THREE.Mesh, isSpeaking, t);
+      }
+    });
+  });
+
+  return (
+    <group ref={groupRef}>
+      <primitive object={gltf.scene} scale={1.35} position={[0, -1.02, 0]} />
+    </group>
+  );
+}
+
 export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHead3DProps) {
+  const hasModel = typeof modelUrl === "string" && modelUrl.trim().length > 0;
+
   return (
     <div className="relative h-[420px] w-[280px] shrink-0 overflow-hidden rounded-[28px] border border-emerald-300/15 bg-[#081411]">
-      {modelUrl ? (
+      {hasModel ? (
         <div className="absolute right-2 top-2 z-20 rounded-full bg-black/55 px-2 py-1 text-[10px] tracking-wide text-emerald-200">
-          MODEL MAPPED
+          3D MODEL ACTIVE
         </div>
-      ) : null}
+      ) : (
+        <div className="absolute right-2 top-2 z-20 rounded-full bg-black/55 px-2 py-1 text-[10px] tracking-wide text-emerald-200">
+          3D FALLBACK
+        </div>
+      )}
 
       <Canvas camera={{ position: [0, 0.1, 2.6], fov: 38 }} shadows dpr={[1, 2]}>
         <color attach="background" args={["#081411"]} />
@@ -78,7 +122,7 @@ export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHea
         <pointLight position={[-2.2, 0.9, 1.8]} intensity={0.85} color="#57ffcb" />
 
         <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.35}>
-          <FallbackHead imageSrc={imageSrc} isSpeaking={isSpeaking} />
+          {hasModel ? <ModelHead modelUrl={modelUrl!} isSpeaking={isSpeaking} /> : <FallbackHead imageSrc={imageSrc} isSpeaking={isSpeaking} />}
         </Float>
 
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.3, 0]} receiveShadow>
