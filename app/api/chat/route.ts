@@ -3,16 +3,19 @@
 export async function POST(req: Request) {
   const { message } = await req.json();
 
-  // TEMP simple logic (we'll upgrade to AI next)
-  let reply = "I hear you. Stay with me and tell me a little more.";
+  console.log("CHAT INPUT:", message);
 
-  if (message.toLowerCase().includes("hello")) {
-    reply = "Hello... I'm here with you now.";
+  let reply = "";
+
+  if (message.toLowerCase().includes("name")) {
+    reply = "You can call me your guide. I'm here for you.";
+  } else if (message.toLowerCase().includes("hello")) {
+    reply = "Hello... I'm right here with you.";
+  } else {
+    reply = "Tell me more... I'm listening.";
   }
 
-  if (message.toLowerCase().includes("how are you")) {
-    reply = "I'm here for you. Tell me what you're feeling.";
-  }
+  console.log("CHAT OUTPUT:", reply);
 
   return NextResponse.json({ reply });
 }

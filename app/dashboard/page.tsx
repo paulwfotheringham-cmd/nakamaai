@@ -26,15 +26,6 @@ const fantasyTile: Tile = {
   cta: "Browse Library",
 };
 
-const speak = (text: string, setIsSpeaking?: (v: boolean) => void) => {
-  const utterance = new SpeechSynthesisUtterance(text);
-
-  utterance.onstart = () => setIsSpeaking?.(true);
-  utterance.onend = () => setIsSpeaking?.(false);
-
-  speechSynthesis.speak(utterance);
-};
-
 function TileCard({ tile }: { tile: Tile }) {
   return (
     <Link href={tile.href} className="block h-full">
@@ -71,7 +62,7 @@ export default function DashboardPage() {
     setMessages([
       { id: 1, role: "assistant", content: `Hello ${userName}... I'm here with you now.` },
     ]);
-    speak(`Hello ${userName}... I'm here with you now.`, setIsSpeaking);
+    speak(`Hello ${userName}... I'm here with you now.`);
   }, []);
 
   useEffect(() => {
@@ -79,43 +70,35 @@ export default function DashboardPage() {
     if (storedVoice) setVoice(storedVoice);
   }, []);
 
-  const playVoice = async (text: string) => {
-    try {
-      const res = await fetch("/api/preview-voice", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          voice,
-          text,
-        }),
-      });
+  const speak = async (text: string) => {
+    setIsSpeaking(true);
 
-      if (!res.ok) {
-        console.error("Voice API failed");
-        return;
-      }
+    const res = await fetch("/api/preview-voice", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        voice: localStorage.getItem("selectedVoice"),
+        text,
+      }),
+    });
 
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
 
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
+    const audio = new Audio(url);
 
-      const audio = new Audio(url);
-      audioRef.current = audio;
-      audio.play();
+    audio.onended = () => {
+      setIsSpeaking(false);
+    };
 
-    } catch (err) {
-      console.error("Voice error:", err);
-    }
+    audio.play();
   };
 
   useEffect(() => {
     setTimeout(() => {
-      playVoice("Hello… I'm your guide. Welcome to your dashboard.");
+      speak("Hello… I'm your guide. Welcome to your dashboard.");
     }, 800);
   }, []);
 
@@ -127,8 +110,13 @@ export default function DashboardPage() {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
 
+    console.log("SENDING:", input);
+
     const res = await fetch("/api/chat", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({ message: input }),
     });
 
@@ -138,7 +126,7 @@ export default function DashboardPage() {
 
     setMessages((prev) => [...prev, botMessage]);
 
-    speak(data.reply, setIsSpeaking);
+    speak(data.reply);
   };
 
   return (
@@ -171,8 +159,10 @@ export default function DashboardPage() {
             {/* GUIDE (LEFT) */}
             <img
               src={guideImage}
-              className={`h-[420px] object-contain transition-all duration-150 ${
-                isSpeaking ? "scale-[1.02] -translate-y-1" : ""
+              className={`h-[420px] object-contain transition-all duration-200 ${
+                isSpeaking
+                  ? "scale-105 -translate-y-2 drop-shadow-[0_0_30px_rgba(0,255,180,0.6)]"
+                  : "opacity-90"
               }`}
               alt="Guide"
             />
