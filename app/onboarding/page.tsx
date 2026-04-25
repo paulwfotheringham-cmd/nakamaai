@@ -140,7 +140,7 @@ export default function OnboardingPage() {
             >
               <img
                 src={`/guides/${guides[guideIndex]}`}
-                alt={guides[guideIndex]}
+                alt="Guide option"
                 className="h-28 w-auto object-contain"
               />
             </button>
