@@ -14,8 +14,8 @@ type Tile = {
 
 type ChatMessage = {
   id: number;
-  role: "guide" | "user";
-  text: string;
+  role: "assistant" | "user";
+  content: string;
 };
 
 const fantasyTile: Tile = {
@@ -24,6 +24,15 @@ const fantasyTile: Tile = {
   href: "/fantasy-audio",
   icon: "📚",
   cta: "Browse Library",
+};
+
+const speak = (text: string, setIsSpeaking?: (v: boolean) => void) => {
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  utterance.onstart = () => setIsSpeaking?.(true);
+  utterance.onend = () => setIsSpeaking?.(false);
+
+  speechSynthesis.speak(utterance);
 };
 
 function TileCard({ tile }: { tile: Tile }) {
@@ -49,8 +58,9 @@ function TileCard({ tile }: { tile: Tile }) {
 export default function DashboardPage() {
   const [guideImage, setGuideImage] = useState("/guides/GUIDE1.png");
   const [voice, setVoice] = useState("Donny - Steady Presence");
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [draft, setDraft] = useState("");
+  const [input, setInput] = useState("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -59,17 +69,9 @@ export default function DashboardPage() {
 
     const userName = localStorage.getItem("userName") || "there";
     setMessages([
-      { id: 1, role: "guide", text: `Hello ${userName}... I'm here with you now.` },
+      { id: 1, role: "assistant", content: `Hello ${userName}... I'm here with you now.` },
     ]);
-
-    const t = setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { id: 2, role: "guide", text: "Tell me your mood and I'll shape tonight for you." },
-      ]);
-    }, 900);
-
-    return () => clearTimeout(t);
+    speak(`Hello ${userName}... I'm here with you now.`, setIsSpeaking);
   }, []);
 
   useEffect(() => {
@@ -117,6 +119,28 @@ export default function DashboardPage() {
     }, 800);
   }, []);
 
+  const sendMessage = async () => {
+    if (!input.trim()) return;
+
+    const userMessage = { id: Date.now(), role: "user", content: input } as const;
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      body: JSON.stringify({ message: input }),
+    });
+
+    const data = await res.json();
+
+    const botMessage = { id: Date.now() + 1, role: "assistant", content: data.reply } as const;
+
+    setMessages((prev) => [...prev, botMessage]);
+
+    speak(data.reply, setIsSpeaking);
+  };
+
   return (
     <main className="relative min-h-screen bg-[#07040d] text-white">
       <a href="/" className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-white/75 backdrop-blur-md">← Home</a>
@@ -147,7 +171,9 @@ export default function DashboardPage() {
             {/* GUIDE (LEFT) */}
             <img
               src={guideImage}
-              className="h-[420px] object-contain"
+              className={`h-[420px] object-contain transition-all duration-150 ${
+                isSpeaking ? "scale-[1.02] -translate-y-1" : ""
+              }`}
               alt="Guide"
             />
 
@@ -167,7 +193,7 @@ export default function DashboardPage() {
                         : "bg-black/35 text-emerald-50"
                     }`}
                   >
-                    {m.text}
+                    {m.content}
                   </div>
                 ))}
               </div>
@@ -176,28 +202,12 @@ export default function DashboardPage() {
                 className="mt-4 flex gap-2"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  const text = draft.trim();
-                  if (!text) return;
-
-                  setMessages((prev) => [...prev, { id: Date.now(), role: "user", text }]);
-                  setDraft("");
-
-                  setTimeout(() => {
-                    setMessages((prev) => [
-                      ...prev,
-                      {
-                        id: Date.now() + 1,
-                        role: "guide",
-                        text: "I hear you. Stay with me and tell me a little more.",
-                      },
-                    ]);
-                    playVoice("I hear you. Stay with me and tell me more.");
-                  }, 450);
+                  void sendMessage();
                 }}
               >
                 <input
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
                   placeholder="Type your message..."
                   className="flex-1 rounded-lg bg-[#041f1c] px-3 py-2 text-white outline-none"
                 />
