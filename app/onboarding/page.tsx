@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [guide, setGuide] = useState("GUIDE1.png");
   const [voice, setVoice] = useState("Donny - Steady Presence");
@@ -19,6 +20,13 @@ export default function OnboardingPage() {
     { id: "alex", name: "Alex - Smooth Operator" }
   ];
   const tones = ["Relaxed", "Playful", "Intense"];
+
+  const playPreview = (voiceName: string) => {
+    // TEMP: use same intro audio for all previews (until real voice API wired)
+    if (!audioRef.current) return;
+    audioRef.current.src = "/audio/intro.mp3";
+    audioRef.current.play().catch(() => {});
+  };
 
   const handleSave = () => {
     localStorage.setItem("selectedGuide", guide);
@@ -48,13 +56,19 @@ export default function OnboardingPage() {
         <div className="flex items-center gap-4">
           <div className={`${box} w-[140px]`}>SELECT GUIDE</div>
 
-          {guides.map((g, i) => (
+          {guides.map((g) => (
             <button
               key={g}
               onClick={() => setGuide(g)}
-              className={`${box} ${guide === g ? active : ""}`}
+              className={`p-2 border ${
+                guide === g ? "border-green-400" : "border-white/20"
+              }`}
             >
-              GUIDE {i + 1}
+              <img
+                src={`/guides/${g}`}
+                alt={g}
+                className="h-28 w-auto object-contain"
+              />
             </button>
           ))}
         </div>
@@ -72,7 +86,11 @@ export default function OnboardingPage() {
                 {v.name}
               </button>
 
-              <button className="text-xs px-3 py-1 bg-[#1c4e63] border border-white/20">
+              <button
+                type="button"
+                onClick={() => playPreview(v.name)}
+                className="text-xs px-3 py-1 bg-[#1c4e63] border border-white/20"
+              >
                 PREVIEW
               </button>
             </div>
@@ -105,6 +123,8 @@ export default function OnboardingPage() {
         </div>
 
       </div>
+
+      <audio ref={audioRef} />
     </div>
   );
 }
