@@ -9,6 +9,7 @@ export default function GuidePage() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [lineIndex, setLineIndex] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [showTap, setShowTap] = useState(false);
 
   const lines = [
     "Hello… I’ve been waiting for you.",
@@ -52,6 +53,16 @@ export default function GuidePage() {
     return () => clearTimeout(t);
   }, [isSpeaking]);
 
+  useEffect(() => {
+    if (lineIndex !== 1) return;
+
+    const t = setTimeout(() => {
+      setShowTap(true);
+    }, 1200); // slight delay after second line
+
+    return () => clearTimeout(t);
+  }, [lineIndex]);
+
   const handleClick = () => {
     if (!hasInteracted) {
       setHasInteracted(true);
@@ -76,9 +87,16 @@ export default function GuidePage() {
       />
 
       {isSpeaking && (
-        <p className="mt-10 text-center px-6 text-xl tracking-wide text-white/80 animate-subtitle-in">
-          {currentText}
-        </p>
+        <>
+          <p className="mt-10 text-center px-6 text-xl tracking-wide text-white/80 animate-subtitle-in">
+            {currentText}
+          </p>
+          {showTap && !hasInteracted && (
+            <p className="mt-4 text-sm text-white/40 animate-subtitle-in">
+              Tap to continue
+            </p>
+          )}
+        </>
       )}
     </div>
   );
