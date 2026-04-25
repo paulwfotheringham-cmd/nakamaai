@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { Float, OrbitControls, useGLTF } from "@react-three/drei";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { setSpeakingMorphTargets } from "../lib/avatar/lipsync";
 
@@ -43,6 +43,7 @@ function FallbackHead2D({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking
 
 function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
+  const modelRef = useRef<THREE.Object3D>(null);
   const gltf = useGLTF(modelUrl);
 
   useMemo(() => {
@@ -53,6 +54,27 @@ function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boo
         mesh.receiveShadow = true;
       }
     });
+  }, [gltf.scene]);
+
+  useEffect(() => {
+    if (!modelRef.current) return;
+
+    const box = new THREE.Box3().setFromObject(modelRef.current);
+    const size = new THREE.Vector3();
+    const center = new THREE.Vector3();
+    box.getSize(size);
+    box.getCenter(center);
+
+    const largestAxis = Math.max(size.x, size.y, size.z) || 1;
+    const targetSize = 1.8;
+    const normalizedScale = targetSize / largestAxis;
+
+    modelRef.current.scale.setScalar(normalizedScale);
+    modelRef.current.position.set(
+      -center.x * normalizedScale,
+      -center.y * normalizedScale - 0.1,
+      -center.z * normalizedScale,
+    );
   }, [gltf.scene]);
 
   useFrame(({ clock }) => {
@@ -73,7 +95,7 @@ function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boo
 
   return (
     <group ref={groupRef}>
-      <primitive object={gltf.scene} scale={1.35} position={[0, -1.02, 0]} />
+      <primitive ref={modelRef} object={gltf.scene} />
     </group>
   );
 }
@@ -94,20 +116,16 @@ export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHea
       )}
 
       {hasModel ? (
-        <Canvas camera={{ position: [0, 0.1, 2.6], fov: 38 }} shadows dpr={[1, 2]}>
+        <Canvas camera={{ position: [0, 0.2, 2.2], fov: 34 }} shadows dpr={[1, 2]}>
           <color attach="background" args={["#081411"]} />
-          <hemisphereLight intensity={0.52} color="#d8fff2" groundColor="#0a0909" />
-          <directionalLight position={[2, 3, 3]} intensity={1.2} color="#f7fff8" castShadow />
-          <pointLight position={[-2.2, 0.9, 1.8]} intensity={0.85} color="#57ffcb" />
+          <ambientLight intensity={0.5} />
+          <hemisphereLight intensity={0.62} color="#d8fff2" groundColor="#0a0909" />
+          <directionalLight position={[2, 3, 3]} intensity={1.35} color="#f7fff8" castShadow />
+          <pointLight position={[-2.2, 0.9, 1.8]} intensity={0.95} color="#57ffcb" />
 
           <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.35}>
             <ModelHead modelUrl={modelUrl!} isSpeaking={isSpeaking} />
           </Float>
-
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.3, 0]} receiveShadow>
-            <circleGeometry args={[1.3, 48]} />
-            <shadowMaterial transparent opacity={0.28} />
-          </mesh>
 
           <OrbitControls enableZoom={false} enablePan={false} minPolarAngle={1.25} maxPolarAngle={1.9} />
         </Canvas>
