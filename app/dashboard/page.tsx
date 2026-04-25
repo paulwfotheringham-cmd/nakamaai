@@ -142,20 +142,22 @@ export default function DashboardPage() {
           </div>
 
           {/* RIGHT SIDE */}
-          <div className="w-[520px] flex flex-col items-center gap-6">
+          <div className="w-[700px] flex items-start gap-6">
 
+            {/* GUIDE (LEFT) */}
             <img
               src={guideImage}
               className="h-[420px] object-contain"
               alt="Guide"
             />
 
-            <div className="w-full rounded-2xl border border-[#1f4f45] bg-[#062f2a] p-4">
+            {/* CHAT (RIGHT) */}
+            <div className="flex-1 rounded-2xl border border-[#1f4f45] bg-[#062f2a] p-4">
               <div className="text-xs tracking-widest text-[#9ed6c7] mb-3">
                 GUIDE CHAT
               </div>
 
-              <div className="h-[240px] overflow-y-auto space-y-3 pr-2">
+              <div className="h-[300px] overflow-y-auto space-y-3 pr-2">
                 {messages.map((m) => (
                   <div
                     key={m.id}
