@@ -35,7 +35,8 @@ export default function OnboardingPage() {
       });
 
       if (!res.ok) {
-        console.error("Preview failed", await res.text());
+        const err = await res.text();
+        console.error("Preview API error:", err);
         return;
       }
 
@@ -44,10 +45,17 @@ export default function OnboardingPage() {
 
       if (!audioRef.current) return;
 
-      audioRef.current.src = url;
-      await audioRef.current.play();
+      const audio = audioRef.current;
+
+      // reset before playing
+      audio.pause();
+      audio.currentTime = 0;
+
+      audio.src = url;
+
+      await audio.play();
     } catch (err) {
-      console.error("Preview failed", err);
+      console.error("Preview failed:", err);
     }
   };
 
