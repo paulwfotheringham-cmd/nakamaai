@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Bounds, Float, OrbitControls, useGLTF } from "@react-three/drei";
-import { Suspense, useMemo, useRef, useState } from "react";
+import { OrbitControls, useGLTF } from "@react-three/drei";
+import { Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { setSpeakingMorphTargets } from "../lib/avatar/lipsync";
 
@@ -12,35 +12,6 @@ type GuideHead3DProps = {
   isSpeaking: boolean;
   modelUrl?: string | null;
 };
-
-type ModelErrorBoundaryProps = {
-  onError: () => void;
-  children: React.ReactNode;
-};
-
-type ModelErrorBoundaryState = {
-  hasError: boolean;
-};
-
-class ModelErrorBoundary extends React.Component<ModelErrorBoundaryProps, ModelErrorBoundaryState> {
-  constructor(props: ModelErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch() {
-    this.props.onError();
-  }
-
-  render() {
-    if (this.state.hasError) return null;
-    return this.props.children;
-  }
-}
 
 function FallbackHead2D({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking: boolean }) {
   return (
@@ -56,7 +27,6 @@ function FallbackHead2D({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking
 }
 
 function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boolean }) {
-  const groupRef = useRef<THREE.Group>(null);
   const gltf = useGLTF(modelUrl);
 
   useMemo(() => {
@@ -71,12 +41,6 @@ function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boo
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
-
-    if (groupRef.current) {
-      groupRef.current.rotation.y = Math.sin(t * 0.6) * 0.1;
-      groupRef.current.rotation.x = Math.sin(t * 0.5) * 0.05;
-      groupRef.current.position.y = 0.1 + Math.sin(t * 1.1) * 0.035;
-    }
 
     gltf.scene.traverse((obj) => {
       if ((obj as THREE.Mesh).isMesh) {
@@ -96,19 +60,15 @@ function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boo
   });
 
   return (
-    <group ref={groupRef}>
-      <primitive object={gltf.scene} />
+    <group>
+      <primitive object={gltf.scene} scale={1.45} position={[0, -1.0, 0]} />
     </group>
   );
 }
 
 export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHead3DProps) {
-  const [modelFailed, setModelFailed] = useState(false);
-  const primaryModel = typeof modelUrl === "string" && modelUrl.trim().length > 0
-    ? modelUrl
-    : "/models/heads/male-guide.glb";
-  const activeModelUrl = modelFailed ? "/models/heads/male-guide-backup.glb" : primaryModel;
-  const showModel = Boolean(activeModelUrl);
+  const activeModelUrl = "/models/heads/male-guide-backup.glb";
+  const showModel = true;
 
   return (
     <div className="relative h-[300px] w-[190px] shrink-0 overflow-hidden rounded-[24px] border border-emerald-300/15 bg-[#081411]">
@@ -123,28 +83,45 @@ export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHea
       )}
 
       {showModel ? (
-        <Canvas camera={{ position: [0, 0, 4.5], fov: 32 }} shadows dpr={[1, 2]}>
+        <Canvas camera={{ position: [0, 0.05, 3.7], fov: 30 }} shadows dpr={[1, 2]}>
           <color attach="background" args={["#081411"]} />
-          <ambientLight intensity={0.75} />
-          <hemisphereLight intensity={0.85} color="#ffffff" groundColor="#1f1f1f" />
-          <directionalLight position={[2, 3, 3]} intensity={1.25} color="#ffffff" castShadow />
-          <pointLight position={[-2.2, 1.1, 2.2]} intensity={0.9} color="#7ffff0" />
+          <ambientLight intensity={0.95} />
+          <hemisphereLight intensity={0.75} color="#ffffff" groundColor="#212121" />
+          <directionalLight position={[2, 3, 3]} intensity={1.15} color="#ffffff" castShadow />
+          <pointLight position={[-2.2, 1.1, 2.2]} intensity={0.8} color="#7ffff0" />
 
           <Suspense fallback={null}>
-            <ModelErrorBoundary onError={() => setModelFailed(true)}>
-              <Bounds fit clip observe margin={1.2}>
-                <Float speed={1.2} rotationIntensity={0.08} floatIntensity={0.12}>
-                  <ModelHead modelUrl={activeModelUrl} isSpeaking={isSpeaking} />
-                </Float>
-              </Bounds>
-            </ModelErrorBoundary>
+            <ModelHead modelUrl={activeModelUrl} isSpeaking={isSpeaking} />
           </Suspense>
 
-          <OrbitControls enableZoom={false} enablePan={false} minPolarAngle={1.2} maxPolarAngle={1.95} />
+          <OrbitControls enableZoom={false} enablePan={false} minPolarAngle={1.35} maxPolarAngle={1.7} />
         </Canvas>
       ) : (
         <FallbackHead2D imageSrc={imageSrc} isSpeaking={isSpeaking} />
       )}
+
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute left-1/2 top-[49%] h-[7.5%] w-[16%] -translate-x-1/2 rounded-full border border-black/35 bg-black/55 ${
+          isSpeaking ? "guide-mouth-active" : "guide-mouth-idle"
+        }`}
+      />
+
+      <style jsx>{`
+        @keyframes lipPulse {
+          0% { transform: translateX(-50%) scaleY(0.45) scaleX(1.02); }
+          50% { transform: translateX(-50%) scaleY(1.15) scaleX(0.94); }
+          100% { transform: translateX(-50%) scaleY(0.45) scaleX(1.02); }
+        }
+        .guide-mouth-active {
+          animation: lipPulse 120ms ease-in-out infinite;
+          opacity: 0.75;
+        }
+        .guide-mouth-idle {
+          transform: translateX(-50%) scaleY(0.45);
+          opacity: 0.45;
+        }
+      `}</style>
     </div>
   );
 }
