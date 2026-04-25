@@ -20,6 +20,7 @@ const GUIDE_CHOICES = [
 export default function OnboardingPage() {
   const router = useRouter();
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const guideScrollerRef = useRef<HTMLDivElement | null>(null);
 
   const [guideIndex, setGuideIndex] = useState(0);
   const [guide, setGuide] = useState<string>(GUIDE_CHOICES[0]);
@@ -51,7 +52,7 @@ export default function OnboardingPage() {
         },
         body: JSON.stringify({
           voice: voiceName,
-          text: "Helloâ€¦ I've been waiting for you.",
+          text: "Hello... I've been waiting for you.",
         }),
       });
 
@@ -99,60 +100,78 @@ export default function OnboardingPage() {
 };
 
   const box =
-    "px-4 py-3 text-sm font-semibold border border-white/20 bg-[#1c4e63] text-white";
+    "px-4 py-3 text-sm font-semibold border border-white/20 bg-[#1c4e63] text-white rounded-lg";
 
   const active =
     "bg-[#8EE26B] text-black border-transparent";
 
+  const scrollGuides = (direction: "left" | "right") => {
+    const el = guideScrollerRef.current;
+    if (!el) return;
+    const amount = direction === "left" ? -240 : 240;
+    el.scrollBy({ left: amount, behavior: "smooth" });
+  };
+
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-6">
-      <div className="w-full max-w-5xl space-y-6">
+    <div className="min-h-screen bg-black text-white px-6 py-10">
+      <div className="mx-auto w-full max-w-6xl space-y-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.45)] sm:p-8">
 
         {/* HEADER TEXT */}
-        <p className="text-sm text-white/80 max-w-md">
+        <p className="max-w-3xl text-sm leading-relaxed text-white/80 sm:text-base">
           Thanks for signing up, in order for us to maximise your experience we provide a personal Guide for each user. 
           This Guide where you can choose how they look, talk and act will always be with you on your Nakama Nights experience.
         </p>
 
         {/* GUIDE ROW */}
-        <div className="flex items-center gap-4">
-          <div className={`${box} w-[140px]`}>SELECT GUIDE</div>
-
+        <div className="space-y-3">
+          <div className={`${box} inline-flex`}>SELECT GUIDE</div>
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => {
-                const next = (guideIndex - 1 + guides.length) % guides.length;
-                setGuideIndex(next);
-                setGuide(guides[next]);
-              }}
-              className="h-11 w-11 rounded-full border border-white/25 bg-[#0f2f3d] text-xl text-white transition hover:border-white/45"
+              onClick={() => scrollGuides("left")}
+              className="h-11 w-11 shrink-0 rounded-full border border-white/25 bg-[#0f2f3d] text-xl text-white transition hover:border-white/45"
+              aria-label="Scroll guides left"
             >
               ‹
             </button>
 
-            <button
-              type="button"
-              onClick={() => setGuide(guides[guideIndex])}
-              className={`rounded-xl border p-2 ${
-                guide === guides[guideIndex] ? "border-green-400" : "border-white/20"
-              }`}
+            <div
+              ref={guideScrollerRef}
+              className="flex min-w-0 flex-1 gap-3 overflow-x-auto rounded-xl border border-white/10 bg-black/35 p-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
-              <img
-                src={`/guides/${guides[guideIndex]}`}
-                alt="Guide option"
-                className="h-28 w-auto object-contain"
-              />
-            </button>
+              {guides.map((g, idx) => (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() => {
+                    setGuide(g);
+                    setGuideIndex(idx);
+                  }}
+                  className={`group relative h-36 w-28 shrink-0 overflow-hidden rounded-xl border-2 bg-black transition ${
+                    guide === g
+                      ? "border-green-400 shadow-[0_0_0_1px_rgba(134,239,172,0.35)]"
+                      : "border-white/15 hover:border-white/40"
+                  }`}
+                >
+                  <img
+                    src={`/guides/${g}`}
+                    alt="Guide option"
+                    className="h-full w-full object-cover transition group-hover:scale-[1.02]"
+                  />
+                  {guide === g && (
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent py-1 text-[10px] font-semibold tracking-[0.14em] text-green-300">
+                      SELECTED
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
 
             <button
               type="button"
-              onClick={() => {
-                const next = (guideIndex + 1) % guides.length;
-                setGuideIndex(next);
-                setGuide(guides[next]);
-              }}
-              className="h-11 w-11 rounded-full border border-white/25 bg-[#0f2f3d] text-xl text-white transition hover:border-white/45"
+              onClick={() => scrollGuides("right")}
+              className="h-11 w-11 shrink-0 rounded-full border border-white/25 bg-[#0f2f3d] text-xl text-white transition hover:border-white/45"
+              aria-label="Scroll guides right"
             >
               ›
             </button>
@@ -160,42 +179,48 @@ export default function OnboardingPage() {
         </div>
 
         {/* VOICE ROW */}
-        <div className="flex items-center gap-4">
-          <div className={`${box} w-[140px]`}>SELECT VOICE</div>
+        <div className="space-y-3">
+          <div className={`${box} inline-flex`}>SELECT VOICE</div>
 
-          {voices.map((v) => (
-            <div key={v.id} className="flex flex-col gap-2">
-              <button
-                onClick={() => setVoice(v.name)}
-                className={`${box} ${voice === v.name ? active : ""}`}
-              >
-                {v.name}
-              </button>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {voices.map((v) => (
+              <div key={v.id} className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 p-2">
+                <button
+                  onClick={() => setVoice(v.name)}
+                  className={`${box} flex-1 text-left ${voice === v.name ? active : ""}`}
+                >
+                  {v.name}
+                </button>
 
-              <button
-                type="button"
-                onClick={() => playPreview(v.name)}
-                className="text-xs px-3 py-1 bg-[#1c4e63] border border-white/20"
-              >
-                PREVIEW
-              </button>
-            </div>
-          ))}
+                <button
+                  type="button"
+                  onClick={() => playPreview(v.name)}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-[#103746] text-sm text-white transition hover:border-white/50"
+                  aria-label={`Play preview for ${v.name}`}
+                  title="Play preview"
+                >
+                  ▶
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* TONE ROW */}
-        <div className="flex items-center gap-4">
-          <div className={`${box} w-[140px]`}>SELECT TONE</div>
+        <div className="space-y-3">
+          <div className={`${box} inline-flex`}>SELECT TONE</div>
 
-          {tones.map((t) => (
-            <button
-              key={t}
-              onClick={() => setTone(t)}
-              className={`${box} ${tone === t ? active : ""}`}
-            >
-              {t.toUpperCase()}
-            </button>
-          ))}
+          <div className="flex flex-wrap gap-3">
+            {tones.map((t) => (
+              <button
+                key={t}
+                onClick={() => setTone(t)}
+                className={`${box} min-w-[140px] ${tone === t ? active : ""}`}
+              >
+                {t.toUpperCase()}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* SAVE BUTTON */}
