@@ -1,5 +1,7 @@
-﻿import Link from "next/link";
-import { useEffect, useState } from "react";
+﻿"use client";
+
+import { useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import CreateAudioTile from "./CreateAudioTile";
 
 type Tile = {
