@@ -1,11 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function OnboardingPage() {
-  const router = useRouter();
-
   const [appearance, setAppearance] = useState<string | null>(null);
 
   const guideOptions = [
@@ -57,7 +54,14 @@ export default function OnboardingPage() {
           <button
             type="button"
             disabled={!appearance}
-            onClick={() => router.push("/guide")}
+            onClick={() => {
+              if (!appearance) return;
+              const fileName = appearance.split("/").pop();
+              if (fileName) {
+                localStorage.setItem("selectedGuide", fileName);
+              }
+              window.location.href = "/guide";
+            }}
             className={`rounded-full px-8 py-3 text-sm font-semibold transition ${
               appearance
                 ? "bg-amber-200 text-black hover:bg-amber-100"
