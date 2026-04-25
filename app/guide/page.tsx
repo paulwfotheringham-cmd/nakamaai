@@ -2,25 +2,51 @@
 
 import { useEffect, useRef, useState } from "react";
 
+const dialogueMap = {
+  business: [
+    "You’ve had a long day, haven’t you?",
+    "Come here… let me take control tonight."
+  ],
+  pirate: [
+    "Ah… a curious one, aren’t you?",
+    "Careful… I don’t play gentle."
+  ],
+  victorian: [
+    "You shouldn’t be here…",
+    "And yet… I’m very glad you are."
+  ],
+  army: ["Stand still.", "I’ll tell you exactly what to do."],
+  highland: [
+    "Come closer…",
+    "I’ve been thinking about you all day."
+  ]
+} as const;
+
+type GuideType = keyof typeof dialogueMap;
+
 export default function GuidePage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [guideImage, setGuideImage] = useState("/guides/GUIDE1.png");
+  const [guideType, setGuideType] = useState<GuideType>("business");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [lineIndex, setLineIndex] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [showTap, setShowTap] = useState(false);
 
-  const lines = [
-    "Hello… I’ve been waiting for you.",
-    "Let me take care of you tonight."
-  ];
+  const lines = dialogueMap[guideType];
 
   // Load selected guide
   useEffect(() => {
     const stored = localStorage.getItem("selectedGuide");
     if (stored) {
       setGuideImage(`/guides/${stored}`);
+
+      if (stored === "GUIDE1.png") setGuideType("business");
+      if (stored === "GUIDE2.png") setGuideType("pirate");
+      if (stored === "GUIDE3.png") setGuideType("victorian");
+      if (stored === "GUIDE4.png") setGuideType("army");
+      if (stored === "GUIDE5.png") setGuideType("highland");
     }
   }, []);
 

@@ -1,76 +1,103 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function OnboardingPage() {
-  const [appearance, setAppearance] = useState<string | null>(null);
+  const router = useRouter();
 
-  const guideOptions = [
-    { id: 1, src: "/guides/GUIDE1.png", label: "Business" },
-    { id: 2, src: "/guides/GUIDE2.png", label: "Pirate" },
-    { id: 3, src: "/guides/GUIDE3.png", label: "Victorian" },
-    { id: 4, src: "/guides/GUIDE4.png", label: "Army" },
-    { id: 5, src: "/guides/GUIDE5.png", label: "Classic" },
-  ];
+  const [guide, setGuide] = useState("GUIDE1.png");
+  const [voice, setVoice] = useState("Deep, Calm");
+  const [tone, setTone] = useState("Relaxed");
+
+  const guides = ["GUIDE1.png", "GUIDE2.png", "GUIDE3.png", "GUIDE4.png", "GUIDE5.png"];
+  const voices = ["Deep, Calm", "Confident, Smooth", "Playful, Teasing", "Dark, Intense"];
+  const tones = ["Relaxed", "Playful", "Intense"];
+
+  const handleSave = () => {
+    localStorage.setItem("selectedGuide", guide);
+    localStorage.setItem("selectedVoice", voice);
+    localStorage.setItem("selectedTone", tone);
+
+    router.push("/guide");
+  };
+
+  const box =
+    "px-4 py-3 text-sm font-semibold border border-white/20 bg-[#1c4e63] text-white";
+
+  const active =
+    "bg-[#8EE26B] text-black border-transparent";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black px-6 text-white">
-      <div className="w-full max-w-5xl text-center">
-        {/* HEADER */}
-        <p className="mb-4 text-xs tracking-[0.2em] text-amber-400">NAKAMA NIGHTS</p>
+    <div className="min-h-screen bg-black text-white flex items-center justify-center px-6">
+      <div className="w-full max-w-5xl space-y-6">
 
-        <h1 className="mb-2 font-serif text-4xl">Choose your Guide</h1>
+        {/* HEADER TEXT */}
+        <p className="text-sm text-white/80 max-w-md">
+          Thanks for signing up, in order for us to maximise your experience we provide a personal Guide for each user. 
+          This Guide where you can choose how they look, talk and act will always be with you on your Nakama Nights experience.
+        </p>
 
-        <p className="mb-12 text-stone-400">Choose the one you&apos;re drawn to.</p>
+        {/* GUIDE ROW */}
+        <div className="flex items-center gap-4">
+          <div className={`${box} w-[140px]`}>SELECT GUIDE</div>
 
-        {/* GRID */}
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-3">
-          {guideOptions.map((guide) => (
+          {guides.map((g, i) => (
             <button
-              key={guide.id}
-              type="button"
-              onClick={() => setAppearance(guide.src)}
-              className={`cursor-pointer rounded-2xl p-6 text-left transition-all duration-300 ${
-                appearance === guide.src
-                  ? "scale-105 bg-black/40 ring-2 ring-amber-300 backdrop-blur-sm"
-                  : "bg-black/30 hover:scale-105"
-              }`}
+              key={g}
+              onClick={() => setGuide(g)}
+              className={`${box} ${guide === g ? active : ""}`}
             >
-              <div className="flex h-72 items-end justify-center">
-                <img
-                  src={guide.src}
-                  alt={guide.label}
-                  className="h-full scale-125 object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,1)]"
-                />
-              </div>
-
-              <p className="mt-4 text-sm text-stone-300">{guide.label}</p>
+              GUIDE {i + 1}
             </button>
           ))}
         </div>
 
-        {/* BUTTONS */}
-        <div className="mt-12 flex justify-center gap-4">
+        {/* VOICE ROW */}
+        <div className="flex items-center gap-4">
+          <div className={`${box} w-[140px]`}>SELECT VOICE</div>
+
+          {voices.map((v) => (
+            <div key={v} className="flex flex-col gap-2">
+              <button
+                onClick={() => setVoice(v)}
+                className={`${box} ${voice === v ? active : ""}`}
+              >
+                {v}
+              </button>
+
+              <button className="text-xs px-3 py-1 bg-[#1c4e63] border border-white/20">
+                PREVIEW
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* TONE ROW */}
+        <div className="flex items-center gap-4">
+          <div className={`${box} w-[140px]`}>SELECT TONE</div>
+
+          {tones.map((t) => (
+            <button
+              key={t}
+              onClick={() => setTone(t)}
+              className={`${box} ${tone === t ? active : ""}`}
+            >
+              {t.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
+        {/* SAVE BUTTON */}
+        <div className="pt-6">
           <button
-            type="button"
-            disabled={!appearance}
-            onClick={() => {
-              if (!appearance) return;
-              const fileName = appearance.split("/").pop();
-              if (fileName) {
-                localStorage.setItem("selectedGuide", fileName);
-              }
-              window.location.href = "/guide";
-            }}
-            className={`rounded-full px-8 py-3 text-sm font-semibold transition ${
-              appearance
-                ? "bg-amber-200 text-black hover:bg-amber-100"
-                : "cursor-not-allowed bg-stone-700 text-stone-400"
-            }`}
+            onClick={handleSave}
+            className="bg-yellow-400 text-black px-6 py-3 font-bold"
           >
-            Continue
+            SAVE
           </button>
         </div>
+
       </div>
     </div>
   );
