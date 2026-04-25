@@ -20,14 +20,6 @@ const tiles: Tile[] = [
     cta: "Browse Library",
   },
   {
-    title: "Marketplace",
-    description:
-      "Explore and discover fantasy audio experiences from the community.",
-    href: "/marketplace",
-    icon: "🛍️",
-    cta: "Enter",
-  },
-  {
     title: "Profile",
     description:
       "Manage your details, preferences, and account settings.",
@@ -106,7 +98,7 @@ export default function DashboardPage() {
             </h2>
             <p className="mt-3 text-base leading-7 text-zinc-300">
               Choose fantasy audio, create your own fantasy audio, explore the
-              marketplace, or manage your profile.
+              platform, or manage your profile.
             </p>
           </div>
         </div>
