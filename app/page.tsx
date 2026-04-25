@@ -16,8 +16,8 @@ export default function Home() {
     localStorage.setItem("userName", name);
     localStorage.setItem("userEmail", email);
 
-    // go straight to onboarding
-    router.push("/onboarding");
+    // next step is plan selection
+    router.push("/select-plan");
   };
 
   return (

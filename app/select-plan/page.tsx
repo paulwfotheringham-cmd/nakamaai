@@ -116,7 +116,7 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
               type="button"
               onClick={() => {
                 localStorage.setItem("plan", "paid");
-                router.push("/onboarding");
+                router.push("/fake-checkout?plan=nights");
               }}
               className="mt-8 inline-flex w-full shrink-0 items-center justify-center rounded-full border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-6 py-3.5 text-center text-sm font-semibold text-zinc-950 shadow-md transition hover:from-amber-100 hover:to-amber-500 sm:py-4 sm:text-[15px]"
             >
@@ -160,7 +160,7 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
               type="button"
               onClick={() => {
                 localStorage.setItem("plan", "free");
-                router.push("/onboarding");
+                router.push("/fake-checkout?plan=teaser");
               }}
               className="mt-8 inline-flex w-full shrink-0 items-center justify-center rounded-full border border-amber-800/50 bg-transparent px-6 py-3.5 text-center text-sm font-semibold text-amber-100/95 transition hover:border-amber-600/60 hover:bg-amber-950/30 sm:py-4 sm:text-[15px]"
             >

@@ -12,6 +12,12 @@ type Tile = {
   cta: string;
 };
 
+type ChatMessage = {
+  id: number;
+  role: "guide" | "user";
+  text: string;
+};
+
 const fantasyTile: Tile = {
   title: "Choose fantasy Audio",
   description: "Browse and begin your next immersive audio experience.",
@@ -42,10 +48,26 @@ function TileCard({ tile }: { tile: Tile }) {
 
 export default function DashboardPage() {
   const [guideImage, setGuideImage] = useState("/guides/GUIDE1.png");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [draft, setDraft] = useState("");
 
   useEffect(() => {
     const stored = localStorage.getItem("selectedGuide");
     if (stored) setGuideImage(`/guides/${stored}`);
+
+    const userName = localStorage.getItem("userName") || "there";
+    setMessages([
+      { id: 1, role: "guide", text: `Hello ${userName}... I'm here with you now.` },
+    ]);
+
+    const t = setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        { id: 2, role: "guide", text: "Tell me your mood and I'll shape tonight for you." },
+      ]);
+    }, 900);
+
+    return () => clearTimeout(t);
   }, []);
 
   return (
@@ -77,9 +99,63 @@ export default function DashboardPage() {
               className="h-[400px] object-contain animate-alive"
             />
 
-            <div className="w-full h-[260px] rounded-xl bg-green-500/90 flex items-center justify-center text-black font-semibold">
-              CHATBOX
+            <div className="w-full h-[260px] overflow-hidden rounded-xl border border-emerald-300/35 bg-emerald-500/15 backdrop-blur-sm">
+              <div className="border-b border-emerald-200/30 px-4 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/90">
+                Guide Chat
+              </div>
+              <div className="flex h-[206px] flex-col gap-3 overflow-y-auto px-4 py-3">
+                {messages.map((m) => (
+                  <div
+                    key={m.id}
+                    className={`max-w-[92%] rounded-lg px-3 py-2 text-sm leading-relaxed ${
+                      m.role === "user"
+                        ? "self-end bg-emerald-200/85 text-black"
+                        : "bg-black/35 text-emerald-50"
+                    }`}
+                  >
+                    {m.text}
+                  </div>
+                ))}
+              </div>
             </div>
+
+            <form
+              className="w-full"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const text = draft.trim();
+                if (!text) return;
+
+                setMessages((prev) => [...prev, { id: Date.now(), role: "user", text }]);
+                setDraft("");
+
+                setTimeout(() => {
+                  setMessages((prev) => [
+                    ...prev,
+                    {
+                      id: Date.now() + 1,
+                      role: "guide",
+                      text: "I hear you. Stay with me and tell me a little more.",
+                    },
+                  ]);
+                }, 450);
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <input
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  placeholder="Type your message..."
+                  className="h-11 w-full rounded-lg border border-emerald-200/30 bg-black/35 px-3 text-sm text-emerald-50 outline-none placeholder:text-emerald-100/45 focus:border-emerald-200/60"
+                />
+                <button
+                  type="submit"
+                  className="h-11 shrink-0 rounded-lg bg-emerald-400 px-4 text-sm font-semibold text-black transition hover:bg-emerald-300"
+                >
+                  Send
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </section>
