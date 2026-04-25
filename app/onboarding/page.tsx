@@ -3,15 +3,30 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
+const GUIDE_CHOICES = [
+  "imageedit_14_7182524648.png",
+  "imageedit_15_8566388634.png",
+  "imageedit_17_9927503197.png",
+  "imageedit_19_7924513571.png",
+  "imageedit_21_9491173695.png",
+  "imageedit_23_8750666346.png",
+  "imageedit_24_3470039515.png",
+  "imageedit_26_9406286079.png",
+  "imageedit_28_6534385177.png",
+  "imageedit_30_3631305230.png",
+  "imageedit_32_6036981563.png",
+] as const;
+
 export default function OnboardingPage() {
   const router = useRouter();
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const [guide, setGuide] = useState("GUIDE1.png");
+  const [guideIndex, setGuideIndex] = useState(0);
+  const [guide, setGuide] = useState<string>(GUIDE_CHOICES[0]);
   const [voice, setVoice] = useState("Donny - Steady Presence");
   const [tone, setTone] = useState("Relaxed");
 
-  const guides = ["GUIDE1.png", "GUIDE2.png", "GUIDE3.png", "GUIDE4.png", "GUIDE5.png"];
+  const guides = GUIDE_CHOICES;
   const voices = [
     { id: "donny", name: "Donny - Steady Presence" },
     { id: "clint", name: "Clint - Rugged Actor" },
@@ -103,21 +118,45 @@ export default function OnboardingPage() {
         <div className="flex items-center gap-4">
           <div className={`${box} w-[140px]`}>SELECT GUIDE</div>
 
-          {guides.map((g) => (
+          <div className="flex items-center gap-3">
             <button
-              key={g}
-              onClick={() => setGuide(g)}
-              className={`p-2 border ${
-                guide === g ? "border-green-400" : "border-white/20"
+              type="button"
+              onClick={() => {
+                const next = (guideIndex - 1 + guides.length) % guides.length;
+                setGuideIndex(next);
+                setGuide(guides[next]);
+              }}
+              className="h-11 w-11 rounded-full border border-white/25 bg-[#0f2f3d] text-xl text-white transition hover:border-white/45"
+            >
+              ‹
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setGuide(guides[guideIndex])}
+              className={`rounded-xl border p-2 ${
+                guide === guides[guideIndex] ? "border-green-400" : "border-white/20"
               }`}
             >
               <img
-                src={`/guides/${g}`}
-                alt={g}
+                src={`/guides/${guides[guideIndex]}`}
+                alt={guides[guideIndex]}
                 className="h-28 w-auto object-contain"
               />
             </button>
-          ))}
+
+            <button
+              type="button"
+              onClick={() => {
+                const next = (guideIndex + 1) % guides.length;
+                setGuideIndex(next);
+                setGuide(guides[next]);
+              }}
+              className="h-11 w-11 rounded-full border border-white/25 bg-[#0f2f3d] text-xl text-white transition hover:border-white/45"
+            >
+              ›
+            </button>
+          </div>
         </div>
 
         {/* VOICE ROW */}
