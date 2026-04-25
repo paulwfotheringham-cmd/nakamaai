@@ -1,8 +1,9 @@
 ﻿"use client";
 
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import * as React from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, OrbitControls, useGLTF } from "@react-three/drei";
-import { useEffect, useMemo, useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { setSpeakingMorphTargets } from "../lib/avatar/lipsync";
 
@@ -11,6 +12,35 @@ type GuideHead3DProps = {
   isSpeaking: boolean;
   modelUrl?: string | null;
 };
+
+type ModelErrorBoundaryProps = {
+  onError: () => void;
+  children: React.ReactNode;
+};
+
+type ModelErrorBoundaryState = {
+  hasError: boolean;
+};
+
+class ModelErrorBoundary extends React.Component<ModelErrorBoundaryProps, ModelErrorBoundaryState> {
+  constructor(props: ModelErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch() {
+    this.props.onError();
+  }
+
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
 
 function FallbackHead2D({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking: boolean }) {
   return (
@@ -102,10 +132,12 @@ function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boo
 
 export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHead3DProps) {
   const hasModel = typeof modelUrl === "string" && modelUrl.trim().length > 0;
+  const [modelFailed, setModelFailed] = useState(false);
+  const showModel = hasModel && !modelFailed;
 
   return (
     <div className="relative h-[300px] w-[190px] shrink-0 overflow-hidden rounded-[24px] border border-emerald-300/15 bg-[#081411]">
-      {hasModel ? (
+      {showModel ? (
         <div className="absolute right-2 top-2 z-20 rounded-full bg-black/55 px-2 py-1 text-[10px] tracking-wide text-emerald-200">
           3D MODEL ACTIVE
         </div>
@@ -115,7 +147,7 @@ export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHea
         </div>
       )}
 
-      {hasModel ? (
+      {showModel ? (
         <Canvas camera={{ position: [0, 0.2, 2.2], fov: 34 }} shadows dpr={[1, 2]}>
           <color attach="background" args={["#081411"]} />
           <ambientLight intensity={0.5} />
@@ -123,9 +155,13 @@ export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHea
           <directionalLight position={[2, 3, 3]} intensity={1.35} color="#f7fff8" castShadow />
           <pointLight position={[-2.2, 0.9, 1.8]} intensity={0.95} color="#57ffcb" />
 
-          <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.35}>
-            <ModelHead modelUrl={modelUrl!} isSpeaking={isSpeaking} />
-          </Float>
+          <ModelErrorBoundary onError={() => setModelFailed(true)}>
+            <Suspense fallback={null}>
+              <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.35}>
+                <ModelHead modelUrl={modelUrl!} isSpeaking={isSpeaking} />
+              </Float>
+            </Suspense>
+          </ModelErrorBoundary>
 
           <OrbitControls enableZoom={false} enablePan={false} minPolarAngle={1.25} maxPolarAngle={1.9} />
         </Canvas>
