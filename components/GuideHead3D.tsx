@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Bounds, Float, OrbitControls, useGLTF } from "@react-three/drei";
-import { Suspense, useMemo, useRef } from "react";
+import { Suspense, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { setSpeakingMorphTargets } from "../lib/avatar/lipsync";
 
@@ -12,6 +12,35 @@ type GuideHead3DProps = {
   isSpeaking: boolean;
   modelUrl?: string | null;
 };
+
+type ModelErrorBoundaryProps = {
+  onError: () => void;
+  children: React.ReactNode;
+};
+
+type ModelErrorBoundaryState = {
+  hasError: boolean;
+};
+
+class ModelErrorBoundary extends React.Component<ModelErrorBoundaryProps, ModelErrorBoundaryState> {
+  constructor(props: ModelErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch() {
+    this.props.onError();
+  }
+
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
 
 function FallbackHead2D({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking: boolean }) {
   return (
@@ -74,8 +103,12 @@ function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boo
 }
 
 export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHead3DProps) {
-  const activeModelUrl = "/models/heads/male-guide-backup.glb";
-  const showModel = true;
+  const [modelFailed, setModelFailed] = useState(false);
+  const primaryModel = typeof modelUrl === "string" && modelUrl.trim().length > 0
+    ? modelUrl
+    : "/models/heads/male-guide.glb";
+  const activeModelUrl = modelFailed ? "/models/heads/male-guide-backup.glb" : primaryModel;
+  const showModel = Boolean(activeModelUrl);
 
   return (
     <div className="relative h-[300px] w-[190px] shrink-0 overflow-hidden rounded-[24px] border border-emerald-300/15 bg-[#081411]">
@@ -98,11 +131,13 @@ export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHea
           <pointLight position={[-2.2, 1.1, 2.2]} intensity={0.9} color="#7ffff0" />
 
           <Suspense fallback={null}>
-            <Bounds fit clip observe margin={1.2}>
-              <Float speed={1.2} rotationIntensity={0.08} floatIntensity={0.12}>
-                <ModelHead modelUrl={activeModelUrl} isSpeaking={isSpeaking} />
-              </Float>
-            </Bounds>
+            <ModelErrorBoundary onError={() => setModelFailed(true)}>
+              <Bounds fit clip observe margin={1.2}>
+                <Float speed={1.2} rotationIntensity={0.08} floatIntensity={0.12}>
+                  <ModelHead modelUrl={activeModelUrl} isSpeaking={isSpeaking} />
+                </Float>
+              </Bounds>
+            </ModelErrorBoundary>
           </Suspense>
 
           <OrbitControls enableZoom={false} enablePan={false} minPolarAngle={1.2} maxPolarAngle={1.95} />
