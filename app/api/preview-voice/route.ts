@@ -1,4 +1,30 @@
-import { NextRequest } from "next/server";
+﻿import { NextRequest } from "next/server";
+
+const DEFAULT_VOICE_ID = "d46abd1d-9f16-4e59-b5e1-8d4c4d2c8f6c";
+
+const VOICE_ENV_MAP: Record<string, string | undefined> = {
+  donny: process.env.CARTESIA_VOICE_DONNY,
+  clint: process.env.CARTESIA_VOICE_CLINT,
+  damon: process.env.CARTESIA_VOICE_DAMON,
+  cameron: process.env.CARTESIA_VOICE_CAMERON,
+  alex: process.env.CARTESIA_VOICE_ALEX,
+};
+
+function resolveVoiceId(voiceRaw: unknown) {
+  if (typeof voiceRaw !== "string" || !voiceRaw.trim()) {
+    return DEFAULT_VOICE_ID;
+  }
+
+  const key = voiceRaw.toLowerCase();
+
+  for (const [name, envVoiceId] of Object.entries(VOICE_ENV_MAP)) {
+    if (key.includes(name) && envVoiceId) {
+      return envVoiceId;
+    }
+  }
+
+  return DEFAULT_VOICE_ID;
+}
 
 export async function POST(req: NextRequest) {
   if (!process.env.CARTESIA_API_KEY) {
@@ -10,14 +36,14 @@ export async function POST(req: NextRequest) {
   const text =
     typeof body.text === "string" && body.text.trim()
       ? body.text.trim()
-      : "Hello… I've been waiting for you.";
+      : "Hello... I've been waiting for you.";
 
-  const voiceId = "d46abd1d-9f16-4e59-b5e1-8d4c4d2c8f6c";
+  const voiceId = resolveVoiceId(body.voice);
 
   const res = await fetch("https://api.cartesia.ai/tts/bytes", {
     method: "POST",
     headers: {
-      "X-API-Key": process.env.CARTESIA_API_KEY!,
+      "X-API-Key": process.env.CARTESIA_API_KEY,
       "Cartesia-Version": "2025-04-16",
       "Content-Type": "application/json",
     },

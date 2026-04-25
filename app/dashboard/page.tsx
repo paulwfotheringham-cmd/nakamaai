@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CreateAudioTile from "./CreateAudioTile";
+import GuideHead3D from "../../components/GuideHead3D";
+import { getHeadModelUrl } from "../../lib/avatar/headModelMap";
 
 type Tile = {
   title: string;
@@ -18,6 +20,8 @@ type ChatMessage = {
   content: string;
 };
 
+type Stage = "intro" | "mood" | "chat";
+
 const fantasyTile: Tile = {
   title: "Choose fantasy Audio",
   description: "Browse and begin your next immersive audio experience.",
@@ -25,6 +29,15 @@ const fantasyTile: Tile = {
   icon: "📚",
   cta: "Browse Library",
 };
+
+const introOptions = ["Great", "So so", "Nah not for me"] as const;
+const moodOptions = [
+  "Something new",
+  "Something familiar",
+  "Continue something",
+  "Deep / immersive",
+  "I'll select myself",
+] as const;
 
 function TileCard({ tile }: { tile: Tile }) {
   return (
@@ -47,96 +60,149 @@ function TileCard({ tile }: { tile: Tile }) {
 }
 
 export default function DashboardPage() {
-  const [guideImage, setGuideImage] = useState("/guides/GUIDE1.png");
+  const [guideImage, setGuideImage] = useState("/guides/imageedit_14_7182524648.png");
+  const [selectedGuideFile, setSelectedGuideFile] = useState("imageedit_14_7182524648.png");
   const [voice, setVoice] = useState("Donny - Steady Presence");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
+  const [stage, setStage] = useState<Stage>("intro");
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("selectedGuide");
-    if (stored) setGuideImage(`/guides/${stored}`);
-
-    const userName = localStorage.getItem("userName") || "there";
-    setMessages([
-      { id: 1, role: "assistant", content: `Hello ${userName}... I'm here with you now.` },
-    ]);
-    speak(`Hello ${userName}... I'm here with you now.`);
-  }, []);
-
-  useEffect(() => {
-    const storedVoice = localStorage.getItem("selectedVoice");
-    if (storedVoice) setVoice(storedVoice);
-  }, []);
 
   const speak = async (text: string) => {
     setIsSpeaking(true);
 
-    const res = await fetch("/api/preview-voice", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        voice: localStorage.getItem("selectedVoice"),
-        text,
-      }),
-    });
+    try {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
 
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
+      const res = await fetch("/api/preview-voice", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          voice,
+          text,
+        }),
+      });
 
-    const audio = new Audio(url);
+      if (!res.ok) {
+        // Fallback so the demo still speaks if TTS API fails.
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
+        speechSynthesis.speak(utterance);
+        return;
+      }
 
-    audio.onended = () => {
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+
+      const audio = audioRef.current;
+      if (!audio) {
+        setIsSpeaking(false);
+        return;
+      }
+
+      audio.onended = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(url);
+      };
+      audio.onerror = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(url);
+      };
+
+      audio.src = url;
+      await audio.play();
+    } catch {
       setIsSpeaking(false);
-    };
-
-    audio.play();
+    }
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      speak("Hello… I'm your guide. Welcome to your dashboard.");
-    }, 800);
+    const storedGuide = localStorage.getItem("selectedGuide");
+    if (storedGuide) {
+      setSelectedGuideFile(storedGuide);
+      setGuideImage(`/guides/${storedGuide}`);
+    }
+
+    const storedVoice = localStorage.getItem("selectedVoice");
+    if (storedVoice) setVoice(storedVoice);
+
+    const userName = localStorage.getItem("userName") || "Crystal";
+    const opener =
+      `Hi ${userName}, nice to see you here again - been a while - I think last time was when you gave being romanced by a pirate a go- how did it go?`;
+
+    setMessages([{ id: 1, role: "assistant", content: opener }]);
+
+    const t = setTimeout(() => {
+      void speak(opener);
+    }, 500);
+
+    return () => clearTimeout(t);
   }, []);
+
+  const handleIntroChoice = (choice: (typeof introOptions)[number]) => {
+    setMessages((prev) => [...prev, { id: Date.now(), role: "user", content: choice }]);
+
+    const follow = "Whats your mood today?";
+    setMessages((prev) => [...prev, { id: Date.now() + 1, role: "assistant", content: follow }]);
+    setStage("mood");
+    void speak(follow);
+  };
+
+  const handleMoodChoice = (choice: (typeof moodOptions)[number]) => {
+    setMessages((prev) => [...prev, { id: Date.now(), role: "user", content: choice }]);
+
+    const follow = "Perfect. Tell me what you want right now, and I'll shape it with you.";
+    setMessages((prev) => [...prev, { id: Date.now() + 1, role: "assistant", content: follow }]);
+    setStage("chat");
+    void speak(follow);
+  };
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMessage = { id: Date.now(), role: "user", content: input } as const;
-
+    const userText = input;
+    const userMessage = { id: Date.now(), role: "user", content: userText } as const;
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-
-    console.log("SENDING:", input);
 
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message: input }),
+      body: JSON.stringify({ message: userText }),
     });
 
     const data = await res.json();
+    const reply =
+      (typeof data?.reply === "string" && data.reply.trim()) ||
+      "I'm here with you. Tell me what you need.";
 
-    const botMessage = { id: Date.now() + 1, role: "assistant", content: data.reply } as const;
-
+    const botMessage = { id: Date.now() + 1, role: "assistant", content: reply } as const;
     setMessages((prev) => [...prev, botMessage]);
 
-    speak(data.reply);
+    void speak(reply);
   };
 
   return (
     <main className="relative min-h-screen bg-[#07040d] text-white">
-      <a href="/" className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-white/75 backdrop-blur-md">← Home</a>
+      <a
+        href="/"
+        className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-white/75 backdrop-blur-md"
+      >
+        ← Home
+      </a>
 
       <section className="mx-auto max-w-7xl px-6 py-12 sm:px-8 lg:px-10">
         <div className="flex items-start justify-between gap-12">
-
-          {/* LEFT SIDE */}
           <div className="flex-1 max-w-xl">
             <div className="mb-10">
               <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
@@ -153,39 +219,57 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* RIGHT SIDE */}
           <div className="w-[700px] flex items-start gap-6">
-
-            {/* GUIDE (LEFT) */}
-            <img
-              src={guideImage}
-              className={`h-[420px] object-contain transition-all duration-200 ${
-                isSpeaking
-                  ? "scale-105 -translate-y-2 drop-shadow-[0_0_30px_rgba(0,255,180,0.6)]"
-                  : "opacity-90"
-              }`}
-              alt="Guide"
+            <GuideHead3D
+              imageSrc={guideImage}
+              isSpeaking={isSpeaking}
+              modelUrl={getHeadModelUrl(selectedGuideFile)}
             />
 
-            {/* CHAT (RIGHT) */}
             <div className="flex-1 rounded-2xl border border-[#1f4f45] bg-[#062f2a] p-4">
-              <div className="text-xs tracking-widest text-[#9ed6c7] mb-3">
-                GUIDE CHAT
-              </div>
+              <div className="mb-3 text-xs tracking-widest text-[#9ed6c7]">GUIDE CHAT</div>
 
               <div className="h-[300px] overflow-y-auto space-y-3 pr-2">
                 {messages.map((m) => (
                   <div
                     key={m.id}
                     className={`max-w-[92%] rounded-lg px-3 py-2 text-sm leading-relaxed ${
-                      m.role === "user"
-                        ? "ml-auto bg-emerald-200/85 text-black"
-                        : "bg-black/35 text-emerald-50"
+                      m.role === "user" ? "ml-auto bg-emerald-200/85 text-black" : "bg-black/35 text-emerald-50"
                     }`}
                   >
                     {m.content}
                   </div>
                 ))}
+
+                {stage === "intro" && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {introOptions.map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => handleIntroChoice(opt)}
+                        className="rounded-full border border-emerald-200/30 bg-emerald-400/20 px-3 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-emerald-300/30"
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {stage === "mood" && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {moodOptions.map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => handleMoodChoice(opt)}
+                        className="rounded-full border border-emerald-200/30 bg-[#0b3f37] px-3 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-[#0f5248]"
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <form
@@ -200,18 +284,34 @@ export default function DashboardPage() {
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type your message..."
                   className="flex-1 rounded-lg bg-[#041f1c] px-3 py-2 text-white outline-none"
+                  disabled={stage !== "chat"}
                 />
-                <button type="submit" className="bg-green-500 px-4 rounded-lg text-black font-semibold">
+                <button
+                  type="submit"
+                  className="rounded-lg bg-green-500 px-4 font-semibold text-black disabled:cursor-not-allowed disabled:opacity-40"
+                  disabled={stage !== "chat"}
+                >
                   Send
                 </button>
               </form>
             </div>
-
           </div>
-
         </div>
         <audio ref={audioRef} />
       </section>
+
+      <style jsx global>{`
+        @keyframes mouthPulse {
+          0% { transform: scaleY(1) translateY(0); opacity: 0.14; }
+          50% { transform: scaleY(1.08) translateY(2px); opacity: 0.34; }
+          100% { transform: scaleY(1) translateY(0); opacity: 0.14; }
+        }
+        .dashboard-mouth-active {
+          clip-path: ellipse(26% 14% at 50% 62%);
+          filter: brightness(1.12) saturate(1.15);
+          animation: mouthPulse 210ms ease-in-out infinite;
+        }
+      `}</style>
     </main>
   );
 }
