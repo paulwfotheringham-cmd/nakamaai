@@ -19,6 +19,14 @@ export default function GuidePage() {
   const [isLineExiting, setIsLineExiting] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [showTapPrompt, setShowTapPrompt] = useState(false);
+  const [guideImage, setGuideImage] = useState("/guides/GUIDE1.png");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("selectedGuide");
+    if (stored) {
+      setGuideImage(`/guides/${stored}`);
+    }
+  }, []);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -99,7 +107,7 @@ export default function GuidePage() {
       <div className="flex min-h-0 flex-1 items-center justify-center px-4 py-10">
         <div className="animate-fade-in">
           <img
-            src="/guides/GUIDE1.png"
+            src={guideImage}
             alt=""
             className="animate-alive h-[min(78vh,860px)] w-auto max-w-[min(92vw,520px)] object-contain will-change-transform [filter:drop-shadow(0_28px_50px_rgba(0,0,0,0.95))_drop-shadow(0_12px_36px_rgba(0,0,0,0.85))]"
           />
