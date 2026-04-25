@@ -122,8 +122,10 @@ export default function DashboardPage() {
       <a href="/" className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-white/75 backdrop-blur-md">← Home</a>
 
       <section className="mx-auto max-w-7xl px-6 py-12 sm:px-8 lg:px-10">
-        <div className="flex gap-10">
-          <div className="flex-1">
+        <div className="flex items-start justify-between gap-12">
+
+          {/* LEFT SIDE */}
+          <div className="flex-1 max-w-xl">
             <div className="mb-10">
               <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
                 Pleasure Portal
@@ -133,30 +135,33 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <div className="max-w-xl space-y-6">
+            <div className="space-y-6">
               <TileCard tile={fantasyTile} />
               <CreateAudioTile />
             </div>
           </div>
 
-          <div className="w-[420px] flex flex-col items-center justify-start gap-6 pt-10">
+          {/* RIGHT SIDE */}
+          <div className="w-[520px] flex flex-col items-center gap-6">
+
             <img
               src={guideImage}
+              className="h-[420px] object-contain"
               alt="Guide"
-              className="h-[400px] object-contain animate-alive"
             />
 
-            <div className="w-full h-[260px] overflow-hidden rounded-xl border border-emerald-300/35 bg-emerald-500/15 backdrop-blur-sm">
-              <div className="border-b border-emerald-200/30 px-4 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/90">
-                Guide Chat
+            <div className="w-full rounded-2xl border border-[#1f4f45] bg-[#062f2a] p-4">
+              <div className="text-xs tracking-widest text-[#9ed6c7] mb-3">
+                GUIDE CHAT
               </div>
-              <div className="flex h-[206px] flex-col gap-3 overflow-y-auto px-4 py-3">
+
+              <div className="h-[240px] overflow-y-auto space-y-3 pr-2">
                 {messages.map((m) => (
                   <div
                     key={m.id}
                     className={`max-w-[92%] rounded-lg px-3 py-2 text-sm leading-relaxed ${
                       m.role === "user"
-                        ? "self-end bg-emerald-200/85 text-black"
+                        ? "ml-auto bg-emerald-200/85 text-black"
                         : "bg-black/35 text-emerald-50"
                     }`}
                   >
@@ -164,49 +169,46 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
-            </div>
 
-            <form
-              className="w-full"
-              onSubmit={(e) => {
-                e.preventDefault();
-                const text = draft.trim();
-                if (!text) return;
+              <form
+                className="mt-4 flex gap-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const text = draft.trim();
+                  if (!text) return;
 
-                setMessages((prev) => [...prev, { id: Date.now(), role: "user", text }]);
-                setDraft("");
+                  setMessages((prev) => [...prev, { id: Date.now(), role: "user", text }]);
+                  setDraft("");
 
-                setTimeout(() => {
-                  setMessages((prev) => [
-                    ...prev,
-                    {
-                      id: Date.now() + 1,
-                      role: "guide",
-                      text: "I hear you. Stay with me and tell me a little more.",
-                    },
-                  ]);
-                  playVoice("I hear you. Stay with me and tell me more.");
-                }, 450);
-              }}
-            >
-              <div className="flex items-center gap-2">
+                  setTimeout(() => {
+                    setMessages((prev) => [
+                      ...prev,
+                      {
+                        id: Date.now() + 1,
+                        role: "guide",
+                        text: "I hear you. Stay with me and tell me a little more.",
+                      },
+                    ]);
+                    playVoice("I hear you. Stay with me and tell me more.");
+                  }, 450);
+                }}
+              >
                 <input
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   placeholder="Type your message..."
-                  className="h-11 w-full rounded-lg border border-emerald-200/30 bg-black/35 px-3 text-sm text-emerald-50 outline-none placeholder:text-emerald-100/45 focus:border-emerald-200/60"
+                  className="flex-1 rounded-lg bg-[#041f1c] px-3 py-2 text-white outline-none"
                 />
-                <button
-                  type="submit"
-                  className="h-11 shrink-0 rounded-lg bg-emerald-400 px-4 text-sm font-semibold text-black transition hover:bg-emerald-300"
-                >
+                <button type="submit" className="bg-green-500 px-4 rounded-lg text-black font-semibold">
                   Send
                 </button>
-              </div>
-            </form>
-            <audio ref={audioRef} />
+              </form>
+            </div>
+
           </div>
+
         </div>
+        <audio ref={audioRef} />
       </section>
     </main>
   );
