@@ -15,7 +15,6 @@ type GuideHead3DProps = {
 function FallbackHead({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const facePlaneRef = useRef<THREE.Mesh>(null);
-  const mouthOverlayRef = useRef<THREE.Mesh>(null);
   const texture = useLoader(THREE.TextureLoader, imageSrc);
 
   const planeMaterial = useMemo(() => {
@@ -40,14 +39,11 @@ function FallbackHead({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking: 
     if (facePlaneRef.current) {
       facePlaneRef.current.rotation.y = Math.sin(t * 0.75) * 0.03;
       facePlaneRef.current.rotation.x = Math.sin(t * 0.45) * 0.01;
-    }
-
-    if (mouthOverlayRef.current) {
-      const openAmount = isSpeaking
-        ? 0.84 + Math.abs(Math.sin(t * 16)) * 0.42
-        : 0.84 + Math.abs(Math.sin(t * 2.8)) * 0.04;
-      mouthOverlayRef.current.scale.y = openAmount;
-      mouthOverlayRef.current.position.y = -0.39 - (openAmount - 0.84) * 0.05;
+      const talkPulse = isSpeaking
+        ? 1 + Math.abs(Math.sin(t * 14)) * 0.03
+        : 1 + Math.abs(Math.sin(t * 2.2)) * 0.006;
+      facePlaneRef.current.scale.y = talkPulse;
+      facePlaneRef.current.position.y = -0.02 - (talkPulse - 1) * 0.04;
     }
   });
 
@@ -56,10 +52,6 @@ function FallbackHead({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking: 
       {/* Keep full guide image intact and animate subtly to avoid visual tearing. */}
       <mesh ref={facePlaneRef} material={planeMaterial} castShadow receiveShadow position={[0, -0.02, 0]}>
         <planeGeometry args={[2.0, 2.35, 64, 64]} />
-      </mesh>
-
-      <mesh ref={mouthOverlayRef} material={planeMaterial} position={[0, -0.39, 0.02]}>
-        <planeGeometry args={[0.62, 0.34, 36, 36]} />
       </mesh>
 
       <mesh position={[0, -0.09, -0.22]}>
