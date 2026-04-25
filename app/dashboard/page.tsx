@@ -19,14 +19,6 @@ const tiles: Tile[] = [
     icon: "📚",
     cta: "Browse Library",
   },
-  {
-    title: "Profile",
-    description:
-      "Manage your details, preferences, and account settings.",
-    href: "/profile",
-    icon: "👤",
-    cta: "Settings",
-  },
 ];
 
 function TileCard({ tile }: { tile: Tile }) {
@@ -98,7 +90,7 @@ export default function DashboardPage() {
             </h2>
             <p className="mt-3 text-base leading-7 text-zinc-300">
               Choose fantasy audio, create your own fantasy audio, explore the
-              platform, or manage your profile.
+              platform.
             </p>
           </div>
         </div>
