@@ -22,6 +22,8 @@ export default function OnboardingPage() {
   const tones = ["Relaxed", "Playful", "Intense"];
 
   const playPreview = async (voiceName: string) => {
+    console.log("CLICKED PREVIEW:", voiceName);
+
     try {
       const res = await fetch("/api/preview-voice", {
         method: "POST",
@@ -34,28 +36,39 @@ export default function OnboardingPage() {
         }),
       });
 
+      console.log("API STATUS:", res.status);
+
       if (!res.ok) {
         const err = await res.text();
-        console.error("Preview API error:", err);
+        console.error("API ERROR:", err);
         return;
       }
 
       const blob = await res.blob();
+      console.log("BLOB SIZE:", blob.size);
+
       const url = URL.createObjectURL(blob);
 
-      if (!audioRef.current) return;
+      if (!audioRef.current) {
+        console.error("NO AUDIO REF");
+        return;
+      }
 
       const audio = audioRef.current;
 
-      // reset before playing
       audio.pause();
       audio.currentTime = 0;
 
       audio.src = url;
 
+      console.log("PLAYING AUDIO...");
+
       await audio.play();
+
+      console.log("PLAY SUCCESS");
+
     } catch (err) {
-      console.error("Preview failed:", err);
+      console.error("PREVIEW FAILED:", err);
     }
   };
 
