@@ -74,7 +74,7 @@ export default function FakeCheckoutPage() {
 
     // fake delay for dev/testing
     setTimeout(() => {
-      router.push("/dashboard");
+      router.push("/onboarding");
     }, 700);
   }
 
