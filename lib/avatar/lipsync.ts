@@ -6,8 +6,11 @@ const MOUTH_MORPH_ALIASES = [
   "aa",
   "A",
   "jawOpen",
+  "JawOpen",
   "jaw_open",
   "mouthOpen",
+  "MouthOpen",
+  "mouthopen",
   "mouth_open",
   "Open",
 ];
@@ -24,6 +27,17 @@ export function setSpeakingMorphTargets(mesh: THREE.Mesh, isSpeaking: boolean, t
     if (typeof candidate === "number") {
       mouthIndex = candidate;
       break;
+    }
+  }
+
+  // Fallback: pick the first morph target that looks like mouth/jaw.
+  if (mouthIndex < 0) {
+    for (const [key, idx] of Object.entries(dict)) {
+      const k = key.toLowerCase();
+      if (k.includes("mouth") || k.includes("jaw") || k.includes("viseme") || k.includes("open")) {
+        mouthIndex = idx;
+        break;
+      }
     }
   }
 

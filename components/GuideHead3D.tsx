@@ -44,7 +44,6 @@ function FallbackHead2D({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking
 function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const modelRef = useRef<THREE.Object3D>(null);
-  const mouthRef = useRef<THREE.Mesh>(null);
   const gltf = useGLTF(modelUrl);
 
   useMemo(() => {
@@ -92,34 +91,11 @@ function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boo
         setSpeakingMorphTargets(obj as THREE.Mesh, isSpeaking, t);
       }
     });
-
-    // Guaranteed visible speaking movement even if model has no morph targets.
-    if (mouthRef.current) {
-      const talk = isSpeaking
-        ? 0.55 + Math.abs(Math.sin(t * 18)) * 0.75
-        : 0.52 + Math.abs(Math.sin(t * 2.2)) * 0.03;
-      mouthRef.current.scale.y = talk;
-      mouthRef.current.position.y = -0.34 - (talk - 0.55) * 0.03;
-      const mat = mouthRef.current.material as THREE.MeshStandardMaterial;
-      mat.opacity = isSpeaking ? 0.45 : 0.32;
-      mat.emissiveIntensity = isSpeaking ? 0.35 : 0.1;
-    }
   });
 
   return (
     <group ref={groupRef}>
       <primitive ref={modelRef} object={gltf.scene} />
-      <mesh ref={mouthRef} position={[0, -0.34, 0.63]}>
-        <circleGeometry args={[0.15, 36]} />
-        <meshStandardMaterial
-          color="#1a1212"
-          emissive="#3a1812"
-          emissiveIntensity={0.1}
-          transparent
-          opacity={0.32}
-          depthWrite={false}
-        />
-      </mesh>
     </group>
   );
 }
