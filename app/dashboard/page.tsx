@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CreateAudioTile from "./CreateAudioTile";
 
@@ -48,8 +48,10 @@ function TileCard({ tile }: { tile: Tile }) {
 
 export default function DashboardPage() {
   const [guideImage, setGuideImage] = useState("/guides/GUIDE1.png");
+  const [voice, setVoice] = useState("Donny - Steady Presence");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("selectedGuide");
@@ -68,6 +70,51 @@ export default function DashboardPage() {
     }, 900);
 
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    const storedVoice = localStorage.getItem("selectedVoice");
+    if (storedVoice) setVoice(storedVoice);
+  }, []);
+
+  const playVoice = async (text: string) => {
+    try {
+      const res = await fetch("/api/preview-voice", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          voice,
+          text,
+        }),
+      });
+
+      if (!res.ok) {
+        console.error("Voice API failed");
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.play();
+
+    } catch (err) {
+      console.error("Voice error:", err);
+    }
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      playVoice("Hello… I'm your guide. Welcome to your dashboard.");
+    }, 800);
   }, []);
 
   return (
@@ -138,6 +185,7 @@ export default function DashboardPage() {
                       text: "I hear you. Stay with me and tell me a little more.",
                     },
                   ]);
+                  playVoice("I hear you. Stay with me and tell me more.");
                 }, 450);
               }}
             >
@@ -156,6 +204,7 @@ export default function DashboardPage() {
                 </button>
               </div>
             </form>
+            <audio ref={audioRef} />
           </div>
         </div>
       </section>
