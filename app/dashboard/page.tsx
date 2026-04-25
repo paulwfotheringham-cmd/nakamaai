@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 
 export default function DashboardPage() {
   const [guide, setGuide] = useState("/guides/GUIDE1.png");
-  const [name, setName] = useState("there");
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -12,11 +11,7 @@ export default function DashboardPage() {
     const g = localStorage.getItem("selectedGuide");
     if (g) setGuide(`/guides/${g}`);
 
-    const userName = localStorage.getItem("userName");
-    if (userName) setName(userName);
-
-    // speak on load
-    speak(`Hello ${userName || "there"}, welcome to your dashboard.`);
+    speak("Hello… welcome to your dashboard.");
   }, []);
 
   const speak = async (text: string) => {
