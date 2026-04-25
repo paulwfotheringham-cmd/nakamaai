@@ -14,15 +14,17 @@ type GuideHead3DProps = {
 
 function FallbackHead({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
-  const jawRef = useRef<THREE.Mesh>(null);
+  const facePlaneRef = useRef<THREE.Mesh>(null);
+  const mouthOverlayRef = useRef<THREE.Mesh>(null);
   const texture = useLoader(THREE.TextureLoader, imageSrc);
 
-  const headMaterial = useMemo(() => {
+  const planeMaterial = useMemo(() => {
     texture.colorSpace = THREE.SRGBColorSpace;
     return new THREE.MeshStandardMaterial({
       map: texture,
-      roughness: 0.75,
-      metalness: 0.08,
+      roughness: 0.68,
+      metalness: 0.06,
+      transparent: true,
     });
   }, [texture]);
 
@@ -30,34 +32,39 @@ function FallbackHead({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking: 
     const t = clock.getElapsedTime();
 
     if (groupRef.current) {
-      groupRef.current.rotation.y = Math.sin(t * 0.7) * 0.08;
-      groupRef.current.rotation.x = Math.sin(t * 0.55) * 0.05;
-      groupRef.current.position.y = 0.15 + Math.sin(t * 1.05) * 0.03;
+      groupRef.current.rotation.y = Math.sin(t * 0.62) * 0.06;
+      groupRef.current.rotation.x = Math.sin(t * 0.5) * 0.03;
+      groupRef.current.position.y = 0.15 + Math.sin(t * 1.1) * 0.02;
     }
 
-    if (jawRef.current) {
-      const speakPulse = isSpeaking
-        ? 0.58 + Math.abs(Math.sin(t * 18)) * 0.75
-        : 0.35 + Math.abs(Math.sin(t * 4)) * 0.1;
-      jawRef.current.scale.y = speakPulse;
-      jawRef.current.position.y = -0.38 - speakPulse * 0.05;
+    if (facePlaneRef.current) {
+      facePlaneRef.current.rotation.y = Math.sin(t * 0.75) * 0.03;
+      facePlaneRef.current.rotation.x = Math.sin(t * 0.45) * 0.01;
+    }
+
+    if (mouthOverlayRef.current) {
+      const openAmount = isSpeaking
+        ? 0.84 + Math.abs(Math.sin(t * 16)) * 0.42
+        : 0.84 + Math.abs(Math.sin(t * 2.8)) * 0.04;
+      mouthOverlayRef.current.scale.y = openAmount;
+      mouthOverlayRef.current.position.y = -0.39 - (openAmount - 0.84) * 0.05;
     }
   });
 
   return (
     <group ref={groupRef}>
-      <mesh material={headMaterial} castShadow receiveShadow>
-        <sphereGeometry args={[1.0, 56, 56]} />
+      {/* Keep full guide image intact and animate subtly to avoid visual tearing. */}
+      <mesh ref={facePlaneRef} material={planeMaterial} castShadow receiveShadow position={[0, -0.02, 0]}>
+        <planeGeometry args={[2.0, 2.35, 64, 64]} />
       </mesh>
 
-      <mesh position={[0, -0.4, 0.95]} ref={jawRef}>
-        <circleGeometry args={[0.23, 48]} />
-        <meshStandardMaterial color="#120605" emissive="#250f0a" emissiveIntensity={isSpeaking ? 0.6 : 0.15} />
+      <mesh ref={mouthOverlayRef} material={planeMaterial} position={[0, -0.39, 0.02]}>
+        <planeGeometry args={[0.62, 0.34, 36, 36]} />
       </mesh>
 
-      <mesh position={[0.0, -0.07, 0.98]}>
-        <ringGeometry args={[0.13, 0.19, 36]} />
-        <meshBasicMaterial color="#2f1611" opacity={0.65} transparent />
+      <mesh position={[0, -0.09, -0.22]}>
+        <planeGeometry args={[2.05, 2.4, 1, 1]} />
+        <meshStandardMaterial color="#101715" transparent opacity={0.45} />
       </mesh>
     </group>
   );
