@@ -30,6 +30,10 @@ module.exports = {
           "0%": { opacity: "1", filter: "blur(0px)" },
           "100%": { opacity: "0", filter: "blur(10px)" },
         },
+        tapHintIn: {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
       },
       animation: {
         "fade-in": "fadeIn 1s ease-out both",
@@ -38,6 +42,7 @@ module.exports = {
           "subtitleReveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.42s forwards",
         "subtitle-out":
           "subtitleHide 0.58s cubic-bezier(0.4, 0, 0.2, 1) forwards",
+        "tap-hint-in": "tapHintIn 0.85s ease-out 0.12s both",
       },
     },
   },
