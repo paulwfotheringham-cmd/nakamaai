@@ -100,10 +100,10 @@ export default function OnboardingPage() {
 };
 
   const box =
-    "px-4 py-3 text-sm font-semibold border border-white/20 bg-[#1c4e63] text-white rounded-lg";
+    "rounded-lg border border-[#2d4a57] bg-[#183848] px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100";
 
   const active =
-    "bg-[#8EE26B] text-black border-transparent";
+    "border-[#8EE26B] bg-[#7fbf63]/85 text-black shadow-[0_0_0_1px_rgba(142,226,107,0.35)]";
 
   const scrollGuides = (direction: "left" | "right") => {
     const el = guideScrollerRef.current;
@@ -182,9 +182,9 @@ export default function OnboardingPage() {
         <div className="space-y-3">
           <div className={`${box} inline-flex`}>SELECT VOICE</div>
 
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-2.5 md:grid-cols-2 xl:grid-cols-3">
             {voices.map((v) => (
-              <div key={v.id} className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 p-2">
+              <div key={v.id} className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/30 p-1.5">
                 <button
                   onClick={() => setVoice(v.name)}
                   className={`${box} flex-1 text-left ${voice === v.name ? active : ""}`}
@@ -195,7 +195,7 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   onClick={() => playPreview(v.name)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-[#103746] text-sm text-white transition hover:border-white/50"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#2d4a57] bg-[#173647] text-xs text-white transition hover:border-white/50"
                   aria-label={`Play preview for ${v.name}`}
                   title="Play preview"
                 >
@@ -210,12 +210,12 @@ export default function OnboardingPage() {
         <div className="space-y-3">
           <div className={`${box} inline-flex`}>SELECT TONE</div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2.5">
             {tones.map((t) => (
               <button
                 key={t}
                 onClick={() => setTone(t)}
-                className={`${box} min-w-[140px] ${tone === t ? active : ""}`}
+                className={`${box} min-w-[120px] ${tone === t ? active : ""}`}
               >
                 {t.toUpperCase()}
               </button>
@@ -227,7 +227,7 @@ export default function OnboardingPage() {
         <div className="pt-6">
           <button
             onClick={handleSave}
-            className="bg-yellow-500 px-6 py-3 text-black font-bold"
+            className="rounded-lg border border-[#b89236] bg-gradient-to-b from-amber-300 to-amber-500 px-5 py-2.5 text-sm font-bold text-black transition hover:from-amber-200 hover:to-amber-400"
           >
             SAVE
           </button>
