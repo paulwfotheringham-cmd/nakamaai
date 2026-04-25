@@ -21,11 +21,34 @@ export default function OnboardingPage() {
   ];
   const tones = ["Relaxed", "Playful", "Intense"];
 
-  const playPreview = (voiceName: string) => {
-    // TEMP: use same intro audio for all previews (until real voice API wired)
-    if (!audioRef.current) return;
-    audioRef.current.src = "/audio/intro.mp3";
-    audioRef.current.play().catch(() => {});
+  const playPreview = async (voiceName: string) => {
+    try {
+      const res = await fetch("/api/preview-voice", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          voice: voiceName,
+          text: "Hello… I've been waiting for you.",
+        }),
+      });
+
+      if (!res.ok) {
+        console.error("Preview failed", await res.text());
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+
+      if (!audioRef.current) return;
+
+      audioRef.current.src = url;
+      await audioRef.current.play();
+    } catch (err) {
+      console.error("Preview failed", err);
+    }
   };
 
   const handleSave = () => {
