@@ -95,12 +95,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="max-w-xl space-y-6">
           <TileCard key={tiles[0].title} tile={tiles[0]} />
           <CreateAudioTile />
-          {tiles.slice(1).map((tile) => (
-            <TileCard key={tile.title} tile={tile} />
-          ))}
         </div>
       </section>
     </main>
