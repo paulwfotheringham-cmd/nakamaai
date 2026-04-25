@@ -1,4 +1,5 @@
 ﻿import Link from "next/link";
+import { useEffect, useState } from "react";
 import CreateAudioTile from "./CreateAudioTile";
 
 type Tile = {
@@ -38,23 +39,45 @@ function TileCard({ tile }: { tile: Tile }) {
 }
 
 export default function DashboardPage() {
+  const [guideImage, setGuideImage] = useState("/guides/GUIDE1.png");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("selectedGuide");
+    if (stored) setGuideImage(`/guides/${stored}`);
+  }, []);
+
   return (
     <main className="relative min-h-screen bg-[#07040d] text-white">
       <a href="/" className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-white/75 backdrop-blur-md">← Home</a>
 
       <section className="mx-auto max-w-7xl px-6 py-12 sm:px-8 lg:px-10">
-        <div className="mb-10">
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-            Pleasure Portal
-          </h1>
-          <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-300">
-            Choose fantasy audio or create your own fantasy audio.
-          </p>
-        </div>
+        <div className="flex gap-10">
+          <div className="flex-1">
+            <div className="mb-10">
+              <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+                Pleasure Portal
+              </h1>
+              <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-300">
+                Choose fantasy audio or create your own fantasy audio.
+              </p>
+            </div>
 
-        <div className="max-w-xl space-y-6">
-          <TileCard tile={fantasyTile} />
-          <CreateAudioTile />
+            <div className="max-w-xl space-y-6">
+              <TileCard tile={fantasyTile} />
+              <CreateAudioTile />
+            </div>
+          </div>
+
+          <div className="w-[500px] flex flex-col items-center justify-center gap-6">
+            <img
+              src={guideImage}
+              className="h-[400px] object-contain animate-alive"
+            />
+
+            <div className="w-full h-[300px] bg-green-500 flex items-center justify-center">
+              CHATBOX
+            </div>
+          </div>
         </div>
       </section>
     </main>
