@@ -439,7 +439,21 @@ function VoiceBrowserModal({
                   <button
                     type="button"
                     title={`Select “${voice.name}” for this role`}
-                    onClick={() => { onSelect({ id: voice.id, title: voice.name }); }}
+                    onClick={() => {
+                      // store selected voice
+                      localStorage.setItem("selectedVoice", voice.name);
+
+                      // check if coming from onboarding
+                      const params = new URLSearchParams(window.location.search);
+                      const from = params.get("from");
+
+                      if (from === "onboarding") {
+                        window.location.href = "/onboarding";
+                      } else {
+                        // keep existing behavior if any
+                        onSelect({ id: voice.id, title: voice.name });
+                      }
+                    }}
                     style={{
                       borderRadius: "10px",
                       border: "none",
