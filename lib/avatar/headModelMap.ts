@@ -14,5 +14,5 @@
 };
 
 export function getHeadModelUrl(selectedGuideFile: string) {
-  return GUIDE_MODEL_MAP[selectedGuideFile] ?? null;
+  return GUIDE_MODEL_MAP[selectedGuideFile] ?? "/models/heads/male-guide.glb";
 }

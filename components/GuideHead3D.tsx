@@ -120,6 +120,16 @@ function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boo
       if ((obj as THREE.Mesh).isMesh) {
         setSpeakingMorphTargets(obj as THREE.Mesh, isSpeaking, t);
       }
+      if ((obj as THREE.Bone).isBone) {
+        const bone = obj as THREE.Bone;
+        const name = bone.name.toLowerCase();
+        if (name.includes("jaw") || name.includes("mouth")) {
+          const jawTarget = isSpeaking
+            ? 0.08 + Math.abs(Math.sin(t * 17)) * 0.16
+            : 0.02;
+          bone.rotation.x = THREE.MathUtils.lerp(bone.rotation.x, jawTarget, isSpeaking ? 0.35 : 0.15);
+        }
+      }
     });
   });
 

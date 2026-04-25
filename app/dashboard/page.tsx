@@ -223,7 +223,7 @@ export default function DashboardPage() {
             <GuideHead3D
               imageSrc={guideImage}
               isSpeaking={isSpeaking}
-              modelUrl={getHeadModelUrl(selectedGuideFile)}
+              modelUrl="/models/heads/male-guide.glb"
             />
 
             <div className="flex-1 rounded-2xl border border-[#1f4f45] bg-[#062f2a] p-4">
