@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, OrbitControls, useGLTF } from "@react-three/drei";
+import { Bounds, Float, OrbitControls, useGLTF } from "@react-three/drei";
 import { Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { setSpeakingMorphTargets } from "../lib/avatar/lipsync";
@@ -68,7 +68,7 @@ function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boo
 
   return (
     <group ref={groupRef}>
-      <primitive object={gltf.scene} scale={1.75} position={[0, -1.0, 0]} />
+      <primitive object={gltf.scene} />
     </group>
   );
 }
@@ -90,20 +90,22 @@ export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHea
       )}
 
       {showModel ? (
-        <Canvas camera={{ position: [0, 0.15, 3.2], fov: 34 }} shadows dpr={[1, 2]}>
+        <Canvas camera={{ position: [0, 0, 4.5], fov: 32 }} shadows dpr={[1, 2]}>
           <color attach="background" args={["#081411"]} />
-          <ambientLight intensity={0.9} />
-          <hemisphereLight intensity={0.9} color="#ffffff" groundColor="#1f1f1f" />
-          <directionalLight position={[2, 3, 3]} intensity={1.6} color="#ffffff" castShadow />
-          <pointLight position={[-2.2, 0.9, 1.8]} intensity={1.1} color="#7ffff0" />
+          <ambientLight intensity={0.75} />
+          <hemisphereLight intensity={0.85} color="#ffffff" groundColor="#1f1f1f" />
+          <directionalLight position={[2, 3, 3]} intensity={1.25} color="#ffffff" castShadow />
+          <pointLight position={[-2.2, 1.1, 2.2]} intensity={0.9} color="#7ffff0" />
 
           <Suspense fallback={null}>
-            <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.35}>
-              <ModelHead modelUrl={activeModelUrl} isSpeaking={isSpeaking} />
-            </Float>
+            <Bounds fit clip observe margin={1.2}>
+              <Float speed={1.2} rotationIntensity={0.08} floatIntensity={0.12}>
+                <ModelHead modelUrl={activeModelUrl} isSpeaking={isSpeaking} />
+              </Float>
+            </Bounds>
           </Suspense>
 
-          <OrbitControls enableZoom={false} enablePan={false} minPolarAngle={1.25} maxPolarAngle={1.9} />
+          <OrbitControls enableZoom={false} enablePan={false} minPolarAngle={1.2} maxPolarAngle={1.95} />
         </Canvas>
       ) : (
         <FallbackHead2D imageSrc={imageSrc} isSpeaking={isSpeaking} />
