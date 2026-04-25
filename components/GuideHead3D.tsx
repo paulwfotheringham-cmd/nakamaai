@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, OrbitControls, useGLTF } from "@react-three/drei";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { setSpeakingMorphTargets } from "../lib/avatar/lipsync";
 
@@ -12,35 +12,6 @@ type GuideHead3DProps = {
   isSpeaking: boolean;
   modelUrl?: string | null;
 };
-
-type ModelErrorBoundaryProps = {
-  onError: () => void;
-  children: React.ReactNode;
-};
-
-type ModelErrorBoundaryState = {
-  hasError: boolean;
-};
-
-class ModelErrorBoundary extends React.Component<ModelErrorBoundaryProps, ModelErrorBoundaryState> {
-  constructor(props: ModelErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch() {
-    this.props.onError();
-  }
-
-  render() {
-    if (this.state.hasError) return null;
-    return this.props.children;
-  }
-}
 
 function FallbackHead2D({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking: boolean }) {
   return (
@@ -57,7 +28,6 @@ function FallbackHead2D({ imageSrc, isSpeaking }: { imageSrc: string; isSpeaking
 
 function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
-  const modelRef = useRef<THREE.Object3D>(null);
   const gltf = useGLTF(modelUrl);
 
   useMemo(() => {
@@ -68,27 +38,6 @@ function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boo
         mesh.receiveShadow = true;
       }
     });
-  }, [gltf.scene]);
-
-  useEffect(() => {
-    if (!modelRef.current) return;
-
-    const box = new THREE.Box3().setFromObject(modelRef.current);
-    const size = new THREE.Vector3();
-    const center = new THREE.Vector3();
-    box.getSize(size);
-    box.getCenter(center);
-
-    const largestAxis = Math.max(size.x, size.y, size.z) || 1;
-    const targetSize = 1.8;
-    const normalizedScale = targetSize / largestAxis;
-
-    modelRef.current.scale.setScalar(normalizedScale);
-    modelRef.current.position.set(
-      -center.x * normalizedScale,
-      -center.y * normalizedScale - 0.1,
-      -center.z * normalizedScale,
-    );
   }, [gltf.scene]);
 
   useFrame(({ clock }) => {
@@ -119,15 +68,14 @@ function ModelHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boo
 
   return (
     <group ref={groupRef}>
-      <primitive ref={modelRef} object={gltf.scene} />
+      <primitive object={gltf.scene} scale={1.75} position={[0, -1.0, 0]} />
     </group>
   );
 }
 
 export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHead3DProps) {
-  const [modelFailed, setModelFailed] = useState(false);
-  const activeModelUrl = modelFailed ? "/models/heads/male-guide-backup.glb" : modelUrl;
-  const showModel = typeof activeModelUrl === "string" && activeModelUrl.trim().length > 0;
+  const activeModelUrl = "/models/heads/male-guide-backup.glb";
+  const showModel = true;
 
   return (
     <div className="relative h-[300px] w-[190px] shrink-0 overflow-hidden rounded-[24px] border border-emerald-300/15 bg-[#081411]">
@@ -142,20 +90,18 @@ export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHea
       )}
 
       {showModel ? (
-        <Canvas camera={{ position: [0, 0.2, 2.2], fov: 34 }} shadows dpr={[1, 2]}>
+        <Canvas camera={{ position: [0, 0.15, 3.2], fov: 34 }} shadows dpr={[1, 2]}>
           <color attach="background" args={["#081411"]} />
-          <ambientLight intensity={0.5} />
-          <hemisphereLight intensity={0.62} color="#d8fff2" groundColor="#0a0909" />
-          <directionalLight position={[2, 3, 3]} intensity={1.35} color="#f7fff8" castShadow />
-          <pointLight position={[-2.2, 0.9, 1.8]} intensity={0.95} color="#57ffcb" />
+          <ambientLight intensity={0.9} />
+          <hemisphereLight intensity={0.9} color="#ffffff" groundColor="#1f1f1f" />
+          <directionalLight position={[2, 3, 3]} intensity={1.6} color="#ffffff" castShadow />
+          <pointLight position={[-2.2, 0.9, 1.8]} intensity={1.1} color="#7ffff0" />
 
-          <ModelErrorBoundary onError={() => setModelFailed(true)}>
-            <Suspense fallback={null}>
-              <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.35}>
-                <ModelHead modelUrl={activeModelUrl!} isSpeaking={isSpeaking} />
-              </Float>
-            </Suspense>
-          </ModelErrorBoundary>
+          <Suspense fallback={null}>
+            <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.35}>
+              <ModelHead modelUrl={activeModelUrl} isSpeaking={isSpeaking} />
+            </Float>
+          </Suspense>
 
           <OrbitControls enableZoom={false} enablePan={false} minPolarAngle={1.25} maxPolarAngle={1.9} />
         </Canvas>
