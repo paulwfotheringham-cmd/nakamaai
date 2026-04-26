@@ -33,7 +33,17 @@ export function setSpeakingMorphTargets(mesh: THREE.Mesh, isSpeaking: boolean, t
   if (mouthIndices.length === 0) {
     for (const [key, idx] of Object.entries(dict)) {
       const k = key.toLowerCase();
-      if (k.includes("mouth") || k.includes("jaw") || k.includes("viseme") || k.includes("open")) {
+      if (k.includes("mouth") || k.includes("jaw") || k.includes("viseme") || k.includes("lip")) {
+        mouthIndices.push(idx);
+      }
+    }
+  }
+
+  // Last resort: if this mesh has a small number of morph targets, treat them as face controls.
+  if (mouthIndices.length === 0) {
+    const keys = Object.keys(dict);
+    if (keys.length > 0 && keys.length <= 12) {
+      for (const idx of Object.values(dict)) {
         mouthIndices.push(idx);
       }
     }
