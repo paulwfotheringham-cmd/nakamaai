@@ -69,24 +69,9 @@ export default function DashboardPage() {
   const [stage, setStage] = useState<Stage>("intro");
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const speakingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const scheduleSpeakingStop = (text: string) => {
-    if (speakingTimerRef.current) {
-      clearTimeout(speakingTimerRef.current);
-    }
-
-    // Keep mouth animation visible even when autoplay/voice playback is blocked.
-    const ms = Math.min(7000, Math.max(1200, text.length * 55));
-    speakingTimerRef.current = setTimeout(() => {
-      setIsSpeaking(false);
-      speakingTimerRef.current = null;
-    }, ms);
-  };
 
   const speak = async (text: string) => {
     setIsSpeaking(true);
-    scheduleSpeakingStop(text);
 
     try {
       if (audioRef.current) {
@@ -108,14 +93,8 @@ export default function DashboardPage() {
       if (!res.ok) {
         // Fallback so the demo still speaks if TTS API fails.
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.onend = () => {
-          if (speakingTimerRef.current) clearTimeout(speakingTimerRef.current);
-          setIsSpeaking(false);
-        };
-        utterance.onerror = () => {
-          if (speakingTimerRef.current) clearTimeout(speakingTimerRef.current);
-          setIsSpeaking(false);
-        };
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
         speechSynthesis.speak(utterance);
         return;
       }
@@ -130,12 +109,10 @@ export default function DashboardPage() {
       }
 
       audio.onended = () => {
-        if (speakingTimerRef.current) clearTimeout(speakingTimerRef.current);
         setIsSpeaking(false);
         URL.revokeObjectURL(url);
       };
       audio.onerror = () => {
-        if (speakingTimerRef.current) clearTimeout(speakingTimerRef.current);
         setIsSpeaking(false);
         URL.revokeObjectURL(url);
       };
@@ -146,12 +123,6 @@ export default function DashboardPage() {
       setIsSpeaking(false);
     }
   };
-
-  useEffect(() => {
-    return () => {
-      if (speakingTimerRef.current) clearTimeout(speakingTimerRef.current);
-    };
-  }, []);
 
   useEffect(() => {
     const storedGuide = localStorage.getItem("selectedGuide");
@@ -252,6 +223,7 @@ export default function DashboardPage() {
             <GuideHead3D
               imageSrc={guideImage}
               isSpeaking={isSpeaking}
+              modelUrl="/models/heads/robot-expressive.glb"
             />
 
             <div className="flex-1 rounded-2xl border border-[#1f4f45] bg-[#062f2a] p-4">
