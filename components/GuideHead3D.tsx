@@ -53,18 +53,17 @@ function FallbackHead2D({ imageSrc }: { imageSrc: string }) {
 function AnimatedHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const gltf = useGLTF(modelUrl);
-  const model = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   const { actions } = useAnimations(gltf.animations, groupRef);
 
   useMemo(() => {
-    model.traverse((obj) => {
+    gltf.scene.traverse((obj) => {
       if ((obj as THREE.Mesh).isMesh) {
         const mesh = obj as THREE.Mesh;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
       }
     });
-  }, [model]);
+  }, [gltf.scene]);
 
   useEffect(() => {
     const actionEntries = Object.entries(actions);
@@ -102,13 +101,13 @@ function AnimatedHead({ modelUrl, isSpeaking }: { modelUrl: string; isSpeaking: 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     if (!groupRef.current) return;
-    groupRef.current.position.y = -1.45 + Math.sin(t * 0.9) * 0.015;
-    groupRef.current.rotation.y = Math.sin(t * 0.45) * 0.04;
+    groupRef.current.position.y = -0.95 + Math.sin(t * 0.9) * 0.01;
+    groupRef.current.rotation.y = Math.sin(t * 0.45) * 0.03;
   });
 
   return (
     <group ref={groupRef}>
-      <primitive object={model} scale={1.45} />
+      <primitive object={gltf.scene} scale={0.62} />
     </group>
   );
 }
@@ -128,7 +127,7 @@ export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHea
       </div>
 
       {showModel ? (
-        <Canvas camera={{ position: [0, 1.3, 3.2], fov: 30 }} shadows dpr={[1, 2]}>
+      <Canvas camera={{ position: [0, 1.4, 5.0], fov: 27 }} shadows dpr={[1, 2]}>
           <color attach="background" args={["#081411"]} />
           <ambientLight intensity={0.75} />
           <hemisphereLight intensity={0.65} color="#ffffff" groundColor="#1f1f1f" />
@@ -140,7 +139,7 @@ export default function GuideHead3D({ imageSrc, isSpeaking, modelUrl }: GuideHea
             </Suspense>
           </ModelErrorBoundary>
 
-          <OrbitControls enableZoom={false} enablePan={false} target={[0, 1.1, 0]} minPolarAngle={1.15} maxPolarAngle={1.9} />
+          <OrbitControls enableZoom={false} enablePan={false} target={[0, 1.2, 0]} minPolarAngle={1.2} maxPolarAngle={1.85} />
         </Canvas>
       ) : (
         <FallbackHead2D imageSrc={imageSrc} />
