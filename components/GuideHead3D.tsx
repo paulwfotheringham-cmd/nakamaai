@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
-import { useRef } from "react";
+import { Suspense, useRef } from "react";
 import * as THREE from "three";
 
 type GuideHead3DProps = {
@@ -36,7 +36,9 @@ export default function GuideHead3D({ isSpeaking }: GuideHead3DProps) {
       <Canvas camera={{ position: [0, 0.8, 3.2], fov: 35 }}>
         <ambientLight intensity={0.7} />
         <directionalLight position={[2, 3, 2]} intensity={1.1} />
-        <AvatarModel isSpeaking={isSpeaking} />
+        <Suspense fallback={null}>
+          <AvatarModel isSpeaking={isSpeaking} />
+        </Suspense>
         <OrbitControls enableZoom={false} />
       </Canvas>
     </div>

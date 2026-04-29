@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CreateAudioTile from "./CreateAudioTile";
 import GuideHead3D from "../../components/GuideHead3D";
-import { getHeadModelUrl } from "../../lib/avatar/headModelMap";
 
 type Tile = {
   title: string;
@@ -60,8 +59,6 @@ function TileCard({ tile }: { tile: Tile }) {
 }
 
 export default function DashboardPage() {
-  const [guideImage, setGuideImage] = useState("/guides/imageedit_14_7182524648.png");
-  const [selectedGuideFile, setSelectedGuideFile] = useState("imageedit_14_7182524648.png");
   const [voice, setVoice] = useState("Donny - Steady Presence");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -154,12 +151,6 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    const storedGuide = localStorage.getItem("selectedGuide");
-    if (storedGuide) {
-      setSelectedGuideFile(storedGuide);
-      setGuideImage(`/guides/${storedGuide}`);
-    }
-
     const storedVoice = localStorage.getItem("selectedVoice");
     if (storedVoice) setVoice(storedVoice);
 
@@ -325,18 +316,6 @@ export default function DashboardPage() {
         <audio ref={audioRef} />
       </section>
 
-      <style jsx global>{`
-        @keyframes mouthPulse {
-          0% { transform: scaleY(1) translateY(0); opacity: 0.14; }
-          50% { transform: scaleY(1.08) translateY(2px); opacity: 0.34; }
-          100% { transform: scaleY(1) translateY(0); opacity: 0.14; }
-        }
-        .dashboard-mouth-active {
-          clip-path: ellipse(26% 14% at 50% 62%);
-          filter: brightness(1.12) saturate(1.15);
-          animation: mouthPulse 210ms ease-in-out infinite;
-        }
-      `}</style>
     </main>
   );
 }
