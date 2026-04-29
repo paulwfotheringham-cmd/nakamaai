@@ -249,10 +249,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="w-[700px] flex items-start gap-6">
-            <GuideHead3D
-              imageSrc={guideImage}
-              isSpeaking={isSpeaking}
-            />
+            <GuideHead3D isSpeaking={isSpeaking} />
 
             <div className="flex-1 rounded-2xl border border-[#1f4f45] bg-[#062f2a] p-4">
               <div className="mb-3 text-xs tracking-widest text-[#9ed6c7]">GUIDE CHAT</div>
