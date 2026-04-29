@@ -1,26 +1,18 @@
 ﻿"use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { Center, OrbitControls, useGLTF } from "@react-three/drei";
-import { Suspense, useRef } from "react";
+import { Suspense } from "react";
 
 type GuideHead3DProps = {
-  isSpeaking: boolean;
+  isSpeaking?: boolean;
 };
 
-function AvatarModel({ isSpeaking }: { isSpeaking: boolean }) {
-  const groupRef = useRef<any>(null);
+function AvatarModel() {
   const { scene } = useGLTF("/LeePerrySmith.glb");
 
-  useFrame(({ clock }) => {
-    if (!groupRef.current) return;
-    const t = clock.getElapsedTime();
-    const turn = isSpeaking ? Math.sin(t * 4) * 0.05 : 0;
-    groupRef.current.rotation.y = Math.PI + turn;
-  });
-
   return (
-    <group ref={groupRef} scale={1.4} position={[0, -0.15, 0]} rotation={[0, Math.PI, 0]}>
+    <group scale={1.4} position={[0, -0.15, 0]} rotation={[0, Math.PI, 0]}>
       <Center>
         <primitive object={scene} />
       </Center>
@@ -28,15 +20,15 @@ function AvatarModel({ isSpeaking }: { isSpeaking: boolean }) {
   );
 }
 
-export default function GuideHead3D({ isSpeaking }: GuideHead3DProps) {
+export default function GuideHead3D({}: GuideHead3DProps) {
   return (
     <div className="h-[300px] w-[190px] overflow-hidden rounded-[24px] border border-emerald-300/15">
       <Canvas camera={{ position: [0, 0.15, 0.6], fov: 35 }}>
-        <ambientLight intensity={0.8} />
-        <directionalLight position={[0, 1, 1]} intensity={1.2} />
-        <directionalLight position={[-1, 1, 1]} intensity={0.6} />
+        <ambientLight intensity={0.9} />
+        <directionalLight position={[1, 1, 1]} intensity={1.2} />
+        <directionalLight position={[-1, 1, 1]} intensity={0.5} />
         <Suspense fallback={null}>
-          <AvatarModel isSpeaking={isSpeaking} />
+          <AvatarModel />
         </Suspense>
         <OrbitControls enableZoom={false} />
       </Canvas>
