@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useGLTF, OrbitControls } from "@react-three/drei";
+import { Center, OrbitControls, useGLTF } from "@react-three/drei";
 import { Suspense, useRef } from "react";
 
 type GuideHead3DProps = {
@@ -15,25 +15,26 @@ function AvatarModel({ isSpeaking }: { isSpeaking: boolean }) {
   useFrame(({ clock }) => {
     if (!groupRef.current) return;
     const t = clock.getElapsedTime();
-    const turn = isSpeaking ? Math.sin(t * 4) * 0.08 : Math.sin(t * 0.8) * 0.02;
-    groupRef.current.rotation.y = turn;
-    groupRef.current.rotation.x = -0.08;
+    const turn = isSpeaking ? Math.sin(t * 4) * 0.05 : 0;
+    groupRef.current.rotation.y = Math.PI + turn;
   });
 
   return (
-    <group ref={groupRef} position={[0, -1.35, 0]} scale={[2.45, 2.45, 2.45]}>
-      <primitive object={scene} />
+    <group ref={groupRef} scale={1.4} position={[0, -0.15, 0]} rotation={[0, Math.PI, 0]}>
+      <Center>
+        <primitive object={scene} />
+      </Center>
     </group>
   );
 }
 
 export default function GuideHead3D({ isSpeaking }: GuideHead3DProps) {
   return (
-    <div className="h-[300px] w-[190px] overflow-hidden rounded-[24px] border border-emerald-300/15 bg-[#081411]">
-      <Canvas camera={{ position: [0, 0.72, 1.7], fov: 28 }}>
-        <ambientLight intensity={1.25} />
-        <directionalLight position={[1.5, 2, 2]} intensity={1.35} />
-        <directionalLight position={[-1.2, 1.2, 1.6]} intensity={0.65} />
+    <div className="h-[300px] w-[190px] overflow-hidden rounded-[24px] border border-emerald-300/15">
+      <Canvas camera={{ position: [0, 0.15, 0.6], fov: 35 }}>
+        <ambientLight intensity={0.8} />
+        <directionalLight position={[0, 1, 1]} intensity={1.2} />
+        <directionalLight position={[-1, 1, 1]} intensity={0.6} />
         <Suspense fallback={null}>
           <AvatarModel isSpeaking={isSpeaking} />
         </Suspense>
