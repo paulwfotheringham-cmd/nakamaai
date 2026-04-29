@@ -1,36 +1,32 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { Center, OrbitControls, useGLTF } from "@react-three/drei";
+import { OrbitControls, useGLTF, Center } from "@react-three/drei";
 import { Suspense } from "react";
 
-function AvatarModel() {
+function Model() {
   const { scene } = useGLTF("/LeePerrySmith.glb");
-
   return (
-    <group scale={1.4} position={[0, -0.15, 0]} rotation={[0, Math.PI, 0]}>
-      <Center>
-        <primitive object={scene} />
-      </Center>
-    </group>
+    <Center>
+      <primitive object={scene} scale={1.8} />
+    </Center>
   );
 }
 
-export default function AvatarTestPage() {
+export default function Page() {
   return (
-    <main className="min-h-screen bg-[#07040d]">
-      <div className="h-screen w-full">
-        <Canvas camera={{ position: [0, 0.15, 0.6], fov: 35 }}>
-          <ambientLight intensity={0.9} />
-          <directionalLight position={[1, 1, 1]} intensity={1.2} />
-          <Suspense fallback={null}>
-            <AvatarModel />
-          </Suspense>
-          <OrbitControls enableZoom={false} />
-        </Canvas>
-      </div>
-    </main>
+    <div style={{ width: "100vw", height: "100vh", background: "black" }}>
+      <Canvas camera={{ position: [0, 0.15, 0.6], fov: 35 }}>
+        <ambientLight intensity={0.9} />
+        <directionalLight position={[1, 1, 1]} intensity={1.2} />
+        <directionalLight position={[-1, 1, 1]} intensity={0.5} />
+
+        <Suspense fallback={null}>
+          <Model />
+        </Suspense>
+
+        <OrbitControls enableZoom={false} />
+      </Canvas>
+    </div>
   );
 }
-
-useGLTF.preload("/LeePerrySmith.glb");
