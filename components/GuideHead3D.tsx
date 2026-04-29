@@ -17,10 +17,11 @@ function AvatarModel({ isSpeaking }: { isSpeaking: boolean }) {
     const t = clock.getElapsedTime();
     const turn = isSpeaking ? Math.sin(t * 4) * 0.08 : Math.sin(t * 0.8) * 0.02;
     groupRef.current.rotation.y = turn;
+    groupRef.current.rotation.x = -0.08;
   });
 
   return (
-    <group ref={groupRef} position={[0, -1.05, 0]} scale={[1.8, 1.8, 1.8]}>
+    <group ref={groupRef} position={[0, -1.35, 0]} scale={[2.45, 2.45, 2.45]}>
       <primitive object={scene} />
     </group>
   );
@@ -29,9 +30,10 @@ function AvatarModel({ isSpeaking }: { isSpeaking: boolean }) {
 export default function GuideHead3D({ isSpeaking }: GuideHead3DProps) {
   return (
     <div className="h-[300px] w-[190px] overflow-hidden rounded-[24px] border border-emerald-300/15 bg-[#081411]">
-      <Canvas camera={{ position: [0, 0.8, 3.2], fov: 35 }}>
-        <ambientLight intensity={1} />
-        <directionalLight position={[2, 2, 2]} />
+      <Canvas camera={{ position: [0, 0.72, 1.7], fov: 28 }}>
+        <ambientLight intensity={1.25} />
+        <directionalLight position={[1.5, 2, 2]} intensity={1.35} />
+        <directionalLight position={[-1.2, 1.2, 1.6]} intensity={0.65} />
         <Suspense fallback={null}>
           <AvatarModel isSpeaking={isSpeaking} />
         </Suspense>
