@@ -2,10 +2,38 @@
 
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Center, OrbitControls, useGLTF } from "@react-three/drei";
-import { Suspense, useEffect, useRef } from "react";
+import { Component, Suspense, type ReactNode, useEffect, useRef, useState } from "react";
+
+type SceneErrorBoundaryProps = {
+  children: ReactNode;
+};
+
+type SceneErrorBoundaryState = {
+  hasError: boolean;
+};
+
+class SceneErrorBoundary extends Component<SceneErrorBoundaryProps, SceneErrorBoundaryState> {
+  state: SceneErrorBoundaryState = { hasError: false };
+
+  static getDerivedStateFromError(): SceneErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: unknown) {
+    console.error("Guide scene crashed:", error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <main className="h-screen w-screen bg-black" />;
+    }
+
+    return this.props.children;
+  }
+}
 
 function AvatarModel() {
-  const { scene } = useGLTF("/avatar.glb");
+  const { scene } = useGLTF("/scenes/avatar.glb");
   const speakingMeshRef = useRef<any>(null);
 
   useEffect(() => {
@@ -48,16 +76,30 @@ function AvatarModel() {
 }
 
 export default function GuidePage() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setMounted(true);
+    }
+  }, []);
+
+  if (!mounted) {
+    return <main className="h-screen w-screen bg-black" />;
+  }
+
   return (
-    <main className="h-screen w-screen bg-black">
-      <Canvas camera={{ position: [0, 0.2, 2.2], fov: 35 }}>
-        <ambientLight intensity={0.9} />
-        <directionalLight position={[1, 1, 1]} intensity={1.2} />
-        <Suspense fallback={null}>
-          <AvatarModel />
-        </Suspense>
-        <OrbitControls enableZoom={false} />
-      </Canvas>
-    </main>
+    <SceneErrorBoundary>
+      <main className="h-screen w-screen bg-black">
+        <Canvas camera={{ position: [0, 0.2, 2.2], fov: 35 }}>
+          <ambientLight intensity={0.9} />
+          <directionalLight position={[1, 1, 1]} intensity={1.2} />
+          <Suspense fallback={null}>
+            <AvatarModel />
+          </Suspense>
+          <OrbitControls enableZoom={false} />
+        </Canvas>
+      </main>
+    </SceneErrorBoundary>
   );
 }
