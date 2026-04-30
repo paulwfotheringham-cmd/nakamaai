@@ -1,129 +1,63 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Center, OrbitControls, useGLTF } from "@react-three/drei";
+import { Suspense, useEffect, useRef } from "react";
 
-const dialogueMap = {
-  business: [
-    "You’ve had a long day, haven’t you?",
-    "Come here… let me take control tonight."
-  ],
-  pirate: [
-    "Ah… a curious one, aren’t you?",
-    "Careful… I don’t play gentle."
-  ],
-  victorian: [
-    "You shouldn’t be here…",
-    "And yet… I’m very glad you are."
-  ],
-  army: ["Stand still.", "I’ll tell you exactly what to do."],
-  highland: [
-    "Come closer…",
-    "I’ve been thinking about you all day."
-  ]
-} as const;
+function AvatarModel() {
+  const { scene } = useGLTF("/avatar.glb");
+  const speakingMeshRef = useRef<any>(null);
 
-type GuideType = keyof typeof dialogueMap;
-
-export default function GuidePage() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  const [guideImage, setGuideImage] = useState("/guides/GUIDE1.png");
-  const [guideType, setGuideType] = useState<GuideType>("business");
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [lineIndex, setLineIndex] = useState(0);
-  const [hasInteracted, setHasInteracted] = useState(false);
-  const [showTap, setShowTap] = useState(false);
-
-  const lines = dialogueMap[guideType];
-
-  // Load selected guide
   useEffect(() => {
-    const stored = localStorage.getItem("selectedGuide");
-    if (stored) {
-      setGuideImage(`/guides/${stored}`);
+    let found: any = null;
 
-      if (stored === "GUIDE1.png") setGuideType("business");
-      if (stored === "GUIDE2.png") setGuideType("pirate");
-      if (stored === "GUIDE3.png") setGuideType("victorian");
-      if (stored === "GUIDE4.png") setGuideType("army");
-      if (stored === "GUIDE5.png") setGuideType("highland");
+    scene.traverse((child: any) => {
+      if (found) return;
+      if (child?.isMesh && Array.isArray(child.morphTargetInfluences)) {
+        found = child;
+      }
+    });
+
+    speakingMeshRef.current = found;
+
+    if (found) {
+      console.log("Morph mesh:", found.name);
+      console.log("Morph dictionary:", found.morphTargetDictionary);
+    } else {
+      console.log("Morph mesh: none found");
     }
-  }, []);
+  }, [scene]);
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (audio) {
-      audio.volume = 0.3;
-      audio.play().catch(() => {});
+  useFrame(({ clock }) => {
+    const mesh = speakingMeshRef.current;
+    if (!mesh || !Array.isArray(mesh.morphTargetInfluences)) return;
+
+    const t = clock.getElapsedTime();
+    const v = (Math.sin(t * 8) + 1) / 2;
+
+    for (let i = 0; i < mesh.morphTargetInfluences.length; i += 1) {
+      mesh.morphTargetInfluences[i] = v;
     }
-
-    // Always trigger speaking regardless of autoplay
-    const t = setTimeout(() => {
-      setIsSpeaking(true);
-    }, 600);
-
-    return () => clearTimeout(t);
-  }, []);
-
-  // Line progression
-  useEffect(() => {
-    if (!isSpeaking) return;
-
-    // show first line clearly first
-    setLineIndex(0);
-
-    const t = setTimeout(() => {
-      setLineIndex(1);
-    }, 3000); // longer so user actually sees it
-
-    return () => clearTimeout(t);
-  }, [isSpeaking]);
-
-  useEffect(() => {
-    if (lineIndex !== 1) return;
-
-    const t = setTimeout(() => {
-      setShowTap(true);
-    }, 1200); // slight delay after second line
-
-    return () => clearTimeout(t);
-  }, [lineIndex]);
-
-  const handleClick = () => {
-    if (!hasInteracted) {
-      setHasInteracted(true);
-    }
-  };
-
-  const currentText = hasInteracted
-    ? "Good… just relax."
-    : lines[lineIndex];
+  });
 
   return (
-    <div
-      onClick={handleClick}
-      className="relative flex min-h-screen flex-col items-center justify-center bg-black cursor-pointer"
-    >
-      <audio ref={audioRef} src="/audio/intro.mp3" />
+    <Center>
+      <primitive object={scene} />
+    </Center>
+  );
+}
 
-      <img
-        src={guideImage}
-        alt=""
-        className="h-[70vh] object-contain animate-alive"
-      />
-
-      {isSpeaking && (
-        <>
-          <p className="mt-10 text-center px-6 text-xl tracking-wide text-white/80 animate-subtitle-in">
-            {currentText}
-          </p>
-          {showTap && !hasInteracted && (
-            <p className="mt-4 text-sm text-white/40 animate-subtitle-in">
-              Tap to continue
-            </p>
-          )}
-        </>
-      )}
-    </div>
+export default function GuidePage() {
+  return (
+    <main className="h-screen w-screen bg-black">
+      <Canvas camera={{ position: [0, 0.2, 2.2], fov: 35 }}>
+        <ambientLight intensity={0.9} />
+        <directionalLight position={[1, 1, 1]} intensity={1.2} />
+        <Suspense fallback={null}>
+          <AvatarModel />
+        </Suspense>
+        <OrbitControls enableZoom={false} />
+      </Canvas>
+    </main>
   );
 }
