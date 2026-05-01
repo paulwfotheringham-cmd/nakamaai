@@ -389,7 +389,7 @@ export default function Page() {
               Nakama Nights
             </p>
             <p className="mt-5 text-sm font-medium uppercase tracking-[0.16em] text-stone-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] sm:whitespace-nowrap sm:text-base">
-              PREMIUM AUDIO ADULT EXPERIENCES. BUILT EXCLUSIVELY FOR WOMEN
+              ADULT AUDIO ADVENTURES. BUILT FOR WOMEN.
             </p>
 
             <div className="mt-8 flex flex-col gap-6">
