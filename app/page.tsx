@@ -395,7 +395,7 @@ export default function Page() {
             <div className="mt-8 flex flex-col gap-6">
               <div>
                 <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
-                  Fantasize<span className="-ml-1">.</span>
+                  Fantasy<span className="-ml-1">.</span>
                 </p>
                 <p className="mt-4 max-w-full whitespace-normal text-[11px] font-medium uppercase leading-snug tracking-[0.18em] text-stone-100 sm:whitespace-nowrap sm:text-xs sm:tracking-[0.24em] sm:text-stone-300 md:text-sm">
                   A NEW EXPERIENCE. NOT JUST AUDIOBOOKS. PRIVATE AND IMMERSIVE
