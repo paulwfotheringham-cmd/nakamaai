@@ -395,23 +395,23 @@ export default function Page() {
             <div className="mt-8 flex flex-col gap-6">
               <div>
                 <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
-                  Your Fantasy<span className="-ml-1">.</span>
+                  Fantasize<span className="-ml-1">.</span>
                 </p>
                 <p className="mt-4 max-w-full whitespace-normal text-[11px] font-medium uppercase leading-snug tracking-[0.18em] text-stone-100 sm:whitespace-nowrap sm:text-xs sm:tracking-[0.24em] sm:text-stone-300 md:text-sm">
                   A NEW EXPERIENCE. NOT JUST AUDIOBOOKS. PRIVATE AND IMMERSIVE
                 </p>
               </div>
               <div>
-                <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
-                  Your Rules.
+                <p className="font-serif text-4xl leading-[1.08] text-amber-200 sm:text-5xl">
+                  Escape.
                 </p>
                 <p className="mt-4 text-xs font-medium uppercase tracking-[0.24em] text-stone-300 sm:text-sm">
                   EXPLORE. BECOME. CONTROL. CONNECT
                 </p>
               </div>
               <div className="pt-4 sm:pt-6">
-                <p className="font-serif text-4xl leading-[1.08] text-amber-200 sm:text-5xl">
-                  Your Pleasure.
+                <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
+                  Pleasure.
                 </p>
                 <p className="mt-3 text-xs font-medium uppercase tracking-[0.24em] text-amber-200/90 sm:text-sm">
                   NAKAMA NIGHTS IS EXCLUSIVE. IT IS PREMIUM. IT IS YOURS
