@@ -1,6 +1,6 @@
 /**
  * Category titles + item labels (first column / tiles) for Fantasy Audio admin.
- * Keep in sync with `rows` in app/fantasy-audio/page.tsx.
+ * Keep in sync with `rows` in src/app/fantasy-audio/page.tsx.
  */
 export type FantasyAudioCategoryOption = {
   categoryTitle: string;

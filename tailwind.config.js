@@ -1,11 +1,19 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
+    "./src/app/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
     extend: {
+      colors: {
+        gold: "#c6a46a",
+        charcoal: "#2a2a2a",
+      },
+      fontFamily: {
+        serif: ["var(--font-playfair)", "Georgia", "serif"],
+        sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
+      },
       keyframes: {
         fadeIn: {
           "0%": { opacity: "0" },

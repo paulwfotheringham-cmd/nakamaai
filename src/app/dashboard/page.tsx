@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CreateAudioTile from "./CreateAudioTile";
-import GuideHead3D from "../../components/GuideHead3D";
+import GuideHead3D from "@/components/GuideHead3D";
 
 type Tile = {
   title: string;

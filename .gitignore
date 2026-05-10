@@ -43,4 +43,11 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+
+# IDE / editors
+.idea/
+*.swp
+*.swo
+
+# turborepo (if used later)
+.turbo

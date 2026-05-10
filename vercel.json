@@ -1,9 +1,9 @@
 {
   "functions": {
-    "app/api/xtts-tts/route.ts": {
+    "src/app/api/xtts-tts/route.ts": {
       "maxDuration": 300
     },
-    "app/api/admin/upload-wav/route.ts": {
+    "src/app/api/admin/upload-wav/route.ts": {
       "maxDuration": 120
     }
   }

@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   FANTASY_AUDIO_CATEGORY_OPTIONS,
-} from "../../lib/fantasy-audio-category-options";
+} from "@/lib/fantasy-audio-category-options";
 
 export default function AdminPage() {
   const first = FANTASY_AUDIO_CATEGORY_OPTIONS[0];

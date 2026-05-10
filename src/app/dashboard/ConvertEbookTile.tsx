@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { supabase } from "../../lib/supabase-browser";
+import { supabase } from "@/lib/supabase-browser";
 
 type EbookFile = {
   name: string;
