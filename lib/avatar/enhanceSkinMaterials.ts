@@ -3,8 +3,13 @@ import { getMeshRole } from "./headMetrics";
 
 /** Fair caucasian skin — warm, visible under studio lighting. */
 export const SKIN_COLOR = 0xddb896;
+/** Natural lip pink — applied on head mesh mouth vertices. */
+export const LIP_COLOR = 0xd67682;
 
 let cachedSkinTexture: THREE.CanvasTexture | null = null;
+
+const skinColor = new THREE.Color(SKIN_COLOR);
+const lipColor = new THREE.Color(LIP_COLOR);
 
 function createProceduralSkinTexture(): THREE.CanvasTexture {
   if (cachedSkinTexture) return cachedSkinTexture;
@@ -42,6 +47,42 @@ function createProceduralSkinTexture(): THREE.CanvasTexture {
   return cachedSkinTexture;
 }
 
+/** Pink lip tint on mouth-region vertices — part of the head mesh, not floating. */
+function applyLipVertexColors(mesh: THREE.Mesh) {
+  const geo = mesh.geometry;
+  geo.computeBoundingBox();
+  const box = geo.boundingBox;
+  if (!box) return;
+
+  const size = box.getSize(new THREE.Vector3());
+  if (size.x <= 0 || size.y <= 0 || size.z <= 0) return;
+
+  const pos = geo.attributes.position as THREE.BufferAttribute;
+  const colors = new Float32Array(pos.count * 3);
+  const v = new THREE.Vector3();
+
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const nx = (v.x - box.min.x) / size.x;
+    const ny = (v.y - box.min.y) / size.y;
+    const nz = (v.z - box.min.z) / size.z;
+
+    const inLip =
+      nx > 0.36 &&
+      nx < 0.64 &&
+      ny > 0.33 &&
+      ny < 0.43 &&
+      nz > 0.68;
+
+    const c = inLip ? lipColor : skinColor;
+    colors[i * 3] = c.r;
+    colors[i * 3 + 1] = c.g;
+    colors[i * 3 + 2] = c.b;
+  }
+
+  geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+}
+
 function applySkinMaterial(
   material: THREE.MeshStandardMaterial,
   role: "eye" | "teeth" | "head",
@@ -49,6 +90,7 @@ function applySkinMaterial(
 ) {
   if (role === "eye") {
     material.map = null;
+    material.vertexColors = false;
     material.color.setHex(0x2563eb);
     material.emissive.setHex(0x1e3a8a);
     material.emissiveIntensity = 0.06;
@@ -62,6 +104,7 @@ function applySkinMaterial(
 
   if (role === "teeth") {
     material.map = null;
+    material.vertexColors = false;
     material.color.setHex(0xf8f4ee);
     material.roughness = 0.4;
     material.metalness = 0;
@@ -69,8 +112,10 @@ function applySkinMaterial(
     return;
   }
 
+  applyLipVertexColors(mesh);
   material.map = createProceduralSkinTexture();
-  material.color.setHex(SKIN_COLOR);
+  material.vertexColors = true;
+  material.color.setHex(0xffffff);
   material.metalness = 0.02;
   material.roughness = 0.56;
   material.envMapIntensity = 0.85;

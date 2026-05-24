@@ -2,12 +2,10 @@
 
 import { Environment, Html, OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Suspense, useEffect, useRef, useState, type RefObject } from "react";
+import { Suspense, useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
 import { enhanceSkinMaterials } from "@/lib/avatar/enhanceSkinMaterials";
-import { GuideEyebrows, GuideHair } from "@/lib/avatar/guideAppearance";
-import { computeHeadMetrics, type HeadMetrics } from "@/lib/avatar/headMetrics";
 import { useGuideGLTF } from "@/lib/avatar/useGuideGLTF";
 
 /** World-space head height — smaller value = smaller face on screen. */
@@ -40,7 +38,6 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   const groupRef = useRef<THREE.Group>(null);
   const framedRef = useRef(false);
   const { scene } = useGuideGLTF();
-  const [headMetrics, setHeadMetrics] = useState<HeadMetrics | null>(null);
 
   useEffect(() => {
     if (framedRef.current) return;
@@ -56,7 +53,6 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
 
     enhanceSkinMaterials(scene);
     scene.updateMatrixWorld(true);
-    setHeadMetrics(computeHeadMetrics(scene));
 
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -68,7 +64,6 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
     const retry = window.setTimeout(() => {
       enhanceSkinMaterials(scene);
       scene.updateMatrixWorld(true);
-      setHeadMetrics(computeHeadMetrics(scene));
     }, 400);
     return () => window.clearTimeout(retry);
   }, [scene]);
@@ -99,12 +94,6 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   return (
     <group ref={groupRef}>
       <primitive object={scene} />
-      {headMetrics && (
-        <>
-          <GuideHair metrics={headMetrics} />
-          <GuideEyebrows metrics={headMetrics} />
-        </>
-      )}
     </group>
   );
 }
