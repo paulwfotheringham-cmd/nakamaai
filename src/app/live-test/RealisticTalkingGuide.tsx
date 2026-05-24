@@ -6,6 +6,7 @@ import { Suspense, useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
 import { enhanceSkinMaterials } from "@/lib/avatar/enhanceSkinMaterials";
+import { GuideHair } from "@/lib/avatar/guideAppearance";
 import { useGuideGLTF } from "@/lib/avatar/useGuideGLTF";
 
 /** World-space head height — smaller value = smaller face on screen. */
@@ -91,6 +92,7 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   return (
     <group ref={groupRef}>
       <primitive object={scene} />
+      <GuideHair />
     </group>
   );
 }

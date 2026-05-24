@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { createBlueEyeTexture } from "./guideAppearance";
 
 /** Fair caucasian skin — warm, visible under studio lighting. */
 export const SKIN_COLOR = 0xddb896;
@@ -47,11 +48,11 @@ function applySkinMaterial(material: THREE.MeshStandardMaterial, meshName: strin
   const name = meshName.toLowerCase();
 
   if (name.includes("eye")) {
-    material.map = null;
-    material.color.setHex(0xf4f2ee);
-    material.roughness = 0.35;
-    material.metalness = 0;
-    material.envMapIntensity = 0.6;
+    material.map = createBlueEyeTexture();
+    material.color.setHex(0xffffff);
+    material.roughness = 0.28;
+    material.metalness = 0.05;
+    material.envMapIntensity = 0.75;
     material.needsUpdate = true;
     return;
   }
