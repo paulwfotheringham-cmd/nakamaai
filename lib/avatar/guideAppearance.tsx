@@ -26,14 +26,18 @@ const browHighlightMaterial = new THREE.MeshStandardMaterial({
   metalness: 0,
 });
 
-/** Short hair cap fitted to the crown — sits on the scalp, not above it. */
+/** Short hair cap fitted to the crown — equator ring sits on the scalp. */
 export function GuideHair({ metrics }: { metrics: HeadMetrics }) {
-  const radius = metrics.width * 0.28;
+  const radius = metrics.width * 0.30;
+  const scaleY = 0.58;
+  // phiLength past PI/2 so the cap wraps slightly down the temples.
+  const phiLength = Math.PI * 0.54;
+  const sink = metrics.height * 0.012;
 
   return (
-    <group position={[metrics.center.x, metrics.topY, metrics.center.z]}>
-      <mesh castShadow receiveShadow material={hairMaterial} scale={[0.92, 0.72, 0.9]}>
-        <sphereGeometry args={[radius, 32, 20, 0, Math.PI * 2, 0, Math.PI * 0.42]} />
+    <group position={[metrics.center.x, metrics.topY - sink, metrics.center.z]}>
+      <mesh castShadow receiveShadow material={hairMaterial} scale={[0.95, scaleY, 0.88]}>
+        <sphereGeometry args={[radius, 36, 24, 0, Math.PI * 2, 0, phiLength]} />
       </mesh>
     </group>
   );
