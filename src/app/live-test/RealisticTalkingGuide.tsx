@@ -1,7 +1,7 @@
 "use client";
 
-import { Bounds, Center, Html, OrbitControls, useGLTF } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Html, OrbitControls, useGLTF } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
@@ -9,16 +9,49 @@ import { setSpeakingMorphTargets } from "@/lib/avatar/lipsync";
 
 const GUIDE_MODEL = "/LeePerrySmith.glb";
 
+/** World-space head height — smaller value = smaller face on screen. */
+const HEAD_HEIGHT = 0.52;
+const CAMERA_Z = 2.65;
+
 type GuideHeadProps = {
   isSpeaking: boolean;
   audioLevelRef: RefObject<number>;
 };
 
+function PortraitCamera() {
+  const { camera } = useThree();
+
+  useEffect(() => {
+    camera.position.set(0, 0.02, CAMERA_Z);
+    camera.lookAt(0, 0, 0);
+    if (camera instanceof THREE.PerspectiveCamera) {
+      camera.fov = 30;
+      camera.near = 0.1;
+      camera.far = 20;
+      camera.updateProjectionMatrix();
+    }
+  }, [camera]);
+
+  return null;
+}
+
 function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   const groupRef = useRef<THREE.Group>(null);
+  const framedRef = useRef(false);
   const { scene } = useGLTF(GUIDE_MODEL);
 
   useEffect(() => {
+    if (framedRef.current) return;
+    framedRef.current = true;
+
+    const box = new THREE.Box3().setFromObject(scene);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+
+    scene.position.sub(center);
+    scene.scale.setScalar(HEAD_HEIGHT / Math.max(size.y, 0.001));
+    scene.position.y -= size.y * (HEAD_HEIGHT / Math.max(size.y, 0.001)) * 0.04;
+
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         child.castShadow = true;
@@ -49,11 +82,7 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
 
   return (
     <group ref={groupRef}>
-      <Bounds fit clip observe margin={0.82}>
-        <Center>
-          <primitive object={scene} />
-        </Center>
-      </Bounds>
+      <primitive object={scene} />
     </group>
   );
 }
@@ -73,10 +102,10 @@ type RealisticTalkingGuideProps = {
 
 export default function RealisticTalkingGuide({ isSpeaking, audioLevelRef }: RealisticTalkingGuideProps) {
   return (
-    <div className="h-[min(78vh,720px)] w-full overflow-hidden rounded-2xl border border-emerald-500/25 bg-[#0a1218] shadow-[0_0_64px_rgba(16,185,129,0.12)]">
+    <div className="flex h-[min(78vh,720px)] w-full items-center justify-center overflow-hidden rounded-2xl border border-emerald-500/25 bg-[#0a1218] shadow-[0_0_64px_rgba(16,185,129,0.12)]">
       <Canvas
         shadows
-        camera={{ position: [0, 0, 2.1], fov: 34 }}
+        camera={{ position: [0, 0.02, CAMERA_Z], fov: 30, near: 0.1, far: 20 }}
         gl={{ antialias: true, alpha: false }}
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
@@ -84,6 +113,7 @@ export default function RealisticTalkingGuide({ isSpeaking, audioLevelRef }: Rea
           gl.setClearColor(0x0a1218, 1);
         }}
       >
+        <PortraitCamera />
         <ambientLight intensity={0.55} />
         <directionalLight position={[2.5, 3.5, 2]} intensity={1.35} castShadow />
         <directionalLight position={[-2, 2.5, 2.5]} intensity={0.55} />
@@ -93,10 +123,11 @@ export default function RealisticTalkingGuide({ isSpeaking, audioLevelRef }: Rea
         </Suspense>
         <OrbitControls
           enableZoom
-          minDistance={0.9}
-          maxDistance={3.5}
+          minDistance={1.8}
+          maxDistance={5}
           maxPolarAngle={Math.PI / 1.85}
           minPolarAngle={Math.PI / 3.2}
+          target={[0, 0, 0]}
         />
       </Canvas>
     </div>
