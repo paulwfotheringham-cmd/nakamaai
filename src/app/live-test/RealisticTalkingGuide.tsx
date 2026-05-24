@@ -5,9 +5,8 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
-import { attachGuideAppearance } from "@/lib/avatar/attachGuideAppearance";
 import { enhanceSkinMaterials } from "@/lib/avatar/enhanceSkinMaterials";
-import { computeHeadMetrics } from "@/lib/avatar/headMetrics";
+import { stripGuideAppearance } from "@/lib/avatar/headMetrics";
 import { useGuideGLTF } from "@/lib/avatar/useGuideGLTF";
 
 /** World-space head height — smaller value = smaller face on screen. */
@@ -38,25 +37,17 @@ function PortraitCamera() {
 
 function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const appearanceCleanupRef = useRef<(() => void) | null>(null);
   const { scene } = useGuideGLTF();
 
-  const attachAppearance = () => {
-    scene.updateMatrixWorld(true);
-    const metrics = computeHeadMetrics(scene);
-    if (!metrics) return;
-    appearanceCleanupRef.current?.();
-    appearanceCleanupRef.current = attachGuideAppearance(metrics);
-  };
-
   useEffect(() => {
+    stripGuideAppearance(scene);
+
+    const box = new THREE.Box3().setFromObject(scene);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+
     if (!scene.userData.guideFramed) {
       scene.userData.guideFramed = true;
-
-      const box = new THREE.Box3().setFromObject(scene);
-      const center = box.getCenter(new THREE.Vector3());
-      const size = box.getSize(new THREE.Vector3());
-
       scene.position.sub(center);
       scene.scale.setScalar(HEAD_HEIGHT / Math.max(size.y, 0.001));
       scene.position.y -= size.y * (HEAD_HEIGHT / Math.max(size.y, 0.001)) * 0.04;
@@ -64,7 +55,6 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
 
     enhanceSkinMaterials(scene);
     scene.updateMatrixWorld(true);
-    attachAppearance();
 
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -74,16 +64,12 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
     });
 
     const retry = window.setTimeout(() => {
+      stripGuideAppearance(scene);
       enhanceSkinMaterials(scene);
       scene.updateMatrixWorld(true);
-      attachAppearance();
     }, 400);
 
-    return () => {
-      window.clearTimeout(retry);
-      appearanceCleanupRef.current?.();
-      appearanceCleanupRef.current = null;
-    };
+    return () => window.clearTimeout(retry);
   }, [scene]);
 
   useFrame((state) => {

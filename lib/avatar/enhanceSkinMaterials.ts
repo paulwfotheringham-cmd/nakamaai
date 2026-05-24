@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { findHeadMesh, getMeshRole } from "./headMetrics";
+import { getMeshRole } from "./headMetrics";
 
 /** Fair caucasian skin — warm, visible under studio lighting. */
 export const SKIN_COLOR = 0xddb896;
