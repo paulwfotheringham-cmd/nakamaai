@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ClientErrorBoundary } from "@/components/ClientErrorBoundary";
 import { useSpeechAudioLevel } from "@/lib/avatar/useSpeechAudioLevel";
-import { LIVE_TEST_AVATAR_SCRIPT, LIVE_TEST_REFERENCE_VIDEO } from "./demo-script";
+import { LIVE_TEST_REFERENCE_VIDEO } from "./demo-script";
+import GuideChatPanel from "./GuideChatPanel";
 
 const RealisticTalkingGuide = dynamic(() => import("./RealisticTalkingGuide"), {
   ssr: false,
@@ -150,9 +151,12 @@ export default function LiveGuideStage() {
   }, [hasReferenceVideo, playReferenceVideo]);
 
   /** Right panel — 3D avatar TTS + lip sync. */
-  const playAvatar = useCallback(async () => {
-    await playTts(LIVE_TEST_AVATAR_SCRIPT);
-  }, [playTts]);
+  const speakAsGuide = useCallback(
+    async (text: string) => {
+      await playTts(text);
+    },
+    [playTts],
+  );
 
   useEffect(() => {
     if (!mediaReady || !hasReferenceVideo) return;
@@ -178,11 +182,11 @@ export default function LiveGuideStage() {
 
       <div className="mx-auto max-w-7xl px-4 pb-16 pt-20 sm:px-8">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-400/80">
-          Stage 3 — expressive 3D guide
+          Stage 4 — guide chat + 3D avatar
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Live test</h1>
         <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-          Reference video on the left (with its own audio). Click Play on the right for the 3D avatar.
+          Reference video on the left. On the right, type as the guide in chat — the 3D avatar speaks your lines.
         </p>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
@@ -226,16 +230,7 @@ export default function LiveGuideStage() {
             <ClientErrorBoundary>
               <RealisticTalkingGuide isSpeaking={avatarSpeaking} audioLevelRef={audioLevelRef} />
             </ClientErrorBoundary>
-            <p className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-zinc-300">
-              &ldquo;{LIVE_TEST_AVATAR_SCRIPT}&rdquo;
-            </p>
-            <button
-              type="button"
-              onClick={() => void playAvatar()}
-              className="mt-4 w-full rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-emerald-400 sm:w-auto"
-            >
-              Play
-            </button>
+            <GuideChatPanel onSpeak={speakAsGuide} isSpeaking={avatarSpeaking} />
           </div>
         </div>
       </div>
