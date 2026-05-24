@@ -5,7 +5,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
-import { enhanceSkinMaterials } from "@/lib/avatar/enhanceSkinMaterials";
+import { enhanceGuideMaterials } from "@/lib/avatar/enhanceGuideMaterials";
 import { stripGuideAppearance } from "@/lib/avatar/headMetrics";
 import { useGuideGLTF } from "@/lib/avatar/useGuideGLTF";
 
@@ -53,19 +53,12 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
       scene.position.y -= size.y * (HEAD_HEIGHT / Math.max(size.y, 0.001)) * 0.04;
     }
 
-    enhanceSkinMaterials(scene);
+    enhanceGuideMaterials(scene);
     scene.updateMatrixWorld(true);
-
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
 
     const retry = window.setTimeout(() => {
       stripGuideAppearance(scene);
-      enhanceSkinMaterials(scene);
+      enhanceGuideMaterials(scene);
       scene.updateMatrixWorld(true);
     }, 400);
 
@@ -121,20 +114,28 @@ export default function RealisticTalkingGuide({ isSpeaking, audioLevelRef }: Rea
       <Canvas
         shadows
         camera={{ position: [0, 0.02, CAMERA_Z], fov: 30, near: 0.1, far: 20 }}
-        gl={{ antialias: true, alpha: false }}
+        gl={{
+          antialias: true,
+          alpha: true,
+          toneMapping: THREE.ACESFilmicToneMapping,
+          outputColorSpace: THREE.SRGBColorSpace,
+        }}
         onCreated={({ gl }) => {
-          gl.toneMapping = THREE.ACESFilmicToneMapping;
           gl.toneMappingExposure = 1.38;
-          gl.outputColorSpace = THREE.SRGBColorSpace;
           gl.setClearColor(0x12100e, 1);
         }}
       >
         <PortraitCamera />
-        <hemisphereLight intensity={0.45} color="#fff8f0" groundColor="#6b5344" />
-        <ambientLight intensity={0.22} />
-        <directionalLight position={[2.2, 3.2, 2.5]} intensity={1.5} color="#fff5eb" castShadow />
-        <directionalLight position={[-2.5, 2, 2]} intensity={0.45} color="#ffd4b8" />
-        <directionalLight position={[0, 1.5, -2.8]} intensity={0.35} color="#c8d8ff" />
+        <ambientLight intensity={0.12} color="#fff8f0" />
+        <directionalLight
+          position={[1.8, 2.8, 2.2]}
+          intensity={1.15}
+          color="#fff5eb"
+          castShadow
+          shadow-mapSize={[1024, 1024]}
+        />
+        <directionalLight position={[-2.2, 1.2, 1.6]} intensity={0.32} color="#ffd4b8" />
+        <directionalLight position={[0, 1.4, -2.6]} intensity={0.22} color="#c8d8ff" />
         <Suspense fallback={<CanvasLoader />}>
           <Environment preset="apartment" />
           <GuideHead isSpeaking={isSpeaking} audioLevelRef={audioLevelRef} />
