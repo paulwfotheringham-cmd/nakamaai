@@ -4,6 +4,8 @@ export type HeadMetrics = {
   headMesh: THREE.Mesh;
   leftEye: THREE.Vector3;
   rightEye: THREE.Vector3;
+  /** Scalp crown in head-mesh local space. */
+  crown: THREE.Vector3;
   headWidth: number;
   headHeight: number;
   headDepth: number;
@@ -46,20 +48,23 @@ export function computeHeadMetrics(scene: THREE.Object3D): HeadMetrics | null {
   headMesh.updateMatrixWorld(true);
   scene.updateMatrixWorld(true);
 
-  const box = new THREE.Box3().setFromObject(headMesh);
-  const size = box.getSize(new THREE.Vector3());
-  const center = box.getCenter(new THREE.Vector3());
-  const minY = box.min.y;
+  headMesh.geometry.computeBoundingBox();
+  const geoBox = headMesh.geometry.boundingBox;
+  if (!geoBox) return null;
+
+  const size = geoBox.getSize(new THREE.Vector3());
+  const center = geoBox.getCenter(new THREE.Vector3());
+  const minY = geoBox.min.y;
 
   let leftEyeWorld = new THREE.Vector3(
     center.x - size.x * 0.11,
     minY + size.y * 0.58,
-    box.max.z - size.z * 0.01,
+    geoBox.max.z - size.z * 0.01,
   );
   let rightEyeWorld = new THREE.Vector3(
     center.x + size.x * 0.11,
     minY + size.y * 0.58,
-    box.max.z - size.z * 0.01,
+    geoBox.max.z - size.z * 0.01,
   );
 
   const eyeLeft = scene.getObjectByName("eyeLeft");
@@ -67,10 +72,17 @@ export function computeHeadMetrics(scene: THREE.Object3D): HeadMetrics | null {
   if (eyeLeft) leftEyeWorld = getObjectCenter(eyeLeft);
   if (eyeRight) rightEyeWorld = getObjectCenter(eyeRight);
 
+  const crown = new THREE.Vector3(
+    center.x,
+    geoBox.max.y - size.y * 0.01,
+    center.z + size.z * 0.025,
+  );
+
   return {
     headMesh,
     leftEye: toHeadLocal(headMesh, leftEyeWorld),
     rightEye: toHeadLocal(headMesh, rightEyeWorld),
+    crown,
     headWidth: size.x,
     headHeight: size.y,
     headDepth: size.z,
