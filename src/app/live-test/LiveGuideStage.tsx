@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ClientErrorBoundary } from "@/components/ClientErrorBoundary";
 import { useSpeechAudioLevel } from "@/lib/avatar/useSpeechAudioLevel";
 import { LIVE_TEST_DEMO_SCRIPT, LIVE_TEST_REFERENCE_VIDEO } from "./demo-script";
 
@@ -164,7 +165,9 @@ export default function LiveGuideStage() {
             <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">
               3D guide (WebGL)
             </p>
-            <RealisticTalkingGuide isSpeaking={isSpeaking} audioLevelRef={audioLevelRef} />
+            <ClientErrorBoundary>
+              <RealisticTalkingGuide isSpeaking={isSpeaking} audioLevelRef={audioLevelRef} />
+            </ClientErrorBoundary>
           </div>
         </div>
 

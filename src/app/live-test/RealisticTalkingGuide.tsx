@@ -1,12 +1,11 @@
 "use client";
 
-import { ContactShadows, Environment, OrbitControls, useGLTF } from "@react-three/drei";
+import { ContactShadows, Environment, OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
-
-const GUIDE_MODEL = "/models/heads/male-guide.glb";
+import { useGuideGLTF } from "@/lib/avatar/useGuideGLTF";
 
 type GuideHeadProps = {
   isSpeaking: boolean;
@@ -15,9 +14,13 @@ type GuideHeadProps = {
 
 function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const { scene } = useGLTF(GUIDE_MODEL);
+  const framedRef = useRef(false);
+  const { scene } = useGuideGLTF();
 
   useEffect(() => {
+    if (framedRef.current) return;
+    framedRef.current = true;
+
     const box = new THREE.Box3().setFromObject(scene);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
@@ -26,8 +29,6 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
     const targetHeight = 1.7;
     const scale = targetHeight / Math.max(size.y, 0.001);
     scene.scale.setScalar(scale);
-
-    // Shift slightly so eyes sit near vertical centre of the frame.
     scene.position.y -= size.y * scale * 0.06;
 
     scene.traverse((child) => {
@@ -88,7 +89,7 @@ export default function RealisticTalkingGuide({ isSpeaking, audioLevelRef }: Rea
         }}
       >
         <ambientLight intensity={0.42} />
-        <directionalLight position={[2.5, 3.5, 2]} intensity={1.45} castShadow shadow-mapSize={[1024, 1024]} />
+        <directionalLight position={[2.5, 3.5, 2]} intensity={1.45} castShadow />
         <directionalLight position={[-2, 2.5, 2.5]} intensity={0.5} />
         <directionalLight position={[0, 0.5, -2.5]} intensity={0.35} color="#b8d4ff" />
         <spotLight position={[0, 3, 1.2]} intensity={0.35} angle={0.4} penumbra={0.6} />
@@ -109,5 +110,3 @@ export default function RealisticTalkingGuide({ isSpeaking, audioLevelRef }: Rea
     </div>
   );
 }
-
-useGLTF.preload(GUIDE_MODEL);
