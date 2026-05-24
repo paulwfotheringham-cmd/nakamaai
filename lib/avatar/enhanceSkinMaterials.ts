@@ -3,16 +3,90 @@ import { getMeshRole } from "./headMetrics";
 
 /** Fair caucasian skin — warm, visible under studio lighting. */
 export const SKIN_COLOR = 0xddb896;
-/** Natural lip pink — applied on head mesh mouth vertices. */
-export const LIP_COLOR = 0xd67682;
 
-let cachedSkinTexture: THREE.CanvasTexture | null = null;
+let cachedHeadTexture: THREE.CanvasTexture | null = null;
 
-const skinColor = new THREE.Color(SKIN_COLOR);
-const lipColor = new THREE.Color(LIP_COLOR);
+function paintLipsOnTexture(ctx: CanvasRenderingContext2D, mesh: THREE.Mesh, size: number) {
+  const uv = mesh.geometry.attributes.uv as THREE.BufferAttribute | undefined;
+  const pos = mesh.geometry.attributes.position as THREE.BufferAttribute | undefined;
+  if (!uv || !pos) return;
 
-function createProceduralSkinTexture(): THREE.CanvasTexture {
-  if (cachedSkinTexture) return cachedSkinTexture;
+  mesh.geometry.computeBoundingBox();
+  const box = mesh.geometry.boundingBox;
+  if (!box) return;
+
+  const sz = box.getSize(new THREE.Vector3());
+  if (sz.x <= 0 || sz.y <= 0 || sz.z <= 0) return;
+
+  const mouthUVs: Array<{ u: number; v: number }> = [];
+
+  for (let i = 0; i < pos.count; i++) {
+    const nx = (pos.getX(i) - box.min.x) / sz.x;
+    const ny = (pos.getY(i) - box.min.y) / sz.y;
+    const nz = (pos.getZ(i) - box.min.z) / sz.z;
+
+    const isMouth =
+      nx > 0.32 &&
+      nx < 0.68 &&
+      ny > 0.16 &&
+      ny < 0.52 &&
+      nz > 0.42;
+
+    if (isMouth) mouthUVs.push({ u: uv.getX(i), v: uv.getY(i) });
+  }
+
+  if (mouthUVs.length === 0) return;
+
+  let minU = 1;
+  let maxU = 0;
+  let minV = 1;
+  let maxV = 0;
+  for (const p of mouthUVs) {
+    minU = Math.min(minU, p.u);
+    maxU = Math.max(maxU, p.u);
+    minV = Math.min(minV, p.v);
+    maxV = Math.max(maxV, p.v);
+  }
+
+  const pad = 0.025;
+  minU -= pad;
+  maxU += pad;
+  minV -= pad;
+  maxV += pad;
+
+  const cx = ((minU + maxU) / 2) * size;
+  const cy = (1 - (minV + maxV) / 2) * size;
+  const rx = ((maxU - minU) / 2) * size * 1.2;
+  const ry = ((maxV - minV) / 2) * size * 1.25;
+
+  ctx.save();
+  ctx.filter = "blur(4px)";
+  ctx.fillStyle = "#c85a6a";
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.fillStyle = "#de6e7e";
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, rx * 0.92, ry * 0.88, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#ea8894";
+  ctx.beginPath();
+  ctx.ellipse(cx, cy - ry * 0.12, rx * 0.72, ry * 0.38, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#d15565";
+  for (const p of mouthUVs) {
+    ctx.beginPath();
+    ctx.arc(p.u * size, (1 - p.v) * size, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function createHeadSkinTexture(headMesh: THREE.Mesh): THREE.CanvasTexture {
+  if (cachedHeadTexture) return cachedHeadTexture;
 
   const size = 512;
   const canvas = document.createElement("canvas");
@@ -20,8 +94,8 @@ function createProceduralSkinTexture(): THREE.CanvasTexture {
   canvas.height = size;
   const ctx = canvas.getContext("2d");
   if (!ctx) {
-    cachedSkinTexture = new THREE.CanvasTexture(canvas);
-    return cachedSkinTexture;
+    cachedHeadTexture = new THREE.CanvasTexture(canvas);
+    return cachedHeadTexture;
   }
 
   const base = ctx.createLinearGradient(0, 0, size, size);
@@ -40,47 +114,13 @@ function createProceduralSkinTexture(): THREE.CanvasTexture {
   }
   ctx.putImageData(img, 0, 0);
 
-  cachedSkinTexture = new THREE.CanvasTexture(canvas);
-  cachedSkinTexture.colorSpace = THREE.SRGBColorSpace;
-  cachedSkinTexture.wrapS = THREE.ClampToEdgeWrapping;
-  cachedSkinTexture.wrapT = THREE.ClampToEdgeWrapping;
-  return cachedSkinTexture;
-}
+  paintLipsOnTexture(ctx, headMesh, size);
 
-/** Pink lip tint on mouth-region vertices — part of the head mesh, not floating. */
-function applyLipVertexColors(mesh: THREE.Mesh) {
-  const geo = mesh.geometry;
-  geo.computeBoundingBox();
-  const box = geo.boundingBox;
-  if (!box) return;
-
-  const size = box.getSize(new THREE.Vector3());
-  if (size.x <= 0 || size.y <= 0 || size.z <= 0) return;
-
-  const pos = geo.attributes.position as THREE.BufferAttribute;
-  const colors = new Float32Array(pos.count * 3);
-  const v = new THREE.Vector3();
-
-  for (let i = 0; i < pos.count; i++) {
-    v.fromBufferAttribute(pos, i);
-    const nx = (v.x - box.min.x) / size.x;
-    const ny = (v.y - box.min.y) / size.y;
-    const nz = (v.z - box.min.z) / size.z;
-
-    const inLip =
-      nx > 0.36 &&
-      nx < 0.64 &&
-      ny > 0.33 &&
-      ny < 0.43 &&
-      nz > 0.68;
-
-    const c = inLip ? lipColor : skinColor;
-    colors[i * 3] = c.r;
-    colors[i * 3 + 1] = c.g;
-    colors[i * 3 + 2] = c.b;
-  }
-
-  geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  cachedHeadTexture = new THREE.CanvasTexture(canvas);
+  cachedHeadTexture.colorSpace = THREE.SRGBColorSpace;
+  cachedHeadTexture.wrapS = THREE.ClampToEdgeWrapping;
+  cachedHeadTexture.wrapT = THREE.ClampToEdgeWrapping;
+  return cachedHeadTexture;
 }
 
 function applySkinMaterial(
@@ -112,9 +152,8 @@ function applySkinMaterial(
     return;
   }
 
-  applyLipVertexColors(mesh);
-  material.map = createProceduralSkinTexture();
-  material.vertexColors = true;
+  material.map = createHeadSkinTexture(mesh);
+  material.vertexColors = false;
   material.color.setHex(0xffffff);
   material.metalness = 0.02;
   material.roughness = 0.56;
@@ -124,6 +163,8 @@ function applySkinMaterial(
 }
 
 export function enhanceSkinMaterials(root: THREE.Object3D) {
+  cachedHeadTexture = null;
+
   root.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
 
