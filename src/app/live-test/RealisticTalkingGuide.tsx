@@ -1,6 +1,6 @@
 "use client";
 
-import { Bounds, Center, ContactShadows, Environment, OrbitControls, useGLTF } from "@react-three/drei";
+import { ContactShadows, Environment, OrbitControls, useGLTF } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
@@ -18,6 +18,18 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   const { scene } = useGLTF(GUIDE_MODEL);
 
   useEffect(() => {
+    const box = new THREE.Box3().setFromObject(scene);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+
+    scene.position.sub(center);
+    const targetHeight = 1.7;
+    const scale = targetHeight / Math.max(size.y, 0.001);
+    scene.scale.setScalar(scale);
+
+    // Shift slightly so eyes sit near vertical centre of the frame.
+    scene.position.y -= size.y * scale * 0.06;
+
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         child.castShadow = true;
@@ -52,11 +64,7 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
 
   return (
     <group ref={groupRef}>
-      <Bounds fit clip observe margin={1.15}>
-        <Center>
-          <primitive object={scene} />
-        </Center>
-      </Bounds>
+      <primitive object={scene} />
     </group>
   );
 }
@@ -71,7 +79,7 @@ export default function RealisticTalkingGuide({ isSpeaking, audioLevelRef }: Rea
     <div className="h-[min(78vh,720px)] w-full overflow-hidden rounded-2xl border border-emerald-500/25 bg-gradient-to-b from-[#101820] via-[#0a1218] to-black shadow-[0_0_64px_rgba(16,185,129,0.12)]">
       <Canvas
         shadows
-        camera={{ position: [0, 0.02, 1.85], fov: 28 }}
+        camera={{ position: [0, 0, 0.82], fov: 38, near: 0.05, far: 20 }}
         gl={{ antialias: true, alpha: true }}
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
@@ -91,10 +99,10 @@ export default function RealisticTalkingGuide({ isSpeaking, audioLevelRef }: Rea
         </Suspense>
         <OrbitControls
           enableZoom
-          minDistance={1}
-          maxDistance={3.2}
-          maxPolarAngle={Math.PI / 1.9}
-          minPolarAngle={Math.PI / 3.4}
+          minDistance={0.55}
+          maxDistance={1.8}
+          maxPolarAngle={Math.PI / 1.85}
+          minPolarAngle={Math.PI / 2.8}
           target={[0, 0, 0]}
         />
       </Canvas>
