@@ -11,7 +11,28 @@ export type HeadMetrics = {
   frontZ: number;
   leftEye: THREE.Vector3;
   rightEye: THREE.Vector3;
+  headMesh: THREE.Mesh;
 };
+
+export function findHeadMesh(scene: THREE.Object3D): THREE.Mesh | null {
+  let headMesh: THREE.Mesh | null = null;
+
+  scene.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    const morphCount = child.morphTargetDictionary
+      ? Object.keys(child.morphTargetDictionary).length
+      : 0;
+    if (morphCount > 20) headMesh = child;
+  });
+
+  return headMesh;
+}
+
+function toHeadLocal(headMesh: THREE.Object3D, world: THREE.Vector3): THREE.Vector3 {
+  headMesh.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(headMesh.matrixWorld).invert();
+  return world.clone().applyMatrix4(inv);
+}
 
 function getEyeSide(mesh: THREE.Mesh): "left" | "right" | null {
   let obj: THREE.Object3D | null = mesh;
@@ -31,7 +52,10 @@ function getEyeSide(mesh: THREE.Mesh): "left" | "right" | null {
   return null;
 }
 
-function findEyeCenters(scene: THREE.Object3D): { left: THREE.Vector3 | null; right: THREE.Vector3 | null } {
+function findEyeCentersLocal(
+  scene: THREE.Object3D,
+  headMesh: THREE.Mesh,
+): { left: THREE.Vector3 | null; right: THREE.Vector3 | null } {
   let left: THREE.Vector3 | null = null;
   let right: THREE.Vector3 | null = null;
 
@@ -40,36 +64,30 @@ function findEyeCenters(scene: THREE.Object3D): { left: THREE.Vector3 | null; ri
     const side = getEyeSide(child);
     if (!side) return;
 
-    const center = new THREE.Box3().setFromObject(child).getCenter(new THREE.Vector3());
-    if (side === "left") left = center;
-    else right = center;
+    const world = new THREE.Box3().setFromObject(child).getCenter(new THREE.Vector3());
+    const local = toHeadLocal(headMesh, world);
+    if (side === "left") left = local;
+    else right = local;
   });
 
   return { left, right };
 }
 
-export function computeHeadMetrics(scene: THREE.Object3D): HeadMetrics {
-  let headMesh: THREE.Mesh | null = null;
+export function computeHeadMetrics(scene: THREE.Object3D): HeadMetrics | null {
+  const headMesh = findHeadMesh(scene);
+  if (!headMesh) return null;
 
-  scene.traverse((child) => {
-    if (!(child instanceof THREE.Mesh)) return;
-    const morphCount = child.morphTargetDictionary
-      ? Object.keys(child.morphTargetDictionary).length
-      : 0;
-    if (morphCount > 20) headMesh = child;
-  });
-
-  const target = headMesh ?? scene;
-  const box = new THREE.Box3().setFromObject(target);
+  headMesh.geometry.computeBoundingBox();
+  const box = headMesh.geometry.boundingBox!.clone();
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
   const minY = box.min.y;
 
-  const { left, right } = findEyeCenters(scene);
+  const { left, right } = findEyeCentersLocal(scene, headMesh);
 
   const fallbackEyeY = minY + size.y * 0.58;
   const fallbackX = size.x * 0.11;
-  const fallbackZ = box.max.z - size.z * 0.02;
+  const fallbackZ = box.max.z - size.z * 0.01;
 
   const leftEye = left ?? new THREE.Vector3(center.x - fallbackX, fallbackEyeY, fallbackZ);
   const rightEye = right ?? new THREE.Vector3(center.x + fallbackX, fallbackEyeY, fallbackZ);
@@ -87,6 +105,7 @@ export function computeHeadMetrics(scene: THREE.Object3D): HeadMetrics {
     frontZ: box.max.z,
     leftEye,
     rightEye,
+    headMesh,
   };
 }
 

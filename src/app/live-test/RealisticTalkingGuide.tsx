@@ -1,7 +1,7 @@
 "use client";
 
 import { Environment, Html, OrbitControls } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, createPortal, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
@@ -55,7 +55,8 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
     scene.position.y -= size.y * (HEAD_HEIGHT / Math.max(size.y, 0.001)) * 0.04;
 
     enhanceSkinMaterials(scene);
-    setHeadMetrics(computeHeadMetrics(scene));
+    const metrics = computeHeadMetrics(scene);
+    if (metrics) setHeadMetrics(metrics);
 
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -66,7 +67,8 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
 
     const retry = window.setTimeout(() => {
       enhanceSkinMaterials(scene);
-      setHeadMetrics(computeHeadMetrics(scene));
+      const retryMetrics = computeHeadMetrics(scene);
+      if (retryMetrics) setHeadMetrics(retryMetrics);
     }, 400);
     return () => window.clearTimeout(retry);
   }, [scene]);
@@ -97,12 +99,14 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   return (
     <group ref={groupRef}>
       <primitive object={scene} />
-      {headMetrics && (
-        <>
-          <GuideHair metrics={headMetrics} />
-          <GuideEyebrows metrics={headMetrics} />
-        </>
-      )}
+      {headMetrics &&
+        createPortal(
+          <>
+            <GuideHair metrics={headMetrics} />
+            <GuideEyebrows metrics={headMetrics} />
+          </>,
+          headMetrics.headMesh,
+        )}
     </group>
   );
 }
