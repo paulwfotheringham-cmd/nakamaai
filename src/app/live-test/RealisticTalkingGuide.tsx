@@ -59,6 +59,10 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
         child.receiveShadow = true;
       }
     });
+
+    // Re-apply after textures finish decoding (KTX2 can resolve async).
+    const retry = window.setTimeout(() => enhanceSkinMaterials(scene), 400);
+    return () => window.clearTimeout(retry);
   }, [scene]);
 
   useFrame((state) => {
@@ -113,7 +117,7 @@ export default function RealisticTalkingGuide({ isSpeaking, audioLevelRef }: Rea
         gl={{ antialias: true, alpha: false }}
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 1.28;
+          gl.toneMappingExposure = 1.38;
           gl.outputColorSpace = THREE.SRGBColorSpace;
           gl.setClearColor(0x12100e, 1);
         }}
