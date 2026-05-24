@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ClientErrorBoundary } from "@/components/ClientErrorBoundary";
 import { useSpeechAudioLevel } from "@/lib/avatar/useSpeechAudioLevel";
-import { LIVE_TEST_DEMO_SCRIPT, LIVE_TEST_REFERENCE_VIDEO } from "./demo-script";
+import { LIVE_TEST_AVATAR_SCRIPT, LIVE_TEST_REFERENCE_VIDEO } from "./demo-script";
 
 const RealisticTalkingGuide = dynamic(() => import("./RealisticTalkingGuide"), {
   ssr: false,
@@ -21,12 +21,13 @@ export default function LiveGuideStage() {
   const [voice, setVoice] = useState("Donny - Steady Presence");
   const [hasReferenceVideo, setHasReferenceVideo] = useState(false);
   const [mediaReady, setMediaReady] = useState(false);
+  const [lipSyncSource, setLipSyncSource] = useState<"video" | "audio">("audio");
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const speakingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const lipSyncRef = hasReferenceVideo ? videoRef : audioRef;
+  const lipSyncRef = lipSyncSource === "video" ? videoRef : audioRef;
   const audioLevelRef = useSpeechAudioLevel(lipSyncRef, isSpeaking);
 
   useEffect(() => {
@@ -84,6 +85,7 @@ export default function LiveGuideStage() {
     };
     video.addEventListener("ended", onEnded);
 
+    setLipSyncSource("video");
     setIsSpeaking(true);
     try {
       await video.play();
@@ -96,6 +98,7 @@ export default function LiveGuideStage() {
 
   const playTts = useCallback(
     async (text: string) => {
+      setLipSyncSource("audio");
       setIsSpeaking(true);
       scheduleSpeakingStop(text.length * 0.055);
 
@@ -139,26 +142,28 @@ export default function LiveGuideStage() {
     [scheduleSpeakingStop, stopSpeaking, voice],
   );
 
-  /** Drives 3D lip sync — uses reference MP4 audio when available. */
-  const playGuide = useCallback(async () => {
-    if (hasReferenceVideo) {
-      const ok = await playReferenceVideo();
-      if (ok) return;
-    }
-    await playTts(LIVE_TEST_DEMO_SCRIPT);
-  }, [hasReferenceVideo, playReferenceVideo, playTts]);
+  /** Left panel — reference MP4 only. */
+  const playReference = useCallback(async () => {
+    if (!hasReferenceVideo) return;
+    await playReferenceVideo();
+  }, [hasReferenceVideo, playReferenceVideo]);
+
+  /** Right panel — 3D avatar TTS + lip sync. */
+  const playAvatar = useCallback(async () => {
+    await playTts(LIVE_TEST_AVATAR_SCRIPT);
+  }, [playTts]);
 
   useEffect(() => {
-    if (!mediaReady) return;
+    if (!mediaReady || !hasReferenceVideo) return;
     const t = setTimeout(() => {
-      void playGuide();
+      void playReferenceVideo();
     }, 600);
     return () => {
       clearTimeout(t);
       stopSpeaking();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mediaReady]);
+  }, [mediaReady, hasReferenceVideo]);
 
   return (
     <main className="min-h-screen bg-[#07040d] text-white">
@@ -205,7 +210,7 @@ export default function LiveGuideStage() {
             {hasReferenceVideo && (
               <button
                 type="button"
-                onClick={() => void playGuide()}
+                onClick={() => void playReference()}
                 className="mt-4 w-full rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-emerald-400 sm:w-auto"
               >
                 Play Reference
@@ -221,10 +226,15 @@ export default function LiveGuideStage() {
               <RealisticTalkingGuide isSpeaking={isSpeaking} audioLevelRef={audioLevelRef} />
             </ClientErrorBoundary>
             <p className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-zinc-300">
-              {hasReferenceVideo
-                ? "Lip sync follows the reference video audio."
-                : `“${LIVE_TEST_DEMO_SCRIPT}”`}
+              &ldquo;{LIVE_TEST_AVATAR_SCRIPT}&rdquo;
             </p>
+            <button
+              type="button"
+              onClick={() => void playAvatar()}
+              className="mt-4 w-full rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-emerald-400 sm:w-auto"
+            >
+              Play
+            </button>
           </div>
         </div>
       </div>
