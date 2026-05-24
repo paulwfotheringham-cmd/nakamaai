@@ -6,6 +6,7 @@ export type HeadMetrics = {
   height: number;
   depth: number;
   topY: number;
+  eyeY: number;
   browY: number;
   frontZ: number;
 };
@@ -26,13 +27,16 @@ export function computeHeadMetrics(scene: THREE.Object3D): HeadMetrics {
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
 
+  const minY = box.min.y;
+
   return {
     center,
     width: size.x,
     height: size.y,
     depth: size.z,
     topY: box.max.y,
-    browY: box.min.y + size.y * 0.71,
+    eyeY: minY + size.y * 0.58,
+    browY: minY + size.y * 0.67,
     frontZ: box.max.z,
   };
 }

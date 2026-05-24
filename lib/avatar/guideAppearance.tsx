@@ -28,34 +28,25 @@ const eyeMaterial = new THREE.MeshStandardMaterial({
   emissiveIntensity: 0.25,
 });
 
-/** Hair cap fitted to the crown of the head mesh. */
+/** Short hair cap fitted to the crown — sits on the scalp, not above it. */
 export function GuideHair({ metrics }: { metrics: HeadMetrics }) {
-  const radius = metrics.width * 0.51;
-  const capCenterY = metrics.topY - radius * 0.38;
+  const radius = metrics.width * 0.28;
 
   return (
-    <group position={[metrics.center.x, capCenterY, metrics.center.z]}>
-      <mesh castShadow receiveShadow material={hairMaterial}>
-        <sphereGeometry args={[radius, 40, 28, 0, Math.PI * 2, 0, Math.PI * 0.5]} />
-      </mesh>
-      <mesh
-        position={[0, -radius * 0.12, metrics.depth * 0.02]}
-        scale={[1.06, 0.5, 1.04]}
-        castShadow
-        material={hairMaterial}
-      >
-        <sphereGeometry args={[radius * 0.96, 32, 16, 0, Math.PI * 2, Math.PI * 0.38, Math.PI * 0.42]} />
+    <group position={[metrics.center.x, metrics.topY, metrics.center.z]}>
+      <mesh castShadow receiveShadow material={hairMaterial} scale={[0.92, 0.72, 0.9]}>
+        <sphereGeometry args={[radius, 32, 20, 0, Math.PI * 2, 0, Math.PI * 0.42]} />
       </mesh>
     </group>
   );
 }
 
-/** Eyebrows on the forehead, aligned to the face surface. */
+/** Eyebrows above the eyes on the forehead. */
 export function GuideEyebrows({ metrics }: { metrics: HeadMetrics }) {
-  const w = metrics.width * 0.13;
-  const h = metrics.height * 0.025;
-  const d = metrics.depth * 0.04;
-  const z = metrics.frontZ - metrics.depth * 0.06;
+  const w = metrics.width * 0.11;
+  const h = metrics.height * 0.018;
+  const d = metrics.depth * 0.035;
+  const z = metrics.frontZ - metrics.depth * 0.05;
   const y = metrics.browY;
   const xOff = metrics.width * 0.11;
 
@@ -63,16 +54,18 @@ export function GuideEyebrows({ metrics }: { metrics: HeadMetrics }) {
     <group>
       <mesh
         position={[metrics.center.x - xOff, y, z]}
-        rotation={[0.12, 0.1, 0.06]}
+        rotation={[0.08, 0.06, 0.05]}
         castShadow
+        renderOrder={5}
         material={browMaterial}
       >
         <boxGeometry args={[w, h, d]} />
       </mesh>
       <mesh
         position={[metrics.center.x + xOff, y, z]}
-        rotation={[0.12, -0.1, -0.06]}
+        rotation={[0.08, -0.06, -0.05]}
         castShadow
+        renderOrder={5}
         material={browMaterial}
       >
         <boxGeometry args={[w, h, d]} />
@@ -83,8 +76,8 @@ export function GuideEyebrows({ metrics }: { metrics: HeadMetrics }) {
 
 /** Blue irises placed on the face surface. */
 export function GuideFaceEyes({ metrics }: { metrics: HeadMetrics }) {
-  const radius = metrics.width * 0.042;
-  const y = metrics.center.y + metrics.height * 0.06;
+  const radius = metrics.width * 0.038;
+  const y = metrics.eyeY;
   const z = metrics.frontZ - metrics.depth * 0.02;
   const xOff = metrics.width * 0.11;
 
