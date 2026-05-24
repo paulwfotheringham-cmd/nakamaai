@@ -28,25 +28,18 @@ function makeBrowMaterial(color: number) {
 const browMaterial = makeBrowMaterial(BROW_COLOR);
 const browHighlightMaterial = makeBrowMaterial(BROW_HIGHLIGHT);
 
-/** Hair cap on the crown plus small temple patches (scene-local). */
+/**
+ * Hair cap — hemisphere with equator at the scalp crown.
+ * Rendered as a sibling of the GLB scene (not portaled into it).
+ */
 export function GuideHair({ metrics }: { metrics: HeadMetrics }) {
-  const radius = metrics.hairWidth * 0.30;
-  const sink = metrics.hairHeight * 0.025;
-  const sideR = radius * 0.22;
-  const sideY = metrics.crown.y - metrics.hairHeight * 0.06;
-  const sideZ = metrics.crown.z - metrics.hairDepth * 0.04;
-  const sideX = metrics.hairWidth * 0.36;
+  const radius = metrics.headWidth * 0.30;
+  const capY = metrics.crown.y - metrics.headHeight * 0.012;
 
   return (
-    <group position={[metrics.crown.x, metrics.crown.y - sink, metrics.crown.z]}>
+    <group position={[metrics.crown.x, capY, metrics.crown.z]}>
       <mesh castShadow receiveShadow material={hairMaterial} scale={[0.95, 0.55, 0.88]}>
-        <sphereGeometry args={[radius, 36, 18, 0, Math.PI * 2, 0, Math.PI * 0.52]} />
-      </mesh>
-      <mesh position={[-sideX, sideY - metrics.crown.y + sink, sideZ - metrics.crown.z]} scale={[0.9, 0.7, 0.85]} material={hairMaterial}>
-        <sphereGeometry args={[sideR, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.45]} />
-      </mesh>
-      <mesh position={[sideX, sideY - metrics.crown.y + sink, sideZ - metrics.crown.z]} scale={[0.9, 0.7, 0.85]} material={hairMaterial}>
-        <sphereGeometry args={[sideR, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.45]} />
+        <sphereGeometry args={[radius, 36, 18, 0, Math.PI * 2, 0, Math.PI * 0.5]} />
       </mesh>
     </group>
   );
@@ -74,20 +67,20 @@ function ArchBrow({ eye, metrics, side }: BrowSideProps) {
 
     for (let i = 0; i < 7; i++) {
       const t = i / 6;
-      const innerBoost = (1 - t) * metrics.hairHeight * 0.008;
-      const arch = Math.sin(t * Math.PI) * metrics.hairHeight * 0.012;
-      const x = eye.x + sign * (t - 0.32) * metrics.hairWidth * 0.095;
-      const y = eye.y + metrics.hairHeight * 0.042 + arch + innerBoost;
-      const z = metrics.faceFrontZ - metrics.hairDepth * 0.006 + Math.sin(t * Math.PI) * metrics.hairDepth * 0.004;
+      const innerBoost = (1 - t) * metrics.headHeight * 0.008;
+      const arch = Math.sin(t * Math.PI) * metrics.headHeight * 0.012;
+      const x = eye.x + sign * (t - 0.32) * metrics.headWidth * 0.095;
+      const y = eye.y + metrics.headHeight * 0.042 + arch + innerBoost;
+      const z = metrics.faceFrontZ - metrics.headDepth * 0.006 + Math.sin(t * Math.PI) * metrics.headDepth * 0.004;
       const taper = 1 - t * 0.55;
 
       items.push({
         x,
         y,
         z,
-        w: metrics.hairWidth * 0.028 * taper,
-        h: metrics.hairHeight * 0.0065 * (0.85 + taper * 0.35),
-        d: metrics.hairDepth * 0.005 * taper,
+        w: metrics.headWidth * 0.028 * taper,
+        h: metrics.headHeight * 0.0065 * (0.85 + taper * 0.35),
+        d: metrics.headDepth * 0.005 * taper,
         rotZ: sign * (0.06 - t * 0.1),
         material: i < 2 ? browHighlightMaterial : browMaterial,
       });
@@ -113,7 +106,6 @@ function ArchBrow({ eye, metrics, side }: BrowSideProps) {
   );
 }
 
-/** Arched eyebrows on the forehead, above each eye (scene-local). */
 export function GuideEyebrows({ metrics }: { metrics: HeadMetrics }) {
   return (
     <group>

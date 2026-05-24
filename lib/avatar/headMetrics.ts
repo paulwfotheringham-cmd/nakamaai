@@ -1,16 +1,13 @@
 import * as THREE from "three";
 
 export type HeadMetrics = {
-  /** Scalp crown in scene-local space. */
+  /** Scalp crown in the same space as the avatar group (world-aligned). */
   crown: THREE.Vector3;
-  /** Head mesh geometry dimensions in scene-local units. */
-  hairWidth: number;
-  hairHeight: number;
-  hairDepth: number;
-  /** Eye centers in scene-local space. */
+  headWidth: number;
+  headHeight: number;
+  headDepth: number;
   leftEye: THREE.Vector3;
   rightEye: THREE.Vector3;
-  /** Forehead surface Z in scene-local space (brows sit here). */
   faceFrontZ: number;
 };
 
@@ -28,24 +25,13 @@ function findHeadMesh(scene: THREE.Object3D): THREE.Mesh | null {
   return headMesh;
 }
 
-function headLocalToSceneLocal(
-  scene: THREE.Object3D,
-  headMesh: THREE.Mesh,
-  point: THREE.Vector3,
-): THREE.Vector3 {
-  scene.updateMatrixWorld(true);
+function headLocalToWorld(headMesh: THREE.Mesh, point: THREE.Vector3): THREE.Vector3 {
   headMesh.updateMatrixWorld(true);
-  const sceneInv = new THREE.Matrix4().copy(scene.matrixWorld).invert();
-  return point.clone().applyMatrix4(headMesh.matrixWorld).applyMatrix4(sceneInv);
+  return point.clone().applyMatrix4(headMesh.matrixWorld);
 }
 
-function worldToSceneLocal(scene: THREE.Object3D, point: THREE.Vector3): THREE.Vector3 {
-  scene.updateMatrixWorld(true);
-  return scene.worldToLocal(point.clone());
-}
-
-/** Highest scalp vertex on the morph head mesh (head geometry local space). */
-function computeCrownHeadLocal(headMesh: THREE.Mesh): THREE.Vector3 {
+/** Highest scalp vertex transformed to world / group space. */
+function computeCrownWorld(headMesh: THREE.Mesh): THREE.Vector3 {
   headMesh.geometry.computeBoundingBox();
 
   const pos = headMesh.geometry.attributes.position as THREE.BufferAttribute;
@@ -64,7 +50,7 @@ function computeCrownHeadLocal(headMesh: THREE.Mesh): THREE.Vector3 {
     if (v.y > best.y) best.set(v.x, v.y, v.z);
   }
 
-  return best;
+  return headLocalToWorld(headMesh, best);
 }
 
 function getEyeSide(mesh: THREE.Mesh): "left" | "right" | null {
@@ -85,7 +71,7 @@ function getEyeSide(mesh: THREE.Mesh): "left" | "right" | null {
   return null;
 }
 
-function findEyeCentersWorld(scene: THREE.Object3D): { left: THREE.Vector3 | null; right: THREE.Vector3 | null } {
+function findEyeCenters(scene: THREE.Object3D): { left: THREE.Vector3 | null; right: THREE.Vector3 | null } {
   let left: THREE.Vector3 | null = null;
   let right: THREE.Vector3 | null = null;
 
@@ -112,43 +98,36 @@ export function computeHeadMetrics(scene: THREE.Object3D): HeadMetrics {
   const center = box.getCenter(new THREE.Vector3());
   const minY = box.min.y;
 
-  const { left, right } = findEyeCentersWorld(scene);
+  const { left, right } = findEyeCenters(scene);
 
   const fallbackEyeY = minY + size.y * 0.58;
   const fallbackX = size.x * 0.11;
   const fallbackZ = box.max.z - size.z * 0.02;
 
-  const leftEyeWorld = left ?? new THREE.Vector3(center.x - fallbackX, fallbackEyeY, fallbackZ);
-  const rightEyeWorld = right ?? new THREE.Vector3(center.x + fallbackX, fallbackEyeY, fallbackZ);
+  const leftEye = left ?? new THREE.Vector3(center.x - fallbackX, fallbackEyeY, fallbackZ);
+  const rightEye = right ?? new THREE.Vector3(center.x + fallbackX, fallbackEyeY, fallbackZ);
 
-  let crown = worldToSceneLocal(scene, new THREE.Vector3(center.x, box.max.y, center.z));
-  let hairWidth = size.x / scene.scale.x;
-  let hairHeight = size.y / scene.scale.y;
-  let hairDepth = size.z / scene.scale.x;
-  let faceFrontZ = crown.z;
+  let crown = new THREE.Vector3(center.x, box.max.y, center.z);
+  let faceFrontZ = box.max.z - size.z * 0.012;
 
   if (headMesh) {
+    crown = computeCrownWorld(headMesh);
     headMesh.geometry.computeBoundingBox();
     const geoBox = headMesh.geometry.boundingBox!;
     const geoSize = geoBox.getSize(new THREE.Vector3());
-    hairWidth = geoSize.x;
-    hairHeight = geoSize.y;
-    hairDepth = geoSize.z;
-    crown = headLocalToSceneLocal(scene, headMesh, computeCrownHeadLocal(headMesh));
-    faceFrontZ = headLocalToSceneLocal(
-      scene,
+    faceFrontZ = headLocalToWorld(
       headMesh,
-      new THREE.Vector3(0, geoBox.min.y + geoSize.y * 0.66, geoBox.max.z - geoSize.z * 0.01),
+      new THREE.Vector3(0, geoBox.min.y + geoSize.y * 0.66, geoBox.max.z - geoSize.z * 0.012),
     ).z;
   }
 
   return {
     crown,
-    hairWidth,
-    hairHeight,
-    hairDepth,
-    leftEye: worldToSceneLocal(scene, leftEyeWorld),
-    rightEye: worldToSceneLocal(scene, rightEyeWorld),
+    headWidth: size.x,
+    headHeight: size.y,
+    headDepth: size.z,
+    leftEye,
+    rightEye,
     faceFrontZ,
   };
 }

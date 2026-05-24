@@ -1,7 +1,7 @@
 "use client";
 
 import { Environment, Html, OrbitControls } from "@react-three/drei";
-import { Canvas, createPortal, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
@@ -99,14 +99,12 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   return (
     <group ref={groupRef}>
       <primitive object={scene} />
-      {headMetrics &&
-        createPortal(
-          <>
-            <GuideHair metrics={headMetrics} />
-            <GuideEyebrows metrics={headMetrics} />
-          </>,
-          scene,
-        )}
+      {headMetrics && (
+        <>
+          <GuideHair metrics={headMetrics} />
+          <GuideEyebrows metrics={headMetrics} />
+        </>
+      )}
     </group>
   );
 }

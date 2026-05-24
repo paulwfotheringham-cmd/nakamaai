@@ -51,11 +51,11 @@ function applySkinMaterial(
     material.map = null;
     material.color.setHex(0x2563eb);
     material.emissive.setHex(0x1e3a8a);
-    material.emissiveIntensity = 0.2;
-    material.roughness = 0.25;
-    material.metalness = 0.05;
-    material.envMapIntensity = 0.7;
-    mesh.renderOrder = 2;
+    material.emissiveIntensity = 0.06;
+    material.roughness = 0.35;
+    material.metalness = 0.02;
+    material.envMapIntensity = 0.4;
+    mesh.renderOrder = 1;
     material.needsUpdate = true;
     return;
   }
