@@ -1,10 +1,8 @@
 import * as THREE from "three";
-import { createBlueEyeTexture } from "./guideAppearance";
+import { getMeshRole } from "./headMetrics";
 
 /** Fair caucasian skin — warm, visible under studio lighting. */
 export const SKIN_COLOR = 0xddb896;
-export const SKIN_COLOR_LIGHT = 0xf0c9a8;
-export const SKIN_COLOR_SHADOW = 0xb8845c;
 
 let cachedSkinTexture: THREE.CanvasTexture | null = null;
 
@@ -44,20 +42,25 @@ function createProceduralSkinTexture(): THREE.CanvasTexture {
   return cachedSkinTexture;
 }
 
-function applySkinMaterial(material: THREE.MeshStandardMaterial, meshName: string) {
-  const name = meshName.toLowerCase();
-
-  if (name.includes("eye")) {
-    material.map = createBlueEyeTexture();
-    material.color.setHex(0xffffff);
-    material.roughness = 0.28;
+function applySkinMaterial(
+  material: THREE.MeshStandardMaterial,
+  role: "eye" | "teeth" | "head",
+  mesh: THREE.Mesh,
+) {
+  if (role === "eye") {
+    material.map = null;
+    material.color.setHex(0x2563eb);
+    material.emissive.setHex(0x1e3a8a);
+    material.emissiveIntensity = 0.2;
+    material.roughness = 0.25;
     material.metalness = 0.05;
-    material.envMapIntensity = 0.75;
+    material.envMapIntensity = 0.7;
+    mesh.renderOrder = 2;
     material.needsUpdate = true;
     return;
   }
 
-  if (name.includes("teeth")) {
+  if (role === "teeth") {
     material.map = null;
     material.color.setHex(0xf8f4ee);
     material.roughness = 0.4;
@@ -66,12 +69,12 @@ function applySkinMaterial(material: THREE.MeshStandardMaterial, meshName: strin
     return;
   }
 
-  // Always use procedural skin albedo so colour is visible even when KTX2 fails.
   material.map = createProceduralSkinTexture();
   material.color.setHex(SKIN_COLOR);
   material.metalness = 0.02;
   material.roughness = 0.56;
   material.envMapIntensity = 0.85;
+  mesh.renderOrder = 0;
   material.needsUpdate = true;
 }
 
@@ -79,24 +82,12 @@ export function enhanceSkinMaterials(root: THREE.Object3D) {
   root.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
 
-    const meshName = child.name || "head";
-    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    const role = getMeshRole(child);
+    const src = child.material;
+    if (!(src instanceof THREE.MeshStandardMaterial)) return;
 
-    if (!Array.isArray(child.material)) {
-      const src = child.material;
-      if (src instanceof THREE.MeshStandardMaterial) {
-        const cloned = src.clone();
-        applySkinMaterial(cloned, meshName);
-        child.material = cloned;
-      }
-      return;
-    }
-
-    child.material = materials.map((m) => {
-      if (!(m instanceof THREE.MeshStandardMaterial)) return m;
-      const cloned = m.clone();
-      applySkinMaterial(cloned, meshName);
-      return cloned;
-    });
+    const cloned = src.clone();
+    applySkinMaterial(cloned, role, child);
+    child.material = cloned;
   });
 }
