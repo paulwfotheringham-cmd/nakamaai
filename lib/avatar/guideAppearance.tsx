@@ -14,20 +14,17 @@ const hairMaterial = new THREE.MeshStandardMaterial({
   metalness: 0.02,
 });
 
-function makeBrowMaterial(color: number) {
-  const mat = new THREE.MeshStandardMaterial({
-    color,
-    roughness: 0.94,
-    metalness: 0,
-    polygonOffset: true,
-    polygonOffsetFactor: -2,
-    polygonOffsetUnits: -2,
-  });
-  return mat;
-}
+const browMaterial = new THREE.MeshStandardMaterial({
+  color: BROW_COLOR,
+  roughness: 0.94,
+  metalness: 0,
+});
 
-const browMaterial = makeBrowMaterial(BROW_COLOR);
-const browHighlightMaterial = makeBrowMaterial(BROW_HIGHLIGHT);
+const browHighlightMaterial = new THREE.MeshStandardMaterial({
+  color: BROW_HIGHLIGHT,
+  roughness: 0.9,
+  metalness: 0,
+});
 
 /** Short hair cap fitted to the crown — sits on the scalp, not above it. */
 export function GuideHair({ metrics }: { metrics: HeadMetrics }) {
@@ -50,8 +47,6 @@ type BrowSideProps = {
 
 function ArchBrow({ eye, metrics, side }: BrowSideProps) {
   const sign = side === "left" ? -1 : 1;
-  const surfaceZ = metrics.frontZ - metrics.depth * 0.012;
-
   const segments = useMemo(() => {
     const items: Array<{
       x: number;
@@ -70,7 +65,7 @@ function ArchBrow({ eye, metrics, side }: BrowSideProps) {
       const arch = Math.sin(t * Math.PI) * metrics.height * 0.012;
       const x = eye.x + sign * (t - 0.32) * metrics.width * 0.095;
       const y = eye.y + metrics.height * 0.045 + arch + innerBoost;
-      const z = surfaceZ + Math.sin(t * Math.PI) * metrics.depth * 0.004;
+      const z = eye.z - metrics.depth * 0.038 + Math.sin(t * Math.PI) * metrics.depth * 0.01;
       const taper = 1 - t * 0.55;
 
       items.push({
@@ -79,14 +74,14 @@ function ArchBrow({ eye, metrics, side }: BrowSideProps) {
         z,
         w: metrics.width * 0.028 * taper,
         h: metrics.height * 0.007 * (0.85 + taper * 0.35),
-        d: metrics.depth * 0.005 * taper,
-        rotZ: sign * (0.06 - t * 0.1),
+        d: metrics.depth * 0.022 * taper,
+        rotZ: sign * (0.08 - t * 0.12),
         material: i < 2 ? browHighlightMaterial : browMaterial,
       });
     }
 
     return items;
-  }, [eye, metrics, side, sign, surfaceZ]);
+  }, [eye, metrics, side, sign]);
 
   return (
     <group>
@@ -94,8 +89,9 @@ function ArchBrow({ eye, metrics, side }: BrowSideProps) {
         <mesh
           key={i}
           position={[seg.x, seg.y, seg.z]}
-          rotation={[0.02, sign * 0.02, seg.rotZ]}
+          rotation={[0.06, sign * 0.04, seg.rotZ]}
           castShadow
+          renderOrder={5}
           material={seg.material}
         >
           <boxGeometry args={[seg.w, seg.h, seg.d]} />
@@ -105,7 +101,7 @@ function ArchBrow({ eye, metrics, side }: BrowSideProps) {
   );
 }
 
-/** Arched eyebrows parented to the head mesh, flush on the forehead. */
+/** Arched eyebrows anchored just above each eye socket. */
 export function GuideEyebrows({ metrics }: { metrics: HeadMetrics }) {
   return (
     <group>
