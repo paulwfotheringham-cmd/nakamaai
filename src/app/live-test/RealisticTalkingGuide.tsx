@@ -1,11 +1,12 @@
 "use client";
 
-import { Html, OrbitControls } from "@react-three/drei";
+import { Environment, Html, OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
-import { GUIDE_MODEL_PATH, useGuideGLTF } from "@/lib/avatar/useGuideGLTF";
+import { enhanceSkinMaterials } from "@/lib/avatar/enhanceSkinMaterials";
+import { useGuideGLTF } from "@/lib/avatar/useGuideGLTF";
 
 /** World-space head height — smaller value = smaller face on screen. */
 const HEAD_HEIGHT = 0.52;
@@ -50,14 +51,12 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
     scene.scale.setScalar(HEAD_HEIGHT / Math.max(size.y, 0.001));
     scene.position.y -= size.y * (HEAD_HEIGHT / Math.max(size.y, 0.001)) * 0.04;
 
+    enhanceSkinMaterials(scene);
+
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         child.castShadow = true;
         child.receiveShadow = true;
-        if (child.material instanceof THREE.MeshStandardMaterial) {
-          child.material.roughness = 0.62;
-          child.material.metalness = 0.04;
-        }
       }
     });
   }, [scene]);
@@ -107,23 +106,26 @@ type RealisticTalkingGuideProps = {
 
 export default function RealisticTalkingGuide({ isSpeaking, audioLevelRef }: RealisticTalkingGuideProps) {
   return (
-    <div className="flex h-[min(78vh,720px)] w-full items-center justify-center overflow-hidden rounded-2xl border border-emerald-500/25 bg-[#0a1218] shadow-[0_0_64px_rgba(16,185,129,0.12)]">
+    <div className="flex h-[min(78vh,720px)] w-full items-center justify-center overflow-hidden rounded-2xl border border-emerald-500/25 bg-gradient-to-b from-[#1a1512] to-[#0a1218] shadow-[0_0_64px_rgba(16,185,129,0.12)]">
       <Canvas
         shadows
         camera={{ position: [0, 0.02, CAMERA_Z], fov: 30, near: 0.1, far: 20 }}
         gl={{ antialias: true, alpha: false }}
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 1.15;
-          gl.setClearColor(0x0a1218, 1);
+          gl.toneMappingExposure = 1.28;
+          gl.outputColorSpace = THREE.SRGBColorSpace;
+          gl.setClearColor(0x12100e, 1);
         }}
       >
         <PortraitCamera />
-        <ambientLight intensity={0.55} />
-        <directionalLight position={[2.5, 3.5, 2]} intensity={1.35} castShadow />
-        <directionalLight position={[-2, 2.5, 2.5]} intensity={0.55} />
-        <directionalLight position={[0, 0.5, -2.5]} intensity={0.3} color="#b8d4ff" />
+        <hemisphereLight intensity={0.45} color="#fff8f0" groundColor="#6b5344" />
+        <ambientLight intensity={0.22} />
+        <directionalLight position={[2.2, 3.2, 2.5]} intensity={1.5} color="#fff5eb" castShadow />
+        <directionalLight position={[-2.5, 2, 2]} intensity={0.45} color="#ffd4b8" />
+        <directionalLight position={[0, 1.5, -2.8]} intensity={0.35} color="#c8d8ff" />
         <Suspense fallback={<CanvasLoader />}>
+          <Environment preset="apartment" />
           <GuideHead isSpeaking={isSpeaking} audioLevelRef={audioLevelRef} />
         </Suspense>
         <OrbitControls
