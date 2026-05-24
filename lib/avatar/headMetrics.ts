@@ -9,7 +9,44 @@ export type HeadMetrics = {
   eyeY: number;
   browY: number;
   frontZ: number;
+  leftEye: THREE.Vector3;
+  rightEye: THREE.Vector3;
 };
+
+function getEyeSide(mesh: THREE.Mesh): "left" | "right" | null {
+  let obj: THREE.Object3D | null = mesh;
+  while (obj) {
+    const n = (obj.name || "").toLowerCase();
+    if (n.includes("eye") && n.includes("left")) return "left";
+    if (n.includes("eye") && n.includes("right")) return "right";
+    obj = obj.parent;
+  }
+
+  const verts = mesh.geometry.attributes.position?.count ?? 0;
+  if (verts > 0 && verts < 900) {
+    const x = new THREE.Box3().setFromObject(mesh).getCenter(new THREE.Vector3()).x;
+    return x < 0 ? "left" : "right";
+  }
+
+  return null;
+}
+
+function findEyeCenters(scene: THREE.Object3D): { left: THREE.Vector3 | null; right: THREE.Vector3 | null } {
+  let left: THREE.Vector3 | null = null;
+  let right: THREE.Vector3 | null = null;
+
+  scene.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    const side = getEyeSide(child);
+    if (!side) return;
+
+    const center = new THREE.Box3().setFromObject(child).getCenter(new THREE.Vector3());
+    if (side === "left") left = center;
+    else right = center;
+  });
+
+  return { left, right };
+}
 
 export function computeHeadMetrics(scene: THREE.Object3D): HeadMetrics {
   let headMesh: THREE.Mesh | null = null;
@@ -26,8 +63,18 @@ export function computeHeadMetrics(scene: THREE.Object3D): HeadMetrics {
   const box = new THREE.Box3().setFromObject(target);
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
-
   const minY = box.min.y;
+
+  const { left, right } = findEyeCenters(scene);
+
+  const fallbackEyeY = minY + size.y * 0.58;
+  const fallbackX = size.x * 0.11;
+  const fallbackZ = box.max.z - size.z * 0.02;
+
+  const leftEye = left ?? new THREE.Vector3(center.x - fallbackX, fallbackEyeY, fallbackZ);
+  const rightEye = right ?? new THREE.Vector3(center.x + fallbackX, fallbackEyeY, fallbackZ);
+  const eyeY = (leftEye.y + rightEye.y) * 0.5;
+  const browGap = size.y * 0.042;
 
   return {
     center,
@@ -35,9 +82,11 @@ export function computeHeadMetrics(scene: THREE.Object3D): HeadMetrics {
     height: size.y,
     depth: size.z,
     topY: box.max.y,
-    eyeY: minY + size.y * 0.58,
-    browY: minY + size.y * 0.67,
+    eyeY,
+    browY: eyeY + browGap,
     frontZ: box.max.z,
+    leftEye,
+    rightEye,
   };
 }
 

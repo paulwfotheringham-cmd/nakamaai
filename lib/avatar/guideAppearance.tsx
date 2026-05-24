@@ -1,10 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import * as THREE from "three";
 import type { HeadMetrics } from "./headMetrics";
 
 export const HAIR_COLOR = 0x4a3728;
 const BROW_COLOR = 0x3d2914;
+const BROW_HIGHLIGHT = 0x5c4030;
 
 const hairMaterial = new THREE.MeshStandardMaterial({
   color: HAIR_COLOR,
@@ -14,7 +16,13 @@ const hairMaterial = new THREE.MeshStandardMaterial({
 
 const browMaterial = new THREE.MeshStandardMaterial({
   color: BROW_COLOR,
-  roughness: 0.92,
+  roughness: 0.94,
+  metalness: 0,
+});
+
+const browHighlightMaterial = new THREE.MeshStandardMaterial({
+  color: BROW_HIGHLIGHT,
+  roughness: 0.9,
   metalness: 0,
 });
 
@@ -31,35 +39,74 @@ export function GuideHair({ metrics }: { metrics: HeadMetrics }) {
   );
 }
 
-/** Eyebrows above the eyes on the forehead. */
-export function GuideEyebrows({ metrics }: { metrics: HeadMetrics }) {
-  const w = metrics.width * 0.11;
-  const h = metrics.height * 0.018;
-  const d = metrics.depth * 0.035;
-  const z = metrics.frontZ - metrics.depth * 0.05;
-  const y = metrics.browY;
-  const xOff = metrics.width * 0.11;
+type BrowSideProps = {
+  eye: THREE.Vector3;
+  metrics: HeadMetrics;
+  side: "left" | "right";
+};
+
+function ArchBrow({ eye, metrics, side }: BrowSideProps) {
+  const sign = side === "left" ? -1 : 1;
+  const segments = useMemo(() => {
+    const items: Array<{
+      x: number;
+      y: number;
+      z: number;
+      w: number;
+      h: number;
+      d: number;
+      rotZ: number;
+      material: THREE.MeshStandardMaterial;
+    }> = [];
+
+    for (let i = 0; i < 7; i++) {
+      const t = i / 6;
+      const innerBoost = (1 - t) * metrics.height * 0.008;
+      const arch = Math.sin(t * Math.PI) * metrics.height * 0.012;
+      const x = eye.x + sign * (t - 0.32) * metrics.width * 0.095;
+      const y = eye.y + metrics.height * 0.045 + arch + innerBoost;
+      const z = eye.z - metrics.depth * 0.038 + Math.sin(t * Math.PI) * metrics.depth * 0.01;
+      const taper = 1 - t * 0.55;
+
+      items.push({
+        x,
+        y,
+        z,
+        w: metrics.width * 0.028 * taper,
+        h: metrics.height * 0.007 * (0.85 + taper * 0.35),
+        d: metrics.depth * 0.022 * taper,
+        rotZ: sign * (0.08 - t * 0.12),
+        material: i < 2 ? browHighlightMaterial : browMaterial,
+      });
+    }
+
+    return items;
+  }, [eye, metrics, side, sign]);
 
   return (
     <group>
-      <mesh
-        position={[metrics.center.x - xOff, y, z]}
-        rotation={[0.08, 0.06, 0.05]}
-        castShadow
-        renderOrder={5}
-        material={browMaterial}
-      >
-        <boxGeometry args={[w, h, d]} />
-      </mesh>
-      <mesh
-        position={[metrics.center.x + xOff, y, z]}
-        rotation={[0.08, -0.06, -0.05]}
-        castShadow
-        renderOrder={5}
-        material={browMaterial}
-      >
-        <boxGeometry args={[w, h, d]} />
-      </mesh>
+      {segments.map((seg, i) => (
+        <mesh
+          key={i}
+          position={[seg.x, seg.y, seg.z]}
+          rotation={[0.06, sign * 0.04, seg.rotZ]}
+          castShadow
+          renderOrder={5}
+          material={seg.material}
+        >
+          <boxGeometry args={[seg.w, seg.h, seg.d]} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/** Arched eyebrows anchored just above each eye socket. */
+export function GuideEyebrows({ metrics }: { metrics: HeadMetrics }) {
+  return (
+    <group>
+      <ArchBrow eye={metrics.leftEye} metrics={metrics} side="left" />
+      <ArchBrow eye={metrics.rightEye} metrics={metrics} side="right" />
     </group>
   );
 }
