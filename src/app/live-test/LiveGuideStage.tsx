@@ -1,14 +1,15 @@
-"use client";
+﻿"use client";
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSpeechAudioLevel } from "@/lib/avatar/useSpeechAudioLevel";
 import { LIVE_TEST_DEMO_SCRIPT, LIVE_TEST_REFERENCE_VIDEO } from "./demo-script";
 
 const RealisticTalkingGuide = dynamic(() => import("./RealisticTalkingGuide"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[min(72vh,640px)] items-center justify-center rounded-2xl border border-white/10 bg-black/40 text-sm text-zinc-500">
+    <div className="flex h-[min(78vh,720px)] items-center justify-center rounded-2xl border border-white/10 bg-black/40 text-sm text-zinc-500">
       Loading 3D guide…
     </div>
   ),
@@ -23,6 +24,7 @@ export default function LiveGuideStage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const speakingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const audioLevelRef = useSpeechAudioLevel(audioRef, isSpeaking);
 
   useEffect(() => {
     fetch(LIVE_TEST_REFERENCE_VIDEO, { method: "HEAD" })
@@ -44,11 +46,14 @@ export default function LiveGuideStage() {
     videoRef.current?.pause();
   }, []);
 
-  const scheduleSpeakingStop = useCallback((text: string) => {
-    if (speakingTimerRef.current) clearTimeout(speakingTimerRef.current);
-    const ms = Math.min(12000, Math.max(2000, text.length * 55));
-    speakingTimerRef.current = setTimeout(stopSpeaking, ms);
-  }, [stopSpeaking]);
+  const scheduleSpeakingStop = useCallback(
+    (text: string) => {
+      if (speakingTimerRef.current) clearTimeout(speakingTimerRef.current);
+      const ms = Math.min(12000, Math.max(2000, text.length * 55));
+      speakingTimerRef.current = setTimeout(stopSpeaking, ms);
+    },
+    [stopSpeaking],
+  );
 
   const speak = useCallback(
     async (text: string) => {
@@ -109,7 +114,6 @@ export default function LiveGuideStage() {
       clearTimeout(t);
       stopSpeaking();
     };
-    // Play once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -124,33 +128,14 @@ export default function LiveGuideStage() {
 
       <div className="mx-auto max-w-7xl px-4 pb-16 pt-20 sm:px-8">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-400/80">
-          Stage 2 — talking guide
+          Stage 3 — expressive 3D guide
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Live test</h1>
         <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-          Realistic 3D guide with lip movement while speaking. Reference MP4 plays alongside when{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">public/live-test/guide-reference.mp4</code>{" "}
-          is present.
+          Reference example on the left, expressive 3D guide on the right — lip sync driven by live speech audio.
         </p>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
-          <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-              3D guide (WebGL)
-            </p>
-            <RealisticTalkingGuide isSpeaking={isSpeaking} />
-            <p className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-zinc-300">
-              &ldquo;{LIVE_TEST_DEMO_SCRIPT}&rdquo;
-            </p>
-            <button
-              type="button"
-              onClick={() => void speak(LIVE_TEST_DEMO_SCRIPT)}
-              className="mt-4 rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-emerald-400"
-            >
-              {playedOnce ? "Play again" : "Play demo"}
-            </button>
-          </div>
-
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">
               Reference MP4
@@ -160,24 +145,42 @@ export default function LiveGuideStage() {
                 <video
                   ref={videoRef}
                   src={LIVE_TEST_REFERENCE_VIDEO}
-                  className="aspect-video w-full object-cover"
+                  className="aspect-[3/4] w-full object-cover lg:h-[min(78vh,720px)] lg:aspect-auto"
                   playsInline
                   muted
                   controls
                 />
               ) : (
-                <div className="flex aspect-video flex-col items-center justify-center gap-2 px-6 text-center text-sm text-zinc-500">
+                <div className="flex aspect-[3/4] flex-col items-center justify-center gap-2 px-6 text-center text-sm text-zinc-500 lg:h-[min(78vh,720px)]">
                   <p>Add your example video at:</p>
                   <code className="text-xs text-zinc-400">public/live-test/guide-reference.mp4</code>
-                  <p className="text-xs">It will play in sync when you press Play.</p>
+                  <p className="text-xs">It plays in sync when you press Play.</p>
                 </div>
               )}
             </div>
           </div>
+
+          <div>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">
+              3D guide (WebGL)
+            </p>
+            <RealisticTalkingGuide isSpeaking={isSpeaking} audioLevelRef={audioLevelRef} />
+          </div>
         </div>
+
+        <p className="mt-8 rounded-xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-zinc-300">
+          &ldquo;{LIVE_TEST_DEMO_SCRIPT}&rdquo;
+        </p>
+        <button
+          type="button"
+          onClick={() => void speak(LIVE_TEST_DEMO_SCRIPT)}
+          className="mt-4 rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-emerald-400"
+        >
+          {playedOnce ? "Play again" : "Play demo"}
+        </button>
       </div>
 
-      <audio ref={audioRef} className="hidden" />
+      <audio ref={audioRef} className="hidden" crossOrigin="anonymous" />
     </main>
   );
 }
