@@ -58,8 +58,8 @@ export function applyFacialAnimation(mesh: THREE.Mesh, input: FacialAnimationInp
   setMorph(dict, influences, "eyeBlink_R", blink, 0.55);
 
   const idleBreath = 0.015 + Math.sin(timeSeconds * 0.9) * 0.008;
-  const jawTarget = isSpeaking ? 0.12 + level * 0.82 + visemes.open * 0.15 : idleBreath;
-  setMorph(dict, influences, "jawOpen", jawTarget, isSpeaking ? 0.42 : 0.12);
+  const jawTarget = isSpeaking ? 0.2 + level * 0.95 + visemes.open * 0.2 : idleBreath;
+  setMorph(dict, influences, "jawOpen", jawTarget, isSpeaking ? 0.55 : 0.12);
   setMorph(dict, influences, "jawForward", isSpeaking ? level * 0.08 : 0, 0.15);
 
   const smileBase = isSpeaking ? 0.1 + level * 0.14 : 0.05;

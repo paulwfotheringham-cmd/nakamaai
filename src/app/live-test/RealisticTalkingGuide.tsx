@@ -1,13 +1,11 @@
 "use client";
 
-import { Html, OrbitControls, useGLTF } from "@react-three/drei";
+import { Html, OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
-import { setSpeakingMorphTargets } from "@/lib/avatar/lipsync";
-
-const GUIDE_MODEL = "/LeePerrySmith.glb";
+import { GUIDE_MODEL_PATH, useGuideGLTF } from "@/lib/avatar/useGuideGLTF";
 
 /** World-space head height — smaller value = smaller face on screen. */
 const HEAD_HEIGHT = 0.52;
@@ -38,7 +36,7 @@ function PortraitCamera() {
 function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   const groupRef = useRef<THREE.Group>(null);
   const framedRef = useRef(false);
-  const { scene } = useGLTF(GUIDE_MODEL);
+  const { scene } = useGuideGLTF();
 
   useEffect(() => {
     if (framedRef.current) return;
@@ -56,6 +54,10 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
       if (child instanceof THREE.Mesh) {
         child.castShadow = true;
         child.receiveShadow = true;
+        if (child.material instanceof THREE.MeshStandardMaterial) {
+          child.material.roughness = 0.62;
+          child.material.metalness = 0.04;
+        }
       }
     });
   }, [scene]);
@@ -64,17 +66,16 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
     const t = state.clock.elapsedTime;
     let audioLevel = audioLevelRef.current ?? 0;
     if (isSpeaking && audioLevel < 0.08) {
-      audioLevel = 0.4 + Math.abs(Math.sin(t * 14)) * 0.5;
+      audioLevel = 0.45 + Math.abs(Math.sin(t * 14)) * 0.5;
     }
 
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        if (isSpeaking) {
-          setSpeakingMorphTargets(child, true, t);
-          applyFacialAnimation(child, { isSpeaking: true, timeSeconds: t, audioLevel });
-        } else {
-          setSpeakingMorphTargets(child, false, t);
-        }
+        applyFacialAnimation(child, {
+          isSpeaking,
+          timeSeconds: t,
+          audioLevel: isSpeaking ? audioLevel : 0,
+        });
       }
     });
 
@@ -137,5 +138,3 @@ export default function RealisticTalkingGuide({ isSpeaking, audioLevelRef }: Rea
     </div>
   );
 }
-
-useGLTF.preload(GUIDE_MODEL);

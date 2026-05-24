@@ -7,7 +7,7 @@ import { KTX2Loader } from "three-stdlib";
 
 export const GUIDE_MODEL_PATH = "/models/heads/male-guide.glb";
 
-const KTX2_TRANSCODER = "https://unpkg.com/three@0.184.0/examples/jsm/libs/basis/";
+const KTX2_TRANSCODER = "/basis/";
 
 export function useGuideGLTF() {
   const gl = useThree((state) => state.gl);

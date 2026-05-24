@@ -17,18 +17,17 @@ const RealisticTalkingGuide = dynamic(() => import("./RealisticTalkingGuide"), {
 });
 
 export default function LiveGuideStage() {
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [avatarSpeaking, setAvatarSpeaking] = useState(false);
   const [voice, setVoice] = useState("Donny - Steady Presence");
   const [hasReferenceVideo, setHasReferenceVideo] = useState(false);
   const [mediaReady, setMediaReady] = useState(false);
-  const [lipSyncSource, setLipSyncSource] = useState<"video" | "audio">("audio");
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const speakingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const avatarTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const referenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const lipSyncRef = lipSyncSource === "video" ? videoRef : audioRef;
-  const audioLevelRef = useSpeechAudioLevel(lipSyncRef, isSpeaking);
+  const audioLevelRef = useSpeechAudioLevel(audioRef, avatarSpeaking);
 
   useEffect(() => {
     fetch(LIVE_TEST_REFERENCE_VIDEO, { method: "HEAD" })
@@ -42,34 +41,38 @@ export default function LiveGuideStage() {
     if (stored) setVoice(stored);
   }, []);
 
-  const stopSpeaking = useCallback(() => {
-    if (speakingTimerRef.current) {
-      clearTimeout(speakingTimerRef.current);
-      speakingTimerRef.current = null;
+  const stopAvatar = useCallback(() => {
+    if (avatarTimerRef.current) {
+      clearTimeout(avatarTimerRef.current);
+      avatarTimerRef.current = null;
     }
-    setIsSpeaking(false);
-    if (videoRef.current) {
-      videoRef.current.pause();
-    }
+    setAvatarSpeaking(false);
     audioRef.current?.pause();
     speechSynthesis.cancel();
   }, []);
 
-  const scheduleSpeakingStop = useCallback(
+  const stopReference = useCallback(() => {
+    if (referenceTimerRef.current) {
+      clearTimeout(referenceTimerRef.current);
+      referenceTimerRef.current = null;
+    }
+    videoRef.current?.pause();
+  }, []);
+
+  const scheduleAvatarStop = useCallback(
     (durationSeconds: number) => {
-      if (speakingTimerRef.current) clearTimeout(speakingTimerRef.current);
+      if (avatarTimerRef.current) clearTimeout(avatarTimerRef.current);
       const ms = Math.min(120000, Math.max(1500, durationSeconds * 1000 + 300));
-      speakingTimerRef.current = setTimeout(stopSpeaking, ms);
+      avatarTimerRef.current = setTimeout(stopAvatar, ms);
     },
-    [stopSpeaking],
+    [stopAvatar],
   );
 
   const playReferenceVideo = useCallback(async () => {
     const video = videoRef.current;
     if (!video) return false;
 
-    audioRef.current?.pause();
-    speechSynthesis.cancel();
+    stopAvatar();
 
     video.muted = false;
     video.volume = 1;
@@ -77,33 +80,31 @@ export default function LiveGuideStage() {
 
     const duration =
       video.duration && Number.isFinite(video.duration) ? video.duration : 4;
-    scheduleSpeakingStop(duration);
+    if (referenceTimerRef.current) clearTimeout(referenceTimerRef.current);
+    referenceTimerRef.current = setTimeout(stopReference, duration * 1000 + 300);
 
     const onEnded = () => {
       video.removeEventListener("ended", onEnded);
-      stopSpeaking();
+      stopReference();
     };
     video.addEventListener("ended", onEnded);
 
-    setLipSyncSource("video");
-    setIsSpeaking(true);
     try {
       await video.play();
       return true;
     } catch {
-      stopSpeaking();
+      stopReference();
       return false;
     }
-  }, [scheduleSpeakingStop, stopSpeaking]);
+  }, [stopAvatar, stopReference]);
 
   const playTts = useCallback(
     async (text: string) => {
-      setLipSyncSource("audio");
-      setIsSpeaking(true);
-      scheduleSpeakingStop(text.length * 0.055);
+      stopReference();
+      setAvatarSpeaking(true);
+      scheduleAvatarStop(text.length * 0.055);
 
       try {
-        videoRef.current?.pause();
         const res = await fetch("/api/preview-voice", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -112,8 +113,8 @@ export default function LiveGuideStage() {
 
         if (!res.ok) {
           const utterance = new SpeechSynthesisUtterance(text);
-          utterance.onend = stopSpeaking;
-          utterance.onerror = stopSpeaking;
+          utterance.onend = stopAvatar;
+          utterance.onerror = stopAvatar;
           speechSynthesis.speak(utterance);
           return;
         }
@@ -122,24 +123,24 @@ export default function LiveGuideStage() {
         const url = URL.createObjectURL(blob);
         const audio = audioRef.current;
         if (!audio) {
-          stopSpeaking();
+          stopAvatar();
           return;
         }
         audio.onended = () => {
           URL.revokeObjectURL(url);
-          stopSpeaking();
+          stopAvatar();
         };
         audio.onerror = () => {
           URL.revokeObjectURL(url);
-          stopSpeaking();
+          stopAvatar();
         };
         audio.src = url;
         await audio.play();
       } catch {
-        stopSpeaking();
+        stopAvatar();
       }
     },
-    [scheduleSpeakingStop, stopSpeaking, voice],
+    [scheduleAvatarStop, stopAvatar, stopReference, voice],
   );
 
   /** Left panel — reference MP4 only. */
@@ -160,7 +161,8 @@ export default function LiveGuideStage() {
     }, 600);
     return () => {
       clearTimeout(t);
-      stopSpeaking();
+      stopAvatar();
+      stopReference();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mediaReady, hasReferenceVideo]);
@@ -180,8 +182,7 @@ export default function LiveGuideStage() {
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Live test</h1>
         <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-          Reference video on the left (with its own audio). 3D guide on the right lip-syncs to that same
-          audio when you play.
+          Reference video on the left (with its own audio). Click Play on the right for the 3D avatar.
         </p>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
@@ -223,7 +224,7 @@ export default function LiveGuideStage() {
               3D guide (WebGL)
             </p>
             <ClientErrorBoundary>
-              <RealisticTalkingGuide isSpeaking={isSpeaking} audioLevelRef={audioLevelRef} />
+              <RealisticTalkingGuide isSpeaking={avatarSpeaking} audioLevelRef={audioLevelRef} />
             </ClientErrorBoundary>
             <p className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-zinc-300">
               &ldquo;{LIVE_TEST_AVATAR_SCRIPT}&rdquo;
