@@ -52,14 +52,14 @@ export function setSpeakingMorphTargets(mesh: THREE.Mesh, isSpeaking: boolean, t
   if (mouthIndices.length === 0) return;
 
   const targetValue = isSpeaking
-    ? 0.45 + Math.abs(Math.sin(timeSeconds * 18)) * 0.55
+    ? 0.55 + Math.abs(Math.sin(timeSeconds * 16)) * 0.65
     : 0.02;
 
   for (const idx of mouthIndices) {
     influences[idx] = THREE.MathUtils.lerp(
       influences[idx] ?? 0,
       targetValue,
-      isSpeaking ? 0.45 : 0.2,
+      isSpeaking ? 0.55 : 0.2,
     );
   }
 }

@@ -63,14 +63,18 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   useFrame((state) => {
     const t = state.clock.elapsedTime;
     let audioLevel = audioLevelRef.current ?? 0;
-    if (isSpeaking && audioLevel < 0.06) {
-      audioLevel = 0.32 + Math.abs(Math.sin(t * 15)) * 0.48;
+    if (isSpeaking && audioLevel < 0.08) {
+      audioLevel = 0.4 + Math.abs(Math.sin(t * 14)) * 0.5;
     }
 
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        applyFacialAnimation(child, { isSpeaking, timeSeconds: t, audioLevel });
-        setSpeakingMorphTargets(child, isSpeaking, t);
+        if (isSpeaking) {
+          setSpeakingMorphTargets(child, true, t);
+          applyFacialAnimation(child, { isSpeaking: true, timeSeconds: t, audioLevel });
+        } else {
+          setSpeakingMorphTargets(child, false, t);
+        }
       }
     });
 

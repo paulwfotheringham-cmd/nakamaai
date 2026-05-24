@@ -46,30 +46,32 @@ export function useSpeechAudioLevel(
         const source = ctx.createMediaElementSource(el);
         const analyser = ctx.createAnalyser();
         analyser.fftSize = 512;
-        analyser.smoothingTimeConstant = 0.72;
+        analyser.smoothingTimeConstant = 0.55;
         source.connect(analyser);
         analyser.connect(ctx.destination);
         sourceRef.current = source;
         analyserRef.current = analyser;
       } catch {
-        // Element may already be wired to another context.
+        // Element may already be wired to another context — analyser loop still runs at 0.
       }
     }
 
     const analyser = analyserRef.current;
-    if (!analyser) return;
-
-    const bins = new Uint8Array(analyser.frequencyBinCount);
+    const bins = new Uint8Array(analyser?.frequencyBinCount ?? 256);
 
     const tick = () => {
-      analyser.getByteFrequencyData(bins);
-      let sum = 0;
-      const start = 2;
-      const end = 28;
-      for (let i = start; i < end; i += 1) sum += bins[i];
-      const raw = sum / (end - start) / 255;
-      const normalized = THREE.MathUtils.clamp((raw - 0.04) / 0.55, 0, 1);
-      levelRef.current = THREE.MathUtils.lerp(levelRef.current, normalized, 0.38);
+      if (analyser) {
+        analyser.getByteFrequencyData(bins);
+        let sum = 0;
+        const start = 1;
+        const end = 32;
+        for (let i = start; i < end; i += 1) sum += bins[i];
+        const raw = sum / (end - start) / 255;
+        const normalized = THREE.MathUtils.clamp((raw - 0.02) / 0.45, 0, 1);
+        levelRef.current = THREE.MathUtils.lerp(levelRef.current, normalized, 0.5);
+      } else if (isActive) {
+        levelRef.current = 0.35 + Math.abs(Math.sin(performance.now() * 0.012)) * 0.45;
+      }
       rafRef.current = requestAnimationFrame(tick);
     };
 
