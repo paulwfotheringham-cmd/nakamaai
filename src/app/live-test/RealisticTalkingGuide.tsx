@@ -38,27 +38,29 @@ function PortraitCamera() {
 
 function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const framedRef = useRef(false);
   const browCleanupRef = useRef<(() => void) | null>(null);
   const { scene } = useGuideGLTF();
 
   const attachBrows = () => {
     scene.updateMatrixWorld(true);
+    const metrics = computeHeadMetrics(scene);
+    if (!metrics) return;
     browCleanupRef.current?.();
-    browCleanupRef.current = attachGuideEyebrows(scene, computeHeadMetrics(scene));
+    browCleanupRef.current = attachGuideEyebrows(metrics);
   };
 
   useEffect(() => {
-    if (framedRef.current) return;
-    framedRef.current = true;
+    if (!scene.userData.guideFramed) {
+      scene.userData.guideFramed = true;
 
-    const box = new THREE.Box3().setFromObject(scene);
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
+      const box = new THREE.Box3().setFromObject(scene);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
 
-    scene.position.sub(center);
-    scene.scale.setScalar(HEAD_HEIGHT / Math.max(size.y, 0.001));
-    scene.position.y -= size.y * (HEAD_HEIGHT / Math.max(size.y, 0.001)) * 0.04;
+      scene.position.sub(center);
+      scene.scale.setScalar(HEAD_HEIGHT / Math.max(size.y, 0.001));
+      scene.position.y -= size.y * (HEAD_HEIGHT / Math.max(size.y, 0.001)) * 0.04;
+    }
 
     enhanceSkinMaterials(scene);
     scene.updateMatrixWorld(true);
@@ -76,6 +78,7 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
       scene.updateMatrixWorld(true);
       attachBrows();
     }, 400);
+
     return () => {
       window.clearTimeout(retry);
       browCleanupRef.current?.();

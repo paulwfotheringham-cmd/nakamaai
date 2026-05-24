@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
 export type HeadMetrics = {
+  headMesh: THREE.Mesh;
   leftEye: THREE.Vector3;
   rightEye: THREE.Vector3;
   headWidth: number;
@@ -19,58 +20,57 @@ export function findHeadMesh(scene: THREE.Object3D): THREE.Mesh | null {
     if (morphCount > 20) headMesh = child;
   });
 
+  if (!headMesh) {
+    const named = scene.getObjectByName("head");
+    if (named instanceof THREE.Mesh) headMesh = named;
+  }
+
   return headMesh;
 }
 
-function getEyeSide(mesh: THREE.Mesh): "left" | "right" | null {
-  let obj: THREE.Object3D | null = mesh;
-  while (obj) {
-    const n = (obj.name || "").toLowerCase();
-    if (n.includes("eye") && n.includes("left")) return "left";
-    if (n.includes("eye") && n.includes("right")) return "right";
-    obj = obj.parent;
-  }
-
-  const verts = mesh.geometry.attributes.position?.count ?? 0;
-  if (verts > 0 && verts < 900) {
-    const x = new THREE.Box3().setFromObject(mesh).getCenter(new THREE.Vector3()).x;
-    return x < 0 ? "left" : "right";
-  }
-
-  return null;
+function getObjectCenter(obj: THREE.Object3D): THREE.Vector3 {
+  const box = new THREE.Box3().setFromObject(obj);
+  return box.getCenter(new THREE.Vector3());
 }
 
-function toSceneLocal(scene: THREE.Object3D, world: THREE.Vector3): THREE.Vector3 {
-  scene.updateMatrixWorld(true);
-  return scene.worldToLocal(world.clone());
+function toHeadLocal(headMesh: THREE.Mesh, world: THREE.Vector3): THREE.Vector3 {
+  headMesh.updateMatrixWorld(true);
+  return headMesh.worldToLocal(world.clone());
 }
 
-/** Metrics in scene-local space for attaching brows as children of the GLB scene. */
-export function computeHeadMetrics(scene: THREE.Object3D): HeadMetrics {
-  scene.updateMatrixWorld(true);
-
+/** Eye + head dimensions in head-mesh local space (brows parent to the morph head). */
+export function computeHeadMetrics(scene: THREE.Object3D): HeadMetrics | null {
   const headMesh = findHeadMesh(scene);
-  const target = headMesh ?? scene;
-  const box = new THREE.Box3().setFromObject(target);
+  if (!headMesh) return null;
+
+  headMesh.updateMatrixWorld(true);
+  scene.updateMatrixWorld(true);
+
+  const box = new THREE.Box3().setFromObject(headMesh);
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
   const minY = box.min.y;
 
-  let leftEyeWorld = new THREE.Vector3(center.x - size.x * 0.11, minY + size.y * 0.58, box.max.z - size.z * 0.02);
-  let rightEyeWorld = new THREE.Vector3(center.x + size.x * 0.11, minY + size.y * 0.58, box.max.z - size.z * 0.02);
+  let leftEyeWorld = new THREE.Vector3(
+    center.x - size.x * 0.11,
+    minY + size.y * 0.58,
+    box.max.z - size.z * 0.01,
+  );
+  let rightEyeWorld = new THREE.Vector3(
+    center.x + size.x * 0.11,
+    minY + size.y * 0.58,
+    box.max.z - size.z * 0.01,
+  );
 
-  scene.traverse((child) => {
-    if (!(child instanceof THREE.Mesh)) return;
-    const side = getEyeSide(child);
-    if (!side) return;
-    const c = new THREE.Box3().setFromObject(child).getCenter(new THREE.Vector3());
-    if (side === "left") leftEyeWorld = c;
-    else rightEyeWorld = c;
-  });
+  const eyeLeft = scene.getObjectByName("eyeLeft");
+  const eyeRight = scene.getObjectByName("eyeRight");
+  if (eyeLeft) leftEyeWorld = getObjectCenter(eyeLeft);
+  if (eyeRight) rightEyeWorld = getObjectCenter(eyeRight);
 
   return {
-    leftEye: toSceneLocal(scene, leftEyeWorld),
-    rightEye: toSceneLocal(scene, rightEyeWorld),
+    headMesh,
+    leftEye: toHeadLocal(headMesh, leftEyeWorld),
+    rightEye: toHeadLocal(headMesh, rightEyeWorld),
     headWidth: size.x,
     headHeight: size.y,
     headDepth: size.z,

@@ -2,45 +2,57 @@ import * as THREE from "three";
 import type { HeadMetrics } from "./headMetrics";
 
 const BROW_COLOR = 0x4a3728;
-const BROW_HIGHLIGHT = 0x5c4030;
+const BROW_HIGHLIGHT = 0x6b4c35;
 
-function createBrowMesh(
+function browMaterial(color: number): THREE.MeshStandardMaterial {
+  return new THREE.MeshStandardMaterial({
+    color,
+    roughness: 0.88,
+    metalness: 0,
+    depthTest: true,
+    depthWrite: true,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -2,
+  });
+}
+
+function createBrowStrip(
   eye: THREE.Vector3,
   metrics: HeadMetrics,
   side: "left" | "right",
-  layer: "main" | "hair",
+  layer: "main" | "strand",
 ): THREE.Mesh {
   const sign = side === "left" ? -1 : 1;
   const points: THREE.Vector3[] = [];
+  const spread = layer === "main" ? 0.11 : 0.095;
+  const yBase = layer === "main" ? 0.07 : 0.075;
+  const zOut = layer === "main" ? 0.055 : 0.062;
 
-  for (let i = 0; i <= 10; i++) {
-    const t = i / 10;
-    const innerLift = (1 - t) * metrics.headHeight * 0.006;
-    const arch = Math.sin(t * Math.PI) * metrics.headHeight * 0.011;
-    const xSpread = layer === "main" ? 0.088 : 0.082;
-    const yLift = layer === "main" ? 0.04 : 0.042;
-    const zPush = layer === "main" ? 0.008 : 0.014;
+  for (let i = 0; i <= 12; i++) {
+    const t = i / 12;
+    const arch = Math.sin(t * Math.PI) * metrics.headHeight * 0.018;
+    const innerLift = (1 - t) * metrics.headHeight * 0.012;
 
     points.push(
       new THREE.Vector3(
-        eye.x + sign * (t - 0.32) * metrics.headWidth * xSpread,
-        eye.y + metrics.headHeight * yLift + arch + innerLift,
-        eye.z + metrics.headDepth * zPush,
+        eye.x + sign * (t - 0.34) * metrics.headWidth * spread,
+        eye.y + metrics.headHeight * yBase + arch + innerLift,
+        eye.z + metrics.headDepth * zOut,
       ),
     );
   }
 
   const curve = new THREE.CatmullRomCurve3(points);
-  const radius = metrics.headWidth * (layer === "main" ? 0.0036 : 0.0018);
-  const geometry = new THREE.TubeGeometry(curve, 14, radius, 5, false);
-  const material = new THREE.MeshStandardMaterial({
-    color: layer === "main" ? BROW_COLOR : BROW_HIGHLIGHT,
-    roughness: 0.93,
-    metalness: 0,
-  });
-
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.castShadow = true;
+  const radius = metrics.headWidth * (layer === "main" ? 0.013 : 0.006);
+  const geometry = new THREE.TubeGeometry(curve, 16, radius, 6, false);
+  const mesh = new THREE.Mesh(
+    geometry,
+    browMaterial(layer === "main" ? BROW_COLOR : BROW_HIGHLIGHT),
+  );
+  mesh.renderOrder = 2;
+  mesh.castShadow = false;
+  mesh.receiveShadow = false;
   return mesh;
 }
 
@@ -53,27 +65,30 @@ function disposeGroup(group: THREE.Group) {
   });
 }
 
-/** Attach brown eyebrow tubes to the GLB scene — moves with the head, not floating in world space. */
-export function attachGuideEyebrows(scene: THREE.Object3D, metrics: HeadMetrics): () => void {
-  const existing = scene.getObjectByName("guideEyebrows");
+/** Brown eyebrow tubes parented to the morph head mesh — visible size, flush on the face. */
+export function attachGuideEyebrows(metrics: HeadMetrics): () => void {
+  const { headMesh } = metrics;
+
+  const existing = headMesh.getObjectByName("guideEyebrows");
   if (existing) {
-    scene.remove(existing);
+    headMesh.remove(existing);
     disposeGroup(existing as THREE.Group);
   }
 
   const group = new THREE.Group();
   group.name = "guideEyebrows";
+  group.renderOrder = 2;
 
   for (const side of ["left", "right"] as const) {
     const eye = side === "left" ? metrics.leftEye : metrics.rightEye;
-    group.add(createBrowMesh(eye, metrics, side, "main"));
-    group.add(createBrowMesh(eye, metrics, side, "hair"));
+    group.add(createBrowStrip(eye, metrics, side, "main"));
+    group.add(createBrowStrip(eye, metrics, side, "strand"));
   }
 
-  scene.add(group);
+  headMesh.add(group);
 
   return () => {
-    scene.remove(group);
+    headMesh.remove(group);
     disposeGroup(group);
   };
 }
