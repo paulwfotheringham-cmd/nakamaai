@@ -99,8 +99,14 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   return (
     <group ref={groupRef}>
       <primitive object={scene} />
-      {headMetrics && createPortal(<GuideHair metrics={headMetrics} />, scene)}
-      {headMetrics && <GuideEyebrows metrics={headMetrics} />}
+      {headMetrics &&
+        createPortal(
+          <>
+            <GuideHair metrics={headMetrics} />
+            <GuideEyebrows metrics={headMetrics} />
+          </>,
+          scene,
+        )}
     </group>
   );
 }
