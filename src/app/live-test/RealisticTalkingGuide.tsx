@@ -5,7 +5,9 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
+import { attachGuideEyebrows } from "@/lib/avatar/attachGuideEyebrows";
 import { enhanceSkinMaterials } from "@/lib/avatar/enhanceSkinMaterials";
+import { computeHeadMetrics } from "@/lib/avatar/headMetrics";
 import { useGuideGLTF } from "@/lib/avatar/useGuideGLTF";
 
 /** World-space head height — smaller value = smaller face on screen. */
@@ -37,7 +39,14 @@ function PortraitCamera() {
 function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   const groupRef = useRef<THREE.Group>(null);
   const framedRef = useRef(false);
+  const browCleanupRef = useRef<(() => void) | null>(null);
   const { scene } = useGuideGLTF();
+
+  const attachBrows = () => {
+    scene.updateMatrixWorld(true);
+    browCleanupRef.current?.();
+    browCleanupRef.current = attachGuideEyebrows(scene, computeHeadMetrics(scene));
+  };
 
   useEffect(() => {
     if (framedRef.current) return;
@@ -53,6 +62,7 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
 
     enhanceSkinMaterials(scene);
     scene.updateMatrixWorld(true);
+    attachBrows();
 
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -64,8 +74,13 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
     const retry = window.setTimeout(() => {
       enhanceSkinMaterials(scene);
       scene.updateMatrixWorld(true);
+      attachBrows();
     }, 400);
-    return () => window.clearTimeout(retry);
+    return () => {
+      window.clearTimeout(retry);
+      browCleanupRef.current?.();
+      browCleanupRef.current = null;
+    };
   }, [scene]);
 
   useFrame((state) => {
