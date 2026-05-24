@@ -21,7 +21,6 @@ export default function LiveGuideStage() {
   const [voice, setVoice] = useState("Donny - Steady Presence");
   const [hasReferenceVideo, setHasReferenceVideo] = useState(false);
   const [mediaReady, setMediaReady] = useState(false);
-  const [playedOnce, setPlayedOnce] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -142,7 +141,6 @@ export default function LiveGuideStage() {
 
   /** Drives 3D lip sync — uses reference MP4 audio when available. */
   const playGuide = useCallback(async () => {
-    setPlayedOnce(true);
     if (hasReferenceVideo) {
       const ok = await playReferenceVideo();
       if (ok) return;
@@ -204,6 +202,15 @@ export default function LiveGuideStage() {
                 </div>
               )}
             </div>
+            {hasReferenceVideo && (
+              <button
+                type="button"
+                onClick={() => void playGuide()}
+                className="mt-4 w-full rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-emerald-400 sm:w-auto"
+              >
+                Play Reference
+              </button>
+            )}
           </div>
 
           <div>
@@ -218,13 +225,6 @@ export default function LiveGuideStage() {
                 ? "Lip sync follows the reference video audio."
                 : `“${LIVE_TEST_DEMO_SCRIPT}”`}
             </p>
-            <button
-              type="button"
-              onClick={() => void playGuide()}
-              className="mt-4 w-full rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-emerald-400 sm:w-auto"
-            >
-              {playedOnce ? "Play again (3D guide)" : "Play 3D guide"}
-            </button>
           </div>
         </div>
       </div>
