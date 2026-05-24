@@ -67,10 +67,10 @@ export function useSpeechAudioLevel(
         const end = 32;
         for (let i = start; i < end; i += 1) sum += bins[i];
         const raw = sum / (end - start) / 255;
-        const normalized = THREE.MathUtils.clamp((raw - 0.02) / 0.45, 0, 1);
-        levelRef.current = THREE.MathUtils.lerp(levelRef.current, normalized, 0.5);
+        const normalized = THREE.MathUtils.clamp((raw - 0.02) / 0.55, 0, 0.75);
+        levelRef.current = THREE.MathUtils.lerp(levelRef.current, normalized, 0.45);
       } else if (isActive) {
-        levelRef.current = 0.35 + Math.abs(Math.sin(performance.now() * 0.012)) * 0.45;
+        levelRef.current = 0.22 + Math.abs(Math.sin(performance.now() * 0.012)) * 0.18;
       }
       rafRef.current = requestAnimationFrame(tick);
     };

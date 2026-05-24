@@ -72,7 +72,7 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
     const t = state.clock.elapsedTime;
     let audioLevel = audioLevelRef.current ?? 0;
     if (isSpeaking && audioLevel < 0.08) {
-      audioLevel = 0.45 + Math.abs(Math.sin(t * 14)) * 0.5;
+      audioLevel = 0.22 + Math.abs(Math.sin(t * 13)) * 0.18;
     }
 
     scene.traverse((child) => {
