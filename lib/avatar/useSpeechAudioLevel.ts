@@ -70,7 +70,7 @@ export function useSpeechAudioLevel(
         const normalized = THREE.MathUtils.clamp((raw - 0.02) / 0.45, 0, 1);
         levelRef.current = THREE.MathUtils.lerp(levelRef.current, normalized, 0.5);
       } else if (isActive) {
-        levelRef.current = 0.35 + Math.abs(Math.sin(performance.now() * 0.012)) * 0.45;
+        levelRef.current = 0.12 + Math.abs(Math.sin(performance.now() * 0.012)) * 0.1;
       }
       rafRef.current = requestAnimationFrame(tick);
     };
