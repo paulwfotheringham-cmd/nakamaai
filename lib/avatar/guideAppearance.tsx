@@ -5,8 +5,6 @@ import type { HeadMetrics } from "./headMetrics";
 
 export const HAIR_COLOR = 0x4a3728;
 const BROW_COLOR = 0x3d2914;
-const EYE_BLUE = 0x2563eb;
-const EYE_EMISSIVE = 0x1e3a8a;
 
 const hairMaterial = new THREE.MeshStandardMaterial({
   color: HAIR_COLOR,
@@ -18,14 +16,6 @@ const browMaterial = new THREE.MeshStandardMaterial({
   color: BROW_COLOR,
   roughness: 0.92,
   metalness: 0,
-});
-
-const eyeMaterial = new THREE.MeshStandardMaterial({
-  color: EYE_BLUE,
-  roughness: 0.22,
-  metalness: 0.08,
-  emissive: new THREE.Color(EYE_EMISSIVE),
-  emissiveIntensity: 0.25,
 });
 
 /** Short hair cap fitted to the crown — sits on the scalp, not above it. */
@@ -69,33 +59,6 @@ export function GuideEyebrows({ metrics }: { metrics: HeadMetrics }) {
         material={browMaterial}
       >
         <boxGeometry args={[w, h, d]} />
-      </mesh>
-    </group>
-  );
-}
-
-/** Blue irises placed on the face surface. */
-export function GuideFaceEyes({ metrics }: { metrics: HeadMetrics }) {
-  const radius = metrics.width * 0.038;
-  const y = metrics.eyeY;
-  const z = metrics.frontZ - metrics.depth * 0.02;
-  const xOff = metrics.width * 0.11;
-
-  return (
-    <group>
-      <mesh position={[metrics.center.x - xOff, y, z]} renderOrder={3} material={eyeMaterial}>
-        <sphereGeometry args={[radius, 20, 20]} />
-      </mesh>
-      <mesh position={[metrics.center.x + xOff, y, z]} renderOrder={3} material={eyeMaterial}>
-        <sphereGeometry args={[radius, 20, 20]} />
-      </mesh>
-      <mesh position={[metrics.center.x - xOff, y, z + radius * 0.35]} renderOrder={4}>
-        <sphereGeometry args={[radius * 0.38, 16, 16]} />
-        <meshStandardMaterial color={0x0a0a0a} roughness={0.4} />
-      </mesh>
-      <mesh position={[metrics.center.x + xOff, y, z + radius * 0.35]} renderOrder={4}>
-        <sphereGeometry args={[radius * 0.38, 16, 16]} />
-        <meshStandardMaterial color={0x0a0a0a} roughness={0.4} />
       </mesh>
     </group>
   );

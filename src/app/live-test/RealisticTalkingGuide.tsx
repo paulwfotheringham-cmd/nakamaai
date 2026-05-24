@@ -6,7 +6,7 @@ import { Suspense, useEffect, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
 import { enhanceSkinMaterials } from "@/lib/avatar/enhanceSkinMaterials";
-import { GuideEyebrows, GuideFaceEyes, GuideHair } from "@/lib/avatar/guideAppearance";
+import { GuideEyebrows, GuideHair } from "@/lib/avatar/guideAppearance";
 import { computeHeadMetrics, type HeadMetrics } from "@/lib/avatar/headMetrics";
 import { useGuideGLTF } from "@/lib/avatar/useGuideGLTF";
 
@@ -101,7 +101,6 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
         <>
           <GuideHair metrics={headMetrics} />
           <GuideEyebrows metrics={headMetrics} />
-          <GuideFaceEyes metrics={headMetrics} />
         </>
       )}
     </group>
