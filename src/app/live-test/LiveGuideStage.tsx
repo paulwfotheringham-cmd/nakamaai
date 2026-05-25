@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, type RefObject } from "react";
 import { ClientErrorBoundary } from "@/components/ClientErrorBoundary";
 import type { SimliAvatarHandle } from "@/components/SimliAvatar";
 import GuideChatPanel, { type SendHandlers } from "./GuideChatPanel";
@@ -38,6 +38,18 @@ async function readStreamingReply(
   return reply.trim() || "I'm here to help. What would you like to know?";
 }
 
+async function waitForAvatarReady(
+  simliRef: RefObject<SimliAvatarHandle | null>,
+  timeoutMs = 20000,
+): Promise<boolean> {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    if (simliRef.current?.isReady()) return true;
+    await new Promise((r) => setTimeout(r, 200));
+  }
+  return false;
+}
+
 export default function LiveGuideStage() {
   const simliRef = useRef<SimliAvatarHandle>(null);
   const [isBusy, setIsBusy] = useState(false);
@@ -64,9 +76,11 @@ export default function LiveGuideStage() {
       const reply = await readStreamingReply(chatRes, onDelta);
       onDelta(reply);
 
-      if (simliRef.current?.isReady()) {
-        await simliRef.current.speak(reply);
+      if (!(await waitForAvatarReady(simliRef))) {
+        throw new Error("Avatar is still connecting. Wait a few seconds and try again.");
       }
+
+      await simliRef.current!.speak(reply);
 
       return reply;
     } finally {

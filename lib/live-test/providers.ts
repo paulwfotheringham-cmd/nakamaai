@@ -19,11 +19,19 @@ function getCartesiaApiKey(): string | null {
 }
 
 function getCartesiaDonnyVoiceId(): string {
-  return (
-    unquoteEnv(process.env.CARTESIA_PREVIEW_DONNY_ID) ||
-    unquoteEnv(process.env.CARTESIA_VOICE_DONNY) ||
-    "d46abd1d-9f16-4e59-b5e1-8d4c4d2c8f6c"
-  );
+  const fallback = "d46abd1d-9f16-4e59-b5e1-8d4c4d2c8f6c";
+  const uuidRe =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+  for (const raw of [
+    process.env.CARTESIA_PREVIEW_DONNY_ID,
+    process.env.CARTESIA_VOICE_DONNY,
+  ]) {
+    const id = unquoteEnv(raw);
+    if (id && uuidRe.test(id)) return id;
+  }
+
+  return fallback;
 }
 
 export function hasLiveTestLlm(): boolean {

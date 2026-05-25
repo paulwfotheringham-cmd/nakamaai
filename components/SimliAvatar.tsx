@@ -99,10 +99,16 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
     }
 
     const pcm = new Uint8Array(await audioRes.arrayBuffer());
+    if (pcm.length < 2) {
+      throw new Error("No audio data returned for speech");
+    }
 
     for (let offset = 0; offset < pcm.length; offset += CHUNK_BYTES) {
       client.sendAudioData(pcm.subarray(offset, offset + CHUNK_BYTES));
     }
+
+    // Brief silence helps Simli detect end of utterance
+    client.sendAudioData(new Uint8Array(3200));
   }, []);
 
   useImperativeHandle(ref, () => ({
@@ -121,7 +127,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
         muted
         className="h-[min(78vh,720px)] w-full object-cover"
       />
-      <audio ref={audioRef} autoPlay className="hidden" />
+      <audio ref={audioRef} autoPlay playsInline className="sr-only" />
 
       {status === "loading" && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/80 text-sm text-zinc-400">
