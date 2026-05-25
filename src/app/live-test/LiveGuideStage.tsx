@@ -2,174 +2,44 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { ClientErrorBoundary } from "@/components/ClientErrorBoundary";
-import { useSpeechAudioLevel } from "@/lib/avatar/useSpeechAudioLevel";
-import { LIVE_TEST_REFERENCE_VIDEO } from "./demo-script";
+import type { SimliAvatarHandle } from "@/components/SimliAvatar";
 import GuideChatPanel from "./GuideChatPanel";
 
-const RealisticTalkingGuide = dynamic(() => import("./RealisticTalkingGuide"), {
+const SimliAvatar = dynamic(() => import("@/components/SimliAvatar"), {
   ssr: false,
   loading: () => (
     <div className="flex h-[min(78vh,720px)] items-center justify-center rounded-2xl border border-white/10 bg-black/40 text-sm text-zinc-500">
-      Loading 3D guide…
+      Loading Simli avatar…
     </div>
   ),
 });
 
 export default function LiveGuideStage() {
-  const [avatarSpeaking, setAvatarSpeaking] = useState(false);
-  const [voice, setVoice] = useState("Donny - Steady Presence");
-  const [hasReferenceVideo, setHasReferenceVideo] = useState(false);
-  const [mediaReady, setMediaReady] = useState(false);
+  const simliRef = useRef<SimliAvatarHandle>(null);
+  const [isBusy, setIsBusy] = useState(false);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const avatarTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const referenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const audioLevelRef = useSpeechAudioLevel(audioRef, avatarSpeaking);
-
-  useEffect(() => {
-    fetch(LIVE_TEST_REFERENCE_VIDEO, { method: "HEAD" })
-      .then((r) => setHasReferenceVideo(r.ok))
-      .catch(() => setHasReferenceVideo(false))
-      .finally(() => setMediaReady(true));
-  }, []);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("selectedVoice");
-    if (stored) setVoice(stored);
-  }, []);
-
-  const stopAvatar = useCallback(() => {
-    if (avatarTimerRef.current) {
-      clearTimeout(avatarTimerRef.current);
-      avatarTimerRef.current = null;
-    }
-    setAvatarSpeaking(false);
-    audioRef.current?.pause();
-    speechSynthesis.cancel();
-  }, []);
-
-  const stopReference = useCallback(() => {
-    if (referenceTimerRef.current) {
-      clearTimeout(referenceTimerRef.current);
-      referenceTimerRef.current = null;
-    }
-    videoRef.current?.pause();
-  }, []);
-
-  const scheduleAvatarStop = useCallback(
-    (durationSeconds: number) => {
-      if (avatarTimerRef.current) clearTimeout(avatarTimerRef.current);
-      const ms = Math.min(120000, Math.max(1500, durationSeconds * 1000 + 300));
-      avatarTimerRef.current = setTimeout(stopAvatar, ms);
-    },
-    [stopAvatar],
-  );
-
-  const playReferenceVideo = useCallback(async () => {
-    const video = videoRef.current;
-    if (!video) return false;
-
-    stopAvatar();
-
-    video.muted = false;
-    video.volume = 1;
-    video.currentTime = 0;
-
-    const duration =
-      video.duration && Number.isFinite(video.duration) ? video.duration : 4;
-    if (referenceTimerRef.current) clearTimeout(referenceTimerRef.current);
-    referenceTimerRef.current = setTimeout(stopReference, duration * 1000 + 300);
-
-    const onEnded = () => {
-      video.removeEventListener("ended", onEnded);
-      stopReference();
-    };
-    video.addEventListener("ended", onEnded);
-
+  const handleSend = useCallback(async (message: string) => {
+    setIsBusy(true);
     try {
-      await video.play();
-      return true;
-    } catch {
-      stopReference();
-      return false;
-    }
-  }, [stopAvatar, stopReference]);
-
-  const playTts = useCallback(
-    async (text: string) => {
-      stopReference();
-      setAvatarSpeaking(true);
-      scheduleAvatarStop(text.length * 0.055);
-
-      try {
-        const res = await fetch("/api/preview-voice", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ voice, text }),
-        });
-
-        if (!res.ok) {
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.onend = stopAvatar;
-          utterance.onerror = stopAvatar;
-          speechSynthesis.speak(utterance);
-          return;
-        }
-
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        const audio = audioRef.current;
-        if (!audio) {
-          stopAvatar();
-          return;
-        }
-        audio.onended = () => {
-          URL.revokeObjectURL(url);
-          stopAvatar();
-        };
-        audio.onerror = () => {
-          URL.revokeObjectURL(url);
-          stopAvatar();
-        };
-        audio.src = url;
-        await audio.play();
-      } catch {
-        stopAvatar();
+      const chatRes = await fetch("/api/live-test/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      });
+      const chatJson = await chatRes.json();
+      if (!chatRes.ok) {
+        throw new Error(chatJson.error || "Chat failed");
       }
-    },
-    [scheduleAvatarStop, stopAvatar, stopReference, voice],
-  );
 
-  /** Left panel — reference MP4 only. */
-  const playReference = useCallback(async () => {
-    if (!hasReferenceVideo) return;
-    await playReferenceVideo();
-  }, [hasReferenceVideo, playReferenceVideo]);
-
-  /** Right panel — 3D avatar TTS + lip sync. */
-  const speakAsGuide = useCallback(
-    async (text: string) => {
-      await playTts(text);
-    },
-    [playTts],
-  );
-
-  useEffect(() => {
-    if (!mediaReady || !hasReferenceVideo) return;
-    const t = setTimeout(() => {
-      void playReferenceVideo();
-    }, 600);
-    return () => {
-      clearTimeout(t);
-      stopAvatar();
-      stopReference();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mediaReady, hasReferenceVideo]);
+      const reply = chatJson.reply as string;
+      await simliRef.current?.speak(reply);
+      return reply;
+    } finally {
+      setIsBusy(false);
+    }
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#07040d] text-white">
@@ -182,60 +52,31 @@ export default function LiveGuideStage() {
 
       <div className="mx-auto max-w-7xl px-4 pb-16 pt-20 sm:px-8">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-400/80">
-          Stage 4 — guide chat + 3D avatar
+          Simli — realtime concierge
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Live test</h1>
         <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-          Reference video on the left. On the right, type as the guide in chat — the 3D avatar speaks your lines.
+          Simli avatar on the left. Type on the right — GPT-4o-mini replies with voice and lip sync.
         </p>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-              Reference MP4
+              Simli avatar (live)
             </p>
-            <div className="overflow-hidden rounded-2xl border border-white/10 bg-black">
-              {hasReferenceVideo ? (
-                <video
-                  ref={videoRef}
-                  src={LIVE_TEST_REFERENCE_VIDEO}
-                  className="aspect-[3/4] w-full object-cover lg:h-[min(78vh,720px)] lg:aspect-auto"
-                  playsInline
-                  preload="auto"
-                  controls
-                />
-              ) : (
-                <div className="flex aspect-[3/4] flex-col items-center justify-center gap-2 px-6 text-center text-sm text-zinc-500 lg:h-[min(78vh,720px)]">
-                  <p>Add your example video at:</p>
-                  <code className="text-xs text-zinc-400">public/live-test/guide-reference.mp4</code>
-                  <p className="text-xs">Without it, the 3D guide uses TTS instead.</p>
-                </div>
-              )}
-            </div>
-            {hasReferenceVideo && (
-              <button
-                type="button"
-                onClick={() => void playReference()}
-                className="mt-4 w-full rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-emerald-400 sm:w-auto"
-              >
-                Play Reference
-              </button>
-            )}
+            <ClientErrorBoundary>
+              <SimliAvatar ref={simliRef} />
+            </ClientErrorBoundary>
           </div>
 
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-              3D guide (WebGL)
+              Chat (text only)
             </p>
-            <ClientErrorBoundary>
-              <RealisticTalkingGuide isSpeaking={avatarSpeaking} audioLevelRef={audioLevelRef} />
-            </ClientErrorBoundary>
-            <GuideChatPanel onSpeak={speakAsGuide} isSpeaking={avatarSpeaking} />
+            <GuideChatPanel onSend={handleSend} isBusy={isBusy} />
           </div>
         </div>
       </div>
-
-      <audio ref={audioRef} className="hidden" crossOrigin="anonymous" />
     </main>
   );
 }
