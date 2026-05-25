@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
+import { getOpenAIApiKey } from "@/lib/openai/config";
 
 /** Downsample mono PCM16 24kHz → 16kHz (Simli expects 16kHz PCM16). */
 function downsamplePcm24kTo16k(pcm24: Buffer): Buffer {
@@ -25,12 +26,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Text is required" }, { status: 400 });
   }
 
-  if (!process.env.OPENAI_API_KEY) {
+  const apiKey = getOpenAIApiKey();
+  if (!apiKey) {
     return NextResponse.json({ error: "OPENAI_API_KEY is not configured" }, { status: 500 });
   }
 
   try {
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const openai = new OpenAI({ apiKey });
     const speech = await openai.audio.speech.create({
       model: "tts-1",
       voice: "onyx",

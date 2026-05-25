@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import { ClientErrorBoundary } from "@/components/ClientErrorBoundary";
 import type { SimliAvatarHandle } from "@/components/SimliAvatar";
-import GuideChatPanel from "./GuideChatPanel";
+import GuideChatPanel, { type SendHandlers } from "./GuideChatPanel";
 
 const SimliAvatar = dynamic(() => import("@/components/SimliAvatar"), {
   ssr: false,
@@ -16,11 +16,33 @@ const SimliAvatar = dynamic(() => import("@/components/SimliAvatar"), {
   ),
 });
 
+async function readStreamingReply(
+  res: Response,
+  onDelta: (text: string) => void,
+): Promise<string> {
+  if (!res.body) {
+    throw new Error("No response body from chat");
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let reply = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    reply += decoder.decode(value, { stream: true });
+    onDelta(reply);
+  }
+
+  return reply.trim() || "I'm here to help. What would you like to know?";
+}
+
 export default function LiveGuideStage() {
   const simliRef = useRef<SimliAvatarHandle>(null);
   const [isBusy, setIsBusy] = useState(false);
 
-  const handleSend = useCallback(async (message: string) => {
+  const handleSend = useCallback(async (message: string, { onDelta }: SendHandlers) => {
     setIsBusy(true);
     try {
       const chatRes = await fetch("/api/live-test/chat", {
@@ -28,13 +50,24 @@ export default function LiveGuideStage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message }),
       });
-      const chatJson = await chatRes.json();
+
+      const contentType = chatRes.headers.get("content-type") ?? "";
+
       if (!chatRes.ok) {
-        throw new Error(chatJson.error || "Chat failed");
+        const err =
+          contentType.includes("application/json")
+            ? ((await chatRes.json().catch(() => ({}))) as { error?: string }).error
+            : await chatRes.text().catch(() => "");
+        throw new Error(err || "Chat failed");
       }
 
-      const reply = chatJson.reply as string;
-      await simliRef.current?.speak(reply);
+      const reply = await readStreamingReply(chatRes, onDelta);
+      onDelta(reply);
+
+      if (simliRef.current?.isReady()) {
+        await simliRef.current.speak(reply);
+      }
+
       return reply;
     } finally {
       setIsBusy(false);

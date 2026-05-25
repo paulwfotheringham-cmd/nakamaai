@@ -8,8 +8,12 @@ export type ChatMessage = {
   text: string;
 };
 
+export type SendHandlers = {
+  onDelta: (text: string) => void;
+};
+
 type GuideChatPanelProps = {
-  onSend: (message: string) => Promise<string>;
+  onSend: (message: string, handlers: SendHandlers) => Promise<string>;
   isBusy: boolean;
 };
 
@@ -37,20 +41,31 @@ export default function GuideChatPanel({ onSend, isBusy }: GuideChatPanelProps) 
     setDraft("");
     setSending(true);
     const userId = `user-${Date.now()}`;
-    setMessages((prev) => [...prev, { id: userId, role: "user", text }]);
+    const assistantId = `assistant-${Date.now()}`;
+
+    setMessages((prev) => [
+      ...prev,
+      { id: userId, role: "user", text },
+      { id: assistantId, role: "assistant", text: "" },
+    ]);
 
     try {
-      const reply = await onSend(text);
-      setMessages((prev) => [
-        ...prev,
-        { id: `assistant-${Date.now()}`, role: "assistant", text: reply },
-      ]);
+      const reply = await onSend(text, {
+        onDelta: (partial) => {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === assistantId ? { ...m, text: partial } : m)),
+          );
+        },
+      });
+
+      setMessages((prev) =>
+        prev.map((m) => (m.id === assistantId ? { ...m, text: reply } : m)),
+      );
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
-      setMessages((prev) => [
-        ...prev,
-        { id: `err-${Date.now()}`, role: "assistant", text: msg },
-      ]);
+      setMessages((prev) =>
+        prev.map((m) => (m.id === assistantId ? { ...m, text: msg } : m)),
+      );
     } finally {
       setSending(false);
     }
@@ -76,7 +91,7 @@ export default function GuideChatPanel({ onSend, isBusy }: GuideChatPanelProps) 
                   : "rounded-bl-sm bg-white/5 text-zinc-300 ring-1 ring-white/10"
               }`}
             >
-              {msg.text}
+              {msg.text || (sending && msg.role === "assistant" ? "…" : "")}
             </div>
           </div>
         ))}

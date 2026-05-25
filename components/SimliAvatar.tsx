@@ -49,7 +49,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
         videoRef.current,
         audioRef.current,
         null,
-        LogLevel.INFO,
+        LogLevel.ERROR,
         "livekit",
       );
 
