@@ -1,63 +1,70 @@
+import { generateSimliSessionToken } from "simli-client";
 import { NextResponse } from "next/server";
+import { getSimliApiKey, getSimliFaceId } from "@/lib/simli/config";
 
-const DEFAULT_FACE_ID = "6ebf0aa7-6fed-443d-a4c6-fd1e3080b215";
+export const dynamic = "force-dynamic";
 
 type SimliTokenResponse = {
   session_token?: string;
-  sessionToken?: string;
   detail?: string;
 };
 
 function simliErrorMessage(detail?: string): string {
   if (detail === "INVALID_API_KEY") {
-    return "Simli rejected your API key (invalid or revoked). Create a new key at https://www.simli.com/ and set SIMLI_API_KEY in .env.local and Vercel, then restart dev / redeploy.";
+    return "Simli rejected your API key (invalid or revoked). Paste a new key from https://www.simli.com/ into SIMLI_API_KEY in .env.local and Vercel, then restart dev / redeploy.";
   }
   return detail || "Simli session failed";
 }
 
 export async function POST() {
-  const apiKey = process.env.SIMLI_API_KEY?.trim();
+  const apiKey = getSimliApiKey();
   if (!apiKey) {
     return NextResponse.json({ error: "SIMLI_API_KEY is not configured" }, { status: 500 });
   }
 
-  const faceId = process.env.SIMLI_FACE_ID || DEFAULT_FACE_ID;
+  const faceId = getSimliFaceId();
 
   try {
-    const res = await fetch("https://api.simli.ai/compose/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-simli-api-key": apiKey,
-      },
-      body: JSON.stringify({
+    const data = (await generateSimliSessionToken({
+      apiKey,
+      config: {
         faceId,
-        apiVersion: "v2",
         handleSilence: true,
         maxSessionLength: 3600,
         maxIdleTime: 600,
-        audioInputFormat: "pcm16",
-      }),
-    });
+        model: "fasttalk",
+      },
+    })) as SimliTokenResponse;
 
-    const data = (await res.json().catch(() => ({}))) as SimliTokenResponse;
-    const sessionToken = data.session_token ?? data.sessionToken;
-
-    if (data.detail === "INVALID_API_KEY" || (!sessionToken && data.detail)) {
-      return NextResponse.json({ error: simliErrorMessage(data.detail) }, { status: 401 });
+    if (data.detail === "INVALID_API_KEY" || !data.session_token) {
+      return NextResponse.json(
+        { error: simliErrorMessage(data.detail) },
+        { status: data.detail === "INVALID_API_KEY" ? 401 : 502 },
+      );
     }
 
-    if (!res.ok) {
-      return NextResponse.json({ error: simliErrorMessage(data.detail) }, { status: res.status });
-    }
-
-    if (!sessionToken) {
-      return NextResponse.json({ error: "No session token from Simli" }, { status: 502 });
-    }
-
-    return NextResponse.json({ sessionToken, faceId });
+    return NextResponse.json({ sessionToken: data.session_token, faceId });
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Simli session error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    let detail: string | undefined;
+    if (typeof e === "string") {
+      try {
+        const parsed = JSON.parse(e) as SimliTokenResponse;
+        detail = parsed.detail;
+      } catch {
+        return NextResponse.json({ error: e }, { status: 502 });
+      }
+    } else if (e instanceof Error) {
+      try {
+        const parsed = JSON.parse(e.message) as SimliTokenResponse;
+        detail = parsed.detail;
+      } catch {
+        return NextResponse.json({ error: e.message }, { status: 500 });
+      }
+    }
+
+    return NextResponse.json(
+      { error: simliErrorMessage(detail) },
+      { status: detail === "INVALID_API_KEY" ? 401 : 500 },
+    );
   }
 }
