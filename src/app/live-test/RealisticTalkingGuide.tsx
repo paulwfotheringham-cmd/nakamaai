@@ -1,17 +1,62 @@
 "use client";
 
-import { Environment, Html, OrbitControls } from "@react-three/drei";
+import { Html, OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
-import { patchHairTransparency } from "@/lib/avatar/patchHairTransparency";
-import { stripGuideAppearance } from "@/lib/avatar/headMetrics";
 import { useGuideGLTF } from "@/lib/avatar/useGuideGLTF";
 
 /** World-space head height — smaller value = smaller face on screen. */
 const HEAD_HEIGHT = 0.52;
 const CAMERA_Z = 2.65;
+
+function debugGuideScene(scene: THREE.Object3D) {
+  if (scene.userData.guideDebugPass) return;
+  scene.userData.guideDebugPass = true;
+
+  const meshNames: string[] = [];
+
+  console.group("[Guide GLB] DEBUG PASS — all meshes");
+
+  scene.traverse((obj) => {
+    const mesh = obj as THREE.Mesh;
+    if (!mesh.isMesh) return;
+
+    meshNames.push(mesh.name || "(unnamed)");
+    console.log("MESH:", mesh.name);
+
+    const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+    const std = mat as THREE.MeshStandardMaterial | undefined;
+
+    console.log({
+      visible: mesh.visible,
+      material: mat?.name,
+      transparent: std?.transparent,
+      opacity: std?.opacity,
+      alphaTest: std?.alphaTest,
+      side: std?.side,
+      map: !!std?.map,
+      alphaMap: !!std?.alphaMap,
+      skinned: (mesh as THREE.SkinnedMesh).isSkinnedMesh,
+    });
+
+    mesh.visible = true;
+    mesh.frustumCulled = false;
+
+    if (std) {
+      std.transparent = true;
+      std.opacity = 1;
+      std.alphaTest = 0.05;
+      std.depthWrite = true;
+      std.side = THREE.DoubleSide;
+      std.needsUpdate = true;
+    }
+  });
+
+  console.log("[Guide GLB] ALL MESH NAMES:", meshNames);
+  console.groupEnd();
+}
 
 type GuideHeadProps = {
   isSpeaking: boolean;
@@ -40,7 +85,7 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
   const { scene } = useGuideGLTF();
 
   useEffect(() => {
-    stripGuideAppearance(scene);
+    debugGuideScene(scene);
 
     const box = new THREE.Box3().setFromObject(scene);
     const center = box.getCenter(new THREE.Vector3());
@@ -53,7 +98,6 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
       scene.position.y -= size.y * (HEAD_HEIGHT / Math.max(size.y, 0.001)) * 0.04;
     }
 
-    patchHairTransparency(scene);
     scene.updateMatrixWorld(true);
   }, [scene]);
 
@@ -103,33 +147,11 @@ type RealisticTalkingGuideProps = {
 export default function RealisticTalkingGuide({ isSpeaking, audioLevelRef }: RealisticTalkingGuideProps) {
   return (
     <div className="flex h-[min(78vh,720px)] w-full items-center justify-center overflow-hidden rounded-2xl border border-emerald-500/25 bg-gradient-to-b from-[#1a1512] to-[#0a1218] shadow-[0_0_64px_rgba(16,185,129,0.12)]">
-      <Canvas
-        shadows
-        camera={{ position: [0, 0.02, CAMERA_Z], fov: 30, near: 0.1, far: 20 }}
-        gl={{
-          antialias: true,
-          alpha: true,
-          toneMapping: THREE.ACESFilmicToneMapping,
-          outputColorSpace: THREE.SRGBColorSpace,
-        }}
-        onCreated={({ gl }) => {
-          gl.toneMappingExposure = 1.38;
-          gl.setClearColor(0x12100e, 1);
-        }}
-      >
+      <Canvas camera={{ position: [0, 0.02, CAMERA_Z], fov: 30, near: 0.1, far: 20 }} gl={{ antialias: true }}>
         <PortraitCamera />
-        <ambientLight intensity={0.12} color="#fff8f0" />
-        <directionalLight
-          position={[1.8, 2.8, 2.2]}
-          intensity={1.15}
-          color="#fff5eb"
-          castShadow
-          shadow-mapSize={1024}
-        />
-        <directionalLight position={[-2.2, 1.2, 1.6]} intensity={0.32} color="#ffd4b8" />
-        <directionalLight position={[0, 1.4, -2.6]} intensity={0.22} color="#c8d8ff" />
+        <ambientLight intensity={3} />
+        <directionalLight position={[0, 2, 2]} intensity={4} />
         <Suspense fallback={<CanvasLoader />}>
-          <Environment preset="apartment" />
           <GuideHead isSpeaking={isSpeaking} audioLevelRef={audioLevelRef} />
         </Suspense>
         <OrbitControls
