@@ -19,7 +19,7 @@ function getCartesiaApiKey(): string | null {
 }
 
 function getCartesiaDonnyVoiceId(): string {
-  const fallback = "d46abd1d-9f16-4e59-b5e1-8d4c4d2c8f6c";
+  const fallback = "d709a7e8-9495-4247-aef0-01b3207d11bf";
   const uuidRe =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
