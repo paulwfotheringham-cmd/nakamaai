@@ -5,115 +5,13 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { applyFacialAnimation } from "@/lib/avatar/facialAnimation";
+import { patchHairTransparency } from "@/lib/avatar/patchHairTransparency";
 import { stripGuideAppearance } from "@/lib/avatar/headMetrics";
 import { useGuideGLTF } from "@/lib/avatar/useGuideGLTF";
 
 /** World-space head height — smaller value = smaller face on screen. */
 const HEAD_HEIGHT = 0.52;
 const CAMERA_Z = 2.65;
-
-const FEATURE_KEYWORDS = {
-  hair: ["hair", "fringe"],
-  eyebrows: ["brow", "eyebrow"],
-  eyelashes: ["lash", "eyelash"],
-  lips: ["lip"],
-} as const;
-
-type FeatureKey = keyof typeof FEATURE_KEYWORDS;
-
-function matchesFeature(name: string, keywords: readonly string[]): boolean {
-  const n = name.toLowerCase();
-  return keywords.some((keyword) => n.includes(keyword));
-}
-
-function collectHierarchyNames(obj: THREE.Object3D): string[] {
-  const names: string[] = [];
-  let current: THREE.Object3D | null = obj;
-  while (current) {
-    if (current.name) names.push(current.name);
-    current = current.parent;
-  }
-  return names;
-}
-
-function detectFeatures(obj: THREE.Object3D): FeatureKey[] {
-  const names = collectHierarchyNames(obj);
-  const hits: FeatureKey[] = [];
-  for (const [feature, keywords] of Object.entries(FEATURE_KEYWORDS) as [FeatureKey, readonly string[]][]) {
-    if (names.some((name) => matchesFeature(name, keywords))) hits.push(feature);
-  }
-  return hits;
-}
-
-function logMaterialDetails(mesh: THREE.Mesh, material: THREE.Material, index?: number) {
-  const label = index === undefined ? "  MATERIAL:" : `  MATERIAL[${index}]:`;
-  const std = material as THREE.MeshStandardMaterial;
-  console.log(label, material.name || "(unnamed)", {
-    type: material.type,
-    visible: mesh.visible,
-    skinnedMesh: mesh instanceof THREE.SkinnedMesh,
-    hasAlphaMap: Boolean(std.alphaMap),
-    transparent: std.transparent ?? false,
-    opacity: std.opacity ?? 1,
-  });
-  console.log("    map:", std.map ?? null);
-  console.log("    alphaMap:", std.alphaMap ?? null);
-  console.log("    transparent:", std.transparent);
-  console.log("    opacity:", std.opacity);
-}
-
-/** Inspect-only pass — logs mesh/material names; does not modify materials. */
-function inspectGuideScene(scene: THREE.Object3D) {
-  if (scene.userData.guideInspected) return;
-  scene.userData.guideInspected = true;
-
-  console.group("[Guide GLB] Scene inspection");
-
-  scene.traverse((obj) => {
-    const mesh = obj as THREE.Mesh;
-    if (!mesh.isMesh) return;
-
-    console.log("MESH:", mesh.name || "(unnamed)");
-
-    if (Array.isArray(mesh.material)) {
-      mesh.material.forEach((m, i) => {
-        console.log("  MATERIAL:", i, m?.name);
-        if (m) logMaterialDetails(mesh, m, i);
-      });
-    } else if (mesh.material) {
-      console.log("  MATERIAL:", mesh.material.name);
-      logMaterialDetails(mesh, mesh.material);
-    } else {
-      console.log("  MATERIAL: (none)");
-    }
-
-    const features = detectFeatures(mesh);
-    if (features.length > 0) {
-      console.log("  FEATURE MATCH:", features.join(", "));
-    }
-  });
-
-  console.group("[Guide GLB] Feature summary");
-  for (const feature of Object.keys(FEATURE_KEYWORDS) as FeatureKey[]) {
-    const matches: string[] = [];
-    scene.traverse((obj) => {
-      const mesh = obj as THREE.Mesh;
-      if (!mesh.isMesh) return;
-      const names = collectHierarchyNames(mesh);
-      const meshHit = names.some((n) => matchesFeature(n, FEATURE_KEYWORDS[feature]));
-      const matHit = (Array.isArray(mesh.material) ? mesh.material : [mesh.material])
-        .filter(Boolean)
-        .some((m) => matchesFeature(m.name || "", FEATURE_KEYWORDS[feature]));
-      if (meshHit || matHit) {
-        matches.push(mesh.name || "(unnamed mesh)");
-      }
-    });
-    console.log(`${feature}:`, matches.length ? matches : "(no matching mesh/material names)");
-  }
-  console.groupEnd();
-
-  console.groupEnd();
-}
 
 type GuideHeadProps = {
   isSpeaking: boolean;
@@ -143,7 +41,6 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
 
   useEffect(() => {
     stripGuideAppearance(scene);
-    inspectGuideScene(scene);
 
     const box = new THREE.Box3().setFromObject(scene);
     const center = box.getCenter(new THREE.Vector3());
@@ -156,6 +53,7 @@ function GuideHead({ isSpeaking, audioLevelRef }: GuideHeadProps) {
       scene.position.y -= size.y * (HEAD_HEIGHT / Math.max(size.y, 0.001)) * 0.04;
     }
 
+    patchHairTransparency(scene);
     scene.updateMatrixWorld(true);
   }, [scene]);
 
