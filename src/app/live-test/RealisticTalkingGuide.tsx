@@ -132,7 +132,7 @@ export default function RealisticTalkingGuide({ isSpeaking, audioLevelRef }: Rea
           intensity={1.15}
           color="#fff5eb"
           castShadow
-          shadow-mapSize={[1024, 1024]}
+          shadow-mapSize={1024}
         />
         <directionalLight position={[-2.2, 1.2, 1.6]} intensity={0.32} color="#ffd4b8" />
         <directionalLight position={[0, 1.4, -2.6]} intensity={0.22} color="#c8d8ff" />

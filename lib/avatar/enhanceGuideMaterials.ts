@@ -7,19 +7,23 @@ export const SKIN_COLOR = 0xddb896;
 const BROW_KEYWORDS = ["brow", "eyebrow", "lash", "eyelash"];
 const HAIR_KEYWORDS = ["hair", "fringe"];
 const LIP_KEYWORDS = ["lip"];
+const ENHANCED_FLAG = "guideMaterialEnhanced";
 
 let cachedSkinTexture: THREE.CanvasTexture | null = null;
 
 type AppearanceRole = "hair" | "brow" | "lip";
 
-function matchesKeywords(name: string, keywords: string[]): boolean {
+function matchesKeywords(name: string | undefined, keywords: string[]): boolean {
+  if (!name) return false;
   const n = name.toLowerCase();
   return keywords.some((keyword) => n.includes(keyword));
 }
 
 function collectNames(mesh: THREE.Mesh, material: THREE.Material): string[] {
-  const names: string[] = [mesh.name, material.name];
-  let obj: THREE.Object3D | null = mesh;
+  const names: string[] = [];
+  if (mesh.name) names.push(mesh.name);
+  if (material.name) names.push(material.name);
+  let obj: THREE.Object3D | null = mesh.parent;
   while (obj) {
     if (obj.name) names.push(obj.name);
     obj = obj.parent;
@@ -45,13 +49,17 @@ function asStandardLike(
   return null;
 }
 
+function safeColor(material: THREE.MeshStandardMaterial | THREE.MeshPhysicalMaterial): THREE.Color {
+  return material.color?.clone?.() ?? new THREE.Color(0xffffff);
+}
+
 function getMaps(oldMat: THREE.MeshStandardMaterial | THREE.MeshPhysicalMaterial) {
   return {
     map: oldMat.map ?? null,
     alphaMap: oldMat.alphaMap ?? oldMat.map ?? null,
     normalMap: oldMat.normalMap ?? null,
     roughnessMap: oldMat.roughnessMap ?? null,
-    color: oldMat.color.clone(),
+    color: safeColor(oldMat),
   };
 }
 
@@ -89,6 +97,7 @@ function createHairMaterial(
   });
 
   resetTransparencyState(material);
+  material.userData[ENHANCED_FLAG] = true;
   material.needsUpdate = true;
   return material;
 }
@@ -127,6 +136,7 @@ function createLipMaterial(
     blending: THREE.NormalBlending,
   });
 
+  material.userData[ENHANCED_FLAG] = true;
   material.needsUpdate = true;
   return material;
 }
@@ -168,9 +178,11 @@ function createProceduralSkinTexture(): THREE.CanvasTexture {
 }
 
 function applySkinMaterial(
-  material: THREE.MeshPhysicalMaterial,
+  material: THREE.MeshStandardMaterial,
   role: "eye" | "teeth" | "head",
 ) {
+  if (!material.emissive) material.emissive = new THREE.Color(0x000000);
+
   if (role === "eye") {
     material.map = null;
     material.alphaMap = null;
@@ -179,13 +191,12 @@ function applySkinMaterial(
     material.emissiveIntensity = 0.06;
     material.roughness = 0.35;
     material.metalness = 0.02;
-    material.clearcoat = 0;
-    material.envMapIntensity = 0.4;
     material.transparent = false;
     material.alphaTest = 0;
     material.opacity = 1;
     material.depthWrite = true;
     material.blending = THREE.NormalBlending;
+    material.envMapIntensity = 0.4;
     material.needsUpdate = true;
     return;
   }
@@ -196,7 +207,6 @@ function applySkinMaterial(
     material.color.setHex(0xf8f4ee);
     material.roughness = 0.4;
     material.metalness = 0;
-    material.clearcoat = 0;
     material.transparent = false;
     material.needsUpdate = true;
     return;
@@ -206,7 +216,6 @@ function applySkinMaterial(
   material.color.setHex(SKIN_COLOR);
   material.metalness = 0.02;
   material.roughness = 0.56;
-  material.clearcoat = 0;
   material.envMapIntensity = 0.85;
   material.transparent = false;
   material.alphaTest = 0;
@@ -236,6 +245,8 @@ function upgradeMaterial(
   index: number,
   materials: THREE.Material | THREE.Material[],
 ) {
+  if (!src || src.userData?.[ENHANCED_FLAG]) return;
+
   const standardLike = asStandardLike(src);
   if (!standardLike) return;
 
@@ -256,9 +267,9 @@ function upgradeMaterial(
   }
 
   const role = getMeshRole(mesh);
-  const upgraded = new THREE.MeshPhysicalMaterial();
-  upgraded.copy(standardLike);
+  const upgraded = standardLike.clone();
   applySkinMaterial(upgraded, role);
+  upgraded.userData[ENHANCED_FLAG] = true;
   replaceMaterial(mesh, index, upgraded, materials);
 }
 
@@ -272,8 +283,12 @@ export function enhanceGuideMaterials(root: THREE.Object3D) {
     child.renderOrder = 0;
 
     const materials = child.material;
+    if (!materials) return;
+
     if (Array.isArray(materials)) {
-      materials.forEach((src, index) => upgradeMaterial(child, src, index, materials));
+      materials.forEach((src, index) => {
+        if (src) upgradeMaterial(child, src, index, materials);
+      });
     } else {
       upgradeMaterial(child, materials, 0, materials);
     }
