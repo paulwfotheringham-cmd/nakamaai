@@ -36,6 +36,7 @@ export const NAKAMA_UNIVERSE_SERVICES = [
     overlayLabel: "Reignite for couples",
     description: "Date Night Mode. Surprise Mode. The Reconnection Series.",
     poster: "/tiles/tile5.jpg",
+    centerPanel: "couples-program" as const,
   },
   {
     id: "character-voices",
@@ -65,10 +66,15 @@ export type NakamaUniverseServiceId = (typeof NAKAMA_UNIVERSE_SERVICES)[number][
 
 export type LiveTestNavId = (typeof LIVE_TEST_NAV_ITEMS)[number]["id"];
 
-export type LiveTestCenterPanel = "dashboard" | "fantasy-audio" | "directed-adventure";
+export type LiveTestCenterPanel =
+  | "dashboard"
+  | "fantasy-audio"
+  | "directed-adventure"
+  | "couples-program";
 
 export function getLiveTestCenterPanel(navId: LiveTestNavId | null): LiveTestCenterPanel {
   if (navId === "audiobooks") return "fantasy-audio";
   if (navId === "interactive-adventures") return "directed-adventure";
+  if (navId === "reignite-couples") return "couples-program";
   return "dashboard";
 }

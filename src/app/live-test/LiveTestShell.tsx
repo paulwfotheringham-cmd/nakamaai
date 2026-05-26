@@ -7,6 +7,7 @@ import {
   getLiveTestCenterPanel,
   type LiveTestNavId,
 } from "@/lib/nakama-universe-services";
+import LiveTestCouplesProgram from "./LiveTestCouplesProgram";
 import LiveTestDashboardHome from "./LiveTestDashboardHome";
 import LiveTestDirectedAdventureFrame from "./LiveTestDirectedAdventureFrame";
 import LiveTestFantasyAudioFrame from "./LiveTestFantasyAudioFrame";
@@ -65,6 +66,7 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
       <section className="relative z-10 flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-2 sm:p-3">
         {centerPanel === "fantasy-audio" && <LiveTestFantasyAudioFrame />}
         {centerPanel === "directed-adventure" && <LiveTestDirectedAdventureFrame />}
+        {centerPanel === "couples-program" && <LiveTestCouplesProgram />}
         {centerPanel === "dashboard" && <LiveTestDashboardHome />}
       </section>
 
