@@ -363,12 +363,12 @@ export default function Page() {
               </div>
             </div>
 
-            <a
-              href="#signup"
+            <Link
+              href="/select-plan"
               className="mt-12 inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
             >
               JOIN NAKAMA NOW
-            </a>
+            </Link>
           </div>
 
           <div className="relative z-10 mt-10 w-full border-t border-amber-200/25 bg-black/90 px-6 sm:px-8 lg:px-10">

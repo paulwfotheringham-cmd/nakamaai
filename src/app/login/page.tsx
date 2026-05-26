@@ -17,18 +17,18 @@ export default function LoginPage() {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
       body: JSON.stringify({ email, password }),
     });
 
-    setLoading(false);
-
     if (!res.ok) {
+      setLoading(false);
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       alert(data.error ?? "Login failed.");
       return;
     }
 
-    router.push("/live-test");
+    router.replace("/live-test");
   }
 
   async function handleForgotPassword() {
