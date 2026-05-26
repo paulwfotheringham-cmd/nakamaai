@@ -20,6 +20,7 @@ type SimliAvatarProps = {
 };
 
 const CHUNK_BYTES = 6000;
+const IMMEDIATE_BYTES = 16000 * 2 * 4; // 4 seconds @ 16kHz PCM16
 
 const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function SimliAvatar(
   { className },
@@ -103,7 +104,11 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       throw new Error("No audio data returned for speech");
     }
 
-    for (let offset = 0; offset < pcm.length; offset += CHUNK_BYTES) {
+    // Kick-start playback + viseme tracking immediately.
+    const first = pcm.subarray(0, Math.min(IMMEDIATE_BYTES, pcm.length));
+    client.sendAudioDataImmediate(first);
+
+    for (let offset = first.length; offset < pcm.length; offset += CHUNK_BYTES) {
       client.sendAudioData(pcm.subarray(offset, offset + CHUNK_BYTES));
     }
 
