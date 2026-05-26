@@ -11,7 +11,7 @@ type LiveTestUniverseNavProps = {
 export default function LiveTestUniverseNav({ activeId, onSelect }: LiveTestUniverseNavProps) {
   return (
     <nav
-      className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto overflow-x-hidden pr-0.5"
+      className="flex shrink-0 flex-row gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] lg:min-h-0 lg:flex-1 lg:flex-col lg:gap-2.5 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-0.5 [&::-webkit-scrollbar]:hidden"
       aria-label="Nakama Nights Universe"
     >
       {LIVE_TEST_NAV_ITEMS.map((item) => (

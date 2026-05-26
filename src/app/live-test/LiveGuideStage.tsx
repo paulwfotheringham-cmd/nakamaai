@@ -84,11 +84,11 @@ export default function LiveGuideStage() {
     <LiveTestShell
       rightColumn={
         <div className="flex h-full min-h-0 flex-col overflow-hidden">
-          <div className="mx-auto h-[clamp(9rem,32%,13rem)] w-full max-w-full shrink-0 overflow-hidden">
+          <div className="mx-auto h-[clamp(5.5rem,22dvh,9rem)] w-full max-w-full shrink-0 overflow-hidden lg:h-[clamp(9rem,32%,13rem)]">
             <SimliAvatar ref={simliRef} className="h-full w-full" />
           </div>
 
-          <div className="mt-2 flex min-h-0 flex-1 flex-col overflow-hidden">
+          <div className="mt-1.5 flex min-h-0 flex-1 flex-col overflow-hidden lg:mt-2">
             <GuideChatPanel onSend={handleSend} isBusy={isBusy} className="min-h-0 flex-1" />
           </div>
         </div>

@@ -671,6 +671,16 @@ function CreateAudioTestInner() {
   const [innerGridHeight, setInnerGridHeight] = useState<number | null>(null);
   const searchParams = useSearchParams();
   const embed = searchParams.get("embed") === "1";
+  const [embedNarrow, setEmbedNarrow] = useState(false);
+
+  useEffect(() => {
+    if (!embed) return;
+    const mq = window.matchMedia("(max-width: 768px)");
+    const update = () => setEmbedNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, [embed]);
 
   // Measure the form+tiles column height and pin the result column to it
   useEffect(() => {
@@ -719,8 +729,6 @@ function CreateAudioTestInner() {
   const [interPaused, setInterPaused]             = useState(false);
   const [interSaveStatus, setInterSaveStatus]     = useState<"idle" | "saving" | "saved">("idle");
 
-  const embedResultsVisible =
-    embed && (interPhase !== "setup" || !!story);
   const [maleName, setMaleName]   = useState(() => randItem(["Luca", "Adrian", "Noah", "Julian", "Theo"]));
   const [femaleName, setFemaleName] = useState(() => randItem(["Elena", "Sofia", "Clara", "Mia", "Isla"]));
   const interStoppedRef      = useRef(false);
@@ -1308,51 +1316,6 @@ function CreateAudioTestInner() {
         </div>
       )}
 
-      {embed && (
-        <header
-          style={{
-            flexShrink: 0,
-            borderBottom: "1px solid rgba(41, 37, 36, 0.9)",
-            padding: "12px 16px 10px",
-          }}
-        >
-          <p
-            style={{
-              margin: 0,
-              fontSize: "10px",
-              fontWeight: 600,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "rgba(251, 191, 36, 0.85)",
-              fontFamily: "system-ui, sans-serif",
-            }}
-          >
-            Interactive adventures
-          </p>
-          <h1
-            style={{
-              margin: "6px 0 0",
-              fontSize: "1.25rem",
-              fontWeight: 600,
-              color: "#fafaf9",
-            }}
-          >
-            Create your fantasy audio
-          </h1>
-          <p
-            style={{
-              margin: "6px 0 0",
-              fontSize: "12px",
-              lineHeight: 1.45,
-              color: "#a8a29e",
-              fontFamily: "system-ui, sans-serif",
-            }}
-          >
-            Shape tone, cast voices, and generate your story.
-          </p>
-        </header>
-      )}
-
       <div
         style={{
           maxWidth: embed ? "none" : "1680px",
@@ -1360,35 +1323,35 @@ function CreateAudioTestInner() {
           minHeight: embed ? 0 : "100vh",
           display: "flex",
           flexDirection: "column",
-          padding: embed ? "0 10px 10px" : "32px 24px",
+          padding: embed ? "8px 10px 10px" : "32px 24px",
           flex: embed ? 1 : undefined,
           overflow: embed ? "hidden" : undefined,
         }}
       >
-        {/* [hero + form] | results — embed: form only, stacked with results */}
+        {/* Standalone: [hero + form] | results — embed: form left | story/chat right */}
         <div
           style={{
             display: "flex",
             flex: embed ? 1 : undefined,
-            flexDirection: embed ? "column" : "row",
+            flexDirection: embed && embedNarrow ? "column" : "row",
             gap: embed ? "10px" : "28px",
             alignItems: embed ? "stretch" : "flex-start",
             minHeight: embed ? 0 : undefined,
-            overflow: embed ? "hidden" : undefined,
+            overflow: embed ? "auto" : undefined,
           }}
         >
 
           <div
             ref={innerGridRef}
             style={{
-              flex: embed ? (embedResultsVisible ? "0 1 auto" : "1 1 0") : "1.75",
+              flex: embed ? (embedNarrow ? "0 0 auto" : "0 0 40%") : "1.75",
               display: "grid",
               gap: embed ? "10px" : "28px",
               gridTemplateColumns: embed ? "1fr" : "0.75fr 1fr",
               alignItems: "stretch",
               minHeight: embed ? 0 : undefined,
               minWidth: embed ? 0 : undefined,
-              maxHeight: embed && embedResultsVisible ? "52%" : undefined,
+              maxWidth: embed ? (embedNarrow ? "100%" : "40%") : undefined,
               overflow: embed ? "auto" : undefined,
             }}
           >
@@ -1505,39 +1468,42 @@ function CreateAudioTestInner() {
           </div>
           )}
 
-          {/* Form */}
+          {/* Form / options */}
           <div
             style={{
               borderRadius: embed ? "12px" : "28px",
               border: embed
-                ? "1px solid rgba(41, 37, 36, 0.95)"
+                ? "1px solid rgba(120, 53, 15, 0.35)"
                 : "1px solid rgba(255,255,255,0.1)",
-              background: embed ? "rgba(9, 9, 11, 0.85)" : "rgba(255,255,255,0.06)",
-              padding: embed ? "14px 12px" : "24px",
-              boxShadow: embed ? "none" : "0 24px 60px rgba(0,0,0,0.35)",
+              background: embed ? "rgba(9, 9, 11, 0.92)" : "rgba(255,255,255,0.06)",
+              padding: embed ? "12px 10px" : "24px",
+              boxShadow: embed ? "inset 0 0 40px rgba(0,0,0,0.2)" : "0 24px 60px rgba(0,0,0,0.35)",
               backdropFilter: embed ? undefined : "blur(12px)",
             }}
           >
-            <div style={{ marginBottom: embed ? "14px" : "24px" }}>
+            <div style={{ marginBottom: embed ? "10px" : "24px" }}>
               <h2
                 style={{
                   margin: 0,
-                  fontSize: embed ? "1.05rem" : "32px",
+                  fontSize: embed ? "0.95rem" : "32px",
                   fontWeight: 700,
                   color: "#fafaf9",
                 }}
               >
-                Customize your adventure
+                {embed ? "Scene options" : "Customize your adventure"}
               </h2>
               <p
                 style={{
-                  marginTop: embed ? "6px" : "8px",
-                  fontSize: embed ? "11px" : "14px",
-                  color: "rgba(255,255,255,0.6)",
+                  marginTop: embed ? "4px" : "8px",
+                  fontSize: embed ? "10px" : "14px",
+                  lineHeight: 1.45,
+                  color: "rgba(255,255,255,0.55)",
                   fontFamily: embed ? "system-ui, sans-serif" : undefined,
                 }}
               >
-                Adjust the story ingredients, then choose voices and generate.
+                {embed
+                  ? "Pick settings and voices, then generate on the right."
+                  : "Adjust the story ingredients, then choose voices and generate."}
               </p>
             </div>
 
@@ -1799,28 +1765,133 @@ function CreateAudioTestInner() {
 
           </div>{/* end inner grid */}
 
-          {/* Results — embed: flex below form; standalone: pinned to form column height */}
+          {/* Story / chat panel — always visible in embed */}
           <div style={{
-            flex: embed ? "1 1 0" : "1",
+            flex: embed ? (embedNarrow ? "1 1 auto" : "1 1 0") : "1",
             display: "flex",
             flexDirection: "column",
             minWidth: 0,
-            minHeight: embed ? 0 : undefined,
+            minHeight: embed ? (embedNarrow ? "min(40dvh, 18rem)" : 0) : undefined,
             height: embed ? "auto" : innerGridHeight ? `${innerGridHeight}px` : "auto",
             maxHeight: embed ? "none" : innerGridHeight ? `${innerGridHeight}px` : "none",
             overflow: "hidden",
           }}>
 
+        {embed && interPhase === "setup" && !story && (
+          <div
+            style={{
+              borderRadius: "12px",
+              border: audioError
+                ? "1px solid rgba(255,80,80,0.35)"
+                : "1px solid rgba(120, 53, 15, 0.35)",
+              background: audioError ? "rgba(40, 10, 10, 0.5)" : "rgba(9, 9, 11, 0.92)",
+              padding: "14px 12px",
+              boxShadow: "inset 0 0 40px rgba(0,0,0,0.2)",
+              flex: 1,
+              minHeight: 0,
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                fontSize: "9px",
+                fontWeight: 600,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "rgba(251, 191, 36, 0.85)",
+                fontFamily: "system-ui, sans-serif",
+              }}
+            >
+              Your adventure
+            </p>
+            <h2
+              style={{
+                margin: "6px 0 0",
+                fontSize: "0.95rem",
+                fontWeight: 600,
+                color: "#fafaf9",
+              }}
+            >
+              Story & choices
+            </h2>
+            <div
+              style={{
+                marginTop: "12px",
+                flex: 1,
+                minHeight: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                overflowY: "auto",
+              }}
+            >
+              {audioError ? (
+                <div
+                  style={{
+                    alignSelf: "flex-start",
+                    maxWidth: "92%",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(255,80,80,0.35)",
+                    background: "rgba(0, 0, 0, 0.45)",
+                    padding: "10px 12px",
+                    fontSize: "12px",
+                    lineHeight: 1.5,
+                    color: "#fecaca",
+                    fontFamily: "system-ui, sans-serif",
+                  }}
+                >
+                  {audioError}
+                </div>
+              ) : (
+                <div
+                  style={{
+                    alignSelf: "flex-start",
+                    maxWidth: "92%",
+                    borderRadius: "12px",
+                    borderBottomLeftRadius: "4px",
+                    border: "1px solid rgba(41, 37, 36, 0.95)",
+                    background: "rgba(0, 0, 0, 0.5)",
+                    padding: "10px 12px",
+                    fontSize: "12px",
+                    lineHeight: 1.5,
+                    color: "#e7e5e4",
+                    fontFamily: "system-ui, sans-serif",
+                  }}
+                >
+                  Welcome — when you&apos;re ready, set your scene on the left and tap{" "}
+                  <strong style={{ color: "#fbbf24" }}>Generate Interactive</strong>. Your
+                  story will play here with choices as you go.
+                </div>
+              )}
+            </div>
+            <p
+              style={{
+                margin: "10px 0 0",
+                fontSize: "10px",
+                color: "rgba(255,255,255,0.4)",
+                fontFamily: "system-ui, sans-serif",
+              }}
+            >
+              Or browse saved stories from the left panel.
+            </p>
+          </div>
+        )}
+
         {/* Interactive Story result area */}
         {interPhase !== "setup" && (
           <div
             style={{
-              borderRadius: "28px",
-              border: "1px solid rgba(14,116,144,0.35)",
-              background: "rgba(8,60,75,0.25)",
-              padding: "28px",
-              boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
-              backdropFilter: "blur(12px)",
+              borderRadius: embed ? "12px" : "28px",
+              border: embed
+                ? "1px solid rgba(120, 53, 15, 0.35)"
+                : "1px solid rgba(14,116,144,0.35)",
+              background: embed ? "rgba(9, 9, 11, 0.92)" : "rgba(8,60,75,0.25)",
+              padding: embed ? "14px 12px" : "28px",
+              boxShadow: embed ? "inset 0 0 40px rgba(0,0,0,0.2)" : "0 24px 60px rgba(0,0,0,0.35)",
+              backdropFilter: embed ? undefined : "blur(12px)",
               flex: 1,
               minHeight: 0,
               display: "flex",
@@ -1831,9 +1902,9 @@ function CreateAudioTestInner() {
             {/* Header bar */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", flexShrink: 0 }}>
               <div>
-                <h2 style={{ margin: "0 0 8px", fontSize: "26px", fontWeight: 700, lineHeight: 1.3 }}>
+                <h2 style={{ margin: "0 0 8px", fontSize: embed ? "0.95rem" : "26px", fontWeight: 700, lineHeight: 1.3 }}>
                   Your fantasy experience.{" "}
-                  <span style={{ color: "#22d3ee" }}>Guide your journey</span>
+                  <span style={{ color: embed ? "#d8b26e" : "#22d3ee" }}>Guide your journey</span>
                 </h2>
                 <p style={{ margin: 0, fontSize: "14px", color: "rgba(255,255,255,0.5)" }}>
                   {setting} · {mood} · {category}
@@ -2187,12 +2258,14 @@ function CreateAudioTestInner() {
         {story && (
           <div
             style={{
-              borderRadius: "28px",
-              border: "1px solid rgba(255,255,255,0.1)",
-              background: "rgba(255,255,255,0.06)",
-              padding: "24px",
-              boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
-              backdropFilter: "blur(12px)",
+              borderRadius: embed ? "12px" : "28px",
+              border: embed
+                ? "1px solid rgba(120, 53, 15, 0.35)"
+                : "1px solid rgba(255,255,255,0.1)",
+              background: embed ? "rgba(9, 9, 11, 0.92)" : "rgba(255,255,255,0.06)",
+              padding: embed ? "14px 12px" : "24px",
+              boxShadow: embed ? "inset 0 0 40px rgba(0,0,0,0.2)" : "0 24px 60px rgba(0,0,0,0.35)",
+              backdropFilter: embed ? undefined : "blur(12px)",
               flex: 1,
               display: "flex",
               flexDirection: "column",
@@ -2433,8 +2506,8 @@ function CreateAudioTestInner() {
           </div>
         )}
 
-        {/* Empty state — nothing generated yet */}
-        {interPhase === "setup" && !story && (
+        {/* Empty state — nothing generated yet (standalone only; embed uses panel above) */}
+        {!embed && interPhase === "setup" && !story && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, borderRadius: "28px", border: audioError ? "1px solid rgba(255,80,80,0.3)" : "1px solid rgba(255,255,255,0.06)", background: audioError ? "rgba(255,80,80,0.05)" : "rgba(255,255,255,0.02)", padding: "40px 24px", textAlign: "center" }}>
             {audioError ? (
               <>

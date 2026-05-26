@@ -41,8 +41,8 @@ export default function LiveTestDashboardHome() {
           </span>
         </h1>
         <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-stone-400 sm:text-xs">
-          Pick up where you left off, or choose from the menu on the left. Your guide is on the
-          right when you want to talk.
+          Pick up where you left off from the menu above. Your guide is below when you want to
+          talk.
         </p>
       </header>
 
@@ -56,7 +56,7 @@ export default function LiveTestDashboardHome() {
           </p>
         </div>
 
-        <ul className="grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-2 sm:gap-2.5">
+        <ul className="grid min-h-0 flex-1 auto-rows-[minmax(7.25rem,1fr)] grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-2 sm:grid-rows-2 sm:overflow-hidden sm:gap-2.5">
           {PICK_UP_ITEMS.map((item) => (
             <li
               key={item.section}

@@ -113,7 +113,7 @@ export default function LiveTestCouplesProgram() {
         </p>
       </header>
 
-      <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-2 p-2 sm:gap-2.5 sm:p-3">
+      <div className="grid min-h-0 flex-1 auto-rows-[minmax(8.5rem,1fr)] grid-cols-1 gap-2 overflow-y-auto p-2 sm:grid-cols-2 sm:grid-rows-2 sm:overflow-hidden sm:gap-2.5 sm:p-3">
         {COUPLES_TILES.map((tile) => (
           <CouplesTile key={tile.id} {...tile} />
         ))}

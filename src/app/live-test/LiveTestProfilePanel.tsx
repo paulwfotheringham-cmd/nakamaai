@@ -63,19 +63,19 @@ export default function LiveTestProfilePanel() {
           aria-hidden
         />
 
-        <ul className="relative z-10 flex min-h-0 flex-1 flex-col justify-center gap-2 overflow-y-auto px-3 py-3 sm:gap-2.5 sm:px-4 sm:py-4">
+        <ul className="relative z-10 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 py-4 sm:justify-evenly sm:gap-5 sm:px-6 sm:py-6">
           {PROFILE_SETTINGS.map((item) => (
             <li
               key={item.id}
-              className="grid min-h-0 grid-cols-[minmax(6.75rem,8.5rem)_1fr] items-center gap-2.5 sm:grid-cols-[minmax(7.5rem,9.5rem)_1fr] sm:gap-3"
+              className="grid grid-cols-1 items-start gap-2 sm:grid-cols-[minmax(9.5rem,12rem)_1fr] sm:items-center sm:gap-6"
             >
               <button
                 type="button"
-                className="w-full rounded-full border border-amber-400/50 bg-gradient-to-b from-amber-200/95 to-amber-600 px-2 py-2 text-center text-[10px] font-bold leading-tight text-zinc-950 shadow-[0_2px_10px_rgba(0,0,0,0.4)] transition hover:from-amber-100 hover:to-amber-500 sm:px-2.5 sm:py-2.5 sm:text-[11px]"
+                className="w-full max-w-[12rem] rounded-full border border-amber-400/50 bg-gradient-to-b from-amber-200/95 to-amber-600 px-3 py-2.5 text-center text-[11px] font-bold leading-snug text-zinc-950 shadow-[0_2px_12px_rgba(0,0,0,0.45)] transition hover:from-amber-100 hover:to-amber-500 sm:max-w-none sm:px-4 sm:py-3 sm:text-xs"
               >
                 {item.label}
               </button>
-              <p className="text-[10px] font-medium leading-snug text-stone-100 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-[11px]">
+              <p className="text-xs font-medium leading-relaxed text-stone-100 drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)] sm:text-sm sm:leading-relaxed">
                 {item.description}
               </p>
             </li>
