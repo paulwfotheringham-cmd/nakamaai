@@ -30,20 +30,17 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
 
       {/* Left — overlay-label Universe nav */}
       <aside className="relative z-10 flex h-full min-h-0 w-[clamp(11.5rem,18vw,13.5rem)] shrink-0 flex-col border-r border-stone-800/90 bg-zinc-950">
-        <div className="shrink-0 border-b border-stone-800/80 px-3 py-3">
-          <Link href="/" className="inline-block max-w-full">
+        <div className="shrink-0 border-b border-stone-800/80 px-2.5 py-3.5 sm:px-3">
+          <Link href="/" className="block w-full">
             <Image
               src="/Nakama-AI-July25-White.png"
               alt="Nakama Nights"
-              width={180}
-              height={48}
-              className="h-8 w-auto max-w-full object-contain object-left"
+              width={240}
+              height={64}
+              className="h-11 w-full max-w-full object-contain object-left sm:h-12"
               priority
             />
           </Link>
-          <h2 className="mt-3 font-serif text-sm leading-tight text-white">
-            Nakama Nights Universe
-          </h2>
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col px-2.5 pb-3 pt-3">
