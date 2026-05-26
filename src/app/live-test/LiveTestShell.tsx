@@ -8,6 +8,7 @@ import {
   type LiveTestNavId,
 } from "@/lib/nakama-universe-services";
 import LiveTestDashboardHome from "./LiveTestDashboardHome";
+import LiveTestDirectedAdventureFrame from "./LiveTestDirectedAdventureFrame";
 import LiveTestFantasyAudioFrame from "./LiveTestFantasyAudioFrame";
 import LiveTestUniverseNav from "./LiveTestUniverseNav";
 
@@ -20,6 +21,7 @@ type LiveTestShellProps = {
 export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
   const [activeNav, setActiveNav] = useState<LiveTestNavId | null>(null);
   const centerPanel = getLiveTestCenterPanel(activeNav);
+  const onDashboard = activeNav === null;
 
   return (
     <div className="relative flex h-full min-h-0 w-full max-w-full overflow-hidden text-stone-200">
@@ -28,19 +30,30 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
         aria-hidden
       />
 
-      {/* Left — overlay-label Universe nav */}
+      {/* Left — logo, dashboard, Universe nav */}
       <aside className="relative z-10 flex h-full min-h-0 w-[clamp(11.5rem,18vw,13.5rem)] shrink-0 flex-col border-r border-stone-800/90 bg-zinc-950">
-        <div className="shrink-0 border-b border-stone-800/80 px-2.5 py-3.5 sm:px-3">
+        <div className="shrink-0 space-y-2.5 border-b border-stone-800/80 px-2.5 py-3.5 sm:px-3">
           <Link href="/" className="block w-full">
             <Image
               src="/Nakama-AI-July25-White.png"
               alt="Nakama Nights"
-              width={240}
-              height={64}
-              className="h-11 w-full max-w-full object-contain object-left sm:h-12"
+              width={280}
+              height={76}
+              className="h-14 w-full max-w-full object-contain object-left sm:h-16"
               priority
             />
           </Link>
+          <button
+            type="button"
+            onClick={() => setActiveNav(null)}
+            className={`w-full rounded-full border px-3 py-2 text-xs font-semibold tracking-wide transition ${
+              onDashboard
+                ? "border-amber-400/55 bg-gradient-to-b from-amber-200/90 to-amber-600 text-zinc-950"
+                : "border-stone-700/80 bg-black/40 text-stone-300 hover:border-amber-700/40 hover:text-amber-100"
+            }`}
+          >
+            Dashboard
+          </button>
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col px-2.5 pb-3 pt-3">
@@ -50,11 +63,9 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
 
       {/* Center — dashboard or section content */}
       <section className="relative z-10 flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-2 sm:p-3">
-        {centerPanel === "fantasy-audio" ? (
-          <LiveTestFantasyAudioFrame />
-        ) : (
-          <LiveTestDashboardHome />
-        )}
+        {centerPanel === "fantasy-audio" && <LiveTestFantasyAudioFrame />}
+        {centerPanel === "directed-adventure" && <LiveTestDirectedAdventureFrame />}
+        {centerPanel === "dashboard" && <LiveTestDashboardHome />}
       </section>
 
       {/* Right — avatar + chat */}

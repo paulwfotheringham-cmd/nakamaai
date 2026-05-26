@@ -21,6 +21,7 @@ export const NAKAMA_UNIVERSE_SERVICES = [
     overlayLabel: "Interactive adventures",
     description: "Control your fantasy as it plays in real time",
     poster: "/tiles/tile3.jpg",
+    centerPanel: "directed-adventure" as const,
   },
   {
     id: "forbidden-chat",
@@ -64,9 +65,10 @@ export type NakamaUniverseServiceId = (typeof NAKAMA_UNIVERSE_SERVICES)[number][
 
 export type LiveTestNavId = (typeof LIVE_TEST_NAV_ITEMS)[number]["id"];
 
-export type LiveTestCenterPanel = "dashboard" | "fantasy-audio";
+export type LiveTestCenterPanel = "dashboard" | "fantasy-audio" | "directed-adventure";
 
 export function getLiveTestCenterPanel(navId: LiveTestNavId | null): LiveTestCenterPanel {
   if (navId === "audiobooks") return "fantasy-audio";
+  if (navId === "interactive-adventures") return "directed-adventure";
   return "dashboard";
 }
