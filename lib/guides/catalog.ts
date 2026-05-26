@@ -19,17 +19,17 @@ export type GuideVoice = {
 export const GUIDE_TONES = ["Relaxed", "Playful", "Intense"] as const;
 export type GuideTone = (typeof GUIDE_TONES)[number];
 
-/** Verified distinct Simli preset faces (override per guide via env on Vercel). */
+/** Simli preset faces verified via compose/token (not INVALID_FACE_ID). */
 const FACE_MARCUS = "6ebf0aa7-6fed-443d-a4c6-fd1e3080b215";
-const FACE_CLINT = "0f0e5f59-2e42-4f5e-9f3d-8b2c4d6e8f0a";
-const FACE_SIENNA = "7c9e6679-7425-40de-944b-e07fc1f90ae7";
+const FACE_CLINT = "101bef0d-b62d-4fbe-a6b4-89bc3fc66ec6";
+const FACE_SIENNA = "4145d354-fd78-4c29-b6b1-0663a04e8d7b";
 
 function envFace(key: string, fallback: string): string {
   const raw = process.env[key]?.trim().replace(/^["']|["']$/g, "");
   return raw || fallback;
 }
 
-/** 3 men + 1 woman — each with a unique Simli faceId. */
+/** 3 men + 1 woman — each with a unique, API-valid Simli faceId. */
 export function getOnboardingGuides(): OnboardingGuide[] {
   return [
     {
@@ -63,7 +63,7 @@ export function getOnboardingGuides(): OnboardingGuide[] {
   ];
 }
 
-/** @deprecated use getOnboardingGuides() — kept for static imports */
+/** @deprecated use getOnboardingGuides() */
 export const ONBOARDING_GUIDES: OnboardingGuide[] = getOnboardingGuides();
 
 export const GUIDE_VOICES: GuideVoice[] = [

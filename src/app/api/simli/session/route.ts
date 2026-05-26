@@ -1,6 +1,6 @@
 import { generateIceServers, generateSimliSessionToken } from "simli-client";
 import { NextResponse } from "next/server";
-import { getSimliApiKey, getSimliFaceId } from "@/lib/simli/config";
+import { DEFAULT_SIMLI_FACE_ID, getSimliApiKey, getSimliFaceId } from "@/lib/simli/config";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -33,25 +33,41 @@ export async function POST(req: Request) {
     /* empty body is fine */
   }
 
-  const faceId = requestedFaceId || getSimliFaceId();
-  const config = {
-    faceId,
-    handleSilence: true,
-    maxSessionLength: 3600,
-    maxIdleTime: 600,
-    model: "fasttalk" as const,
-  };
+  let faceId = requestedFaceId || getSimliFaceId();
+
+  async function requestToken(id: string) {
+    return generateSimliSessionToken({
+      apiKey,
+      config: {
+        faceId: id,
+        handleSilence: true,
+        maxSessionLength: 3600,
+        maxIdleTime: 600,
+        model: "fasttalk" as const,
+      },
+    }) as Promise<SimliTokenResponse>;
+  }
 
   try {
-    const [data, iceServers] = await Promise.all([
-      generateSimliSessionToken({ apiKey, config }) as Promise<SimliTokenResponse>,
-      generateIceServers(apiKey),
-    ]);
+    const iceServers = await generateIceServers(apiKey);
+    let data = await requestToken(faceId);
+
+    if (data.detail === "INVALID_FACE_ID" && faceId !== DEFAULT_SIMLI_FACE_ID) {
+      faceId = DEFAULT_SIMLI_FACE_ID;
+      data = await requestToken(faceId);
+    }
 
     if (data.detail === "INVALID_API_KEY" || !data.session_token) {
       return NextResponse.json(
         { error: simliErrorMessage(data.detail) },
         { status: data.detail === "INVALID_API_KEY" ? 401 : 502 },
+      );
+    }
+
+    if (data.detail === "INVALID_FACE_ID") {
+      return NextResponse.json(
+        { error: "This guide face is not available. Pick another guide or update SIMLI_FACE_* in Vercel." },
+        { status: 400 },
       );
     }
 
