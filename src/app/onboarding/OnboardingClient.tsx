@@ -113,7 +113,7 @@ export default function OnboardingClient() {
               <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-500/90">
                 Select guide
               </h2>
-              <p className="mt-1 text-sm text-stone-500">3 men · 1 woman · live Simli preview</p>
+              <p className="mt-1 text-sm text-stone-500">3 men · 1 woman · tap to preview live</p>
               <div className="mt-4 grid grid-cols-2 gap-3">
                 {ONBOARDING_GUIDES.map((guide) => {
                   const active = selectedGuide.id === guide.id;
@@ -122,32 +122,24 @@ export default function OnboardingClient() {
                       key={guide.id}
                       type="button"
                       onClick={() => setSelectedGuide(guide)}
-                      className={`group relative overflow-hidden rounded-2xl border text-left transition ${
+                      className={`rounded-2xl border p-4 text-left transition ${
                         active
-                          ? "border-amber-400/60 shadow-[0_0_0_1px_rgba(251,191,36,0.25)]"
-                          : "border-stone-800/80 hover:border-amber-800/50"
+                          ? "border-amber-400/60 bg-gradient-to-b from-amber-950/40 to-zinc-950 shadow-[0_0_0_1px_rgba(251,191,36,0.2)]"
+                          : "border-stone-800/80 bg-zinc-950/60 hover:border-amber-800/50 hover:bg-zinc-900/80"
                       }`}
                     >
-                      <img
-                        src={guide.thumbnail}
-                        alt=""
-                        className="aspect-[3/4] w-full object-cover object-top transition group-hover:scale-[1.02]"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-                      <div className="absolute inset-x-0 bottom-0 p-3">
+                      <div className="flex items-start justify-between gap-2">
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-400/90">
                           {guide.gender}
                         </p>
-                        <p className="font-serif text-lg font-semibold text-white">{guide.name}</p>
-                        <p className="mt-0.5 line-clamp-2 text-[11px] text-stone-300">
-                          {guide.tagline}
-                        </p>
+                        {active && (
+                          <span className="shrink-0 rounded-full bg-amber-400/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-zinc-950">
+                            Selected
+                          </span>
+                        )}
                       </div>
-                      {active && (
-                        <span className="absolute right-2 top-2 rounded-full bg-amber-400/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-zinc-950">
-                          Selected
-                        </span>
-                      )}
+                      <p className="mt-2 font-serif text-xl font-semibold text-white">{guide.name}</p>
+                      <p className="mt-1 text-sm leading-snug text-stone-400">{guide.tagline}</p>
                     </button>
                   );
                 })}

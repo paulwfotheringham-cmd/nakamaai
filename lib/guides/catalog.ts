@@ -7,7 +7,6 @@ export type OnboardingGuide = {
   name: string;
   gender: GuideGender;
   simliFaceId: string;
-  thumbnail: string;
   tagline: string;
 };
 
@@ -29,7 +28,6 @@ export const ONBOARDING_GUIDES: OnboardingGuide[] = [
     name: "Frank",
     gender: "male",
     simliFaceId: DEFAULT_SIMLI_FACE_ID,
-    thumbnail: "/guides/imageedit_14_7182524648.png",
     tagline: "Warm concierge energy",
   },
   {
@@ -37,7 +35,6 @@ export const ONBOARDING_GUIDES: OnboardingGuide[] = [
     name: "Marcus",
     gender: "male",
     simliFaceId: FACE_MARCUS,
-    thumbnail: "/guides/imageedit_17_9927503197.png",
     tagline: "Steady, grounded presence",
   },
   {
@@ -45,7 +42,6 @@ export const ONBOARDING_GUIDES: OnboardingGuide[] = [
     name: "Clint",
     gender: "male",
     simliFaceId: DEFAULT_SIMLI_FACE_ID,
-    thumbnail: "/guides/imageedit_21_9491173695.png",
     tagline: "Rugged, direct charm",
   },
   {
@@ -53,7 +49,6 @@ export const ONBOARDING_GUIDES: OnboardingGuide[] = [
     name: "Sienna",
     gender: "female",
     simliFaceId: FACE_MARCUS,
-    thumbnail: "/guides/imageedit_24_3470039515.png",
     tagline: "Playful, inviting guide",
   },
 ];
