@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, useRef, useEffect, type ReactNode } from "react";
+import { Suspense, useMemo, useState, useRef, useEffect, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
 import Image, { StaticImageData } from "next/image";
 import animeAudio from "./animeaudio.jpg";
 import werewolfImg from "./Images each category/werewolf.jpg";
@@ -146,8 +147,8 @@ function ArrowButton({
         width: 48,
         height: 48,
         borderRadius: 14,
-        border: "1px solid rgba(255,255,255,0.12)",
-        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(41,37,36,0.95)",
+        background: "rgba(0,0,0,0.4)",
         color: "#d8b26e",
         cursor: "pointer",
         fontSize: 22,
@@ -166,8 +167,8 @@ function ArrowButton({
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-        e.currentTarget.style.border = "1px solid rgba(255,255,255,0.12)";
+        e.currentTarget.style.background = "rgba(0,0,0,0.4)";
+        e.currentTarget.style.border = "1px solid rgba(41,37,36,0.95)";
       }}
     >
       {isLeft ? "←" : "→"}
@@ -201,7 +202,10 @@ function CategoryThumbnail({ row }: { row: Row }) {
   );
 }
 
-export default function FantasyAudioPage() {
+function FantasyAudioContent() {
+  const searchParams = useSearchParams();
+  const embed = searchParams.get("embed") === "1";
+
   const [positions, setPositions] = useState<number[]>(rows.map(() => 0));
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -361,7 +365,7 @@ export default function FantasyAudioPage() {
   }, [positions]);
 
   return (
-    <main className="fantasy-page">
+    <main className={`fantasy-page${embed ? " fantasy-page-embed" : ""}`}>
       <div className="fantasy-shell">
         <div className="fantasy-header">
           <div className="fantasy-badge">Fantasy Audio</div>
@@ -451,15 +455,17 @@ export default function FantasyAudioPage() {
         </section>
 
 
-        <div className="fantasy-footer">
-          <a href="/dashboard" className="fantasy-back">
-            Back to Dashboard
-          </a>
+        {!embed && (
+          <div className="fantasy-footer">
+            <a href="/dashboard" className="fantasy-back">
+              Back to Dashboard
+            </a>
 
-          <div className="fantasy-footer-copy">
-            Browse and refine your preferred fantasy style.
+            <div className="fantasy-footer-copy">
+              Browse and refine your preferred fantasy style.
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {currentlyPlaying && (
@@ -509,13 +515,74 @@ export default function FantasyAudioPage() {
           min-height: 100vh;
           background:
             radial-gradient(
-              circle at top,
-              rgba(86, 49, 126, 0.22) 0%,
-              rgba(7, 4, 13, 1) 34%
+              ellipse 80% 45% at 50% -8%,
+              rgba(180, 130, 50, 0.14),
+              transparent 55%
             ),
-            linear-gradient(180deg, #09050f 0%, #07040d 100%);
-          color: white;
-          padding: 40px 20px 56px;
+            linear-gradient(180deg, #0a0a0a 0%, #050505 100%);
+          color: #e7e5e4;
+          padding: 32px 20px 48px;
+        }
+
+        .fantasy-page-embed {
+          min-height: 100%;
+          height: 100%;
+          padding: 0;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .fantasy-page-embed .fantasy-shell {
+          flex: 1;
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
+          max-width: none;
+        }
+
+        .fantasy-page-embed .fantasy-header {
+          margin-bottom: 0;
+          padding: 14px 16px 10px;
+          border-bottom: 1px solid rgba(41, 37, 36, 0.9);
+          flex-shrink: 0;
+        }
+
+        .fantasy-page-embed .fantasy-header h1 {
+          font-size: 1.25rem;
+        }
+
+        .fantasy-page-embed .fantasy-header p {
+          font-size: 0.75rem;
+          line-height: 1.45;
+        }
+
+        .fantasy-page-embed .fantasy-badge {
+          font-size: 10px;
+          padding: 5px 10px;
+          margin-bottom: 8px;
+        }
+
+        .fantasy-page-embed .fantasy-panel {
+          flex: 1;
+          min-height: 0;
+          border-radius: 0;
+          border: none;
+          box-shadow: none;
+          padding: 14px 16px;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .fantasy-page-embed .fantasy-rows {
+          overflow-y: auto;
+          flex: 1;
+          min-height: 0;
+        }
+
+        .fantasy-page-embed .fantasy-player {
+          position: sticky;
+          bottom: 0;
         }
 
         .fantasy-shell {
@@ -524,67 +591,64 @@ export default function FantasyAudioPage() {
         }
 
         .fantasy-header {
-          margin-bottom: 28px;
+          margin-bottom: 24px;
         }
 
         .fantasy-badge {
           display: inline-block;
-          padding: 8px 14px;
+          padding: 6px 12px;
           border-radius: 999px;
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          color: rgba(255, 255, 255, 0.78);
-          font-size: 13px;
-          margin-bottom: 16px;
-          backdrop-filter: blur(10px);
+          background: rgba(69, 26, 3, 0.35);
+          border: 1px solid rgba(180, 130, 50, 0.35);
+          color: rgba(251, 191, 36, 0.9);
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          margin-bottom: 12px;
         }
 
         .fantasy-header h1 {
-          font-size: clamp(36px, 6vw, 56px);
-          line-height: 1.02;
-          font-weight: 800;
-          letter-spacing: -0.03em;
-          margin: 0 0 14px 0;
+          font-family: ui-serif, Georgia, "Times New Roman", serif;
+          font-size: clamp(1.75rem, 4vw, 2.5rem);
+          line-height: 1.1;
+          font-weight: 600;
+          letter-spacing: -0.02em;
+          margin: 0 0 10px 0;
+          color: #fafaf9;
         }
 
         .fantasy-header p {
           margin: 0;
           max-width: 760px;
-          font-size: 18px;
-          line-height: 1.65;
-          color: rgba(255, 255, 255, 0.72);
+          font-size: 0.9375rem;
+          line-height: 1.55;
+          color: #a8a29e;
         }
 
         .fantasy-panel {
           position: relative;
           overflow: hidden;
-          border-radius: 30px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 1rem;
+          border: 1px solid rgba(120, 53, 15, 0.28);
           background: linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.05),
-            rgba(255, 255, 255, 0.025)
+            rgba(9, 9, 11, 0.98) 0%,
+            rgba(6, 26, 26, 0.95) 100%
           );
-          padding: 28px;
-          box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
-          backdrop-filter: blur(14px);
+          padding: 22px;
+          box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.25);
         }
 
         .fantasy-panel-glow {
           position: absolute;
           inset: 0;
           pointer-events: none;
-          background:
-            radial-gradient(
-              circle at top right,
-              rgba(216, 178, 110, 0.08),
-              transparent 30%
-            ),
-            radial-gradient(
-              circle at bottom left,
-              rgba(119, 90, 255, 0.08),
-              transparent 28%
-            );
+          background: radial-gradient(
+            circle at top right,
+            rgba(180, 130, 50, 0.06),
+            transparent 40%
+          );
         }
 
         .fantasy-panel-top {
@@ -594,32 +658,34 @@ export default function FantasyAudioPage() {
           justify-content: space-between;
           align-items: center;
           gap: 16px;
-          margin-bottom: 22px;
+          margin-bottom: 18px;
           flex-wrap: wrap;
         }
 
         .fantasy-panel-top h2 {
-          margin: 0 0 8px 0;
-          font-size: 24px;
-          font-weight: 700;
+          margin: 0 0 6px 0;
+          font-family: ui-serif, Georgia, "Times New Roman", serif;
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: #fafaf9;
         }
 
         .fantasy-panel-top p {
           margin: 0;
-          color: rgba(255, 255, 255, 0.62);
-          font-size: 15px;
+          color: #78716c;
+          font-size: 0.8125rem;
         }
 
         .fantasy-note {
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          padding: 10px 14px;
-          border-radius: 16px;
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          color: rgba(255, 255, 255, 0.72);
-          font-size: 14px;
+          padding: 8px 12px;
+          border-radius: 999px;
+          background: rgba(0, 0, 0, 0.35);
+          border: 1px solid rgba(41, 37, 36, 0.9);
+          color: #a8a29e;
+          font-size: 0.75rem;
         }
 
         .fantasy-note-dot {
@@ -648,17 +714,11 @@ export default function FantasyAudioPage() {
 
         .fantasy-category-card {
           min-height: 84px;
-          border-radius: 22px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          background: linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.06),
-            rgba(255, 255, 255, 0.03)
-          );
+          border-radius: 0.75rem;
+          border: 1px solid rgba(41, 37, 36, 0.95);
+          background: rgba(0, 0, 0, 0.35);
           overflow: hidden;
-          box-shadow:
-            0 12px 28px rgba(0, 0, 0, 0.22),
-            inset 0 1px 0 rgba(255, 255, 255, 0.04);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
           display: grid;
           grid-template-columns: 74px 1fr;
           align-items: center;
@@ -699,7 +759,11 @@ export default function FantasyAudioPage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(135deg, rgba(201,169,106,0.12) 0%, rgba(124,106,255,0.1) 100%);
+          background: linear-gradient(
+            135deg,
+            rgba(120, 53, 15, 0.25) 0%,
+            rgba(0, 0, 0, 0.5) 100%
+          );
         }
 
         .fantasy-category-caption {
@@ -711,9 +775,9 @@ export default function FantasyAudioPage() {
         }
 
         .fantasy-category-caption-title {
-          font-size: 15px;
-          font-weight: 700;
-          color: #f7f5f2;
+          font-size: 14px;
+          font-weight: 600;
+          color: rgba(251, 191, 36, 0.92);
           line-height: 1.2;
         }
 
@@ -729,76 +793,52 @@ export default function FantasyAudioPage() {
           gap: 14px;
         }
 
-                .fantasy-tile {
+        .fantasy-tile {
           min-height: 84px;
-          border-radius: 22px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          background: linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.07),
-            rgba(255, 255, 255, 0.035)
-          );
-          color: white;
-          font-size: 18px;
+          border-radius: 0.75rem;
+          border: 1px solid rgba(41, 37, 36, 0.95);
+          background: rgba(0, 0, 0, 0.45);
+          color: #fafaf9;
+          font-size: 1rem;
           font-weight: 600;
-          padding: 0 18px;
+          padding: 0 14px;
           cursor: pointer;
-          box-shadow:
-            0 12px 28px rgba(0, 0, 0, 0.22),
-            inset 0 1px 0 rgba(255, 255, 255, 0.04);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
           transition:
             transform 0.2s ease,
             border-color 0.2s ease,
-            background 0.2s ease;
+            box-shadow 0.2s ease;
         }
 
         .fantasy-tile:hover {
-          transform: translateY(-2px);
-          border-color: rgba(216, 178, 110, 0.28);
-          background: linear-gradient(
-            180deg,
-            rgba(216, 178, 110, 0.16),
-            rgba(255, 255, 255, 0.05)
-          );
+          transform: translateY(-1px);
+          border-color: rgba(180, 130, 50, 0.45);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
         }
 
         .fantasy-tile-playable {
-          background: linear-gradient(
-            180deg,
-            rgba(76, 175, 80, 0.12),
-            rgba(255, 255, 255, 0.035)
-          );
-          border-color: rgba(76, 175, 80, 0.2);
+          border-color: rgba(180, 130, 50, 0.35);
         }
 
         .fantasy-tile-playable:hover {
-          background: linear-gradient(
-            180deg,
-            rgba(76, 175, 80, 0.2),
-            rgba(255, 255, 255, 0.05)
-          );
-          border-color: rgba(76, 175, 80, 0.4);
+          border-color: rgba(251, 191, 36, 0.55);
         }
 
         .fantasy-tile-playing {
-          background: linear-gradient(
-            180deg,
-            rgba(255, 193, 7, 0.15),
-            rgba(255, 255, 255, 0.035)
-          );
-          border-color: rgba(255, 193, 7, 0.4);
+          border-color: rgba(251, 191, 36, 0.65);
+          box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.25);
           animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
           0% {
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22), 0 0 0 0 rgba(255, 193, 7, 0.4);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 0 rgba(251, 191, 36, 0.35);
           }
           70% {
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22), 0 0 0 8px rgba(255, 193, 7, 0);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 6px rgba(251, 191, 36, 0);
           }
           100% {
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22), 0 0 0 0 rgba(255, 193, 7, 0);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 0 rgba(251, 191, 36, 0);
           }
         }
 
@@ -808,6 +848,26 @@ export default function FantasyAudioPage() {
           justify-content: center;
           gap: 8px;
           height: 100%;
+          position: relative;
+          z-index: 1;
+          text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+        }
+
+        .fantasy-tile[style*="background-image"]::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.35) 0%,
+            rgba(0, 0, 0, 0.65) 100%
+          );
+          pointer-events: none;
+        }
+
+        .fantasy-tile[style*="background-image"] {
+          position: relative;
         }
 
         .fantasy-tile-icon {
@@ -828,18 +888,24 @@ export default function FantasyAudioPage() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          background: white;
-          color: black;
-          padding: 14px 20px;
-          border-radius: 14px;
+          background: linear-gradient(180deg, #fde68a 0%, #d97706 100%);
+          color: #0c0a09;
+          padding: 12px 18px;
+          border-radius: 999px;
           font-weight: 700;
+          font-size: 0.875rem;
           text-decoration: none;
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+          border: 1px solid rgba(251, 191, 36, 0.4);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        .fantasy-back:hover {
+          background: linear-gradient(180deg, #fef3c7 0%, #f59e0b 100%);
         }
 
         .fantasy-footer-copy {
-          color: rgba(255, 255, 255, 0.56);
-          font-size: 14px;
+          color: #78716c;
+          font-size: 0.875rem;
         }
 
         .fantasy-tile-wrap {
@@ -865,11 +931,11 @@ export default function FantasyAudioPage() {
           display: flex;
           align-items: center;
           gap: 20px;
-          padding: 14px 28px;
-          background: rgba(10, 7, 18, 0.96);
-          border-top: 1px solid rgba(216, 178, 110, 0.2);
-          backdrop-filter: blur(20px);
-          box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+          padding: 12px 20px;
+          background: rgba(9, 9, 11, 0.97);
+          border-top: 1px solid rgba(120, 53, 15, 0.4);
+          backdrop-filter: blur(16px);
+          box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.55);
         }
 
         .fantasy-player-left {
@@ -1031,5 +1097,19 @@ export default function FantasyAudioPage() {
         }
       `}</style>
     </main>
+  );
+}
+
+export default function FantasyAudioPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="fantasy-page fantasy-page-embed flex min-h-[200px] items-center justify-center text-sm text-stone-400">
+          Loading…
+        </main>
+      }
+    >
+      <FantasyAudioContent />
+    </Suspense>
   );
 }
