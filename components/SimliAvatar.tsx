@@ -225,14 +225,14 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border border-white/10 bg-black ${className ?? ""}`}
+      className={`relative overflow-hidden rounded-2xl border border-amber-900/35 bg-black shadow-[0_0_0_1px_rgba(245,158,11,0.06),0_20px_50px_rgba(0,0,0,0.45)] ${className ?? ""}`}
     >
       <video
         ref={videoRef}
         autoPlay
         playsInline
         muted
-        className="h-[min(78vh,720px)] w-full object-cover"
+        className="h-full min-h-[min(52vh,520px)] w-full object-cover lg:min-h-[min(68vh,640px)]"
       />
       <audio ref={audioRef} autoPlay playsInline className="sr-only" />
 
@@ -250,7 +250,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
           <button
             type="button"
             onClick={() => void initClient()}
-            className="mt-2 rounded-lg bg-emerald-500 px-4 py-2 text-xs font-semibold text-black"
+            className="mt-2 rounded-lg border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-4 py-2 text-xs font-semibold text-zinc-950"
           >
             Retry
           </button>

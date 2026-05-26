@@ -3,7 +3,7 @@ import LiveGuideStage from "./LiveGuideStage";
 
 export const metadata: Metadata = {
   title: "Live Test",
-  description: "Nakama Nights — Simli realtime talking concierge (live test).",
+  description: "Nakama Nights — your live concierge guide with voice and lip sync.",
 };
 
 export default function LiveTestPage() {
