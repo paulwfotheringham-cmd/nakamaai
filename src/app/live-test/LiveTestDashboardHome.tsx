@@ -5,21 +5,25 @@ const PICK_UP_ITEMS = [
     section: "Audiobooks",
     lastActivity: "Gothic · windswept moor",
     when: "Last played 3 days ago",
+    image: "/scenes/moor.jpg",
   },
   {
     section: "Build Adventure",
     lastActivity: "Your draft — slow burn, office setting",
     when: "Saved, not finished",
+    image: "/scenes/office.jpg",
   },
   {
     section: "Interactive Adventures",
     lastActivity: "Chapter 2 — the choice at the door",
     when: "In progress",
+    image: "/tiles/tile3.jpg",
   },
   {
     section: "Reignite for Couples",
     lastActivity: "Date Night Mode — Reconnection Series",
     when: "Last time you were here, 2 days ago",
+    image: "/tiles/tile5.jpg",
   },
 ] as const;
 
@@ -56,30 +60,43 @@ export default function LiveTestDashboardHome() {
           {PICK_UP_ITEMS.map((item) => (
             <li
               key={item.section}
-              className="flex min-h-0 flex-col justify-between overflow-hidden rounded-xl border border-stone-800/80 bg-black/30 px-2.5 py-2 sm:px-3 sm:py-2.5"
+              className="relative min-h-0 overflow-hidden rounded-xl border border-stone-800/80 bg-black"
             >
-              <div className="min-w-0">
-                <p className="text-[9px] font-semibold uppercase tracking-wider text-amber-600/75 sm:text-[10px]">
+              <img
+                src={item.image}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover opacity-[0.28]"
+              />
+              <div
+                className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/55 to-black/80"
+                aria-hidden
+              />
+
+              <div className="relative z-10 px-2.5 pt-2 sm:px-3 sm:pt-2.5">
+                <p className="text-[9px] font-semibold uppercase tracking-wider text-amber-500/90 sm:text-[10px]">
                   {item.section}
                 </p>
-                <p className="mt-1 truncate text-xs font-medium text-stone-200 sm:text-sm">
+                <p className="mt-0.5 line-clamp-2 text-xs font-medium leading-snug text-stone-100 sm:text-sm">
                   {item.lastActivity}
                 </p>
-                <p className="mt-0.5 truncate text-[10px] text-stone-500">{item.when}</p>
+                <p className="mt-0.5 truncate text-[10px] text-stone-400">{item.when}</p>
               </div>
-              <div className="mt-2 flex shrink-0 flex-wrap gap-1.5">
-                <button
-                  type="button"
-                  className="rounded-full border border-amber-400/40 bg-gradient-to-b from-amber-200/90 to-amber-600 px-2.5 py-1 text-[10px] font-semibold text-zinc-950 transition hover:from-amber-100 hover:to-amber-500 sm:px-3 sm:text-xs"
-                >
-                  Yes, continue
-                </button>
-                <button
-                  type="button"
-                  className="rounded-full border border-stone-700/80 bg-transparent px-2.5 py-1 text-[10px] font-medium text-stone-400 transition hover:border-stone-600 hover:text-stone-300 sm:px-3 sm:text-xs"
-                >
-                  Not now
-                </button>
+
+              <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-2">
+                <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-1.5">
+                  <button
+                    type="button"
+                    className="rounded-full border border-amber-400/50 bg-gradient-to-b from-amber-200/95 to-amber-600 px-3 py-1.5 text-[10px] font-semibold text-zinc-950 shadow-lg shadow-black/40 transition hover:from-amber-100 hover:to-amber-500 sm:px-3.5 sm:text-xs"
+                  >
+                    Yes, continue
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-full border border-stone-500/60 bg-black/55 px-3 py-1.5 text-[10px] font-medium text-stone-200 backdrop-blur-sm transition hover:border-stone-400 hover:bg-black/70 sm:px-3.5 sm:text-xs"
+                  >
+                    Not now
+                  </button>
+                </div>
               </div>
             </li>
           ))}
