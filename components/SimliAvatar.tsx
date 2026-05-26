@@ -21,6 +21,8 @@ type SimliAvatarProps = {
   className?: string;
   /** Simli face UUID — when changed, reconnects the avatar session. */
   faceId?: string;
+  /** Nakama guide id — server resolves face from catalog (preferred over faceId). */
+  guideId?: string;
 };
 
 type ConnectionPhase = "idle" | "session" | "webrtc" | "ready" | "error";
@@ -46,7 +48,7 @@ async function waitForMediaRefs(
 }
 
 const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function SimliAvatar(
-  { className, faceId },
+  { className, faceId, guideId },
   ref,
 ) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -148,10 +150,16 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
     if (gen !== initGenRef.current) return;
 
     try {
+      const sessionBody =
+        guideId != null && guideId !== ""
+          ? { guideId }
+          : faceId
+            ? { faceId }
+            : {};
       const sessionRes = await fetch("/api/simli/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(faceId ? { faceId } : {}),
+        body: JSON.stringify(sessionBody),
       });
       const sessionJson = (await sessionRes.json()) as {
         sessionToken?: string;
@@ -170,21 +178,24 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       setStatusLine("Connecting avatar (WebRTC)…");
 
       let lastError: unknown;
-      try {
-        setStatusLine("Connecting avatar (LiveKit)…");
-        await connectWithTransport(sessionJson.sessionToken, null, "livekit");
-      } catch (e) {
-        lastError = e;
+      const transports: Array<{ mode: "p2p" | "livekit"; ice: RTCIceServer[] | null; label: string }> =
+        iceServers?.length
+          ? [
+              { mode: "p2p", ice: iceServers, label: "Connecting avatar (WebRTC)…" },
+              { mode: "livekit", ice: null, label: "Retrying with LiveKit…" },
+            ]
+          : [{ mode: "livekit", ice: null, label: "Connecting avatar (LiveKit)…" }];
+
+      for (const { mode, ice, label } of transports) {
         if (gen !== initGenRef.current) return;
-        await stopClient();
-        if (iceServers?.length) {
-          setStatusLine("Retrying with direct WebRTC…");
-          try {
-            await connectWithTransport(sessionJson.sessionToken, iceServers, "p2p");
-            lastError = undefined;
-          } catch (p2pErr) {
-            lastError = p2pErr;
-          }
+        try {
+          setStatusLine(label);
+          await connectWithTransport(sessionJson.sessionToken, ice, mode);
+          lastError = undefined;
+          break;
+        } catch (e) {
+          lastError = e;
+          await stopClient();
         }
       }
 
@@ -200,7 +211,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       setError(formatSimliError(e));
       setPhase("error");
     }
-  }, [connectWithTransport, markReady, stopClient, faceId]);
+  }, [connectWithTransport, markReady, stopClient, faceId, guideId]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -211,7 +222,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       initGenRef.current += 1;
       void stopClient();
     };
-  }, [initClient, stopClient, faceId]);
+  }, [initClient, stopClient, faceId, guideId]);
 
   const playPcm = useCallback(
     async (pcm: Uint8Array) => {

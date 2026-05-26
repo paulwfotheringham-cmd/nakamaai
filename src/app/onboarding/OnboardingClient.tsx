@@ -223,8 +223,9 @@ export default function OnboardingClient() {
               </p>
               <div className="mt-4 aspect-[4/5] max-h-[min(52vh,420px)] w-full overflow-hidden rounded-xl border border-stone-800/80 bg-black">
                 <SimliAvatar
-                  key={selectedGuide.simliFaceId}
+                  key={selectedGuide.id}
                   ref={simliRef}
+                  guideId={selectedGuide.id}
                   faceId={selectedGuide.simliFaceId}
                   className="h-full w-full rounded-xl"
                 />
