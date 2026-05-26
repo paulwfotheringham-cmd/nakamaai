@@ -3,8 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
-import type { LiveTestNavId } from "@/lib/nakama-universe-services";
+import {
+  getLiveTestCenterPanel,
+  type LiveTestNavId,
+} from "@/lib/nakama-universe-services";
 import LiveTestDashboardHome from "./LiveTestDashboardHome";
+import LiveTestFantasyAudioFrame from "./LiveTestFantasyAudioFrame";
 import LiveTestUniverseNav from "./LiveTestUniverseNav";
 
 export type { LiveTestNavId };
@@ -14,7 +18,8 @@ type LiveTestShellProps = {
 };
 
 export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
-  const [highlightNav, setHighlightNav] = useState<LiveTestNavId | null>(null);
+  const [activeNav, setActiveNav] = useState<LiveTestNavId | null>(null);
+  const centerPanel = getLiveTestCenterPanel(activeNav);
 
   return (
     <div className="relative flex h-full min-h-0 w-full max-w-full overflow-hidden text-stone-200">
@@ -23,8 +28,8 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
         aria-hidden
       />
 
-      {/* Left — logo + Universe nav (same cards as homepage, vertical) */}
-      <aside className="relative z-10 flex h-full min-h-0 w-[clamp(13.5rem,22vw,15.5rem)] shrink-0 flex-col border-r border-stone-800/90 bg-zinc-950">
+      {/* Left — overlay-label Universe nav */}
+      <aside className="relative z-10 flex h-full min-h-0 w-[clamp(11.5rem,18vw,13.5rem)] shrink-0 flex-col border-r border-stone-800/90 bg-zinc-950">
         <div className="shrink-0 border-b border-stone-800/80 px-3 py-3">
           <Link href="/" className="inline-block max-w-full">
             <Image
@@ -42,16 +47,17 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col px-2.5 pb-3 pt-3">
-          <LiveTestUniverseNav
-            activeId={highlightNav}
-            onSelect={setHighlightNav}
-          />
+          <LiveTestUniverseNav activeId={activeNav} onSelect={setActiveNav} />
         </div>
       </aside>
 
-      {/* Center — always dashboard home */}
+      {/* Center — dashboard or section content */}
       <section className="relative z-10 flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-2 sm:p-3">
-        <LiveTestDashboardHome />
+        {centerPanel === "fantasy-audio" ? (
+          <LiveTestFantasyAudioFrame />
+        ) : (
+          <LiveTestDashboardHome />
+        )}
       </section>
 
       {/* Right — avatar + chat */}

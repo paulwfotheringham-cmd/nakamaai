@@ -1,6 +1,6 @@
 "use client";
 
-import { NakamaUniverseCard } from "@/components/NakamaUniverseCard";
+import { NakamaUniverseNavButton } from "@/components/NakamaUniverseNavButton";
 import { LIVE_TEST_NAV_ITEMS, type LiveTestNavId } from "@/lib/nakama-universe-services";
 
 type LiveTestUniverseNavProps = {
@@ -11,14 +11,13 @@ type LiveTestUniverseNavProps = {
 export default function LiveTestUniverseNav({ activeId, onSelect }: LiveTestUniverseNavProps) {
   return (
     <nav
-      className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overflow-x-hidden pr-0.5"
+      className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto overflow-x-hidden pr-0.5"
       aria-label="Nakama Nights Universe"
     >
       {LIVE_TEST_NAV_ITEMS.map((item) => (
-        <NakamaUniverseCard
+        <NakamaUniverseNavButton
           key={item.id}
-          title={item.title}
-          description={item.description}
+          label={item.overlayLabel}
           poster={item.poster}
           active={activeId === item.id}
           onClick={() => onSelect(item.id)}
