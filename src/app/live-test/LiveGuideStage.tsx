@@ -83,18 +83,15 @@ export default function LiveGuideStage() {
   return (
     <LiveTestShell
       rightColumn={
-        <>
-          <div className="shrink-0">
-            <SimliAvatar
-              ref={simliRef}
-              className="mx-auto aspect-[4/5] w-full max-w-[220px] max-h-[min(28vh,280px)] sm:max-w-[240px]"
-            />
+        <div className="flex h-full min-h-0 flex-col overflow-hidden">
+          <div className="mx-auto h-[clamp(7.5rem,28%,11rem)] w-full max-w-full shrink-0 overflow-hidden">
+            <SimliAvatar ref={simliRef} className="h-full w-full" />
           </div>
 
-          <div className="flex min-h-[min(58vh,640px)] flex-1 flex-col">
+          <div className="mt-2 flex min-h-0 flex-1 flex-col overflow-hidden">
             <GuideChatPanel onSend={handleSend} isBusy={isBusy} className="min-h-0 flex-1" />
           </div>
-        </>
+        </div>
       }
     />
   );

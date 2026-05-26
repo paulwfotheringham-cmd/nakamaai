@@ -8,7 +8,7 @@ import { useState, type ReactNode } from "react";
 const FantasyCatalogueEmbed = dynamic(() => import("./FantasyCatalogueEmbed"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-full min-h-[200px] items-center justify-center rounded-2xl border border-amber-900/25 bg-zinc-950/90 text-sm text-stone-500">
+    <div className="flex h-full min-h-0 items-center justify-center rounded-2xl border border-amber-900/25 bg-zinc-950/90 text-sm text-stone-500">
       Loading catalogue…
     </div>
   ),
@@ -47,28 +47,28 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
   const [selected, setSelected] = useState<LiveTestNavId>("chat");
 
   return (
-    <div className="relative flex min-h-screen bg-black text-stone-200">
+    <div className="relative flex h-full min-h-0 w-full max-w-full overflow-hidden text-stone-200">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_45%_at_50%_-8%,rgba(180,130,50,0.12),transparent_55%)]"
         aria-hidden
       />
 
-      {/* Left — logo + nav (per wireframe) */}
-      <aside className="relative z-10 flex w-[11.5rem] shrink-0 flex-col border-r border-stone-800/90 bg-zinc-950 sm:w-52 lg:w-56">
-        <div className="border-b border-stone-800/80 px-3 py-4 sm:px-4">
-          <Link href="/" className="inline-block">
+      {/* Left — logo + nav */}
+      <aside className="relative z-10 flex h-full min-h-0 w-[clamp(9rem,13vw,13.5rem)] shrink-0 flex-col border-r border-stone-800/90 bg-zinc-950">
+        <div className="shrink-0 border-b border-stone-800/80 px-2.5 py-3 sm:px-3">
+          <Link href="/" className="inline-block max-w-full">
             <Image
               src="/Nakama-AI-July25-White.png"
               alt="Nakama Nights"
               width={180}
               height={48}
-              className="h-9 w-auto object-contain object-left sm:h-10"
+              className="h-8 w-auto max-w-full object-contain object-left sm:h-9"
               priority
             />
           </Link>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-2.5 overflow-y-auto px-2.5 py-4 sm:gap-3 sm:px-3">
+        <nav className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden px-2 py-3 sm:gap-2.5 sm:px-2.5">
           {LIVE_TEST_NAV.map((item) => {
             const active = item.id === selected;
             return (
@@ -76,9 +76,9 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
                 key={item.id}
                 type="button"
                 onClick={() => setSelected(item.id)}
-                className={`w-full rounded-2xl border-2 px-3 py-3.5 text-center text-[13px] font-semibold leading-snug transition sm:py-4 sm:text-sm ${
+                className={`w-full min-w-0 rounded-xl border-2 px-2 py-2.5 text-center text-[11px] font-semibold leading-snug transition sm:rounded-2xl sm:px-2.5 sm:py-3 sm:text-xs ${
                   active
-                    ? "border-amber-400/55 bg-amber-950/50 text-amber-100 shadow-[inset_0_0_0_1px_rgba(251,191,36,0.15)]"
+                    ? "border-amber-400/55 bg-amber-950/50 text-amber-100"
                     : "border-amber-800/35 bg-zinc-900/80 text-stone-300 hover:border-amber-600/40 hover:bg-zinc-900"
                 }`}
               >
@@ -89,13 +89,13 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
         </nav>
       </aside>
 
-      {/* Center — catalogue or placeholder */}
-      <section className="relative z-10 flex min-h-0 min-w-0 flex-1 flex-col p-3 sm:p-4 lg:p-5">
+      {/* Center */}
+      <section className="relative z-10 flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-2 sm:p-3">
         {selected === "fantasy-catalogue" ? (
           <FantasyCatalogueEmbed />
         ) : (
-          <div className="flex min-h-0 flex-1 flex-col justify-center rounded-2xl border border-amber-900/25 bg-gradient-to-b from-[#0a2a28]/90 to-[#061a1a] px-6 py-10 shadow-[inset_0_0_80px_rgba(0,0,0,0.35)] sm:px-10">
-            <p className="mx-auto max-w-md text-center text-sm leading-relaxed text-stone-300/95 sm:text-base">
+          <div className="flex h-full min-h-0 flex-col justify-center overflow-hidden rounded-2xl border border-amber-900/25 bg-gradient-to-b from-[#0a2a28]/90 to-[#061a1a] px-4 py-6 shadow-[inset_0_0_80px_rgba(0,0,0,0.35)] sm:px-6">
+            <p className="mx-auto max-w-md overflow-y-auto text-center text-sm leading-relaxed text-stone-300/95">
               {selected === "chat" ? (
                 <>
                   <span className="mb-3 block text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-500/80">
@@ -120,8 +120,8 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
         )}
       </section>
 
-      {/* Right — avatar + chat stacked */}
-      <aside className="relative z-10 flex w-[min(100%,26rem)] shrink-0 flex-col gap-2 border-l border-stone-800/90 bg-black/40 p-3 sm:w-[26rem] sm:gap-3 sm:p-4 lg:w-[28rem]">
+      {/* Right — avatar + chat */}
+      <aside className="relative z-10 flex h-full min-h-0 w-[clamp(15rem,26vw,20rem)] shrink-0 flex-col gap-2 overflow-hidden border-l border-stone-800/90 bg-black/40 p-2 sm:gap-2.5 sm:p-3">
         {rightColumn}
       </aside>
     </div>

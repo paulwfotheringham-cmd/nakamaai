@@ -225,14 +225,14 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border border-amber-900/35 bg-black shadow-[0_0_0_1px_rgba(245,158,11,0.06),0_20px_50px_rgba(0,0,0,0.45)] ${className ?? ""}`}
+      className={`relative max-w-full overflow-hidden rounded-2xl border border-amber-900/35 bg-black shadow-[0_0_0_1px_rgba(245,158,11,0.06),0_20px_50px_rgba(0,0,0,0.45)] ${className ?? ""}`}
     >
       <video
         ref={videoRef}
         autoPlay
         playsInline
         muted
-        className="h-full min-h-[200px] w-full object-cover object-[50%_38%]"
+        className="h-full max-h-full min-h-0 w-full object-cover object-[50%_38%]"
       />
       <audio ref={audioRef} autoPlay playsInline className="sr-only" />
 

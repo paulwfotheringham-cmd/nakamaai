@@ -7,4 +7,10 @@
   html {
     -webkit-font-smoothing: antialiased;
   }
+
+  html:has(.live-test-root),
+  html:has(.live-test-root) body {
+    overflow: hidden;
+    max-width: 100vw;
+  }
 }

@@ -7,5 +7,9 @@ export const metadata: Metadata = {
 };
 
 export default function LiveTestPage() {
-  return <LiveGuideStage />;
+  return (
+    <div className="live-test-root h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-black">
+      <LiveGuideStage />
+    </div>
+  );
 }
