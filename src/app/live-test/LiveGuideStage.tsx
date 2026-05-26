@@ -1,20 +1,10 @@
 ﻿"use client";
 
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useRef, useState, type RefObject } from "react";
-import { ClientErrorBoundary } from "@/components/ClientErrorBoundary";
-import type { SimliAvatarHandle } from "@/components/SimliAvatar";
+import { fetchLiveTestPcm16 } from "@/lib/live-test/fetch-pcm-client";
+import SimliAvatar, { type SimliAvatarHandle } from "@/components/SimliAvatar";
 import GuideChatPanel, { type SendHandlers } from "./GuideChatPanel";
-
-const SimliAvatar = dynamic(() => import("@/components/SimliAvatar"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-[min(78vh,720px)] items-center justify-center rounded-2xl border border-white/10 bg-black/40 text-sm text-zinc-500">
-      Loading Simli avatar…
-    </div>
-  ),
-});
 
 async function readStreamingReply(
   res: Response,
@@ -38,18 +28,6 @@ async function readStreamingReply(
   return reply.trim() || "I'm here to help. What would you like to know?";
 }
 
-async function waitForAvatarReady(
-  simliRef: RefObject<SimliAvatarHandle | null>,
-  timeoutMs = 20000,
-): Promise<boolean> {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    if (simliRef.current?.isReady()) return true;
-    await new Promise((r) => setTimeout(r, 200));
-  }
-  return false;
-}
-
 export default function LiveGuideStage() {
   const simliRef = useRef<SimliAvatarHandle>(null);
   const [isBusy, setIsBusy] = useState(false);
@@ -57,6 +35,8 @@ export default function LiveGuideStage() {
   const handleSend = useCallback(async (message: string, { onDelta }: SendHandlers) => {
     setIsBusy(true);
     try {
+      await simliRef.current?.unlockAudio();
+
       const chatRes = await fetch("/api/live-test/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -76,11 +56,24 @@ export default function LiveGuideStage() {
       const reply = await readStreamingReply(chatRes, onDelta);
       onDelta(reply);
 
-      if (!(await waitForAvatarReady(simliRef))) {
-        throw new Error("Avatar is still connecting. Wait a few seconds and try again.");
+      // Generate speech while avatar is already connected (runs in parallel with UI update).
+      const pcmPromise = fetchLiveTestPcm16(reply);
+
+      if (!simliRef.current?.isReady()) {
+        const deadline = Date.now() + 5000;
+        while (Date.now() < deadline) {
+          if (simliRef.current?.isReady()) break;
+          await new Promise((r) => setTimeout(r, 100));
+        }
+        if (!simliRef.current?.isReady()) {
+          throw new Error(
+            "Avatar is still connecting — wait until the face appears on the left, then send again.",
+          );
+        }
       }
 
-      await simliRef.current!.speak(reply);
+      const pcm = await pcmPromise;
+      await simliRef.current!.playPcm(pcm);
 
       return reply;
     } finally {
@@ -103,7 +96,7 @@ export default function LiveGuideStage() {
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Live test</h1>
         <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-          Simli avatar on the left. Type on the right — GPT-4o-mini replies with voice and lip sync.
+          Simli avatar on the left. Type on the right — GPT replies with voice and lip sync.
         </p>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
@@ -111,9 +104,7 @@ export default function LiveGuideStage() {
             <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">
               Simli avatar (live)
             </p>
-            <ClientErrorBoundary>
-              <SimliAvatar ref={simliRef} />
-            </ClientErrorBoundary>
+            <SimliAvatar ref={simliRef} />
           </div>
 
           <div>

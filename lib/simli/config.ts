@@ -10,7 +10,8 @@ export function getSimliApiKey(): string | null {
   return unquoted || null;
 }
 
-export const DEFAULT_SIMLI_FACE_ID = "6ebf0aa7-6fed-443d-a4c6-fd1e3080b215";
+/** Simli preset "Frank" — younger male concierge (official OpenAI starter). */
+export const DEFAULT_SIMLI_FACE_ID = "5514e24d-6086-46a3-ace4-6a7264e5cb7c";
 
 export function getSimliFaceId(): string {
   const raw = process.env.SIMLI_FACE_ID?.trim();

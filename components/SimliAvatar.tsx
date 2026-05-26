@@ -11,16 +11,36 @@ import {
 import { LogLevel, SimliClient } from "simli-client";
 
 export type SimliAvatarHandle = {
-  speak: (text: string) => Promise<void>;
+  playPcm: (pcm: Uint8Array) => Promise<void>;
   isReady: () => boolean;
+  unlockAudio: () => Promise<void>;
 };
 
 type SimliAvatarProps = {
   className?: string;
 };
 
+type ConnectionPhase = "idle" | "session" | "webrtc" | "ready" | "error";
+
 const CHUNK_BYTES = 6000;
-const IMMEDIATE_BYTES = 16000 * 2 * 4; // 4 seconds @ 16kHz PCM16
+const IMMEDIATE_BYTES = 16000 * 2 * 2; // 2s @ 16kHz PCM16
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForMediaRefs(
+  videoRef: React.RefObject<HTMLVideoElement | null>,
+  audioRef: React.RefObject<HTMLAudioElement | null>,
+  maxMs = 5000,
+): Promise<boolean> {
+  const start = Date.now();
+  while (Date.now() - start < maxMs) {
+    if (videoRef.current && audioRef.current) return true;
+    await sleep(50);
+  }
+  return Boolean(videoRef.current && audioRef.current);
+}
 
 const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function SimliAvatar(
   { className },
@@ -29,97 +49,179 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const clientRef = useRef<SimliClient | null>(null);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const readyRef = useRef(false);
+  const initGenRef = useRef(0);
+  const [phase, setPhase] = useState<ConnectionPhase>("idle");
   const [error, setError] = useState("");
+  const [statusLine, setStatusLine] = useState("");
 
-  const initClient = useCallback(async () => {
-    if (!videoRef.current || !audioRef.current) return;
-
-    setStatus("loading");
-    setError("");
-
+  const unlockAudio = useCallback(async () => {
     try {
-      const sessionRes = await fetch("/api/simli/session", { method: "POST" });
-      const sessionJson = await sessionRes.json();
-      if (!sessionRes.ok) {
-        throw new Error(sessionJson.error || "Failed to start Simli session");
+      await audioRef.current?.play();
+    } catch {
+      // Browser may block until user gesture; ignore.
+    }
+  }, []);
+
+  const markReady = useCallback(() => {
+    readyRef.current = true;
+    setPhase("ready");
+    setStatusLine("");
+  }, []);
+
+  const stopClient = useCallback(async () => {
+    const client = clientRef.current;
+    clientRef.current = null;
+    readyRef.current = false;
+    if (client) {
+      try {
+        await client.stop();
+      } catch {
+        // ignore cleanup errors
+      }
+    }
+  }, []);
+
+  const connectWithTransport = useCallback(
+    async (
+      sessionToken: string,
+      iceServers: RTCIceServer[] | null,
+      transport: "p2p" | "livekit",
+    ) => {
+      const video = videoRef.current;
+      const audio = audioRef.current;
+      if (!video || !audio) {
+        throw new Error("Avatar video elements are not mounted.");
       }
 
       const client = new SimliClient(
-        sessionJson.sessionToken,
-        videoRef.current,
-        audioRef.current,
-        null,
+        sessionToken,
+        video,
+        audio,
+        iceServers,
         LogLevel.ERROR,
-        "livekit",
+        transport,
       );
 
-      client.on("start", () => setStatus("ready"));
+      client.on("start", () => {
+        markReady();
+      });
       client.on("startup_error", (msg: string) => {
-        setError(msg);
-        setStatus("error");
+        throw new Error(msg || "Simli WebRTC startup failed");
       });
       client.on("error", () => {
-        setError("Simli connection error");
-        setStatus("error");
+        readyRef.current = false;
+        setError("Simli connection lost");
+        setPhase("error");
       });
 
       await client.start();
       clientRef.current = client;
-      setStatus("ready");
+
+      if (!readyRef.current) {
+        markReady();
+      }
+    },
+    [markReady],
+  );
+
+  const initClient = useCallback(async () => {
+    const gen = ++initGenRef.current;
+    await stopClient();
+
+    readyRef.current = false;
+    setPhase("session");
+    setStatusLine("Requesting Simli session…");
+    setError("");
+
+    const hasRefs = await waitForMediaRefs(videoRef, audioRef);
+    if (!hasRefs) {
+      setError("Avatar player failed to mount. Refresh the page.");
+      setPhase("error");
+      return;
+    }
+    if (gen !== initGenRef.current) return;
+
+    try {
+      const sessionRes = await fetch("/api/simli/session", { method: "POST" });
+      const sessionJson = (await sessionRes.json()) as {
+        sessionToken?: string;
+        iceServers?: RTCIceServer[];
+        error?: string;
+      };
+
+      if (gen !== initGenRef.current) return;
+
+      if (!sessionRes.ok || !sessionJson.sessionToken) {
+        throw new Error(sessionJson.error || "Failed to start Simli session");
+      }
+
+      const iceServers = sessionJson.iceServers ?? null;
+      setPhase("webrtc");
+      setStatusLine("Connecting avatar (WebRTC)…");
+
+      try {
+        await connectWithTransport(sessionJson.sessionToken, iceServers, "p2p");
+      } catch {
+        if (gen !== initGenRef.current) return;
+        await stopClient();
+        setStatusLine("Retrying with alternate connection…");
+        await connectWithTransport(sessionJson.sessionToken, null, "livekit");
+      }
+
+      if (gen !== initGenRef.current) return;
+      markReady();
     } catch (e) {
+      if (gen !== initGenRef.current) return;
+      readyRef.current = false;
       const msg = e instanceof Error ? e.message : "Simli init failed";
       setError(msg);
-      setStatus("error");
+      setPhase("error");
     }
-  }, []);
+  }, [connectWithTransport, markReady, stopClient]);
 
   useEffect(() => {
     void initClient();
     return () => {
-      void clientRef.current?.stop();
-      clientRef.current = null;
+      initGenRef.current += 1;
+      void stopClient();
     };
-  }, [initClient]);
+  }, [initClient, stopClient]);
 
-  const speak = useCallback(async (text: string) => {
-    const client = clientRef.current;
-    if (!client || !text.trim()) return;
+  const playPcm = useCallback(
+    async (pcm: Uint8Array) => {
+      const client = clientRef.current;
+      if (!client || pcm.length < 2) {
+        throw new Error("Avatar is not ready to speak yet.");
+      }
 
-    client.ClearBuffer();
+      await unlockAudio();
 
-    const audioRes = await fetch("/api/live-test/simli-audio", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
-    });
+      client.ClearBuffer();
 
-    if (!audioRes.ok) {
-      const err = await audioRes.json().catch(() => ({}));
-      throw new Error(err.error || "Failed to generate speech audio");
-    }
+      const firstLen = Math.min(IMMEDIATE_BYTES, pcm.length);
+      client.sendAudioDataImmediate(pcm.subarray(0, firstLen));
 
-    const pcm = new Uint8Array(await audioRes.arrayBuffer());
-    if (pcm.length < 2) {
-      throw new Error("No audio data returned for speech");
-    }
+      for (let offset = firstLen; offset < pcm.length; offset += CHUNK_BYTES) {
+        client.sendAudioData(pcm.subarray(offset, offset + CHUNK_BYTES));
+      }
 
-    // Kick-start playback + viseme tracking immediately.
-    const first = pcm.subarray(0, Math.min(IMMEDIATE_BYTES, pcm.length));
-    client.sendAudioDataImmediate(first);
+      client.sendAudioData(new Uint8Array(3200));
+    },
+    [unlockAudio],
+  );
 
-    for (let offset = first.length; offset < pcm.length; offset += CHUNK_BYTES) {
-      client.sendAudioData(pcm.subarray(offset, offset + CHUNK_BYTES));
-    }
+  useImperativeHandle(
+    ref,
+    () => ({
+      playPcm,
+      unlockAudio,
+      isReady: () => readyRef.current && clientRef.current !== null,
+    }),
+    [playPcm, unlockAudio],
+  );
 
-    // Brief silence helps Simli detect end of utterance
-    client.sendAudioData(new Uint8Array(3200));
-  }, []);
-
-  useImperativeHandle(ref, () => ({
-    speak,
-    isReady: () => status === "ready" && clientRef.current !== null,
-  }));
+  const showOverlay = phase === "session" || phase === "webrtc";
 
   return (
     <div
@@ -134,13 +236,14 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       />
       <audio ref={audioRef} autoPlay playsInline className="sr-only" />
 
-      {status === "loading" && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/80 text-sm text-zinc-400">
-          Connecting Simli avatar…
+      {showOverlay && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/85 px-6 text-center">
+          <p className="text-sm text-zinc-300">{statusLine || "Connecting Simli avatar…"}</p>
+          <p className="text-xs text-zinc-500">This can take up to 30 seconds on first load.</p>
         </div>
       )}
 
-      {status === "error" && (
+      {phase === "error" && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/90 px-6 text-center text-sm text-red-200">
           <p>Simli avatar failed to load.</p>
           <p className="text-xs text-red-300/80">{error}</p>

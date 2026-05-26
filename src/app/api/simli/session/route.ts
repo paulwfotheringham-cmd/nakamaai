@@ -1,8 +1,9 @@
-import { generateSimliSessionToken } from "simli-client";
+import { generateIceServers, generateSimliSessionToken } from "simli-client";
 import { NextResponse } from "next/server";
 import { getSimliApiKey, getSimliFaceId } from "@/lib/simli/config";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
 type SimliTokenResponse = {
   session_token?: string;
@@ -23,18 +24,19 @@ export async function POST() {
   }
 
   const faceId = getSimliFaceId();
+  const config = {
+    faceId,
+    handleSilence: true,
+    maxSessionLength: 3600,
+    maxIdleTime: 600,
+    model: "fasttalk" as const,
+  };
 
   try {
-    const data = (await generateSimliSessionToken({
-      apiKey,
-      config: {
-        faceId,
-        handleSilence: true,
-        maxSessionLength: 3600,
-        maxIdleTime: 600,
-        model: "fasttalk",
-      },
-    })) as SimliTokenResponse;
+    const [data, iceServers] = await Promise.all([
+      generateSimliSessionToken({ apiKey, config }) as Promise<SimliTokenResponse>,
+      generateIceServers(apiKey),
+    ]);
 
     if (data.detail === "INVALID_API_KEY" || !data.session_token) {
       return NextResponse.json(
@@ -43,7 +45,12 @@ export async function POST() {
       );
     }
 
-    return NextResponse.json({ sessionToken: data.session_token, faceId });
+    return NextResponse.json({
+      sessionToken: data.session_token,
+      faceId,
+      iceServers,
+      transport: "p2p" as const,
+    });
   } catch (e) {
     let detail: string | undefined;
     if (typeof e === "string") {

@@ -31,7 +31,7 @@ function loadSimliKey() {
 }
 
 const apiKey = loadSimliKey();
-const faceId = "6ebf0aa7-6fed-443d-a4c6-fd1e3080b215";
+const faceId = "5514e24d-6086-46a3-ace4-6a7264e5cb7c";
 
 const res = await fetch("https://api.simli.ai/compose/token", {
   method: "POST",
