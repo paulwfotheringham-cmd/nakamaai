@@ -81,37 +81,24 @@ export default function LiveGuideStage() {
   }, []);
 
   return (
-    <LiveTestShell>
-      <header className="shrink-0 border-b border-stone-800/80 px-5 py-5 sm:px-8">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-600/85">
-          Your guide
-        </p>
-        <h1 className="mt-2 font-serif text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-          <span className="bg-gradient-to-r from-amber-200 via-amber-100 to-amber-300/90 bg-clip-text text-transparent">
-            Concierge
-          </span>{" "}
-          <span className="text-stone-300">live</span>
-        </h1>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-stone-400">
-          Talk to your Nakama guide — voice and lip sync in real time.
-        </p>
-      </header>
+    <LiveTestShell
+      rightColumn={
+        <>
+          <div className="shrink-0">
+            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-500">
+              Simli avatar (live)
+            </p>
+            <SimliAvatar ref={simliRef} className="aspect-[4/5] w-full max-h-[min(42vh,380px)]" />
+          </div>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:gap-6 lg:p-8">
-        <section className="flex min-h-[min(52vh,520px)] flex-1 flex-col lg:min-h-0 lg:max-w-[min(52%,640px)]">
-          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-500/70">
-            Live avatar
-          </p>
-          <SimliAvatar ref={simliRef} className="min-h-0 flex-1" />
-        </section>
-
-        <section className="flex min-h-[min(52vh,520px)] flex-1 flex-col lg:min-h-0">
-          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-500/70">
-            Guide chat
-          </p>
-          <GuideChatPanel onSend={handleSend} isBusy={isBusy} className="min-h-0 flex-1" />
-        </section>
-      </div>
-    </LiveTestShell>
+          <div className="flex min-h-[min(38vh,420px)] flex-1 flex-col">
+            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-500">
+              Chat (text only)
+            </p>
+            <GuideChatPanel onSend={handleSend} isBusy={isBusy} className="min-h-0 flex-1" />
+          </div>
+        </>
+      }
+    />
   );
 }
