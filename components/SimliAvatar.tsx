@@ -232,7 +232,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
         autoPlay
         playsInline
         muted
-        className="h-full max-h-full min-h-0 w-full object-cover object-[50%_38%]"
+        className="h-full max-h-full min-h-0 w-full object-contain object-center"
       />
       <audio ref={audioRef} autoPlay playsInline className="sr-only" />
 

@@ -84,7 +84,7 @@ export default function LiveGuideStage() {
     <LiveTestShell
       rightColumn={
         <div className="flex h-full min-h-0 flex-col overflow-hidden">
-          <div className="mx-auto h-[clamp(7.5rem,28%,11rem)] w-full max-w-full shrink-0 overflow-hidden">
+          <div className="mx-auto h-[clamp(9rem,32%,13rem)] w-full max-w-full shrink-0 overflow-hidden">
             <SimliAvatar ref={simliRef} className="h-full w-full" />
           </div>
 
