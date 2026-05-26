@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { resolveCartesiaVoiceId } from "@/lib/guides/voice";
 import { getOpenAIApiKey } from "@/lib/openai/config";
 
 export const LIVE_TEST_SYSTEM_PROMPT =
@@ -108,7 +109,10 @@ export async function streamLiveTestChat(message: string): Promise<ReadableStrea
   });
 }
 
-export async function synthesizeLiveTestPcm16(text: string): Promise<Uint8Array> {
+export async function synthesizeLiveTestPcm16(
+  text: string,
+  voiceKey?: string,
+): Promise<Uint8Array> {
   const openaiKey = getOpenAIApiKey();
   if (openaiKey) {
     const openai = new OpenAI({ apiKey: openaiKey });
@@ -139,7 +143,10 @@ export async function synthesizeLiveTestPcm16(text: string): Promise<Uint8Array>
       model_id: "sonic-3",
       transcript: text.slice(0, 4096),
       language: "en",
-      voice: { mode: "id", id: getCartesiaDonnyVoiceId() },
+      voice: {
+        mode: "id",
+        id: voiceKey ? resolveCartesiaVoiceId(voiceKey) : getCartesiaDonnyVoiceId(),
+      },
       output_format: {
         container: "raw",
         encoding: "pcm_s16le",

@@ -6,6 +6,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const text = typeof body?.text === "string" ? body.text.trim() : "";
+  const voiceKey = typeof body?.voiceId === "string" ? body.voiceId.trim() : undefined;
 
   if (!text) {
     return NextResponse.json({ error: "Text is required" }, { status: 400 });
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const pcm16 = await synthesizeLiveTestPcm16(text);
+    const pcm16 = await synthesizeLiveTestPcm16(text, voiceKey);
     return new NextResponse(Buffer.from(pcm16), {
       headers: {
         "Content-Type": "application/octet-stream",

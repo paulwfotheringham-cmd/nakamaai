@@ -17,13 +17,23 @@ function simliErrorMessage(detail?: string): string {
   return detail || "Simli session failed";
 }
 
-export async function POST() {
+export async function POST(req: Request) {
   const apiKey = getSimliApiKey();
   if (!apiKey) {
     return NextResponse.json({ error: "SIMLI_API_KEY is not configured" }, { status: 500 });
   }
 
-  const faceId = getSimliFaceId();
+  let requestedFaceId: string | undefined;
+  try {
+    const body = (await req.json()) as { faceId?: string };
+    if (typeof body.faceId === "string" && body.faceId.trim()) {
+      requestedFaceId = body.faceId.trim();
+    }
+  } catch {
+    /* empty body is fine */
+  }
+
+  const faceId = requestedFaceId || getSimliFaceId();
   const config = {
     faceId,
     handleSilence: true,

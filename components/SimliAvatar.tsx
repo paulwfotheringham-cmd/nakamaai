@@ -19,6 +19,8 @@ export type SimliAvatarHandle = {
 
 type SimliAvatarProps = {
   className?: string;
+  /** Simli face UUID — when changed, reconnects the avatar session. */
+  faceId?: string;
 };
 
 type ConnectionPhase = "idle" | "session" | "webrtc" | "ready" | "error";
@@ -44,7 +46,7 @@ async function waitForMediaRefs(
 }
 
 const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function SimliAvatar(
-  { className },
+  { className, faceId },
   ref,
 ) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -146,7 +148,11 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
     if (gen !== initGenRef.current) return;
 
     try {
-      const sessionRes = await fetch("/api/simli/session", { method: "POST" });
+      const sessionRes = await fetch("/api/simli/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(faceId ? { faceId } : {}),
+      });
       const sessionJson = (await sessionRes.json()) as {
         sessionToken?: string;
         iceServers?: RTCIceServer[];
@@ -194,7 +200,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       setError(formatSimliError(e));
       setPhase("error");
     }
-  }, [connectWithTransport, markReady, stopClient]);
+  }, [connectWithTransport, markReady, stopClient, faceId]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -205,7 +211,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       initGenRef.current += 1;
       void stopClient();
     };
-  }, [initClient, stopClient]);
+  }, [initClient, stopClient, faceId]);
 
   const playPcm = useCallback(
     async (pcm: Uint8Array) => {

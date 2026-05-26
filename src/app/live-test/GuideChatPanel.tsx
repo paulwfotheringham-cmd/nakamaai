@@ -19,22 +19,28 @@ const MOOD_OPTIONS = [
   "you choose",
 ] as const;
 
-const WELCOME_TEXT =
-  "Hi Jane, welcome back to Nakama Nights!\n\nWhat kind of mood are you in today?";
-
 type GuideChatPanelProps = {
   onSend: (message: string, handlers: SendHandlers) => Promise<string>;
   isBusy: boolean;
   className?: string;
+  userName?: string;
+  guideName?: string;
 };
+
+function buildWelcome(userName: string, guideName: string): string {
+  return `Hi ${userName}, I'm ${guideName} — welcome back to Nakama Nights!\n\nWhat kind of mood are you in today?`;
+}
 
 export default function GuideChatPanel({
   onSend,
   isBusy,
   className = "",
+  userName = "Jane",
+  guideName = "your guide",
 }: GuideChatPanelProps) {
+  const welcome = buildWelcome(userName, guideName);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: "welcome", role: "assistant", text: WELCOME_TEXT },
+    { id: "welcome", role: "assistant", text: welcome },
   ]);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);

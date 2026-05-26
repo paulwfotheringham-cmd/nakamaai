@@ -1,9 +1,12 @@
 /** Browser-side PCM fetch for Simli (16 kHz PCM16). */
-export async function fetchLiveTestPcm16(text: string): Promise<Uint8Array> {
+export async function fetchLiveTestPcm16(
+  text: string,
+  voiceId?: string,
+): Promise<Uint8Array> {
   const res = await fetch("/api/live-test/simli-audio", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ text, voiceId }),
   });
 
   if (!res.ok) {

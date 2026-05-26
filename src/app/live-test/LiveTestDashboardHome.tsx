@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { readGuidePreferences, type GuidePreferences } from "@/lib/guides/preferences";
+
 const PICK_UP_ITEMS = [
   {
     section: "Audiobooks",
@@ -28,6 +31,17 @@ const PICK_UP_ITEMS = [
 ] as const;
 
 export default function LiveTestDashboardHome() {
+  const [prefs, setPrefs] = useState<GuidePreferences | null>(null);
+
+  useEffect(() => {
+    setPrefs(readGuidePreferences());
+  }, []);
+
+  const userName = prefs?.userName ?? "Jane";
+  const guideName = prefs?.guideName ?? "your guide";
+  const voiceLabel = prefs?.voiceName?.split("—")[0]?.trim() ?? "your voice";
+  const tone = prefs?.tone ?? "Relaxed";
+
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-amber-900/25 bg-gradient-to-b from-zinc-950/95 to-[#061a1a] shadow-[inset_0_0_60px_rgba(0,0,0,0.25)]">
       <header className="shrink-0 border-b border-stone-800/50 px-3 py-2.5 sm:px-4 sm:py-3">
@@ -37,12 +51,13 @@ export default function LiveTestDashboardHome() {
         <h1 className="mt-1 font-serif text-lg font-semibold leading-tight tracking-tight text-white sm:text-xl lg:text-2xl">
           This is your dashboard,{" "}
           <span className="bg-gradient-to-r from-amber-200 via-amber-100 to-amber-300/90 bg-clip-text text-transparent">
-            Jane
+            {userName}
           </span>
         </h1>
         <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-stone-400 sm:text-xs">
-          Pick up where you left off from the menu above. Your guide is below when you want to
-          talk.
+          Pick up where you left off from the menu above. Your guide{" "}
+          <span className="font-medium text-amber-200/90">{guideName}</span> ({voiceLabel}
+          , {tone} tone) is on the right when you want to talk.
         </p>
       </header>
 
@@ -67,10 +82,7 @@ export default function LiveTestDashboardHome() {
                 alt=""
                 className="absolute inset-0 h-full w-full object-cover"
               />
-              <div
-                className="pointer-events-none absolute inset-0 bg-black/25"
-                aria-hidden
-              />
+              <div className="pointer-events-none absolute inset-0 bg-black/25" aria-hidden />
               <div
                 className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/55"
                 aria-hidden
