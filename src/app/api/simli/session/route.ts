@@ -22,6 +22,7 @@ export async function POST(req: Request) {
   if (!apiKey) {
     return NextResponse.json({ error: "SIMLI_API_KEY is not configured" }, { status: 500 });
   }
+  const resolvedApiKey = apiKey;
 
   let requestedFaceId: string | undefined;
   try {
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
 
   async function requestToken(id: string) {
     return generateSimliSessionToken({
-      apiKey,
+      apiKey: resolvedApiKey,
       config: {
         faceId: id,
         handleSilence: true,
@@ -49,7 +50,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const iceServers = await generateIceServers(apiKey);
+    const iceServers = await generateIceServers(resolvedApiKey);
     let data = await requestToken(faceId);
 
     if (data.detail === "INVALID_FACE_ID" && faceId !== DEFAULT_SIMLI_FACE_ID) {
