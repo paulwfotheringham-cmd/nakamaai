@@ -1,32 +1,27 @@
 "use client";
 
-const QUICK_TILES = [
+const PICK_UP_ITEMS = [
   {
-    title: "Fantasy catalogue",
-    description: "Browse themed audio collections and find your next mood.",
-    icon: "✦",
+    section: "Couples",
+    lastActivity: "Date Night Mode — Reconnection Series",
+    when: "Last time you were here, 2 days ago",
   },
   {
-    title: "Build a story",
-    description: "Shape tone, heat, and voice — your fantasy, your way.",
-    icon: "◇",
+    section: "Fantasy Catalogue",
+    lastActivity: "Gothic · windswept moor",
+    when: "Browsed last week",
   },
   {
-    title: "Interactive story",
-    description: "Branching adventures that respond to your choices.",
-    icon: "◎",
+    section: "Build story",
+    lastActivity: "Your draft — slow burn, office setting",
+    when: "Saved, not finished",
   },
   {
-    title: "Couples",
-    description: "Shared experiences for two — date night and reconnect.",
-    icon: "♡",
+    section: "Interactive story",
+    lastActivity: "Chapter 2 — the choice at the door",
+    when: "In progress",
   },
 ] as const;
-
-const RECENT_PLACEHOLDER = [
-  { label: "Pirate on the high seas", meta: "Historical · Last played 3 days ago" },
-  { label: "Office after hours", meta: "Modern · In progress" },
-];
 
 export default function LiveTestDashboardHome() {
   return (
@@ -34,61 +29,56 @@ export default function LiveTestDashboardHome() {
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-4 py-5 sm:px-6 sm:py-6">
         <header className="mb-6">
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-amber-600/85">
-            Pleasure portal
+            Dashboard
           </p>
           <h1 className="mt-2 font-serif text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-            Welcome back,{" "}
+            This is your dashboard,{" "}
             <span className="bg-gradient-to-r from-amber-200 via-amber-100 to-amber-300/90 bg-clip-text text-transparent">
               Jane
             </span>
           </h1>
           <p className="mt-2 max-w-lg text-sm leading-relaxed text-stone-400">
-            Your Nakama home — pick up where you left off or start something new. Your guide
-            is ready on the right whenever you want to talk.
+            Everything you&apos;ve opened lives here. Pick up where you left off, or use the menu
+            on the left to try something new. Your guide is on the right if you want to talk.
           </p>
         </header>
 
-        <section className="mb-6">
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-amber-500/80">
-            Continue
+        <section>
+          <h2 className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-500/80">
+            Pick up where you left off
           </h2>
-          <ul className="space-y-2">
-            {RECENT_PLACEHOLDER.map((item) => (
+          <p className="mb-4 text-xs text-stone-500">
+            Based on the last places you visited — do you want to continue?
+          </p>
+
+          <ul className="space-y-3">
+            {PICK_UP_ITEMS.map((item) => (
               <li
-                key={item.label}
-                className="flex items-center justify-between gap-3 rounded-xl border border-stone-800/80 bg-black/30 px-3.5 py-3"
+                key={item.section}
+                className="rounded-xl border border-stone-800/80 bg-black/30 px-3.5 py-3.5"
               >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-stone-200">{item.label}</p>
-                  <p className="mt-0.5 text-xs text-stone-500">{item.meta}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-600/75">
+                  {item.section}
+                </p>
+                <p className="mt-1.5 text-sm font-medium text-stone-200">{item.lastActivity}</p>
+                <p className="mt-0.5 text-xs text-stone-500">{item.when}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="rounded-full border border-amber-400/40 bg-gradient-to-b from-amber-200/90 to-amber-600 px-3.5 py-1.5 text-xs font-semibold text-zinc-950 transition hover:from-amber-100 hover:to-amber-500"
+                  >
+                    Yes, continue
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-full border border-stone-700/80 bg-transparent px-3.5 py-1.5 text-xs font-medium text-stone-400 transition hover:border-stone-600 hover:text-stone-300"
+                  >
+                    Not now
+                  </button>
                 </div>
-                <span className="shrink-0 text-xs font-medium text-amber-500/90">Resume →</span>
               </li>
             ))}
           </ul>
-        </section>
-
-        <section>
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-amber-500/80">
-            Explore
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {QUICK_TILES.map((tile) => (
-              <div
-                key={tile.title}
-                className="rounded-xl border border-amber-900/20 bg-zinc-900/40 p-4 transition hover:border-amber-700/35 hover:bg-zinc-900/70"
-              >
-                <span
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-amber-800/30 bg-amber-950/50 text-sm text-amber-300/90"
-                  aria-hidden
-                >
-                  {tile.icon}
-                </span>
-                <h3 className="mt-3 text-sm font-semibold text-amber-50/95">{tile.title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-stone-500">{tile.description}</p>
-              </div>
-            ))}
-          </div>
         </section>
       </div>
     </div>
