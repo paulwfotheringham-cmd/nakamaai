@@ -107,7 +107,7 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
       </section>
 
       {/* Right — avatar + chat stacked */}
-      <aside className="relative z-10 flex w-[min(100%,22rem)] shrink-0 flex-col gap-3 border-l border-stone-800/90 bg-black/40 p-3 sm:w-80 sm:gap-4 sm:p-4 lg:w-[22rem]">
+      <aside className="relative z-10 flex w-[min(100%,26rem)] shrink-0 flex-col gap-2 border-l border-stone-800/90 bg-black/40 p-3 sm:w-[26rem] sm:gap-3 sm:p-4 lg:w-[28rem]">
         {rightColumn}
       </aside>
     </div>

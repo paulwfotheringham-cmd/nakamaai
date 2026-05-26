@@ -85,16 +85,13 @@ export default function LiveGuideStage() {
       rightColumn={
         <>
           <div className="shrink-0">
-            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-500">
-              Simli avatar (live)
-            </p>
-            <SimliAvatar ref={simliRef} className="aspect-[4/5] w-full max-h-[min(42vh,380px)]" />
+            <SimliAvatar
+              ref={simliRef}
+              className="mx-auto aspect-[3/4] w-full max-w-[200px] max-h-[min(22vh,220px)] sm:max-w-[220px]"
+            />
           </div>
 
-          <div className="flex min-h-[min(38vh,420px)] flex-1 flex-col">
-            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-500">
-              Chat (text only)
-            </p>
+          <div className="flex min-h-[min(58vh,640px)] flex-1 flex-col">
             <GuideChatPanel onSend={handleSend} isBusy={isBusy} className="min-h-0 flex-1" />
           </div>
         </>
