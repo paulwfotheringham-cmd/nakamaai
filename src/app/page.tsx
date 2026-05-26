@@ -301,7 +301,7 @@ export default function Page() {
 
           <div className="ml-auto flex items-center gap-3">
             <Link
-              href="/select-plan"
+              href="/signup-trial"
               className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
             >
               10 Day Free Trial
@@ -377,12 +377,12 @@ export default function Page() {
                 <p className="font-serif text-base font-semibold uppercase tracking-[0.22em] text-amber-200 sm:text-lg">
                   NEW TO THIS?
                 </p>
-                <a
-                  href="#signup"
+                <Link
+                  href="/signup-trial"
                   className="inline-flex w-full max-w-full items-center justify-center rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200 md:w-fit md:px-7 md:py-3 md:pl-8 md:pr-7 md:text-[11px] lg:text-xs"
                 >
                   TRY YOUR FIRST EXPERIENCE
-                </a>
+                </Link>
               </div>
 
               <div className="min-w-0 flex-1 space-y-3 md:space-y-4 md:pt-1">

@@ -49,7 +49,10 @@ export default function SetPasswordPage() {
         return;
       }
 
-      router.push("/live-test");
+      const params = new URLSearchParams();
+      params.set("email", email.trim());
+      if (name.trim()) params.set("name", name.trim());
+      router.push(`/select-plan?${params.toString()}`);
     } catch {
       setMessage("Something went wrong. Please try again.");
       setSaving(false);
