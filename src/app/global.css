@@ -18,7 +18,10 @@
 
   html:has(.create-audio-embed),
   html:has(.create-audio-embed) body {
+    margin: 0;
+    padding: 0;
     overflow: hidden;
+    width: 100%;
     height: 100%;
     max-width: 100vw;
   }

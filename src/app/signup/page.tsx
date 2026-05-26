@@ -16,9 +16,10 @@ export default function SignupPage() {
 
     router.push(
       `/set-password?email=${encodeURIComponent(
-        email
-      )}&name=${encodeURIComponent(name)}`
+        email.trim()
+      )}&name=${encodeURIComponent(name.trim())}`
     );
+    setLoading(false);
   }
 
   return (

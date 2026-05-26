@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { formatSimliError } from "@/lib/simli/format-error";
 import { LogLevel, SimliClient } from "simli-client";
 
 export type SimliAvatarHandle = {
@@ -107,7 +108,9 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
         markReady();
       });
       client.on("startup_error", (msg: string) => {
-        throw new Error(msg || "Simli WebRTC startup failed");
+        readyRef.current = false;
+        setError(msg || "Simli WebRTC startup failed");
+        setPhase("error");
       });
       client.on("error", () => {
         readyRef.current = false;
@@ -160,13 +163,27 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       setPhase("webrtc");
       setStatusLine("Connecting avatar (WebRTC)…");
 
+      let lastError: unknown;
       try {
-        await connectWithTransport(sessionJson.sessionToken, iceServers, "p2p");
-      } catch {
+        setStatusLine("Connecting avatar (LiveKit)…");
+        await connectWithTransport(sessionJson.sessionToken, null, "livekit");
+      } catch (e) {
+        lastError = e;
         if (gen !== initGenRef.current) return;
         await stopClient();
-        setStatusLine("Retrying with alternate connection…");
-        await connectWithTransport(sessionJson.sessionToken, null, "livekit");
+        if (iceServers?.length) {
+          setStatusLine("Retrying with direct WebRTC…");
+          try {
+            await connectWithTransport(sessionJson.sessionToken, iceServers, "p2p");
+            lastError = undefined;
+          } catch (p2pErr) {
+            lastError = p2pErr;
+          }
+        }
+      }
+
+      if (lastError) {
+        throw lastError;
       }
 
       if (gen !== initGenRef.current) return;
@@ -174,15 +191,17 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
     } catch (e) {
       if (gen !== initGenRef.current) return;
       readyRef.current = false;
-      const msg = e instanceof Error ? e.message : "Simli init failed";
-      setError(msg);
+      setError(formatSimliError(e));
       setPhase("error");
     }
   }, [connectWithTransport, markReady, stopClient]);
 
   useEffect(() => {
-    void initClient();
+    const timer = window.setTimeout(() => {
+      void initClient();
+    }, 0);
     return () => {
+      window.clearTimeout(timer);
       initGenRef.current += 1;
       void stopClient();
     };
@@ -247,6 +266,11 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/90 px-6 text-center text-sm text-red-200">
           <p>Simli avatar failed to load.</p>
           <p className="text-xs text-red-300/80">{error}</p>
+          {(error.includes("TIMED OUT") || error.includes("Websocket")) && (
+            <p className="text-xs text-zinc-400">
+              Check your network or VPN, then tap Retry. A firewall can block WebRTC.
+            </p>
+          )}
           <button
             type="button"
             onClick={() => void initClient()}

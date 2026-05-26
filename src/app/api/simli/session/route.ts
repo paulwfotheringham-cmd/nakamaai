@@ -49,7 +49,7 @@ export async function POST() {
       sessionToken: data.session_token,
       faceId,
       iceServers,
-      transport: "p2p" as const,
+      transport: "livekit" as const,
     });
   } catch (e) {
     let detail: string | undefined;

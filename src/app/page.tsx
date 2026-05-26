@@ -270,9 +270,10 @@ export default function Page() {
 
   function handleCreateAccount(e: React.FormEvent) {
     e.preventDefault();
-    const params = new URLSearchParams();
-    if (email) params.set("email", email);
-    router.push(`/select-plan?${params.toString()}`);
+    if (!firstName.trim() || !email.trim()) return;
+    router.push(
+      `/set-password?email=${encodeURIComponent(email.trim())}&name=${encodeURIComponent(firstName.trim())}`,
+    );
   }
 
   function handleContactSubmit(e: React.FormEvent) {
@@ -532,6 +533,7 @@ export default function Page() {
                 placeholder="Your name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
+                required
                 className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
               />
 
@@ -540,6 +542,7 @@ export default function Page() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
                 className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
               />
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { resolveLoginEmail } from "@/lib/auth-login";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,19 +14,21 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
     });
 
     setLoading(false);
 
-    if (error) {
-      alert(error.message);
+    if (!res.ok) {
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      alert(data.error ?? "Login failed.");
       return;
     }
 
-    router.push("/onboarding");
+    router.push("/live-test");
   }
 
   async function handleForgotPassword() {
@@ -35,19 +37,9 @@ export default function LoginPage() {
       return;
     }
 
-    const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-      "https://nakamanights.com";
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${siteUrl}/set-password`,
-    });
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    alert("Check your email for your password reset link.");
+    alert(
+      "Password reset is only available for email accounts registered in Supabase. Use your demo credentials or contact support.",
+    );
   }
 
   return (
@@ -106,13 +98,14 @@ export default function LoginPage() {
             lineHeight: 1.6,
           }}
         >
-          Sign in with your email and password.
+          Sign in with your email or username and password.
         </p>
 
         <form onSubmit={handleLogin} style={{ display: "grid", gap: "16px" }}>
           <input
-            placeholder="Email Address"
-            type="email"
+            placeholder="Email or username"
+            type="text"
+            autoComplete="username"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required

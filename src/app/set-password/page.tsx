@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 
 export default function SetPasswordPage() {
   const router = useRouter();
@@ -27,31 +26,34 @@ export default function SetPasswordPage() {
       return;
     }
 
-    if (!password) {
-      setMessage("Please enter a password.");
+    if (password.length < 6) {
+      setMessage("Password must be at least 6 characters.");
       return;
     }
 
     setSaving(true);
-    setMessage("");
+    setMessage("Creating your account…");
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: name,
-        },
-      },
-    });
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), password, name: name.trim() }),
+      });
 
-    if (error) {
-      setMessage(error.message);
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+
+      if (!res.ok) {
+        setMessage(data.error ?? "Could not create account. Please try again.");
+        setSaving(false);
+        return;
+      }
+
+      router.push("/live-test");
+    } catch {
+      setMessage("Something went wrong. Please try again.");
       setSaving(false);
-      return;
     }
-
-    router.push("/select-plan");
   }
 
   return (
@@ -68,7 +70,9 @@ export default function SetPasswordPage() {
         fontFamily: "Arial, Helvetica, sans-serif",
       }}
     >
-      <a href="/signup" style={backBtnStyle}>← Back</a>
+      <a href="/signup" style={backBtnStyle}>
+        ← Back
+      </a>
       <div
         style={{
           width: "100%",
@@ -116,10 +120,12 @@ export default function SetPasswordPage() {
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: "16px" }}>
           <input
             type="password"
-            placeholder="Create password"
+            placeholder="Create password (min. 6 characters)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            minLength={6}
             required
+            autoComplete="new-password"
             style={{
               width: "100%",
               padding: "14px 16px",
