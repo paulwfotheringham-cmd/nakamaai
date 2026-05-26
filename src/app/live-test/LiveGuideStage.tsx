@@ -87,7 +87,7 @@ export default function LiveGuideStage() {
           <div className="shrink-0">
             <SimliAvatar
               ref={simliRef}
-              className="mx-auto aspect-[3/4] w-full max-w-[200px] max-h-[min(22vh,220px)] sm:max-w-[220px]"
+              className="mx-auto aspect-[4/5] w-full max-w-[220px] max-h-[min(28vh,280px)] sm:max-w-[240px]"
             />
           </div>
 
