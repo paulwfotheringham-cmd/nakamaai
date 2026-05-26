@@ -3,23 +3,74 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  height: "58px",
+  marginBottom: "14px",
+  borderRadius: "18px",
+  border: "1px solid rgba(255,255,255,0.08)",
+  background: "rgba(255,255,255,0.04)",
+  padding: "0 18px",
+  color: "white",
+  boxSizing: "border-box",
+  fontSize: "16px",
+  outline: "none",
+};
+
 export default function SignupPage() {
   const router = useRouter();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordRepeat, setPasswordRepeat] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError("");
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (password !== passwordRepeat) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
 
-    router.push(
-      `/set-password?email=${encodeURIComponent(
-        email.trim()
-      )}&name=${encodeURIComponent(name.trim())}`
-    );
-    setLoading(false);
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+          name: name.trim(),
+        }),
+      });
+
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+
+      if (!res.ok) {
+        setError(data.error ?? "Could not create account. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      const params = new URLSearchParams();
+      params.set("email", email.trim());
+      if (name.trim()) params.set("name", name.trim());
+      router.push(`/ccard-sign?${params.toString()}`);
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
   }
 
   return (
@@ -27,12 +78,17 @@ export default function SignupPage() {
       style={{
         position: "relative",
         minHeight: "100vh",
-        overflow: "hidden",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "24px",
         background: "#07040d",
         color: "white",
       }}
     >
-      <a href="/" style={backBtnStyle}>← Home</a>
+      <a href="/select-plan" style={backBtnStyle}>
+        ← Back
+      </a>
       <div
         style={{
           position: "absolute",
@@ -47,335 +103,128 @@ export default function SignupPage() {
         style={{
           position: "relative",
           zIndex: 10,
-          maxWidth: "1280px",
-          margin: "0 auto",
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "96px",
-          padding: "56px 32px",
-          flexWrap: "wrap",
+          width: "100%",
+          maxWidth: "520px",
+          borderRadius: "34px",
+          border: "1px solid rgba(255,255,255,0.09)",
+          background:
+            "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.035))",
+          padding: "38px",
+          boxShadow: "0 22px 80px rgba(0,0,0,0.35)",
+          backdropFilter: "blur(12px)",
         }}
       >
-        <section
+        <p
           style={{
-            flex: 1,
-            maxWidth: "700px",
-            minWidth: "320px",
+            margin: "0 0 22px 0",
+            fontSize: "13px",
+            letterSpacing: "0.34em",
+            textTransform: "uppercase",
+            color: "#c9a96a",
           }}
         >
-          <p
-            style={{
-              margin: "0 0 24px 0",
-              fontSize: "13px",
-              letterSpacing: "0.42em",
-              textTransform: "uppercase",
-              color: "#c9a96a",
-            }}
-          >
-            Nakama
-          </p>
+          Get started
+        </p>
 
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              marginBottom: "28px",
-              borderRadius: "999px",
-              border: "1px solid rgba(201,169,106,0.28)",
-              background: "rgba(64, 43, 33, 0.45)",
-              padding: "12px 20px",
-              fontSize: "14px",
-              color: "#e5c888",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
-            }}
-          >
-            Premium fantasy audio experiences
-          </div>
-
-          <h1
-            style={{
-              margin: 0,
-              fontSize: "clamp(64px, 7vw, 98px)",
-              lineHeight: 0.98,
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              color: "#f7f5f2",
-            }}
-          >
-            Ready to turn
-            <br />
-            up the heat?
-          </h1>
-
-          <p
-            style={{
-              margin: "34px 0 0 0",
-              maxWidth: "720px",
-              fontSize: "22px",
-              lineHeight: 1.55,
-              color: "rgba(255,255,255,0.78)",
-            }}
-          >
-            Craving something steamier than standard audiobooks?
-          </p>
-
-          <p
-            style={{
-              margin: "18px 0 0 0",
-              maxWidth: "720px",
-              fontSize: "22px",
-              lineHeight: 1.55,
-              color: "rgba(255,255,255,0.78)",
-            }}
-          >
-            Whisper your wildest fantasies.
-          </p>
-
-          <p
-            style={{
-              margin: "18px 0 0 0",
-              maxWidth: "720px",
-              fontSize: "20px",
-              lineHeight: 1.55,
-              color: "rgba(255,255,255,0.72)",
-            }}
-          >
-            Join Nakama today and transform your reading time into an
-            unforgettable auditory experience.
-          </p>
-
-          <p
-            style={{
-              margin: "28px 0 0 0",
-              maxWidth: "720px",
-              fontSize: "18px",
-              lineHeight: 1.6,
-              color: "rgba(255,255,255,0.62)",
-            }}
-          >
-            We&apos;re the only professional service dedicated exclusively to
-            bringing your romantic fantasies to life through sound. We convert
-            your favourite romantic books into breathtaking, sexy audio stories.
-          </p>
-
-          <p
-            style={{
-              margin: "20px 0 0 0",
-              fontSize: "16px",
-              fontWeight: 600,
-              letterSpacing: "0.08em",
-              color: "#d2b56f",
-            }}
-          >
-            100% private. 100% yours.
-          </p>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-              gap: "18px",
-              marginTop: "42px",
-              maxWidth: "640px",
-            }}
-          >
-            {[
-              {
-                title: "Guided story design",
-                text: "Pick the setting, tone, pacing, and story type.",
-              },
-              {
-                title: "Voice customization",
-                text: "Assign different voices to different characters.",
-              },
-              {
-                title: "Private audio scenes",
-                text: "Generate scenes made for listening, not just reading.",
-              },
-              {
-                title: "Fast iteration",
-                text: "Adjust one detail and instantly create a new version.",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                style={{
-                  borderRadius: "22px",
-                  border: "1px solid rgba(255,255,255,0.09)",
-                  background:
-                    "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.03))",
-                  padding: "22px 20px",
-                  boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
-                  backdropFilter: "blur(6px)",
-                }}
-              >
-                <h3
-                  style={{
-                    margin: "0 0 12px 0",
-                    fontSize: "17px",
-                    lineHeight: 1.2,
-                    fontWeight: 700,
-                    color: "#ffffff",
-                  }}
-                >
-                  {item.title}
-                </h3>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "15px",
-                    lineHeight: 1.6,
-                    color: "rgba(255,255,255,0.66)",
-                  }}
-                >
-                  {item.text}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <aside
+        <h1
           style={{
-            width: "100%",
-            maxWidth: "520px",
-            flex: "0 0 520px",
+            margin: "0 0 18px 0",
+            fontSize: "clamp(42px, 8vw, 58px)",
+            lineHeight: 0.98,
+            letterSpacing: "-0.035em",
+            fontWeight: 700,
+            color: "#f7f5f2",
           }}
         >
-          <div
-            style={{
-              borderRadius: "34px",
-              border: "1px solid rgba(255,255,255,0.09)",
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.035))",
-              padding: "38px",
-              boxShadow: "0 22px 80px rgba(0,0,0,0.35)",
-              backdropFilter: "blur(12px)",
-            }}
-          >
+          Join Nakama
+        </h1>
+
+        <p
+          style={{
+            margin: "0 0 28px 0",
+            fontSize: "19px",
+            lineHeight: 1.6,
+            color: "rgba(255,255,255,0.68)",
+          }}
+        >
+          Create your account and subscribe to Nakama Nights.
+        </p>
+
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            autoComplete="name"
+            style={inputStyle}
+          />
+
+          <input
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+            style={inputStyle}
+          />
+
+          <input
+            type="password"
+            placeholder="Set password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={6}
+            autoComplete="new-password"
+            style={inputStyle}
+          />
+
+          <input
+            type="password"
+            placeholder="Re-enter password"
+            value={passwordRepeat}
+            onChange={(e) => setPasswordRepeat(e.target.value)}
+            required
+            minLength={6}
+            autoComplete="new-password"
+            style={{ ...inputStyle, marginBottom: "18px" }}
+          />
+
+          {error && (
             <p
               style={{
-                margin: "0 0 22px 0",
-                fontSize: "13px",
-                letterSpacing: "0.34em",
-                textTransform: "uppercase",
-                color: "#c9a96a",
-              }}
-            >
-              Get started
-            </p>
-
-            <h2
-              style={{
-                margin: "0 0 18px 0",
-                fontSize: "58px",
-                lineHeight: 0.98,
-                letterSpacing: "-0.035em",
-                fontWeight: 700,
-                color: "#f7f5f2",
-              }}
-            >
-              Join Nakama
-            </h2>
-
-            <p
-              style={{
-                margin: "0 0 28px 0",
-                fontSize: "19px",
-                lineHeight: 1.6,
-                color: "rgba(255,255,255,0.68)",
-              }}
-            >
-              Create your account and sign up for a subscription or a FREE 7 day
-              trial.
-            </p>
-
-            <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                style={{
-                  width: "100%",
-                  height: "58px",
-                  marginBottom: "14px",
-                  borderRadius: "18px",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  background: "rgba(255,255,255,0.04)",
-                  padding: "0 18px",
-                  color: "white",
-                  boxSizing: "border-box",
-                  fontSize: "16px",
-                  outline: "none",
-                }}
-              />
-
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                style={{
-                  width: "100%",
-                  height: "58px",
-                  marginBottom: "18px",
-                  borderRadius: "18px",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  background: "rgba(255,255,255,0.04)",
-                  padding: "0 18px",
-                  color: "white",
-                  boxSizing: "border-box",
-                  fontSize: "16px",
-                  outline: "none",
-                }}
-              />
-
-              <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  width: "100%",
-                  height: "60px",
-                  border: "none",
-                  borderRadius: "18px",
-                  background: "#d2b56f",
-                  color: "#111111",
-                  fontSize: "18px",
-                  fontWeight: 700,
-                  cursor: loading ? "default" : "pointer",
-                  opacity: loading ? 0.7 : 1,
-                }}
-              >
-                {loading ? "Continuing..." : "Create Account"}
-              </button>
-            </form>
-
-            <p
-              style={{
-                margin: "18px 0 0 0",
+                margin: "0 0 14px 0",
                 fontSize: "14px",
-                color: "rgba(255,255,255,0.62)",
+                lineHeight: 1.5,
+                color: "#f0a8a8",
               }}
             >
-              Already have an account?{" "}
-              <a
-                href="/login"
-                style={{
-                  color: "#d2b56f",
-                  textDecoration: "none",
-                  fontWeight: 600,
-                }}
-              >
-                Log in
-              </a>
+              {error}
             </p>
-          </div>
-        </aside>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: "100%",
+              height: "60px",
+              border: "none",
+              borderRadius: "18px",
+              background: "#d2b56f",
+              color: "#111111",
+              fontSize: "18px",
+              fontWeight: 700,
+              cursor: loading ? "default" : "pointer",
+              opacity: loading ? 0.7 : 1,
+            }}
+          >
+            {loading ? "Creating account..." : "Create Account"}
+          </button>
+        </form>
       </div>
     </main>
   );
