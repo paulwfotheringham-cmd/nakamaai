@@ -2,7 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useState, type ReactNode } from "react";
+
+const FantasyCatalogueEmbed = dynamic(() => import("./FantasyCatalogueEmbed"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full min-h-[200px] items-center justify-center rounded-2xl border border-amber-900/25 bg-zinc-950/90 text-sm text-stone-500">
+      Loading catalogue…
+    </div>
+  ),
+});
 
 export const LIVE_TEST_NAV = [
   { id: "fantasy-catalogue", label: "Fantasy Catalogue" },
@@ -79,31 +89,35 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
         </nav>
       </aside>
 
-      {/* Center — info placeholder */}
-      <section className="relative z-10 flex min-w-0 flex-1 flex-col p-4 sm:p-5 lg:p-6">
-        <div className="flex min-h-0 flex-1 flex-col justify-center rounded-2xl border border-amber-900/25 bg-gradient-to-b from-[#0a2a28]/90 to-[#061a1a] px-6 py-10 shadow-[inset_0_0_80px_rgba(0,0,0,0.35)] sm:px-10">
-          <p className="mx-auto max-w-md text-center text-sm leading-relaxed text-stone-300/95 sm:text-base">
-            {selected === "chat" ? (
-              <>
-                <span className="mb-3 block text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-500/80">
-                  {LIVE_TEST_NAV.find((n) => n.id === selected)?.label}
-                </span>
-                {PLACEHOLDER_COPY[selected]}
-              </>
-            ) : (
-              <>
-                <span className="mb-4 block text-xs font-medium uppercase tracking-wider text-amber-600/70">
-                  Coming soon
-                </span>
-                Placeholder box for information that shows after you select an option
-                button on the left.
-                <span className="mt-4 block text-sm text-stone-500">
+      {/* Center — catalogue or placeholder */}
+      <section className="relative z-10 flex min-h-0 min-w-0 flex-1 flex-col p-3 sm:p-4 lg:p-5">
+        {selected === "fantasy-catalogue" ? (
+          <FantasyCatalogueEmbed />
+        ) : (
+          <div className="flex min-h-0 flex-1 flex-col justify-center rounded-2xl border border-amber-900/25 bg-gradient-to-b from-[#0a2a28]/90 to-[#061a1a] px-6 py-10 shadow-[inset_0_0_80px_rgba(0,0,0,0.35)] sm:px-10">
+            <p className="mx-auto max-w-md text-center text-sm leading-relaxed text-stone-300/95 sm:text-base">
+              {selected === "chat" ? (
+                <>
+                  <span className="mb-3 block text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-500/80">
+                    {LIVE_TEST_NAV.find((n) => n.id === selected)?.label}
+                  </span>
                   {PLACEHOLDER_COPY[selected]}
-                </span>
-              </>
-            )}
-          </p>
-        </div>
+                </>
+              ) : (
+                <>
+                  <span className="mb-4 block text-xs font-medium uppercase tracking-wider text-amber-600/70">
+                    Coming soon
+                  </span>
+                  Placeholder box for information that shows after you select an option
+                  button on the left.
+                  <span className="mt-4 block text-sm text-stone-500">
+                    {PLACEHOLDER_COPY[selected]}
+                  </span>
+                </>
+              )}
+            </p>
+          </div>
+        )}
       </section>
 
       {/* Right — avatar + chat stacked */}
