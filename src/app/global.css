@@ -13,4 +13,33 @@
     overflow: hidden;
     max-width: 100vw;
   }
+
+  html:has(.create-audio-embed),
+  html:has(.create-audio-embed) body {
+    overflow: hidden;
+    height: 100%;
+    max-width: 100vw;
+  }
+}
+
+/* create-audio when embedded in live-test — align panels with Nakama dark + gold */
+.create-audio-embed [style*="border: 1px solid rgba(216,178,110"] {
+  border-color: rgba(120, 53, 15, 0.35) !important;
+}
+
+.create-audio-embed [style*="border: 1px solid rgba(255,255,255,0.1)"] {
+  border-color: rgba(41, 37, 36, 0.95) !important;
+}
+
+.create-audio-embed [style*="background: rgba(255,255,255,0.04)"] {
+  background: rgba(0, 0, 0, 0.35) !important;
+}
+
+.create-audio-embed [style*="background: rgba(255,255,255,0.05)"] {
+  background: rgba(0, 0, 0, 0.35) !important;
+}
+
+.create-audio-embed [style*="background: rgba(255,255,255,0.06)"] {
+  background: rgba(9, 9, 11, 0.8) !important;
+  border-color: rgba(41, 37, 36, 0.9) !important;
 }

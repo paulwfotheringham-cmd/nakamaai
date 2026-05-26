@@ -670,6 +670,7 @@ function CreateAudioTestInner() {
   const innerGridRef           = useRef<HTMLDivElement>(null);
   const [innerGridHeight, setInnerGridHeight] = useState<number | null>(null);
   const searchParams = useSearchParams();
+  const embed = searchParams.get("embed") === "1";
 
   // Measure the form+tiles column height and pin the result column to it
   useEffect(() => {
@@ -1267,11 +1268,18 @@ function CreateAudioTestInner() {
 
   return (
     <div
+      className={embed ? "create-audio-embed" : undefined}
       style={{
-        minHeight: "100vh",
-        background: "radial-gradient(circle at top, #3a1d2e 0%, #160f18 35%, #09080b 100%)",
+        minHeight: embed ? "100%" : "100vh",
+        height: embed ? "100%" : undefined,
+        background: embed
+          ? "linear-gradient(180deg, #0a0a0a 0%, #061a1a 100%)"
+          : "radial-gradient(circle at top, #3a1d2e 0%, #160f18 35%, #09080b 100%)",
         color: "white",
-        fontFamily: "Arial, Helvetica, sans-serif",
+        fontFamily: embed
+          ? 'ui-serif, Georgia, "Times New Roman", serif'
+          : "Arial, Helvetica, sans-serif",
+        overflow: embed ? "auto" : undefined,
       }}
     >
       {activeBrowserSlot && (
@@ -1285,22 +1293,69 @@ function CreateAudioTestInner() {
         />
       )}
 
-      <a href="/dashboard" style={backBtnStyle}>← Dashboard</a>
+      {!embed && <a href="/dashboard" style={backBtnStyle}>← Dashboard</a>}
 
-      {/* Logo — top right */}
-      <div style={{ position: "fixed", top: "14px", right: "24px", zIndex: 50 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/Nakama-AI-July25-White.png" alt="Nakama AI" style={{ height: "40px", width: "auto", display: "block" }} />
-      </div>
+      {!embed && (
+        <div style={{ position: "fixed", top: "14px", right: "24px", zIndex: 50 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/Nakama-AI-July25-White.png" alt="Nakama AI" style={{ height: "40px", width: "auto", display: "block" }} />
+        </div>
+      )}
+
+      {embed && (
+        <header
+          style={{
+            flexShrink: 0,
+            borderBottom: "1px solid rgba(41, 37, 36, 0.9)",
+            padding: "12px 16px 10px",
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              fontSize: "10px",
+              fontWeight: 600,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: "rgba(251, 191, 36, 0.85)",
+              fontFamily: "system-ui, sans-serif",
+            }}
+          >
+            Interactive adventures
+          </p>
+          <h1
+            style={{
+              margin: "6px 0 0",
+              fontSize: "1.25rem",
+              fontWeight: 600,
+              color: "#fafaf9",
+            }}
+          >
+            Create your fantasy audio
+          </h1>
+          <p
+            style={{
+              margin: "6px 0 0",
+              fontSize: "12px",
+              lineHeight: 1.45,
+              color: "#a8a29e",
+              fontFamily: "system-ui, sans-serif",
+            }}
+          >
+            Shape tone, cast voices, and generate your story.
+          </p>
+        </header>
+      )}
 
       <div
         style={{
-          maxWidth: "1680px",
+          maxWidth: embed ? "none" : "1680px",
           margin: "0 auto",
-          minHeight: "100vh",
+          minHeight: embed ? 0 : "100vh",
           display: "flex",
           flexDirection: "column",
-          padding: "32px 24px",
+          padding: embed ? "12px 14px 16px" : "32px 24px",
+          flex: embed ? 1 : undefined,
         }}
       >
         {/* Three-column layout: [hero + form] | results */}
