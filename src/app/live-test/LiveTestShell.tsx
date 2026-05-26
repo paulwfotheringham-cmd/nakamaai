@@ -11,6 +11,8 @@ import LiveTestCouplesProgram from "./LiveTestCouplesProgram";
 import LiveTestDashboardHome from "./LiveTestDashboardHome";
 import LiveTestCreateAudioFrame from "./LiveTestCreateAudioFrame";
 import LiveTestFantasyAudioFrame from "./LiveTestFantasyAudioFrame";
+import LiveTestForbiddenChat from "./LiveTestForbiddenChat";
+import LiveTestInfoPanel from "./LiveTestInfoPanel";
 import LiveTestUniverseNav from "./LiveTestUniverseNav";
 
 export type { LiveTestNavId };
@@ -32,15 +34,15 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
       />
 
       {/* Left — logo, dashboard, Universe nav */}
-      <aside className="relative z-10 flex h-full min-h-0 w-[clamp(11.5rem,18vw,13.5rem)] shrink-0 flex-col border-r border-stone-800/90 bg-zinc-950">
-        <div className="shrink-0 space-y-2.5 border-b border-stone-800/80 px-2.5 py-3.5 sm:px-3">
-          <Link href="/" className="block w-full">
+      <aside className="relative z-10 flex h-full min-h-0 w-[clamp(11.5rem,18vw,13.5rem)] shrink-0 flex-col border-r border-stone-800/90 bg-black">
+        <div className="shrink-0 space-y-2.5 border-b border-stone-800/80 bg-black px-2.5 py-3.5 sm:px-3">
+          <Link href="/" className="flex justify-center">
             <Image
               src="/Nakama-AI-July25-White.png"
               alt="Nakama Nights"
               width={280}
               height={76}
-              className="h-14 w-full max-w-full object-contain object-left sm:h-16"
+              className="h-14 w-auto max-w-full object-contain sm:h-16"
               priority
             />
           </Link>
@@ -67,6 +69,34 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
         {centerPanel === "fantasy-audio" && <LiveTestFantasyAudioFrame />}
         {centerPanel === "create-audio" && <LiveTestCreateAudioFrame />}
         {centerPanel === "couples-program" && <LiveTestCouplesProgram />}
+        {centerPanel === "build-adventure" && (
+          <LiveTestInfoPanel
+            eyebrow="Build adventure"
+            title="Create your fantasy"
+            description="Shape tone, setting, and heat on your terms."
+            poster="/tiles/tile2.jpg"
+            body="Build Adventure lets you craft custom audio stories step by step — choose characters, mood, pacing, and how far you want to go. Save drafts, revisit scenes, and publish when you’re ready."
+          />
+        )}
+        {centerPanel === "character-voices" && (
+          <LiveTestInfoPanel
+            eyebrow="Characters & voices"
+            title="Your cast, your sound"
+            description="Create a character that stays with you across experiences."
+            poster="/tiles/tile6.jpg"
+            body="Pick or clone the voice you want, define personality and boundaries, and reuse your character in adventures, audiobooks, and chat. Voices and personas travel with you across Nakama Nights."
+          />
+        )}
+        {centerPanel === "forbidden-chat" && <LiveTestForbiddenChat />}
+        {centerPanel === "profile" && (
+          <LiveTestInfoPanel
+            eyebrow="Profile"
+            title="Jane"
+            description="Your account, preferences, and membership."
+            poster="/scenes/moor.jpg"
+            body="Manage your display name, email, and password. Set content preferences, privacy controls, and notification options. View your plan, billing history, and saved experiences — all in one place when Profile launches."
+          />
+        )}
         {centerPanel === "dashboard" && <LiveTestDashboardHome />}
       </section>
 

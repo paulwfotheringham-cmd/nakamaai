@@ -674,6 +674,7 @@ function CreateAudioTestInner() {
 
   // Measure the form+tiles column height and pin the result column to it
   useEffect(() => {
+    if (embed) return;
     const el = innerGridRef.current;
     if (!el) return;
     const apply = (h: number) => setInnerGridHeight(Math.round(h));
@@ -717,6 +718,9 @@ function CreateAudioTestInner() {
   const [interLoading, setInterLoading]           = useState(false);
   const [interPaused, setInterPaused]             = useState(false);
   const [interSaveStatus, setInterSaveStatus]     = useState<"idle" | "saving" | "saved">("idle");
+
+  const embedResultsVisible =
+    embed && (interPhase !== "setup" || !!story);
   const [maleName, setMaleName]   = useState(() => randItem(["Luca", "Adrian", "Noah", "Julian", "Theo"]));
   const [femaleName, setFemaleName] = useState(() => randItem(["Elena", "Sofia", "Clara", "Mia", "Isla"]));
   const interStoppedRef      = useRef(false);
@@ -1279,7 +1283,9 @@ function CreateAudioTestInner() {
         fontFamily: embed
           ? 'ui-serif, Georgia, "Times New Roman", serif'
           : "Arial, Helvetica, sans-serif",
-        overflow: embed ? "auto" : undefined,
+        overflow: embed ? "hidden" : undefined,
+        display: embed ? "flex" : undefined,
+        flexDirection: embed ? "column" : undefined,
       }}
     >
       {activeBrowserSlot && (
@@ -1354,17 +1360,40 @@ function CreateAudioTestInner() {
           minHeight: embed ? 0 : "100vh",
           display: "flex",
           flexDirection: "column",
-          padding: embed ? "12px 14px 16px" : "32px 24px",
+          padding: embed ? "0 10px 10px" : "32px 24px",
           flex: embed ? 1 : undefined,
+          overflow: embed ? "hidden" : undefined,
         }}
       >
-        {/* Three-column layout: [hero + form] | results */}
-        <div style={{ display: "flex", gap: "28px", alignItems: "flex-start" }}>
+        {/* [hero + form] | results — embed: form only, stacked with results */}
+        <div
+          style={{
+            display: "flex",
+            flex: embed ? 1 : undefined,
+            flexDirection: embed ? "column" : "row",
+            gap: embed ? "10px" : "28px",
+            alignItems: embed ? "stretch" : "flex-start",
+            minHeight: embed ? 0 : undefined,
+            overflow: embed ? "hidden" : undefined,
+          }}
+        >
 
-          {/* Inner flex: hero | form — sized to each other only */}
-          <div ref={innerGridRef} style={{ flex: "1.75", display: "grid", gap: "28px", gridTemplateColumns: "0.75fr 1fr", alignItems: "stretch" }}>
+          <div
+            ref={innerGridRef}
+            style={{
+              flex: embed ? (embedResultsVisible ? "0 1 auto" : "1 1 0") : "1.75",
+              display: "grid",
+              gap: embed ? "10px" : "28px",
+              gridTemplateColumns: embed ? "1fr" : "0.75fr 1fr",
+              alignItems: "stretch",
+              minHeight: embed ? 0 : undefined,
+              minWidth: embed ? 0 : undefined,
+              maxHeight: embed && embedResultsVisible ? "52%" : undefined,
+              overflow: embed ? "auto" : undefined,
+            }}
+          >
 
-          {/* Left: hero text + tiles stacked */}
+          {!embed && (
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
 
             {/* Hero card */}
@@ -1474,21 +1503,40 @@ function CreateAudioTestInner() {
             </div>
 
           </div>
+          )}
 
-          {/* Right: form */}
+          {/* Form */}
           <div
             style={{
-              borderRadius: "28px",
-              border: "1px solid rgba(255,255,255,0.1)",
-              background: "rgba(255,255,255,0.06)",
-              padding: "24px",
-              boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
-              backdropFilter: "blur(12px)",
+              borderRadius: embed ? "12px" : "28px",
+              border: embed
+                ? "1px solid rgba(41, 37, 36, 0.95)"
+                : "1px solid rgba(255,255,255,0.1)",
+              background: embed ? "rgba(9, 9, 11, 0.85)" : "rgba(255,255,255,0.06)",
+              padding: embed ? "14px 12px" : "24px",
+              boxShadow: embed ? "none" : "0 24px 60px rgba(0,0,0,0.35)",
+              backdropFilter: embed ? undefined : "blur(12px)",
             }}
           >
-            <div style={{ marginBottom: "24px" }}>
-              <h2 style={{ margin: 0, fontSize: "32px", fontWeight: 700 }}>Customize your adventure</h2>
-              <p style={{ marginTop: "8px", fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>
+            <div style={{ marginBottom: embed ? "14px" : "24px" }}>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: embed ? "1.05rem" : "32px",
+                  fontWeight: 700,
+                  color: "#fafaf9",
+                }}
+              >
+                Customize your adventure
+              </h2>
+              <p
+                style={{
+                  marginTop: embed ? "6px" : "8px",
+                  fontSize: embed ? "11px" : "14px",
+                  color: "rgba(255,255,255,0.6)",
+                  fontFamily: embed ? "system-ui, sans-serif" : undefined,
+                }}
+              >
                 Adjust the story ingredients, then choose voices and generate.
               </p>
             </div>
@@ -1751,15 +1799,15 @@ function CreateAudioTestInner() {
 
           </div>{/* end inner grid */}
 
-          {/* Column 3: Results — pinned to inner grid height (never taller than form column) */}
+          {/* Results — embed: flex below form; standalone: pinned to form column height */}
           <div style={{
-            flex: "1",
+            flex: embed ? "1 1 0" : "1",
             display: "flex",
             flexDirection: "column",
             minWidth: 0,
-            minHeight: 0,
-            height: innerGridHeight ? `${innerGridHeight}px` : "auto",
-            maxHeight: innerGridHeight ? `${innerGridHeight}px` : "none",
+            minHeight: embed ? 0 : undefined,
+            height: embed ? "auto" : innerGridHeight ? `${innerGridHeight}px` : "auto",
+            maxHeight: embed ? "none" : innerGridHeight ? `${innerGridHeight}px` : "none",
             overflow: "hidden",
           }}>
 

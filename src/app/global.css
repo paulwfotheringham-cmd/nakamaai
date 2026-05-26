@@ -11,6 +11,8 @@
   html:has(.live-test-root),
   html:has(.live-test-root) body {
     overflow: hidden;
+    height: 100dvh;
+    max-height: 100dvh;
     max-width: 100vw;
   }
 
@@ -18,6 +20,16 @@
   html:has(.create-audio-embed) body {
     overflow: hidden;
     height: 100%;
+    max-width: 100vw;
+  }
+
+  html:has(.fantasy-page-embed),
+  html:has(.fantasy-page-embed) body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     max-width: 100vw;
   }
 }
@@ -42,4 +54,12 @@
 .create-audio-embed [style*="background: rgba(255,255,255,0.06)"] {
   background: rgba(9, 9, 11, 0.8) !important;
   border-color: rgba(41, 37, 36, 0.9) !important;
+}
+
+.create-audio-embed [style*="border: 1px solid rgba(14,116,144"] {
+  border-color: rgba(120, 53, 15, 0.35) !important;
+}
+
+.create-audio-embed [style*="background: rgba(8,60,75"] {
+  background: rgba(9, 9, 11, 0.75) !important;
 }

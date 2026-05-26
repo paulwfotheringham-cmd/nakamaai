@@ -60,43 +60,49 @@ export default function LiveTestDashboardHome() {
           {PICK_UP_ITEMS.map((item) => (
             <li
               key={item.section}
-              className="relative min-h-0 overflow-hidden rounded-xl border border-stone-800/80 bg-black"
+              className="relative h-full min-h-0 overflow-hidden rounded-xl border border-stone-800/80 bg-zinc-950"
             >
               <img
                 src={item.image}
                 alt=""
-                className="absolute inset-0 h-full w-full object-cover opacity-[0.28]"
+                className="absolute inset-0 h-full w-full object-cover"
               />
               <div
-                className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/55 to-black/80"
+                className="pointer-events-none absolute inset-0 bg-black/25"
+                aria-hidden
+              />
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/55"
                 aria-hidden
               />
 
-              <div className="relative z-10 px-2.5 pt-2 sm:px-3 sm:pt-2.5">
-                <p className="text-[9px] font-semibold uppercase tracking-wider text-amber-500/90 sm:text-[10px]">
-                  {item.section}
-                </p>
-                <p className="mt-0.5 line-clamp-2 text-xs font-medium leading-snug text-stone-100 sm:text-sm">
-                  {item.lastActivity}
-                </p>
-                <p className="mt-0.5 truncate text-[10px] text-stone-400">{item.when}</p>
+              <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-center px-2.5 pb-[4.25rem] pt-2 text-center sm:px-3 sm:pb-[4.5rem]">
+                <div className="max-w-[95%]">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-amber-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-[10px]">
+                    {item.section}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-xs font-bold leading-snug text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] sm:text-sm">
+                    {item.lastActivity}
+                  </p>
+                  <p className="mt-1 line-clamp-1 text-[10px] font-semibold text-stone-200 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)]">
+                    {item.when}
+                  </p>
+                </div>
               </div>
 
-              <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-2">
-                <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-1.5">
-                  <button
-                    type="button"
-                    className="rounded-full border border-amber-400/50 bg-gradient-to-b from-amber-200/95 to-amber-600 px-3 py-1.5 text-[10px] font-semibold text-zinc-950 shadow-lg shadow-black/40 transition hover:from-amber-100 hover:to-amber-500 sm:px-3.5 sm:text-xs"
-                  >
-                    Yes, continue
-                  </button>
-                  <button
-                    type="button"
-                    className="rounded-full border border-stone-500/60 bg-black/55 px-3 py-1.5 text-[10px] font-medium text-stone-200 backdrop-blur-sm transition hover:border-stone-400 hover:bg-black/70 sm:px-3.5 sm:text-xs"
-                  >
-                    Not now
-                  </button>
-                </div>
+              <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-1.5 px-2 pb-2.5 pt-5 sm:gap-2 sm:pb-3">
+                <button
+                  type="button"
+                  className="w-full max-w-[10.5rem] rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-4 py-2 text-center text-[11px] font-bold text-zinc-950 shadow-lg shadow-black/40 transition hover:from-amber-100 hover:to-amber-500 sm:max-w-[11.5rem] sm:text-xs"
+                >
+                  Yes, continue
+                </button>
+                <button
+                  type="button"
+                  className="w-full max-w-[10.5rem] rounded-full border border-stone-400/50 bg-black/50 px-4 py-2 text-center text-[11px] font-semibold text-stone-100 backdrop-blur-sm transition hover:border-stone-300 hover:bg-black/65 sm:max-w-[11.5rem] sm:text-xs"
+                >
+                  Not now
+                </button>
               </div>
             </li>
           ))}

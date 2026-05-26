@@ -70,11 +70,19 @@ export type LiveTestCenterPanel =
   | "dashboard"
   | "fantasy-audio"
   | "create-audio"
-  | "couples-program";
+  | "couples-program"
+  | "build-adventure"
+  | "character-voices"
+  | "forbidden-chat"
+  | "profile";
 
 export function getLiveTestCenterPanel(navId: LiveTestNavId | null): LiveTestCenterPanel {
   if (navId === "audiobooks") return "fantasy-audio";
   if (navId === "interactive-adventures") return "create-audio";
   if (navId === "reignite-couples") return "couples-program";
+  if (navId === "build-adventure") return "build-adventure";
+  if (navId === "character-voices") return "character-voices";
+  if (navId === "forbidden-chat") return "forbidden-chat";
+  if (navId === "profile") return "profile";
   return "dashboard";
 }

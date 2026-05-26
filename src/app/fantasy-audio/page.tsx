@@ -327,7 +327,7 @@ function FantasyAudioContent() {
     );
   }
 
-  const tileVisibleCount = embed ? 2 : 3;
+  const tileVisibleCount = embed ? 3 : 3;
 
   const visibleRows = useMemo(() => {
     return rows.map((row, rowIndex) => {
@@ -505,27 +505,35 @@ function FantasyAudioContent() {
         }
 
         .fantasy-page-embed {
+          width: 100%;
           min-height: 100%;
           height: 100%;
           padding: 0;
+          margin: 0;
           overflow: hidden;
           display: flex;
           flex-direction: column;
+          box-sizing: border-box;
         }
 
         .fantasy-page-embed .fantasy-shell {
           flex: 1;
+          width: 100%;
           min-height: 0;
+          min-width: 0;
           display: flex;
           flex-direction: column;
           max-width: none;
+          margin: 0;
         }
 
         .fantasy-page-embed .fantasy-header {
           margin-bottom: 0;
-          padding: 14px 16px 10px;
+          padding: 12px 12px 10px;
           border-bottom: 1px solid rgba(41, 37, 36, 0.9);
           flex-shrink: 0;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .fantasy-page-embed .fantasy-header h1 {
@@ -545,13 +553,28 @@ function FantasyAudioContent() {
 
         .fantasy-page-embed .fantasy-panel {
           flex: 1;
+          width: 100%;
           min-height: 0;
+          min-width: 0;
           border-radius: 0;
           border: none;
           box-shadow: none;
-          padding: 14px 16px;
+          padding: 10px 8px 12px;
           display: flex;
           flex-direction: column;
+          box-sizing: border-box;
+        }
+
+        .fantasy-page-embed .fantasy-panel-top {
+          width: 100%;
+        }
+
+        .fantasy-page-embed .fantasy-row {
+          width: 100%;
+        }
+
+        .fantasy-page-embed .fantasy-row-scroller {
+          width: 100%;
         }
 
         .fantasy-page-embed .fantasy-rows {
@@ -563,6 +586,15 @@ function FantasyAudioContent() {
         .fantasy-page-embed .fantasy-player {
           position: sticky;
           bottom: 0;
+          width: 100%;
+          max-width: none;
+          margin: 0;
+          left: 0;
+          right: 0;
+        }
+
+        .fantasy-page-embed .fantasy-header p {
+          max-width: none;
         }
 
         .fantasy-shell {
@@ -816,10 +848,6 @@ function FantasyAudioContent() {
           grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 8px;
           min-width: 0;
-        }
-
-        .fantasy-page-embed .fantasy-tiles {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .fantasy-tile {
