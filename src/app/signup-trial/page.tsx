@@ -45,6 +45,7 @@ export default function SignupTrialPage() {
 
     try {
       const res = await fetch("/api/auth/register", {
+        credentials: "same-origin",
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -146,7 +147,7 @@ export default function SignupTrialPage() {
             color: "rgba(255,255,255,0.68)",
           }}
         >
-          Create your account and sign up for a subscription or a FREE 10 day trial.
+          Create your account and sign up for a FREE 10 day trial.
         </p>
 
         <form onSubmit={handleSubmit}>

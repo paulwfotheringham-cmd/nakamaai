@@ -1,10 +1,23 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { verifyDemoLogin } from "@/lib/auth-login-server";
 import { resolveLoginEmail } from "@/lib/auth-login";
+import { verifyLocalUser } from "@/lib/auth-local-store";
+import { signInSupabaseUser } from "@/lib/supabase-admin";
 
 const SESSION_COOKIE = "nakama_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 30;
+
+function sessionResponse(source: "demo" | "supabase" | "local") {
+  const ok = NextResponse.json({ ok: true });
+  ok.cookies.set(SESSION_COOKIE, source, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: SESSION_MAX_AGE,
+    path: "/",
+  });
+  return ok;
+}
 
 export async function POST(req: Request) {
   let body: { email?: string; password?: string };
@@ -24,44 +37,20 @@ export async function POST(req: Request) {
   }
 
   const email = resolveLoginEmail(identifier);
-  const ok = NextResponse.json({ ok: true });
 
   if (verifyDemoLogin(identifier, password)) {
-    ok.cookies.set(SESSION_COOKIE, "demo", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: SESSION_MAX_AGE,
-      path: "/",
-    });
-    return ok;
+    return sessionResponse("demo");
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.json({ error: "Invalid login credentials." }, { status: 401 });
+  const supabaseResult = await signInSupabaseUser(email, password);
+  if (supabaseResult.ok) {
+    return sessionResponse("supabase");
   }
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error || !data.session) {
-    return NextResponse.json(
-      { error: error?.message ?? "Invalid login credentials." },
-      { status: 401 },
-    );
+  const localResult = await verifyLocalUser(email, password);
+  if (localResult.ok) {
+    return sessionResponse("local");
   }
 
-  ok.cookies.set(SESSION_COOKIE, "supabase", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: SESSION_MAX_AGE,
-    path: "/",
-  });
-  return ok;
+  return NextResponse.json({ error: "Invalid login credentials." }, { status: 401 });
 }
