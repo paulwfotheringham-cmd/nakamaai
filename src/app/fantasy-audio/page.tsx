@@ -127,8 +127,6 @@ const rows: Row[] = [
   },
 ];
 
-const visibleCount = 3;
-
 function ArrowButton({
   direction,
   onClick,
@@ -143,33 +141,7 @@ function ArrowButton({
       onClick={onClick}
       aria-label={isLeft ? "Previous options" : "Next options"}
       type="button"
-      style={{
-        width: 48,
-        height: 48,
-        borderRadius: 14,
-        border: "1px solid rgba(41,37,36,0.95)",
-        background: "rgba(0,0,0,0.4)",
-        color: "#d8b26e",
-        cursor: "pointer",
-        fontSize: 22,
-        fontWeight: 700,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        transition: "all 0.2s ease",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
-        backdropFilter: "blur(10px)",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-1px)";
-        e.currentTarget.style.background = "rgba(216,178,110,0.12)";
-        e.currentTarget.style.border = "1px solid rgba(216,178,110,0.28)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.background = "rgba(0,0,0,0.4)";
-        e.currentTarget.style.border = "1px solid rgba(41,37,36,0.95)";
-      }}
+      className="fantasy-arrow-btn"
     >
       {isLeft ? "←" : "→"}
     </button>
@@ -355,14 +327,16 @@ function FantasyAudioContent() {
     );
   }
 
+  const tileVisibleCount = embed ? 2 : 3;
+
   const visibleRows = useMemo(() => {
     return rows.map((row, rowIndex) => {
       const start = positions[rowIndex];
-      return Array.from({ length: visibleCount }, (_, offset) => {
+      return Array.from({ length: tileVisibleCount }, (_, offset) => {
         return row.items[(start + offset) % row.items.length];
       });
     });
-  }, [positions]);
+  }, [positions, tileVisibleCount]);
 
   return (
     <main className={`fantasy-page${embed ? " fantasy-page-embed" : ""}`}>
@@ -401,53 +375,59 @@ function FantasyAudioContent() {
               <div key={row.title} className="fantasy-row">
                 <CategoryThumbnail row={row} />
 
-                <div className="fantasy-arrow-wrap fantasy-arrow-left">
-                  <ArrowButton
-                    direction="left"
-                    onClick={() => goPrev(rowIndex)}
-                  />
-                </div>
+                <div className="fantasy-row-scroller">
+                  <div className="fantasy-arrow-wrap">
+                    <ArrowButton
+                      direction="left"
+                      onClick={() => goPrev(rowIndex)}
+                    />
+                  </div>
 
-                <div className="fantasy-tiles">
-                                    {visibleRows[rowIndex].map((item, itemIndex) => (
-                    <div key={`${row.title}-${item}-${itemIndex}`} className="fantasy-tile-wrap">
-                      <button
-                        type="button"
-                        className={`fantasy-tile ${
-                          audioFiles[item] ? 'fantasy-tile-playable' : ''
-                        } ${
-                          currentlyPlaying === item && isPlaying ? 'fantasy-tile-playing' : ''
-                        }`}
-                        onClick={() => handleTileClick(item)}
-                        style={itemImages[item] ? {
-                          backgroundImage: `url(${itemImages[item].src})`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center",
-                        } : undefined}
-                      >
-                        <div className="fantasy-tile-content">
-                          {audioFiles[item] && (
-                            <div className="fantasy-tile-icon">
-                              {currentlyPlaying === item && isPlaying ? '⏸️' : '▶️'}
-                            </div>
-                          )}
-                          <span>{item}</span>
-                          {audioFiles[item] && audioDurations[item] && (
-                            <span className="fantasy-tile-duration">
-                              {formatTime(audioDurations[item])}
-                            </span>
-                          )}
-                        </div>
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                  <div className="fantasy-tiles">
+                    {visibleRows[rowIndex].map((item, itemIndex) => (
+                      <div key={`${row.title}-${item}-${itemIndex}`} className="fantasy-tile-wrap">
+                        <button
+                          type="button"
+                          className={`fantasy-tile ${
+                            audioFiles[item] ? "fantasy-tile-playable" : ""
+                          } ${
+                            currentlyPlaying === item && isPlaying ? "fantasy-tile-playing" : ""
+                          }`}
+                          onClick={() => handleTileClick(item)}
+                          style={
+                            itemImages[item]
+                              ? {
+                                  backgroundImage: `url(${itemImages[item].src})`,
+                                  backgroundSize: "cover",
+                                  backgroundPosition: "center",
+                                }
+                              : undefined
+                          }
+                        >
+                          <div className="fantasy-tile-content">
+                            {audioFiles[item] && (
+                              <div className="fantasy-tile-icon">
+                                {currentlyPlaying === item && isPlaying ? "⏸️" : "▶️"}
+                              </div>
+                            )}
+                            <span>{item}</span>
+                            {audioFiles[item] && audioDurations[item] && (
+                              <span className="fantasy-tile-duration">
+                                {formatTime(audioDurations[item])}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
 
-                <div className="fantasy-arrow-wrap fantasy-arrow-right">
-                  <ArrowButton
-                    direction="right"
-                    onClick={() => goNext(rowIndex)}
-                  />
+                  <div className="fantasy-arrow-wrap">
+                    <ArrowButton
+                      direction="right"
+                      onClick={() => goNext(rowIndex)}
+                    />
+                  </div>
                 </div>
               </div>
             ))}
@@ -702,60 +682,72 @@ function FantasyAudioContent() {
           z-index: 1;
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 10px;
         }
 
         .fantasy-row {
           display: grid;
-          grid-template-columns: 220px 56px minmax(0, 1fr) 56px;
-          gap: 14px;
+          grid-template-columns: 4.75rem minmax(0, 1fr);
+          gap: 8px;
           align-items: center;
+          min-width: 0;
+        }
+
+        .fantasy-row-scroller {
+          display: grid;
+          grid-template-columns: 2rem minmax(0, 1fr) 2rem;
+          gap: 6px;
+          align-items: center;
+          min-width: 0;
         }
 
         .fantasy-category-card {
-          min-height: 84px;
-          border-radius: 0.75rem;
+          width: 4.75rem;
+          min-height: 0;
+          border-radius: 0.625rem;
           border: 1px solid rgba(41, 37, 36, 0.95);
           background: rgba(0, 0, 0, 0.35);
           overflow: hidden;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
           display: grid;
-          grid-template-columns: 74px 1fr;
+          grid-template-columns: 1fr;
+          grid-template-rows: auto auto;
           align-items: center;
+          justify-items: center;
         }
 
         .fantasy-category-image-wrap {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding-left: 10px;
+          padding: 6px 6px 0;
         }
 
         .fantasy-category-photo {
-          width: 64px;
-          height: 64px;
+          width: 2.75rem;
+          height: 2.75rem;
           object-fit: cover;
-          border-radius: 10px;
+          border-radius: 8px;
           display: block;
         }
 
         .fantasy-category-fallback {
-          width: 64px;
-          height: 64px;
-          border-radius: 10px;
+          width: 2.75rem;
+          height: 2.75rem;
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
           background: linear-gradient(135deg, #4b5563 0%, #1f2937 100%);
           color: white;
-          font-size: 24px;
+          font-size: 1rem;
           font-weight: 700;
         }
 
         .fantasy-category-icon {
-          width: 64px;
-          height: 64px;
-          border-radius: 10px;
+          width: 2.75rem;
+          height: 2.75rem;
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -766,8 +758,13 @@ function FantasyAudioContent() {
           );
         }
 
+        .fantasy-category-icon :global(svg) {
+          width: 1.75rem !important;
+          height: 1.75rem !important;
+        }
+
         .fantasy-category-caption {
-          padding: 12px 14px 12px 10px;
+          padding: 4px 6px 6px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -775,10 +772,14 @@ function FantasyAudioContent() {
         }
 
         .fantasy-category-caption-title {
-          font-size: 14px;
+          font-size: 9px;
           font-weight: 600;
           color: rgba(251, 191, 36, 0.92);
-          line-height: 1.2;
+          line-height: 1.15;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
 
         .fantasy-arrow-wrap {
@@ -787,23 +788,51 @@ function FantasyAudioContent() {
           justify-content: center;
         }
 
+        .fantasy-arrow-btn {
+          width: 2rem;
+          height: 2rem;
+          border-radius: 10px;
+          border: 1px solid rgba(41, 37, 36, 0.95);
+          background: rgba(0, 0, 0, 0.4);
+          color: #d8b26e;
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+        }
+
+        .fantasy-arrow-btn:hover {
+          transform: translateY(-1px);
+          background: rgba(216, 178, 110, 0.12);
+          border-color: rgba(216, 178, 110, 0.28);
+        }
+
         .fantasy-tiles {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 14px;
+          gap: 8px;
+          min-width: 0;
+        }
+
+        .fantasy-page-embed .fantasy-tiles {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .fantasy-tile {
-          min-height: 84px;
-          border-radius: 0.75rem;
+          min-height: 3.25rem;
+          border-radius: 0.625rem;
           border: 1px solid rgba(41, 37, 36, 0.95);
           background: rgba(0, 0, 0, 0.45);
           color: #fafaf9;
-          font-size: 1rem;
+          font-size: 0.75rem;
           font-weight: 600;
-          padding: 0 14px;
+          padding: 0 8px;
           cursor: pointer;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
           transition:
             transform 0.2s ease,
             border-color 0.2s ease,
@@ -871,7 +900,7 @@ function FantasyAudioContent() {
         }
 
         .fantasy-tile-icon {
-          font-size: 16px;
+          font-size: 12px;
           opacity: 0.8;
         }
 
@@ -915,10 +944,10 @@ function FantasyAudioContent() {
 
         .fantasy-tile-duration {
           display: block;
-          font-size: 11px;
+          font-size: 9px;
           font-weight: 500;
           color: rgba(255, 255, 255, 0.6);
-          margin-top: 4px;
+          margin-top: 2px;
           letter-spacing: 0.04em;
         }
 
@@ -1039,60 +1068,22 @@ function FantasyAudioContent() {
           background: rgba(216,178,110,0.2);
         }
 
-        @media (max-width: 1080px) {
-          .fantasy-row {
-            grid-template-columns: 1fr;
-          }
-
-          .fantasy-arrow-wrap {
-            justify-content: space-between;
-          }
-
-          .fantasy-arrow-left,
-          .fantasy-arrow-right {
-            display: inline-flex;
-          }
-        }
-
         @media (max-width: 760px) {
-          .fantasy-page {
+          .fantasy-page:not(.fantasy-page-embed) {
             padding: 28px 16px 48px;
           }
 
-          .fantasy-panel {
+          .fantasy-page:not(.fantasy-page-embed) .fantasy-panel {
             padding: 20px;
             border-radius: 24px;
           }
 
-          .fantasy-header p {
+          .fantasy-page:not(.fantasy-page-embed) .fantasy-header p {
             font-size: 16px;
           }
 
-          .fantasy-tiles {
-            grid-template-columns: 1fr;
-          }
-
-          .fantasy-category-card,
-          .fantasy-tile {
-            min-height: 72px;
-          }
-
-          .fantasy-category-card {
-            grid-template-columns: 74px 1fr;
-          }
-
-          .fantasy-category-photo,
-          .fantasy-category-fallback {
-            width: 56px;
-            height: 56px;
-          }
-
-                    .fantasy-tile {
-            font-size: 16px;
-          }
-
-          .fantasy-tile-icon {
-            font-size: 14px;
+          .fantasy-page:not(.fantasy-page-embed) .fantasy-tiles {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
         }
       `}</style>
