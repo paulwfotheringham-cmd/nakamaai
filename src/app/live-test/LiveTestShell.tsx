@@ -13,6 +13,7 @@ import LiveTestCreateAudioFrame from "./LiveTestCreateAudioFrame";
 import LiveTestFantasyAudioFrame from "./LiveTestFantasyAudioFrame";
 import LiveTestForbiddenChat from "./LiveTestForbiddenChat";
 import LiveTestInfoPanel from "./LiveTestInfoPanel";
+import LiveTestProfilePanel from "./LiveTestProfilePanel";
 import LiveTestUniverseNav from "./LiveTestUniverseNav";
 
 export type { LiveTestNavId };
@@ -88,15 +89,7 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
           />
         )}
         {centerPanel === "forbidden-chat" && <LiveTestForbiddenChat />}
-        {centerPanel === "profile" && (
-          <LiveTestInfoPanel
-            eyebrow="Profile"
-            title="Jane"
-            description="Your account, preferences, and membership."
-            poster="/scenes/moor.jpg"
-            body="Manage your display name, email, and password. Set content preferences, privacy controls, and notification options. View your plan, billing history, and saved experiences — all in one place when Profile launches."
-          />
-        )}
+        {centerPanel === "profile" && <LiveTestProfilePanel />}
         {centerPanel === "dashboard" && <LiveTestDashboardHome />}
       </section>
 
