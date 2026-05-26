@@ -7,7 +7,7 @@ import SimliAvatar, { type SimliAvatarHandle } from "@/components/SimliAvatar";
 import {
   GUIDE_TONES,
   GUIDE_VOICES,
-  ONBOARDING_GUIDES,
+  getOnboardingGuides,
   type GuideTone,
   type OnboardingGuide,
 } from "@/lib/guides/catalog";
@@ -18,7 +18,8 @@ export default function OnboardingClient() {
   const simliRef = useRef<SimliAvatarHandle>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const [selectedGuide, setSelectedGuide] = useState<OnboardingGuide>(ONBOARDING_GUIDES[0]);
+  const guides = useMemo(() => getOnboardingGuides(), []);
+  const [selectedGuide, setSelectedGuide] = useState<OnboardingGuide>(() => guides[0]);
   const [voiceId, setVoiceId] = useState(GUIDE_VOICES[0].id);
   const [tone, setTone] = useState<GuideTone>("Relaxed");
   const [previewingVoice, setPreviewingVoice] = useState<string | null>(null);
@@ -115,7 +116,7 @@ export default function OnboardingClient() {
               </h2>
               <p className="mt-1 text-sm text-stone-500">3 men · 1 woman · tap to preview live</p>
               <div className="mt-4 grid grid-cols-2 gap-3">
-                {ONBOARDING_GUIDES.map((guide) => {
+                {guides.map((guide) => {
                   const active = selectedGuide.id === guide.id;
                   return (
                     <button
