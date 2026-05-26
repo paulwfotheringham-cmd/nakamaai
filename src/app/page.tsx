@@ -1,5 +1,7 @@
 ﻿"use client";
 
+import { NakamaUniverseCard } from "@/components/NakamaUniverseCard";
+import { NAKAMA_UNIVERSE_SERVICES } from "@/lib/nakama-universe-services";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -198,53 +200,10 @@ function SceneAtmosphere({
   return null;
 }
 
-/* Short CC0 / permissive samples for hover previews (replace with your own clips in /public when ready). */
-const browseServices = [
-  {
-    title: "AUDIOBOOKS",
-    description: "Lose yourself in curated fantasy scenes",
-    poster: "/tiles/tile1.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "BUILD ADVENTURE",
-    description: "Create your own fantasy with tone and heat on your terms",
-    poster: "/tiles/tile2.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "INTERACTIVE ADVENTURES",
-    description: "Control your fantasy as it plays in real time",
-    poster: "/tiles/tile3.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "FORBIDDEN CHAT DESIRES",
-    description:
-      "Real time, voice to voice or messaging.",
-    poster: "/tiles/tile4.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "REINGITE FOR COUPLES",
-    description: "Date Night Mode. Surprise Mode. The Reconnection Series.",
-    poster: "/tiles/tile5.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    title: "CHARACTER & VOICES",
-    description:
-      "Create your character that will always be with you. In the voice you most desire",
-    poster: "/tiles/tile6.jpg",
-    videoSrc:
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-];
+const browseServices = NAKAMA_UNIVERSE_SERVICES.map((s) => ({
+  ...s,
+  videoSrc: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+}));
 
 function ServiceHoverVideoCard({
   title,
@@ -255,23 +214,7 @@ function ServiceHoverVideoCard({
   description: string;
   poster: string;
 }) {
-  return (
-    <div className="group relative w-full overflow-hidden rounded-xl border border-stone-800 bg-black shadow-lg">
-      <img
-        src={poster}
-        alt=""
-        className="h-36 w-full object-cover sm:h-40"
-      />
-      <div className="px-3 pb-4 pt-7">
-        <h3 className="min-h-[2.2rem] text-[10px] font-semibold leading-snug tracking-wide text-amber-100/95 sm:text-[11px]">
-          {title}
-        </h3>
-        <p className="mt-2 min-h-[3.6rem] text-[11px] leading-snug text-stone-300/90">
-          {description}
-        </p>
-      </div>
-    </div>
-  );
+  return <NakamaUniverseCard title={title} description={description} poster={poster} />;
 }
 
 export default function Page() {

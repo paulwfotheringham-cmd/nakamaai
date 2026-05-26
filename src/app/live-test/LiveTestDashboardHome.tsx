@@ -2,24 +2,24 @@
 
 const PICK_UP_ITEMS = [
   {
-    section: "Couples",
-    lastActivity: "Date Night Mode — Reconnection Series",
-    when: "Last time you were here, 2 days ago",
-  },
-  {
-    section: "Fantasy Catalogue",
+    section: "Audiobooks",
     lastActivity: "Gothic · windswept moor",
-    when: "Browsed last week",
+    when: "Last played 3 days ago",
   },
   {
-    section: "Build story",
+    section: "Build Adventure",
     lastActivity: "Your draft — slow burn, office setting",
     when: "Saved, not finished",
   },
   {
-    section: "Interactive story",
+    section: "Interactive Adventures",
     lastActivity: "Chapter 2 — the choice at the door",
     when: "In progress",
+  },
+  {
+    section: "Reignite for Couples",
+    lastActivity: "Date Night Mode — Reconnection Series",
+    when: "Last time you were here, 2 days ago",
   },
 ] as const;
 
