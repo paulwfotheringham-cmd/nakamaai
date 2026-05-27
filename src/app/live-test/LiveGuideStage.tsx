@@ -66,8 +66,6 @@ export default function LiveGuideStage() {
         const reply = await readStreamingReply(chatRes, onDelta);
         onDelta(reply);
 
-        const pcmPromise = fetchLiveTestPcm16(reply, voiceId);
-
         if (!simliRef.current?.isReady()) {
           const deadline = Date.now() + 5000;
           while (Date.now() < deadline) {
@@ -81,8 +79,12 @@ export default function LiveGuideStage() {
           }
         }
 
-        const pcm = await pcmPromise;
-        await simliRef.current!.playPcm(pcm);
+        try {
+          const pcm = await fetchLiveTestPcm16(reply, voiceId);
+          await simliRef.current!.playPcm(pcm);
+        } catch {
+          // Keep the chat reply even if TTS / lip-sync fails.
+        }
 
         return reply;
       } finally {

@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { resolveCartesiaVoiceId } from "@/lib/guides/voice";
+import { CARTESIA_VOICE_UUIDS, readEnvUuid } from "@/lib/guides/voices";
 import { getOpenAIApiKey } from "@/lib/openai/config";
 
 export const LIVE_TEST_SYSTEM_PROMPT =
@@ -20,19 +21,10 @@ function getCartesiaApiKey(): string | null {
 }
 
 function getCartesiaDonnyVoiceId(): string {
-  const fallback = "d709a7e8-9495-4247-aef0-01b3207d11bf";
-  const uuidRe =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-  for (const raw of [
-    process.env.CARTESIA_PREVIEW_DONNY_ID,
-    process.env.CARTESIA_VOICE_DONNY,
-  ]) {
-    const id = unquoteEnv(raw);
-    if (id && uuidRe.test(id)) return id;
-  }
-
-  return fallback;
+  return (
+    readEnvUuid(process.env.CARTESIA_VOICE_DONNY, process.env.CARTESIA_PREVIEW_DONNY_ID) ??
+    CARTESIA_VOICE_UUIDS.donny
+  );
 }
 
 export function hasLiveTestLlm(): boolean {
