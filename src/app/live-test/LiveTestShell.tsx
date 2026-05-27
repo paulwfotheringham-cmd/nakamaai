@@ -25,7 +25,7 @@ export default function LiveTestShell() {
   const onDashboard = activeNav === null;
 
   return (
-    <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden text-stone-200 grid-rows-[auto_1fr_auto] md:grid-cols-[minmax(11.5rem,13.5rem)_minmax(0,1fr)_minmax(15rem,20rem)] md:grid-rows-1">
+    <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden text-stone-200 grid-rows-[auto_1fr_auto] md:grid-cols-[minmax(12rem,14.5rem)_minmax(0,1fr)_minmax(15rem,20rem)] md:grid-rows-1">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_45%_at_50%_-8%,rgba(180,130,50,0.12),transparent_55%)]"
         aria-hidden
@@ -33,21 +33,21 @@ export default function LiveTestShell() {
 
       {/* Left nav */}
       <aside className="relative z-10 flex shrink-0 flex-col border-b border-stone-800/90 bg-black md:col-start-1 md:row-start-1 md:h-full md:min-h-0 md:border-b-0 md:border-r">
-        <div className="flex shrink-0 items-center gap-2 border-b border-stone-800/80 px-2.5 py-2 md:block md:space-y-2.5 md:px-3 md:py-3.5">
-          <Link href="/" className="flex shrink-0 justify-center md:block">
+        <div className="flex shrink-0 flex-col items-center gap-2.5 border-b border-stone-800/80 px-3 py-3 md:gap-3 md:px-4 md:py-4">
+          <Link href="/" className="flex w-full justify-center">
             <Image
               src="/Nakama-AI-July25-White.png"
               alt="Nakama Nights"
               width={280}
               height={76}
-              className="h-10 w-auto max-w-[8.5rem] object-contain md:h-16 md:max-w-full"
+              className="h-12 w-auto max-w-[10.5rem] object-contain sm:h-14 md:h-[4.75rem] md:max-w-full"
               priority
             />
           </Link>
           <button
             type="button"
             onClick={() => setActiveNav(null)}
-            className={`shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-semibold tracking-wide transition md:w-full md:py-2 md:text-xs ${
+            className={`w-full max-w-[11rem] rounded-full border px-3 py-1.5 text-[11px] font-semibold tracking-wide transition md:max-w-none md:py-2 md:text-xs ${
               onDashboard
                 ? "border-amber-400/55 bg-gradient-to-b from-amber-200/90 to-amber-600 text-zinc-950"
                 : "border-stone-700/80 bg-black/40 text-stone-300 hover:border-amber-700/40 hover:text-amber-100"
