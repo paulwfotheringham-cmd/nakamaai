@@ -63,9 +63,12 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
   const initGenRef = useRef(0);
   const rateLimitUntilRef = useRef(0);
   const [phase, setPhase] = useState<ConnectionPhase>("idle");
+  const [disconnected, setDisconnected] = useState(false);
   const [error, setError] = useState("");
   const [statusLine, setStatusLine] = useState("");
   const [retryCountdown, setRetryCountdown] = useState(0);
+  const phaseRef = useRef<ConnectionPhase>("idle");
+  phaseRef.current = phase;
 
   const unlockAudio = useCallback(async () => {
     try {
@@ -77,11 +80,12 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
 
   const markReady = useCallback(() => {
     readyRef.current = true;
+    setDisconnected(false);
     setPhase("ready");
     setStatusLine("");
   }, []);
 
-  const stopClient = useCallback(async () => {
+  const stopClient = useCallback(async (resetUi = false) => {
     const client = clientRef.current;
     clientRef.current = null;
     readyRef.current = false;
@@ -93,6 +97,11 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       }
     }
     releaseSimliSlot(stopClient);
+    if (resetUi) {
+      setDisconnected(true);
+      setPhase("idle");
+      setStatusLine("");
+    }
   }, []);
 
   const connectLivekit = useCallback(
@@ -140,8 +149,13 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       try {
         await client.start();
         clientRef.current = client;
+
+        const frameDeadline = Date.now() + 25_000;
+        while (Date.now() < frameDeadline && !readyRef.current) {
+          await sleep(100);
+        }
         if (!readyRef.current) {
-          markReady();
+          throw new Error("Avatar video did not start — tap Retry.");
         }
       } catch (e) {
         clientRef.current = null;
@@ -177,6 +191,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
 
     readyRef.current = false;
     setPhase("session");
+    setDisconnected(false);
     setStatusLine("Requesting Simli session…");
     setError("");
     setRetryCountdown(0);
@@ -218,7 +233,6 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       await connectLivekit(sessionJson.sessionToken);
 
       if (gen !== initGenRef.current) return;
-      markReady();
     } catch (e) {
       if (gen !== initGenRef.current) return;
       readyRef.current = false;
@@ -234,30 +248,29 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
   }, [connectLivekit, markReady, stopClient, faceId, guideId]);
 
   useEffect(() => {
+    let cancelled = false;
+
     const timer = window.setTimeout(() => {
-      void initClient();
+      if (!cancelled) void initClient();
     }, 0);
 
-    const onHide = () => {
-      if (document.visibilityState === "hidden") {
-        initGenRef.current += 1;
-        void stopClient();
+    const onVisible = () => {
+      if (document.visibilityState !== "visible" || cancelled) return;
+      const p = phaseRef.current;
+      if (p === "session" || p === "webrtc") return;
+      if (!readyRef.current && !clientRef.current) {
+        void initClient();
       }
     };
-    const onPageHide = () => {
-      initGenRef.current += 1;
-      void stopClient();
-    };
 
-    document.addEventListener("visibilitychange", onHide);
-    window.addEventListener("pagehide", onPageHide);
+    document.addEventListener("visibilitychange", onVisible);
 
     return () => {
+      cancelled = true;
       window.clearTimeout(timer);
-      document.removeEventListener("visibilitychange", onHide);
-      window.removeEventListener("pagehide", onPageHide);
+      document.removeEventListener("visibilitychange", onVisible);
       initGenRef.current += 1;
-      void stopClient();
+      void stopClient(true);
     };
   }, [initClient, stopClient]);
 
@@ -309,12 +322,12 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
     [playPcm, unlockAudio],
   );
 
-  const showOverlay = phase === "session" || phase === "webrtc";
+  const showOverlay = phase === "idle" || phase === "session" || phase === "webrtc";
   const rateLimited = retryCountdown > 0;
 
   return (
     <div
-      className={`relative max-w-full overflow-hidden rounded-2xl border border-amber-900/35 bg-black shadow-[0_0_0_1px_rgba(245,158,11,0.06),0_20px_50px_rgba(0,0,0,0.45)] ${className ?? ""}`}
+      className={`relative min-h-[7.5rem] max-w-full overflow-hidden rounded-2xl border border-amber-900/35 bg-black shadow-[0_0_0_1px_rgba(245,158,11,0.06),0_20px_50px_rgba(0,0,0,0.45)] ${className ?? ""}`}
     >
       <video
         ref={videoRef}
@@ -327,8 +340,23 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
 
       {showOverlay && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/85 px-6 text-center">
-          <p className="text-sm text-zinc-300">{statusLine || "Connecting Simli avatar…"}</p>
+          <p className="text-sm text-zinc-300">
+            {statusLine || (phase === "idle" ? "Starting guide avatar…" : "Connecting Simli avatar…")}
+          </p>
           <p className="text-xs text-zinc-500">This can take up to 30 seconds on first load.</p>
+        </div>
+      )}
+
+      {phase === "ready" && disconnected && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/85 px-4 text-center">
+          <p className="text-xs text-stone-400">Avatar disconnected.</p>
+          <button
+            type="button"
+            onClick={() => void initClient()}
+            className="rounded-lg border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-3 py-1.5 text-xs font-semibold text-zinc-950"
+          >
+            Reconnect
+          </button>
         </div>
       )}
 
