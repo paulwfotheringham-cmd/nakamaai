@@ -625,12 +625,9 @@ export default function Page() {
               <Link href="/privacy" className="transition hover:text-stone-100">
                 Privacy
               </Link>
-              <a
-                href="mailto:info@nakamanights.com"
-                className="transition hover:text-stone-100"
-              >
+              <Link href="/contact" className="transition hover:text-stone-100">
                 Contact
-              </a>
+              </Link>
               <Link
                 href="/faq-support"
                 className="transition hover:text-stone-100"
