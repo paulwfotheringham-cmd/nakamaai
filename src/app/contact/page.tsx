@@ -50,8 +50,7 @@ export default function ContactPage() {
               Contact us
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-stone-400 sm:text-base">
-              Ask us anything about Nakama Nights. This form opens your email client and
-              pre-fills the message to <span className="text-amber-200/90">info@nakamanights.com</span>.
+              Ask us anything about Nakama Nights.
             </p>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-4">
@@ -88,16 +87,6 @@ export default function ContactPage() {
               >
                 Send message
               </button>
-
-              <div className="pt-2 text-center text-xs text-stone-500">
-                Prefer email?{" "}
-                <a
-                  href="mailto:info@nakamanights.com"
-                  className="text-amber-200/90 underline decoration-amber-300/40 underline-offset-4 hover:text-amber-100"
-                >
-                  info@nakamanights.com
-                </a>
-              </div>
             </form>
           </div>
         </div>
