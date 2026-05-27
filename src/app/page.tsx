@@ -299,7 +299,13 @@ export default function Page() {
             />
           </Link>
 
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-3 sm:gap-4">
+            <a
+              href="#fantasy-services"
+              className="text-sm font-medium text-stone-300 transition hover:text-amber-100"
+            >
+              Fantasy services
+            </a>
             <Link
               href="/signup-trial"
               className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
@@ -503,7 +509,7 @@ export default function Page() {
           </div>
         </section>
 
-        <section id="browse-services" className="mt-8 scroll-mt-28 rounded-2xl bg-zinc-950/80 p-6">
+        <section id="fantasy-services" className="mt-8 scroll-mt-28 rounded-2xl bg-zinc-950/80 p-6">
           <h2 className="font-serif text-2xl leading-tight text-white sm:text-3xl">
             Nakama Nights Universe
           </h2>
