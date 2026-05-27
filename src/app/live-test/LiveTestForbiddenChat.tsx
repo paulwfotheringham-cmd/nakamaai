@@ -15,16 +15,11 @@ type ChatMessage = {
   text: string;
 };
 
-const WELCOME =
-  "Welcome to Forbidden Chat.\n\nThis is a private space for voice and text — set the scene below, or jump straight into open chat.";
-
 const PLACEHOLDER_REPLY =
   "Thanks for your message. Full Forbidden Chat is coming soon — for now, use your guide on the right or explore another section from the menu.";
 
 export default function LiveTestForbiddenChat() {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: "welcome", role: "assistant", text: WELCOME },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [setupComplete, setSetupComplete] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
