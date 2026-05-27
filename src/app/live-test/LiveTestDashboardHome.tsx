@@ -96,14 +96,14 @@ export default function LiveTestDashboardHome() {
 
               <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-start px-2.5 pb-[5.5rem] pt-4 text-center sm:px-3 sm:pt-5 lg:pb-[5.5rem]">
                 <div className="flex h-full w-full max-w-[95%] flex-col">
-                  <p className="text-[10px] font-bold uppercase leading-tight tracking-[0.12em] text-amber-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-[11px] lg:text-[9px] lg:tracking-[0.08em]">
+                  <p className="text-[11px] font-bold uppercase leading-tight tracking-[0.12em] text-amber-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-xs lg:text-[10px] lg:tracking-[0.1em]">
                     {item.section}
                   </p>
                   <div className="flex-1" />
-                  <p className="line-clamp-4 font-serif text-sm font-bold leading-snug text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] sm:text-base lg:text-[13px] lg:leading-[1.35]">
+                  <p className="line-clamp-4 font-serif text-base font-bold leading-snug text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] sm:text-lg lg:text-[17px] lg:leading-[1.3]">
                     {item.lastActivity}
                   </p>
-                  <p className="mt-1.5 line-clamp-3 text-[11px] font-semibold leading-snug text-stone-200 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-xs lg:mt-1 lg:text-[10px]">
+                  <p className="mt-1.5 line-clamp-3 text-xs font-semibold leading-snug text-stone-200 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-sm lg:mt-1.5 lg:text-xs">
                     {item.when}
                   </p>
                   <div className="flex-[0.9]" />
