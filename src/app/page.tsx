@@ -302,7 +302,7 @@ export default function Page() {
           <div className="ml-auto flex flex-wrap items-center justify-end gap-3 sm:gap-4">
             <a
               href="#fantasy-services"
-              className="inline-flex rounded-full border border-stone-600/70 bg-stone-900/60 px-5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-200 shadow-[0_8px_24px_rgba(0,0,0,0.2)] backdrop-blur-sm transition hover:border-stone-500 hover:bg-stone-800/80 hover:text-white"
+              className="inline-flex rounded-full border border-amber-400/35 bg-gradient-to-b from-[#e4efd9] via-[#dce8c8] to-[#d0ddb8] px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:border-amber-300/50 hover:from-[#ecf4e4] hover:via-[#e6efd6] hover:to-[#dae6c8]"
             >
               Fantasy services
             </a>
