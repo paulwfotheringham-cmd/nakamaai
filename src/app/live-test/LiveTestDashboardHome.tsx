@@ -94,8 +94,8 @@ export default function LiveTestDashboardHome() {
                 aria-hidden
               />
 
-              <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-start px-2.5 pb-2 pt-3 text-center sm:px-3 sm:pt-4">
-                <div className="flex h-full w-full max-w-[95%] flex-col">
+              <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-center px-2.5 pb-[5.5rem] pt-3 text-center sm:px-3 sm:pb-[5.75rem] sm:pt-4 lg:pb-[5.5rem]">
+                <div className="max-w-[95%]">
                   <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-xs">
                     {item.section}
                   </p>
@@ -105,7 +105,6 @@ export default function LiveTestDashboardHome() {
                   <p className="mt-1.5 line-clamp-2 text-xs font-semibold text-stone-200 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-sm">
                     {item.when}
                   </p>
-                  <div className="flex-1" />
                 </div>
               </div>
 
