@@ -65,7 +65,7 @@ function CouplesTile({
         aria-hidden
       />
 
-      <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-start px-2.5 pb-3 pt-4 text-center sm:px-3 sm:pt-5">
+      <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-start px-2.5 pb-2 pt-3 text-center sm:px-3 sm:pt-4">
         <div className="max-w-[95%]">
           {eyebrow ? (
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)] sm:text-[11px]">
@@ -79,15 +79,15 @@ function CouplesTile({
           >
             {title}
           </h2>
-          <p className="mt-2 line-clamp-4 text-xs font-semibold leading-snug text-stone-100 drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)] sm:text-[13px]">
-            {description}
-          </p>
           <button
             type="button"
-            className="mx-auto mt-3 w-full max-w-[11rem] rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-4 py-2 text-center text-[11px] font-bold text-zinc-950 shadow-[0_2px_12px_rgba(0,0,0,0.45)] transition hover:from-amber-100 hover:to-amber-500 sm:max-w-[12.5rem] sm:px-5 sm:py-2.5 sm:text-xs"
+            className="mx-auto mt-2.5 w-full max-w-[11rem] rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-4 py-2 text-center text-[11px] font-bold text-zinc-950 shadow-[0_2px_12px_rgba(0,0,0,0.45)] transition hover:from-amber-100 hover:to-amber-500 sm:max-w-[12.5rem] sm:mt-3 sm:px-5 sm:py-2.5 sm:text-xs"
           >
             {button}
           </button>
+          <p className="mt-2 line-clamp-3 text-[11px] font-medium leading-snug text-stone-200/90 drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)] sm:text-xs">
+            {description}
+          </p>
         </div>
       </div>
     </article>
