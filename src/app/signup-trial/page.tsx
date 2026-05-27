@@ -86,7 +86,7 @@ export default function SignupTrialPage() {
         color: "white",
       }}
     >
-      <a href="/select-plan" style={backBtnStyle}>
+      <a href="/" style={backBtnStyle}>
         ← Back
       </a>
       <div
