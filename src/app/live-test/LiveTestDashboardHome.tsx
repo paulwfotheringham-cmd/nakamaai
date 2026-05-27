@@ -12,13 +12,13 @@ const PICK_UP_ITEMS = [
   },
   {
     section: "Build Adventure",
-    lastActivity: "Your draft — slow burn, office setting",
+    lastActivity: "Your draft — slow burn, office",
     when: "Saved, not finished",
     image: "/scenes/office.jpg",
   },
   {
     section: "Interactive Adventures",
-    lastActivity: "Chapter 2 — the choice at the door",
+    lastActivity: "Chapter 2 — choice at the door",
     when: "In progress",
     image: "/tiles/tile3.jpg",
   },
@@ -30,8 +30,8 @@ const PICK_UP_ITEMS = [
   },
   {
     section: "Reignite for Couples",
-    lastActivity: "Date Night Mode — Reconnection Series",
-    when: "Last time you were here, 2 days ago",
+    lastActivity: "Date Night · Reconnection",
+    when: "Last here 2 days ago",
     image: "/tiles/tile5.jpg",
   },
 ] as const;
@@ -96,14 +96,14 @@ export default function LiveTestDashboardHome() {
 
               <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-start px-2.5 pb-[5.5rem] pt-4 text-center sm:px-3 sm:pt-5 lg:pb-[5.5rem]">
                 <div className="flex h-full w-full max-w-[95%] flex-col">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-xs">
+                  <p className="text-[10px] font-bold uppercase leading-tight tracking-[0.12em] text-amber-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-[11px] lg:text-[9px] lg:tracking-[0.08em]">
                     {item.section}
                   </p>
                   <div className="flex-1" />
-                  <p className="line-clamp-2 font-serif text-lg font-bold leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] sm:text-xl md:text-[1.35rem]">
+                  <p className="line-clamp-4 font-serif text-sm font-bold leading-snug text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] sm:text-base lg:text-[13px] lg:leading-[1.35]">
                     {item.lastActivity}
                   </p>
-                  <p className="mt-1.5 line-clamp-2 text-xs font-semibold text-stone-200 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-sm">
+                  <p className="mt-1.5 line-clamp-3 text-[11px] font-semibold leading-snug text-stone-200 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-xs lg:mt-1 lg:text-[10px]">
                     {item.when}
                   </p>
                   <div className="flex-[0.9]" />
