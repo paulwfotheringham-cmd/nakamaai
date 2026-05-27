@@ -1,4 +1,4 @@
-export const CHAT_SETUP_KEY = "nakama_chat_setup";
+export const FORBIDDEN_CHAT_SETUP_KEY = "nakama_forbidden_chat_setup";
 
 export const EXPERIENCE_LENGTH_OPTIONS = [
   "Quick Escape",
@@ -75,10 +75,10 @@ export type ChatSetupPreferences = {
   interactionStyle?: string;
 };
 
-export function readChatSetup(): ChatSetupPreferences | null {
+export function readForbiddenChatSetup(): ChatSetupPreferences | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = sessionStorage.getItem(CHAT_SETUP_KEY);
+    const raw = sessionStorage.getItem(FORBIDDEN_CHAT_SETUP_KEY);
     if (!raw) return null;
     return JSON.parse(raw) as ChatSetupPreferences;
   } catch {
@@ -86,9 +86,9 @@ export function readChatSetup(): ChatSetupPreferences | null {
   }
 }
 
-export function writeChatSetup(prefs: ChatSetupPreferences): void {
+export function writeForbiddenChatSetup(prefs: ChatSetupPreferences): void {
   if (typeof window === "undefined") return;
-  sessionStorage.setItem(CHAT_SETUP_KEY, JSON.stringify(prefs));
+  sessionStorage.setItem(FORBIDDEN_CHAT_SETUP_KEY, JSON.stringify(prefs));
 }
 
 export function buildGuidedStartMessage(prefs: ChatSetupPreferences): string {
