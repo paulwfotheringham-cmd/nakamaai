@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { GUIDE_VOICES } from "@/lib/guides/catalog";
 import {
   CHARACTER_OPTIONS,
   CHAT_MOOD_OPTIONS,
@@ -10,6 +11,7 @@ import {
   buildGuidedStartMessage,
   type ChatSetupPreferences,
 } from "@/lib/guides/chat-setup";
+import { readGuidePreferences } from "@/lib/guides/preferences";
 
 const SELECT_CLASS =
   "w-full rounded-lg border border-stone-700/80 bg-zinc-950/90 px-2.5 py-2 text-xs text-white focus:border-amber-500/45 focus:outline-none focus:ring-1 focus:ring-amber-500/25 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm";
@@ -70,7 +72,17 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
   const [customScenario, setCustomScenario] = useState("");
   const [character, setCharacter] = useState("");
   const [interactionStyle, setInteractionStyle] = useState("");
+  const [voiceId, setVoiceId] = useState("");
   const [setupError, setSetupError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const savedVoice = readGuidePreferences().voiceId;
+    if (savedVoice && GUIDE_VOICES.some((v) => v.id === savedVoice)) {
+      setVoiceId(savedVoice);
+    }
+  }, []);
+
+  const selectedVoice = GUIDE_VOICES.find((v) => v.id === voiceId);
 
   const guidedReady =
     experienceLength &&
@@ -78,12 +90,17 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
     scenario &&
     character &&
     interactionStyle &&
+    voiceId &&
     (scenario !== "Create your own" || customScenario.trim());
 
   const handleUnfettered = () => {
     setSetupError(null);
     onComplete({
-      prefs: { mode: "unfettered" },
+      prefs: {
+        mode: "unfettered",
+        voiceId: selectedVoice?.id,
+        voiceName: selectedVoice?.name,
+      },
       assistantNote:
         "You've got an open canvas — no rules, no script. Say anything and we'll go wherever you want.",
     });
@@ -107,6 +124,8 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
       customScenario: scenario === "Create your own" ? customScenario.trim() : undefined,
       character,
       interactionStyle,
+      voiceId: selectedVoice!.id,
+      voiceName: selectedVoice!.name,
     };
 
     const scenarioLabel =
@@ -191,6 +210,25 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
           options={INTERACTION_STYLE_OPTIONS}
           disabled={disabled}
         />
+        <label htmlFor="forbidden-voice" className="block">
+          <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-500/90 sm:text-[11px]">
+            Choose your voice
+          </span>
+          <select
+            id="forbidden-voice"
+            value={voiceId}
+            onChange={(e) => setVoiceId(e.target.value)}
+            disabled={disabled}
+            className={SELECT_CLASS}
+          >
+            <option value="">Choose…</option>
+            {GUIDE_VOICES.map((v) => (
+              <option key={v.id} value={v.id}>
+                {v.name}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
       {setupError && <p className="text-center text-xs text-red-400/90">{setupError}</p>}

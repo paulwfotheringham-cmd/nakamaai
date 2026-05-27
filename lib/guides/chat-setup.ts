@@ -73,6 +73,8 @@ export type ChatSetupPreferences = {
   customScenario?: string;
   character?: string;
   interactionStyle?: string;
+  voiceId?: string;
+  voiceName?: string;
 };
 
 export function readForbiddenChatSetup(): ChatSetupPreferences | null {
@@ -104,6 +106,9 @@ export function buildGuidedStartMessage(prefs: ChatSetupPreferences): string {
     `Scenario: ${scenario}`,
     `Character: ${prefs.character}`,
     `Interaction style: ${prefs.interactionStyle}`,
+    prefs.voiceName ? `Voice: ${prefs.voiceName}` : null,
     "Please begin in character and match this tone.",
-  ].join("\n");
+  ]
+    .filter(Boolean)
+    .join("\n");
 }

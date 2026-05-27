@@ -4,6 +4,10 @@ import {
   readForbiddenChatSetup,
   writeForbiddenChatSetup,
 } from "@/lib/guides/chat-setup";
+import {
+  readGuidePreferences,
+  writeGuidePreferences,
+} from "@/lib/guides/preferences";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import ForbiddenChatSetup, {
   type ForbiddenChatSetupResult,
@@ -48,6 +52,14 @@ export default function LiveTestForbiddenChat() {
 
   const handleSetupComplete = (result: ForbiddenChatSetupResult) => {
     writeForbiddenChatSetup(result.prefs);
+    if (result.prefs.voiceId && result.prefs.voiceName) {
+      const guidePrefs = readGuidePreferences();
+      writeGuidePreferences({
+        ...guidePrefs,
+        voiceId: result.prefs.voiceId,
+        voiceName: result.prefs.voiceName,
+      });
+    }
     setSetupComplete(true);
 
     const next: ChatMessage[] = [
