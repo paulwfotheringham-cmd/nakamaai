@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { resolveLoginEmail } from "@/lib/auth-login";
@@ -47,6 +48,7 @@ export default function LoginPage() {
       style={{
         minHeight: "100vh",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         background:
@@ -56,7 +58,29 @@ export default function LoginPage() {
         fontFamily: "Arial, Helvetica, sans-serif",
       }}
     >
-      <a href="/" style={backBtnStyle}>← Home</a>
+      <a href="/" style={backBtnStyle}>
+        ← Home
+      </a>
+      <Link
+        href="/"
+        style={{
+          display: "block",
+          marginBottom: "28px",
+          flexShrink: 0,
+        }}
+      >
+        <img
+          src="/Nakama-AI-July25-White.png"
+          alt="Nakama Nights"
+          style={{
+            display: "block",
+            height: "52px",
+            width: "auto",
+            maxWidth: "min(100%, 280px)",
+            objectFit: "contain",
+          }}
+        />
+      </Link>
       <div
         style={{
           width: "100%",
@@ -69,18 +93,6 @@ export default function LoginPage() {
           backdropFilter: "blur(12px)",
         }}
       >
-        <div
-          style={{
-            fontSize: "12px",
-            letterSpacing: "0.35em",
-            textTransform: "uppercase",
-            color: "#d8b26e",
-            marginBottom: "12px",
-          }}
-        >
-          Nakama
-        </div>
-
         <h1
           style={{
             fontSize: "40px",
