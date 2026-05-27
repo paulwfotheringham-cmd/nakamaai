@@ -27,7 +27,6 @@ const COUPLES_TILES = [
   },
   {
     id: "shared",
-    eyebrow: "Together",
     title: "Shared session",
     description:
       "Both partners open the same audio on their devices and play together — guided by a narrator for both of you.",
