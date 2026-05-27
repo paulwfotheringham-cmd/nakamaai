@@ -371,7 +371,7 @@ export default function Page() {
 
             <Link
               href="/select-plan"
-              className="mt-12 inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
+              className="mt-12 inline-flex w-full max-w-[280px] items-center justify-center rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100 md:px-7 md:py-3 md:text-[11px] lg:text-xs"
             >
               JOIN NAKAMA NOW
             </Link>
