@@ -96,7 +96,7 @@ export default function LiveTestDashboardHome() {
 
               <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-start px-2.5 pb-[5.5rem] pt-4 text-center sm:px-3 sm:pt-5 lg:pb-[5.5rem]">
                 <div className="flex h-full w-full max-w-[95%] flex-col">
-                  <p className="text-[11px] font-bold uppercase leading-tight tracking-[0.12em] text-amber-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-xs lg:text-[10px] lg:tracking-[0.1em]">
+                  <p className="text-xs font-bold uppercase leading-relaxed tracking-[0.1em] text-amber-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-sm lg:text-[13px] lg:leading-[1.5] lg:tracking-[0.08em]">
                     {item.section}
                   </p>
                   <div className="flex-1" />
@@ -110,16 +110,16 @@ export default function LiveTestDashboardHome() {
                 </div>
               </div>
 
-              <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-1.5 px-2 pb-2.5 pt-5 sm:gap-2 sm:pb-3">
+              <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-3 px-2 pb-2.5 pt-5 sm:gap-3.5 sm:pb-3 lg:gap-4">
                 <button
                   type="button"
-                  className="w-full max-w-[12rem] rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-3 py-2 text-center text-xs font-bold text-zinc-950 shadow-lg shadow-black/40 transition hover:from-amber-100 hover:to-amber-500 sm:max-w-[12.5rem] sm:py-2.5 sm:text-sm lg:max-w-none lg:px-3 lg:py-2 lg:text-[11px]"
+                  className="w-full max-w-[12rem] rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-3 py-2 text-center text-xs font-bold text-zinc-950 shadow-lg shadow-black/40 transition hover:from-amber-100 hover:to-amber-500 sm:max-w-[12.5rem] sm:py-2.5 sm:text-sm lg:max-w-none lg:px-3 lg:py-2.5 lg:text-sm"
                 >
                   Yes, continue
                 </button>
                 <button
                   type="button"
-                  className="w-full max-w-[12rem] rounded-full border border-stone-400/50 bg-black/50 px-3 py-2 text-center text-xs font-semibold text-stone-100 backdrop-blur-sm transition hover:border-stone-300 hover:bg-black/65 sm:max-w-[12.5rem] sm:py-2.5 sm:text-sm lg:max-w-none lg:px-3 lg:py-2 lg:text-[11px]"
+                  className="w-full max-w-[12rem] rounded-full border border-stone-400/50 bg-black/50 px-3 py-2 text-center text-xs font-semibold text-stone-100 backdrop-blur-sm transition hover:border-stone-300 hover:bg-black/65 sm:max-w-[12.5rem] sm:py-2.5 sm:text-sm lg:max-w-none lg:px-3 lg:py-2.5 lg:text-sm"
                 >
                   Not now
                 </button>
