@@ -104,8 +104,12 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
     }
   }, []);
 
-  const connectLivekit = useCallback(
-    async (sessionToken: string) => {
+  const connectWithTransport = useCallback(
+    async (
+      sessionToken: string,
+      iceServers: RTCIceServer[] | null,
+      transport: "p2p" | "livekit",
+    ) => {
       const video = videoRef.current;
       const audio = audioRef.current;
       if (!video || !audio) {
@@ -116,12 +120,16 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
         sessionToken,
         video,
         audio,
-        null,
+        iceServers,
         LogLevel.ERROR,
-        "livekit",
+        transport,
       );
 
+      let settled = false;
+
       const fail = async (msg: string) => {
+        if (settled) return;
+        settled = true;
         readyRef.current = false;
         if (isSimliRateLimitError(msg)) {
           rateLimitUntilRef.current = Date.now() + RATE_LIMIT_COOLDOWN_MS;
@@ -137,6 +145,8 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       };
 
       client.on("start", () => {
+        if (settled) return;
+        settled = true;
         markReady();
       });
       client.on("startup_error", (msg: string) => {
@@ -150,15 +160,24 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
         await client.start();
         clientRef.current = client;
 
-        const frameDeadline = Date.now() + 25_000;
+        const frameDeadline = Date.now() + 30_000;
         while (Date.now() < frameDeadline && !readyRef.current) {
           await sleep(100);
         }
         if (!readyRef.current) {
           throw new Error("Avatar video did not start — tap Retry.");
         }
+
+        const videoDeadline = Date.now() + 8_000;
+        while (Date.now() < videoDeadline) {
+          const el = videoRef.current;
+          if (el && (el.videoWidth > 0 || el.srcObject)) return;
+          await sleep(200);
+        }
       } catch (e) {
+        settled = true;
         clientRef.current = null;
+        readyRef.current = false;
         try {
           await client.stop();
         } catch {
@@ -183,7 +202,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
     }
 
     const gen = ++initGenRef.current;
-    await stopClient();
+    await stopClient(true);
     await sleep(TEARDOWN_MS);
     if (gen !== initGenRef.current) return;
 
@@ -219,6 +238,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       });
       const sessionJson = (await sessionRes.json()) as {
         sessionToken?: string;
+        iceServers?: RTCIceServer[];
         error?: string;
       };
 
@@ -228,9 +248,43 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
         throw new Error(sessionJson.error || "Failed to start Simli session");
       }
 
+      const iceServers = sessionJson.iceServers ?? null;
       setPhase("webrtc");
-      setStatusLine("Connecting avatar…");
-      await connectLivekit(sessionJson.sessionToken);
+      setStatusLine("Connecting avatar (LiveKit)…");
+
+      let lastError: unknown;
+      const attempts: Array<{
+        mode: "livekit" | "p2p";
+        ice: RTCIceServer[] | null;
+        label: string;
+      }> = [
+        { mode: "livekit", ice: null, label: "Connecting avatar (LiveKit)…" },
+      ];
+      if (iceServers?.length) {
+        attempts.push({
+          mode: "p2p",
+          ice: iceServers,
+          label: "Retrying avatar (WebRTC)…",
+        });
+      }
+
+      for (const { mode, ice, label } of attempts) {
+        if (gen !== initGenRef.current) return;
+        try {
+          setStatusLine(label);
+          await connectWithTransport(sessionJson.sessionToken, ice, mode);
+          lastError = undefined;
+          break;
+        } catch (e) {
+          lastError = e;
+          await stopClient();
+          await sleep(600);
+        }
+      }
+
+      if (lastError) {
+        throw lastError;
+      }
 
       if (gen !== initGenRef.current) return;
     } catch (e) {
@@ -245,13 +299,16 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       setPhase("error");
       await stopClient();
     }
-  }, [connectLivekit, markReady, stopClient, faceId, guideId]);
+  }, [connectWithTransport, stopClient, faceId, guideId]);
+
+  const initRef = useRef(initClient);
+  initRef.current = initClient;
 
   useEffect(() => {
     let cancelled = false;
 
     const timer = window.setTimeout(() => {
-      if (!cancelled) void initClient();
+      if (!cancelled) void initRef.current();
     }, 0);
 
     const onVisible = () => {
@@ -259,7 +316,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       const p = phaseRef.current;
       if (p === "session" || p === "webrtc") return;
       if (!readyRef.current && !clientRef.current) {
-        void initClient();
+        void initRef.current();
       }
     };
 
@@ -272,7 +329,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       initGenRef.current += 1;
       void stopClient(true);
     };
-  }, [initClient, stopClient]);
+  }, [guideId, faceId, stopClient]);
 
   useEffect(() => {
     if (retryCountdown <= 0) return;
@@ -327,7 +384,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
 
   return (
     <div
-      className={`relative min-h-[7.5rem] max-w-full overflow-hidden rounded-2xl border border-amber-900/35 bg-black shadow-[0_0_0_1px_rgba(245,158,11,0.06),0_20px_50px_rgba(0,0,0,0.45)] ${className ?? ""}`}
+      className={`relative min-h-[9rem] max-w-full overflow-hidden rounded-2xl border border-amber-900/35 bg-black shadow-[0_0_0_1px_rgba(245,158,11,0.06),0_20px_50px_rgba(0,0,0,0.45)] ${className ?? ""}`}
     >
       <video
         ref={videoRef}

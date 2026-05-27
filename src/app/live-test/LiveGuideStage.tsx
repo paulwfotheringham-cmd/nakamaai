@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { fetchLiveTestPcm16 } from "@/lib/live-test/fetch-pcm-client";
 import { readGuidePreferences, type GuidePreferences } from "@/lib/guides/preferences";
 import SimliAvatar, { type SimliAvatarHandle } from "@/components/SimliAvatar";
@@ -32,11 +32,7 @@ async function readStreamingReply(
 export default function LiveGuideStage() {
   const simliRef = useRef<SimliAvatarHandle>(null);
   const [isBusy, setIsBusy] = useState(false);
-  const [prefs, setPrefs] = useState<GuidePreferences | null>(null);
-
-  useEffect(() => {
-    setPrefs(readGuidePreferences());
-  }, []);
+  const [prefs] = useState<GuidePreferences>(() => readGuidePreferences());
 
   const simliFaceId = prefs?.simliFaceId;
   const voiceId = prefs?.voiceId;
@@ -98,20 +94,14 @@ export default function LiveGuideStage() {
     <LiveTestShell
       rightColumn={
         <div className="flex h-full min-h-0 flex-col overflow-hidden">
-          <div className="mx-auto min-h-[7.5rem] h-[clamp(7.5rem,26dvh,11rem)] w-full max-w-full shrink-0 overflow-hidden lg:min-h-[10rem] lg:h-[clamp(10rem,34%,14rem)]">
-            {prefs ? (
-              <SimliAvatar
-                key={prefs.guideId}
-                ref={simliRef}
-                guideId={prefs.guideId}
-                faceId={simliFaceId}
-                className="h-full w-full"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center rounded-2xl border border-amber-900/35 bg-black text-xs text-stone-500">
-                Loading guide…
-              </div>
-            )}
+          <div className="mx-auto min-h-[9rem] h-[clamp(9rem,28dvh,13rem)] w-full max-w-full shrink-0 overflow-hidden md:min-h-[10rem] md:h-[clamp(10rem,36%,15rem)]">
+            <SimliAvatar
+              key={prefs.guideId}
+              ref={simliRef}
+              guideId={prefs.guideId}
+              faceId={simliFaceId}
+              className="h-full w-full"
+            />
           </div>
 
           <div className="mt-1.5 flex min-h-0 flex-1 flex-col overflow-hidden lg:mt-2">

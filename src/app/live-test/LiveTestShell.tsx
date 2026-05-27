@@ -66,8 +66,8 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
       </aside>
 
       {/* Main — center content + guide (stacked on mobile, side-by-side on desktop) */}
-      <div className="relative z-10 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden lg:flex-row">
-        <section className="flex min-h-0 min-w-0 flex-[1.35] flex-col overflow-hidden p-2 sm:p-3 lg:flex-1">
+      <div className="relative z-10 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden md:flex-row">
+        <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-2 sm:p-3">
           {centerPanel === "fantasy-audio" && <LiveTestFantasyAudioFrame />}
           {centerPanel === "create-audio" && <LiveTestCreateAudioFrame />}
           {centerPanel === "couples-program" && <LiveTestCouplesProgram />}
@@ -94,7 +94,7 @@ export default function LiveTestShell({ rightColumn }: LiveTestShellProps) {
           {centerPanel === "dashboard" && <LiveTestDashboardHome />}
         </section>
 
-        <aside className="flex h-[min(38dvh,17.5rem)] min-h-0 shrink-0 flex-col gap-2 overflow-hidden border-t border-stone-800/90 bg-black/40 p-2 sm:gap-2.5 sm:p-3 lg:h-full lg:w-[clamp(14rem,24vw,19rem)] lg:shrink-0 lg:border-l lg:border-t-0">
+        <aside className="flex h-[min(42dvh,20rem)] min-h-[16rem] shrink-0 flex-col gap-2 overflow-hidden border-t border-stone-800/90 bg-black/40 p-2 sm:gap-2.5 sm:p-3 md:h-full md:min-h-0 md:w-[clamp(15rem,26vw,20rem)] md:shrink-0 md:border-l md:border-t-0">
           {rightColumn}
         </aside>
       </div>
