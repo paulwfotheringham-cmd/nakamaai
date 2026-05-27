@@ -8,6 +8,11 @@ import {
   useRef,
   useState,
 } from "react";
+import {
+  isSimliRateLimitError,
+  registerSimliTeardown,
+  releaseSimliSlot,
+} from "@/lib/simli/connection-guard";
 import { formatSimliError } from "@/lib/simli/format-error";
 import { LogLevel, SimliClient } from "simli-client";
 
@@ -19,16 +24,16 @@ export type SimliAvatarHandle = {
 
 type SimliAvatarProps = {
   className?: string;
-  /** Simli face UUID — when changed, reconnects the avatar session. */
   faceId?: string;
-  /** Nakama guide id — server resolves face from catalog (preferred over faceId). */
   guideId?: string;
 };
 
 type ConnectionPhase = "idle" | "session" | "webrtc" | "ready" | "error";
 
 const CHUNK_BYTES = 6000;
-const IMMEDIATE_BYTES = 16000 * 2 * 2; // 2s @ 16kHz PCM16
+const IMMEDIATE_BYTES = 16000 * 2 * 2;
+const RATE_LIMIT_COOLDOWN_MS = 30_000;
+const TEARDOWN_MS = 1200;
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -56,15 +61,17 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
   const clientRef = useRef<SimliClient | null>(null);
   const readyRef = useRef(false);
   const initGenRef = useRef(0);
+  const rateLimitUntilRef = useRef(0);
   const [phase, setPhase] = useState<ConnectionPhase>("idle");
   const [error, setError] = useState("");
   const [statusLine, setStatusLine] = useState("");
+  const [retryCountdown, setRetryCountdown] = useState(0);
 
   const unlockAudio = useCallback(async () => {
     try {
       await audioRef.current?.play();
     } catch {
-      // Browser may block until user gesture; ignore.
+      /* ignore */
     }
   }, []);
 
@@ -82,17 +89,14 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       try {
         await client.stop();
       } catch {
-        // ignore cleanup errors
+        /* ignore */
       }
     }
+    releaseSimliSlot(stopClient);
   }, []);
 
-  const connectWithTransport = useCallback(
-    async (
-      sessionToken: string,
-      iceServers: RTCIceServer[] | null,
-      transport: "p2p" | "livekit",
-    ) => {
+  const connectLivekit = useCallback(
+    async (sessionToken: string) => {
       const video = videoRef.current;
       const audio = audioRef.current;
       if (!video || !audio) {
@@ -103,43 +107,79 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
         sessionToken,
         video,
         audio,
-        iceServers,
+        null,
         LogLevel.ERROR,
-        transport,
+        "livekit",
       );
+
+      const fail = async (msg: string) => {
+        readyRef.current = false;
+        if (isSimliRateLimitError(msg)) {
+          rateLimitUntilRef.current = Date.now() + RATE_LIMIT_COOLDOWN_MS;
+        }
+        setError(msg || "Simli WebRTC startup failed");
+        setPhase("error");
+        clientRef.current = null;
+        try {
+          await client.stop();
+        } catch {
+          /* ignore */
+        }
+      };
 
       client.on("start", () => {
         markReady();
       });
       client.on("startup_error", (msg: string) => {
-        readyRef.current = false;
-        setError(msg || "Simli WebRTC startup failed");
-        setPhase("error");
+        void fail(msg);
       });
       client.on("error", () => {
-        readyRef.current = false;
-        setError("Simli connection lost");
-        setPhase("error");
+        void fail("Simli connection lost");
       });
 
-      await client.start();
-      clientRef.current = client;
-
-      if (!readyRef.current) {
-        markReady();
+      try {
+        await client.start();
+        clientRef.current = client;
+        if (!readyRef.current) {
+          markReady();
+        }
+      } catch (e) {
+        clientRef.current = null;
+        try {
+          await client.stop();
+        } catch {
+          /* ignore */
+        }
+        throw e;
       }
     },
     [markReady],
   );
 
   const initClient = useCallback(async () => {
+    const now = Date.now();
+    if (now < rateLimitUntilRef.current) {
+      const secs = Math.ceil((rateLimitUntilRef.current - now) / 1000);
+      setError(
+        `Simli rate limit — wait ${secs}s, then tap Retry. Close other Nakama tabs first.`,
+      );
+      setPhase("error");
+      setRetryCountdown(secs);
+      return;
+    }
+
     const gen = ++initGenRef.current;
     await stopClient();
+    await sleep(TEARDOWN_MS);
+    if (gen !== initGenRef.current) return;
+
+    await registerSimliTeardown(stopClient);
 
     readyRef.current = false;
     setPhase("session");
     setStatusLine("Requesting Simli session…");
     setError("");
+    setRetryCountdown(0);
 
     const hasRefs = await waitForMediaRefs(videoRef, audioRef);
     if (!hasRefs) {
@@ -156,6 +196,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
           : faceId
             ? { faceId }
             : {};
+
       const sessionRes = await fetch("/api/simli/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -163,7 +204,6 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       });
       const sessionJson = (await sessionRes.json()) as {
         sessionToken?: string;
-        iceServers?: RTCIceServer[];
         error?: string;
       };
 
@@ -173,56 +213,69 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
         throw new Error(sessionJson.error || "Failed to start Simli session");
       }
 
-      const iceServers = sessionJson.iceServers ?? null;
       setPhase("webrtc");
-      setStatusLine("Connecting avatar (WebRTC)…");
-
-      let lastError: unknown;
-      const transports: Array<{ mode: "p2p" | "livekit"; ice: RTCIceServer[] | null; label: string }> =
-        iceServers?.length
-          ? [
-              { mode: "p2p", ice: iceServers, label: "Connecting avatar (WebRTC)…" },
-              { mode: "livekit", ice: null, label: "Retrying with LiveKit…" },
-            ]
-          : [{ mode: "livekit", ice: null, label: "Connecting avatar (LiveKit)…" }];
-
-      for (const { mode, ice, label } of transports) {
-        if (gen !== initGenRef.current) return;
-        try {
-          setStatusLine(label);
-          await connectWithTransport(sessionJson.sessionToken, ice, mode);
-          lastError = undefined;
-          break;
-        } catch (e) {
-          lastError = e;
-          await stopClient();
-        }
-      }
-
-      if (lastError) {
-        throw lastError;
-      }
+      setStatusLine("Connecting avatar…");
+      await connectLivekit(sessionJson.sessionToken);
 
       if (gen !== initGenRef.current) return;
       markReady();
     } catch (e) {
       if (gen !== initGenRef.current) return;
       readyRef.current = false;
-      setError(formatSimliError(e));
+      const msg = formatSimliError(e);
+      if (isSimliRateLimitError(msg)) {
+        rateLimitUntilRef.current = Date.now() + RATE_LIMIT_COOLDOWN_MS;
+        setRetryCountdown(Math.ceil(RATE_LIMIT_COOLDOWN_MS / 1000));
+      }
+      setError(msg);
       setPhase("error");
+      await stopClient();
     }
-  }, [connectWithTransport, markReady, stopClient, faceId, guideId]);
+  }, [connectLivekit, markReady, stopClient, faceId, guideId]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
       void initClient();
     }, 0);
-    return () => {
-      window.clearTimeout(timer);
+
+    const onHide = () => {
+      if (document.visibilityState === "hidden") {
+        initGenRef.current += 1;
+        void stopClient();
+      }
+    };
+    const onPageHide = () => {
       initGenRef.current += 1;
       void stopClient();
     };
-  }, [initClient, stopClient, faceId, guideId]);
+
+    document.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", onPageHide);
+
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onHide);
+      window.removeEventListener("pagehide", onPageHide);
+      initGenRef.current += 1;
+      void stopClient();
+    };
+  }, [initClient, stopClient]);
+
+  useEffect(() => {
+    if (retryCountdown <= 0) return;
+    const id = window.setInterval(() => {
+      const left = Math.max(0, Math.ceil((rateLimitUntilRef.current - Date.now()) / 1000));
+      setRetryCountdown(left);
+      if (left <= 0) {
+        setError((prev) =>
+          prev.includes("rate limit")
+            ? "You can tap Retry now. Close other Nakama tabs if it fails again."
+            : prev,
+        );
+      }
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [retryCountdown]);
 
   const playPcm = useCallback(
     async (pcm: Uint8Array) => {
@@ -232,7 +285,6 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
       }
 
       await unlockAudio();
-
       client.ClearBuffer();
 
       const firstLen = Math.min(IMMEDIATE_BYTES, pcm.length);
@@ -258,6 +310,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
   );
 
   const showOverlay = phase === "session" || phase === "webrtc";
+  const rateLimited = retryCountdown > 0;
 
   return (
     <div
@@ -288,12 +341,16 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
               Check your network or VPN, then tap Retry. A firewall can block WebRTC.
             </p>
           )}
+          {rateLimited && (
+            <p className="text-xs text-amber-200/90">Retry available in {retryCountdown}s</p>
+          )}
           <button
             type="button"
+            disabled={rateLimited}
             onClick={() => void initClient()}
-            className="mt-2 rounded-lg border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-4 py-2 text-xs font-semibold text-zinc-950"
+            className="mt-2 rounded-lg border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-4 py-2 text-xs font-semibold text-zinc-950 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Retry
+            {rateLimited ? `Wait ${retryCountdown}s` : "Retry"}
           </button>
         </div>
       )}
