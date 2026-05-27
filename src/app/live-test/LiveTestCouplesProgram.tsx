@@ -65,29 +65,30 @@ function CouplesTile({
         aria-hidden
       />
 
-      <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-start px-2.5 pb-2 pt-3 text-center sm:px-3 sm:pt-4">
-        <div className="max-w-[95%]">
+      <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-start px-3 pb-3 pt-4 text-center sm:px-4 sm:pt-6">
+        <div className="flex h-full w-full max-w-[95%] flex-col">
           {eyebrow ? (
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)] sm:text-[11px]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-amber-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)] sm:text-xs">
               {eyebrow}
             </p>
           ) : null}
           <h2
-            className={`font-serif text-xl font-bold leading-tight text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)] sm:text-2xl md:text-[1.75rem] ${
+            className={`font-serif text-2xl font-bold leading-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.95)] sm:text-3xl md:text-[2.15rem] ${
               eyebrow ? "mt-1" : ""
             }`}
           >
             {title}
           </h2>
+          <p className="mt-3 line-clamp-4 text-sm font-semibold leading-snug text-stone-100/95 drop-shadow-[0_1px_8px_rgba(0,0,0,0.95)] sm:text-[15px] md:text-base">
+            {description}
+          </p>
+          <div className="flex-1" />
           <button
             type="button"
-            className="mx-auto mt-2.5 w-full max-w-[11rem] rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-4 py-2 text-center text-[11px] font-bold text-zinc-950 shadow-[0_2px_12px_rgba(0,0,0,0.45)] transition hover:from-amber-100 hover:to-amber-500 sm:max-w-[12.5rem] sm:mt-3 sm:px-5 sm:py-2.5 sm:text-xs"
+            className="mx-auto mt-4 w-full max-w-[12.5rem] rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-5 py-2.5 text-center text-xs font-bold text-zinc-950 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition hover:from-amber-100 hover:to-amber-500 sm:mt-5 sm:max-w-[14rem] sm:py-3 sm:text-sm"
           >
             {button}
           </button>
-          <p className="mt-2 line-clamp-3 text-[11px] font-medium leading-snug text-stone-200/90 drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)] sm:text-xs">
-            {description}
-          </p>
         </div>
       </div>
     </article>
