@@ -32,6 +32,7 @@ const COUPLES_TILES = [
       "Both partners open the same audio on their devices and play together — guided by a narrator for both of you.",
     image: "/couples/shared-session.jpg",
     button: "Begin shared session",
+    compactButton: true,
   },
 ] as const;
 
@@ -41,12 +42,14 @@ function CouplesTile({
   description,
   image,
   button,
+  compactButton,
 }: {
   eyebrow?: string;
   title: string;
   description: string;
   image: string;
   button: string;
+  compactButton?: boolean;
 }) {
   return (
     <article className="relative h-full min-h-0 overflow-hidden rounded-xl border border-stone-800/80 bg-zinc-950">
@@ -81,13 +84,16 @@ function CouplesTile({
           <p className="mt-3 line-clamp-4 text-sm font-semibold leading-snug text-stone-100/95 drop-shadow-[0_1px_8px_rgba(0,0,0,0.95)] sm:text-[15px] md:text-base">
             {description}
           </p>
-          <div className="flex-[0.35]" />
-          <button
-            type="button"
-            className="mx-auto mt-4 w-full max-w-[12.5rem] rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-5 py-2.5 text-center text-xs font-bold text-zinc-950 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition hover:from-amber-100 hover:to-amber-500 sm:mt-5 sm:max-w-[14rem] sm:py-3 sm:text-sm"
-          >
-            {button}
-          </button>
+          <div className="mt-auto flex w-full justify-center pt-4 sm:pt-5">
+            <button
+              type="button"
+              className={`flex min-h-[2.75rem] w-full max-w-[12.5rem] items-center justify-center whitespace-nowrap rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-4 py-2.5 text-center font-bold leading-none text-zinc-950 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition hover:from-amber-100 hover:to-amber-500 sm:max-w-[14rem] sm:px-5 sm:py-3 ${
+                compactButton ? "text-[10px] sm:text-xs" : "text-xs sm:text-sm"
+              }`}
+            >
+              {button}
+            </button>
+          </div>
         </div>
       </div>
     </article>
@@ -110,7 +116,7 @@ export default function LiveTestCouplesProgram() {
         </p>
       </header>
 
-      <div className="grid min-h-0 flex-1 auto-rows-[minmax(8.5rem,1fr)] grid-cols-1 gap-2 overflow-y-auto p-2 sm:grid-cols-2 sm:grid-rows-2 sm:overflow-hidden sm:gap-2.5 sm:p-3">
+      <div className="grid min-h-0 flex-1 auto-rows-[minmax(8.5rem,1fr)] grid-cols-1 items-stretch gap-2 overflow-y-auto p-2 sm:grid-cols-2 sm:grid-rows-2 sm:overflow-hidden sm:gap-2.5 sm:p-3">
         {COUPLES_TILES.map((tile) => (
           <CouplesTile key={tile.id} {...tile} />
         ))}
