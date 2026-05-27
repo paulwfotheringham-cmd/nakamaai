@@ -23,6 +23,12 @@ const PICK_UP_ITEMS = [
     image: "/tiles/tile3.jpg",
   },
   {
+    section: "Forbidden Chat",
+    lastActivity: "Private desires",
+    when: "Pick up the conversation",
+    image: "/tiles/tile4.jpg",
+  },
+  {
     section: "Reignite for Couples",
     lastActivity: "Date Night Mode — Reconnection Series",
     when: "Last time you were here, 2 days ago",
@@ -71,7 +77,7 @@ export default function LiveTestDashboardHome() {
           </p>
         </div>
 
-        <ul className="grid min-h-0 flex-1 auto-rows-[minmax(7.25rem,1fr)] grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-2 sm:grid-rows-2 sm:overflow-hidden sm:gap-2.5">
+        <ul className="grid min-h-0 flex-1 auto-rows-[minmax(8.75rem,1fr)] grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-5 lg:auto-rows-[minmax(11.5rem,1fr)] lg:overflow-hidden">
           {PICK_UP_ITEMS.map((item) => (
             <li
               key={item.section}
@@ -88,8 +94,8 @@ export default function LiveTestDashboardHome() {
                 aria-hidden
               />
 
-              <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-center px-2.5 pb-[4.5rem] pt-2 text-center sm:px-3 sm:pb-[4.75rem]">
-                <div className="max-w-[95%]">
+              <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-start px-2.5 pb-2 pt-3 text-center sm:px-3 sm:pt-4">
+                <div className="flex h-full w-full max-w-[95%] flex-col">
                   <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-xs">
                     {item.section}
                   </p>
@@ -99,19 +105,20 @@ export default function LiveTestDashboardHome() {
                   <p className="mt-1.5 line-clamp-2 text-xs font-semibold text-stone-200 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-sm">
                     {item.when}
                   </p>
+                  <div className="flex-1" />
                 </div>
               </div>
 
               <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-1.5 px-2 pb-2.5 pt-5 sm:gap-2 sm:pb-3">
                 <button
                   type="button"
-                  className="w-full max-w-[11rem] rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-4 py-2 text-center text-xs font-bold text-zinc-950 shadow-lg shadow-black/40 transition hover:from-amber-100 hover:to-amber-500 sm:max-w-[12rem] sm:py-2.5 sm:text-sm"
+                  className="w-full max-w-[12rem] rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-3 py-2 text-center text-xs font-bold text-zinc-950 shadow-lg shadow-black/40 transition hover:from-amber-100 hover:to-amber-500 sm:max-w-[12.5rem] sm:py-2.5 sm:text-sm lg:max-w-none lg:px-3 lg:py-2 lg:text-[11px]"
                 >
                   Yes, continue
                 </button>
                 <button
                   type="button"
-                  className="w-full max-w-[11rem] rounded-full border border-stone-400/50 bg-black/50 px-4 py-2 text-center text-xs font-semibold text-stone-100 backdrop-blur-sm transition hover:border-stone-300 hover:bg-black/65 sm:max-w-[12rem] sm:py-2.5 sm:text-sm"
+                  className="w-full max-w-[12rem] rounded-full border border-stone-400/50 bg-black/50 px-3 py-2 text-center text-xs font-semibold text-stone-100 backdrop-blur-sm transition hover:border-stone-300 hover:bg-black/65 sm:max-w-[12.5rem] sm:py-2.5 sm:text-sm lg:max-w-none lg:px-3 lg:py-2 lg:text-[11px]"
                 >
                   Not now
                 </button>
