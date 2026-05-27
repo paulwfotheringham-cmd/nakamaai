@@ -11,7 +11,11 @@ import {
   type GuideTone,
   type OnboardingGuide,
 } from "@/lib/guides/catalog";
-import { writeGuidePreferences } from "@/lib/guides/preferences";
+import {
+  readGuidePreferences,
+  resolveGuideDisplayName,
+  writeGuidePreferences,
+} from "@/lib/guides/preferences";
 
 export default function OnboardingClient() {
   const router = useRouter();
@@ -20,6 +24,14 @@ export default function OnboardingClient() {
 
   const guides = useMemo(() => getOnboardingGuides(), []);
   const [selectedGuide, setSelectedGuide] = useState<OnboardingGuide>(() => guides[0]);
+  const [guideDisplayNames, setGuideDisplayNames] = useState<Record<string, string>>(() => {
+    const saved = readGuidePreferences().guideDisplayNames ?? {};
+    const initial: Record<string, string> = {};
+    for (const g of getOnboardingGuides()) {
+      initial[g.id] = saved[g.id]?.trim() || g.name;
+    }
+    return initial;
+  });
   const [voiceId, setVoiceId] = useState(GUIDE_VOICES[0].id);
   const [tone, setTone] = useState<GuideTone>("Relaxed");
   const [previewingVoice, setPreviewingVoice] = useState<string | null>(null);
@@ -30,6 +42,15 @@ export default function OnboardingClient() {
     [voiceId],
   );
 
+  const displayNameFor = (guide: OnboardingGuide) =>
+    guideDisplayNames[guide.id]?.trim() || guide.name;
+
+  const selectedDisplayName = displayNameFor(selectedGuide);
+
+  const setGuideDisplayName = (guideId: string, name: string) => {
+    setGuideDisplayNames((prev) => ({ ...prev, [guideId]: name }));
+  };
+
   const playVoicePreview = async (previewKey: string, label: string) => {
     setPreviewingVoice(previewKey);
     try {
@@ -38,7 +59,7 @@ export default function OnboardingClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           voice: label,
-          text: `Hi, I'm ${selectedGuide.name}. I'll be your guide on Nakama Nights.`,
+          text: `Hi, I'm ${selectedDisplayName}. I'll be your guide on Nakama Nights.`,
         }),
       });
       if (!res.ok) return;
@@ -58,14 +79,21 @@ export default function OnboardingClient() {
 
   const handleSave = () => {
     setSaving(true);
+    const names: Record<string, string> = {};
+    for (const g of guides) {
+      const custom = guideDisplayNames[g.id]?.trim();
+      names[g.id] = custom || g.name;
+    }
+
     writeGuidePreferences({
       guideId: selectedGuide.id,
-      guideName: selectedGuide.name,
+      guideName: resolveGuideDisplayName(selectedGuide.id, names),
       simliFaceId: selectedGuide.simliFaceId,
       voiceId: selectedVoice.id,
       voiceName: selectedVoice.name,
       tone,
       userName: "Jane",
+      guideDisplayNames: names,
     });
     router.push("/live-test");
   };
@@ -114,34 +142,59 @@ export default function OnboardingClient() {
               <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-500/90">
                 Select guide
               </h2>
-              <p className="mt-1 text-sm text-stone-500">3 men · 1 woman · tap to preview live</p>
+              <p className="mt-1 text-sm text-stone-500">
+                3 men · 1 woman · tap to preview · rename each guide below
+              </p>
               <div className="mt-4 grid grid-cols-2 gap-3">
                 {guides.map((guide) => {
                   const active = selectedGuide.id === guide.id;
+                  const defaultName = guide.name;
                   return (
-                    <button
+                    <div
                       key={guide.id}
-                      type="button"
-                      onClick={() => setSelectedGuide(guide)}
-                      className={`rounded-2xl border p-4 text-left transition ${
+                      className={`rounded-2xl border text-left transition ${
                         active
                           ? "border-amber-400/60 bg-gradient-to-b from-amber-950/40 to-zinc-950 shadow-[0_0_0_1px_rgba(251,191,36,0.2)]"
                           : "border-stone-800/80 bg-zinc-950/60 hover:border-amber-800/50 hover:bg-zinc-900/80"
                       }`}
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-400/90">
-                          {guide.gender}
-                        </p>
-                        {active && (
-                          <span className="shrink-0 rounded-full bg-amber-400/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-zinc-950">
-                            Selected
-                          </span>
-                        )}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedGuide(guide)}
+                        className="w-full p-4 pb-2 text-left"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-400/90">
+                            {guide.gender}
+                          </p>
+                          {active && (
+                            <span className="shrink-0 rounded-full bg-amber-400/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-zinc-950">
+                              Selected
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-1 text-sm leading-snug text-stone-400">{guide.tagline}</p>
+                      </button>
+                      <div className="px-4 pb-4 pt-0">
+                        <label
+                          htmlFor={`guide-name-${guide.id}`}
+                          className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-stone-500"
+                        >
+                          Guide name
+                        </label>
+                        <input
+                          id={`guide-name-${guide.id}`}
+                          type="text"
+                          value={guideDisplayNames[guide.id] ?? defaultName}
+                          onChange={(e) => setGuideDisplayName(guide.id, e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          onFocus={() => setSelectedGuide(guide)}
+                          maxLength={32}
+                          placeholder={defaultName}
+                          className="w-full rounded-lg border border-stone-700/80 bg-black/50 px-2.5 py-2 font-serif text-lg font-semibold text-white placeholder:text-stone-600 focus:border-amber-500/45 focus:outline-none focus:ring-1 focus:ring-amber-500/25"
+                        />
                       </div>
-                      <p className="mt-2 font-serif text-xl font-semibold text-white">{guide.name}</p>
-                      <p className="mt-1 text-sm leading-snug text-stone-400">{guide.tagline}</p>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
@@ -216,7 +269,7 @@ export default function OnboardingClient() {
                 Live preview
               </p>
               <p className="mt-1 font-serif text-xl text-white">
-                {selectedGuide.name}{" "}
+                {selectedDisplayName}{" "}
                 <span className="text-sm font-sans font-normal text-stone-500">
                   · {selectedVoice.name.split("—")[0]?.trim()}
                 </span>

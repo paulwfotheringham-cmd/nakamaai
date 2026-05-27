@@ -16,7 +16,18 @@ export type GuidePreferences = {
   voiceName: string;
   tone: GuideTone;
   userName: string;
+  /** Custom display names keyed by guide id (frank, marcus, …). */
+  guideDisplayNames?: Record<string, string>;
 };
+
+export function resolveGuideDisplayName(
+  guideId: string,
+  displayNames?: Record<string, string>,
+): string {
+  const custom = displayNames?.[guideId]?.trim();
+  if (custom) return custom;
+  return getGuideById(guideId)?.name ?? "your guide";
+}
 
 export const DEFAULT_USER_NAME = "Jane";
 
@@ -43,14 +54,19 @@ export function parseGuidePreferences(raw: string | null): GuidePreferences {
     const tone = GUIDE_TONES.includes((data.tone ?? "") as GuideTone)
       ? (data.tone as GuideTone)
       : "Relaxed";
+    const guideDisplayNames =
+      data.guideDisplayNames && typeof data.guideDisplayNames === "object"
+        ? (data.guideDisplayNames as Record<string, string>)
+        : undefined;
     return {
       guideId: guide.id,
-      guideName: guide.name,
+      guideName: resolveGuideDisplayName(guide.id, guideDisplayNames),
       simliFaceId: guide.simliFaceId,
       voiceId: voice.id,
       voiceName: voice.name,
       tone,
       userName: (data.userName ?? DEFAULT_USER_NAME).trim() || DEFAULT_USER_NAME,
+      guideDisplayNames,
     };
   } catch {
     return defaultGuidePreferences();
