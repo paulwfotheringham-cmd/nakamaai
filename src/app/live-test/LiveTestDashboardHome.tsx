@@ -9,18 +9,21 @@ const PICK_UP_ITEMS = [
     lastActivity: "Gothic · windswept moor",
     when: "Last played 3 days ago",
     image: "/scenes/moor.jpg",
+    imagePosition: "78% center",
   },
   {
     section: "Build Adventure",
     lastActivity: "Your draft — slow burn, office",
     when: "Saved, not finished",
     image: "/scenes/office.jpg",
+    imagePosition: "32% center",
   },
   {
     section: "Interactive Adventures",
     lastActivity: "Chapter 2 — choice at the door",
     when: "In progress",
     image: "/tiles/tile3.jpg",
+    imagePosition: "52% 38%",
   },
   {
     section: "Forbidden Chat",
@@ -86,7 +89,12 @@ export default function LiveTestDashboardHome() {
               <img
                 src={item.image}
                 alt=""
-                className="absolute inset-0 h-full w-full object-cover"
+                className="absolute inset-0 h-full w-full object-cover object-center"
+                style={
+                  "imagePosition" in item
+                    ? { objectPosition: item.imagePosition }
+                    : undefined
+                }
               />
               <div className="pointer-events-none absolute inset-0 bg-black/25" aria-hidden />
               <div
