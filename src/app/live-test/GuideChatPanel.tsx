@@ -1,5 +1,10 @@
 "use client";
 
+import type { LiveTestNavId } from "@/lib/nakama-universe-services";
+import {
+  detectGuideChatNavIntent,
+  getNavSectionLabel,
+} from "@/lib/live-test/chat-nav-intent";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
 export type ChatMessage = {
@@ -21,6 +26,7 @@ const MOOD_OPTIONS = [
 
 type GuideChatPanelProps = {
   onSend: (message: string, handlers: SendHandlers) => Promise<string>;
+  onNavigate?: (navId: LiveTestNavId) => void;
   isBusy: boolean;
   className?: string;
   userName?: string;
@@ -33,6 +39,7 @@ function buildWelcome(userName: string, guideName: string): string {
 
 export default function GuideChatPanel({
   onSend,
+  onNavigate,
   isBusy,
   className = "",
   userName = "Jane",
@@ -58,6 +65,22 @@ export default function GuideChatPanel({
     setSending(true);
     const userId = `user-${Date.now()}`;
     const assistantId = `assistant-${Date.now()}`;
+
+    const navId = detectGuideChatNavIntent(text);
+    if (navId && onNavigate) {
+      onNavigate(navId);
+      setMessages((prev) => [
+        ...prev,
+        { id: userId, role: "user", text },
+        {
+          id: assistantId,
+          role: "assistant",
+          text: `I've opened ${getNavSectionLabel(navId)} for you — take a look in the panel to your left.`,
+        },
+      ]);
+      setSending(false);
+      return;
+    }
 
     setMessages((prev) => [
       ...prev,

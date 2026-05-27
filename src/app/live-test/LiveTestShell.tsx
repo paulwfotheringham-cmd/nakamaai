@@ -92,7 +92,7 @@ export default function LiveTestShell() {
 
       {/* Guide — avatar + chat (always visible, every section) */}
       <aside className="relative z-20 flex min-h-[18rem] shrink-0 flex-col overflow-hidden border-t border-stone-800/90 bg-black/95 p-2 sm:min-h-[20rem] sm:p-3 md:col-start-3 md:row-start-1 md:h-full md:min-h-0 md:border-l md:border-t-0">
-        <LiveTestGuideRail />
+        <LiveTestGuideRail onNavigate={setActiveNav} />
       </aside>
     </div>
   );

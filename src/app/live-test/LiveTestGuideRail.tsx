@@ -3,9 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchLiveTestPcm16 } from "@/lib/live-test/fetch-pcm-client";
 import { defaultGuidePreferences, readGuidePreferences, type GuidePreferences } from "@/lib/guides/preferences";
+import type { LiveTestNavId } from "@/lib/nakama-universe-services";
 import GuideChatPanel, { type SendHandlers } from "./GuideChatPanel";
 import type { SimliAvatarHandle } from "@/components/SimliAvatar";
 import SimliAvatar from "@/components/SimliAvatar";
+
+type LiveTestGuideRailProps = {
+  onNavigate?: (navId: LiveTestNavId) => void;
+};
 
 async function readStreamingReply(
   res: Response,
@@ -30,7 +35,7 @@ async function readStreamingReply(
 }
 
 /** Persistent guide avatar + chat — always mounted in the right column. */
-export default function LiveTestGuideRail() {
+export default function LiveTestGuideRail({ onNavigate }: LiveTestGuideRailProps) {
   const simliRef = useRef<SimliAvatarHandle>(null);
   const [isBusy, setIsBusy] = useState(false);
   const [prefs, setPrefs] = useState<GuidePreferences>(() => defaultGuidePreferences());
@@ -114,6 +119,7 @@ export default function LiveTestGuideRail() {
       <div className="mt-1.5 flex min-h-0 flex-1 flex-col overflow-hidden md:mt-2">
         <GuideChatPanel
           onSend={handleSend}
+          onNavigate={onNavigate}
           isBusy={isBusy}
           className="min-h-0 flex-1"
           userName={prefs.userName}
