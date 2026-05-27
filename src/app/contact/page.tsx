@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import MarketingPageShell from "@/components/MarketingPageShell";
 import { useState } from "react";
 
 export const dynamic = "force-dynamic";
@@ -18,28 +18,8 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-stone-200">
-      <header className="border-b border-stone-800 bg-black/90">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-4">
-          <Link href="/" className="shrink-0">
-            <img
-              src="/Nakama-AI-July25-White.png"
-              alt="Nakama Nights"
-              className="block h-[4.2rem] w-auto object-contain object-left sm:h-[5.2rem] md:h-[5.8rem]"
-            />
-          </Link>
-          <div className="ml-auto flex items-center gap-3">
-            <Link
-              href="/login"
-              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
-            >
-              Login
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-5xl px-6 py-12">
+    <MarketingPageShell>
+      <div className="mx-auto max-w-5xl px-6 py-12">
         <div className="relative overflow-hidden rounded-[2rem] border border-stone-700/65 bg-zinc-950 shadow-[0_0_0_1px_rgba(245,158,11,0.08),0_26px_62px_rgba(0,0,0,0.5)]">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_45%_at_50%_-10%,rgba(180,130,50,0.14),transparent_55%)]" />
           <div className="relative p-8 sm:p-10">
@@ -87,29 +67,7 @@ export default function ContactPage() {
             </form>
           </div>
         </div>
-      </main>
-
-      <footer className="border-t border-stone-800 py-8">
-        <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 lg:flex-row lg:items-center lg:justify-between">
-          <img
-            src="/Nakama-AI-July25-White.png"
-            alt="Nakama Nights"
-            className="block h-10 w-auto object-contain sm:h-12"
-          />
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-stone-400">
-            <Link href="/terms" className="transition hover:text-stone-100">
-              T&amp;Cs
-            </Link>
-            <Link href="/privacy" className="transition hover:text-stone-100">
-              Privacy
-            </Link>
-            <Link href="/faq-support" className="transition hover:text-stone-100">
-              FAQ &amp; Support
-            </Link>
-          </div>
-        </div>
-      </footer>
-    </div>
+      </div>
+    </MarketingPageShell>
   );
 }
-

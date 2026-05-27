@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import MarketingPageShell from "@/components/MarketingPageShell";
 import { useState } from "react";
 
 const faqs = [
@@ -56,16 +56,9 @@ export default function FaqSupportPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black px-6 py-12 text-stone-300">
-      <div className="mx-auto max-w-7xl">
-        <Link
-          href="/"
-          className="text-sm text-stone-500 transition hover:text-stone-300"
-        >
-          ← Home
-        </Link>
-
-        <h1 className="mt-6 font-serif text-4xl text-stone-100">FAQ &amp; Support</h1>
+    <MarketingPageShell>
+      <div className="mx-auto max-w-7xl px-6 py-12 text-stone-300">
+        <h1 className="font-serif text-4xl text-stone-100">FAQ &amp; Support</h1>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
           <section className="rounded-2xl border border-stone-800 bg-zinc-950/80 p-6">
@@ -127,6 +120,6 @@ export default function FaqSupportPage() {
           </section>
         </div>
       </div>
-    </main>
+    </MarketingPageShell>
   );
 }
