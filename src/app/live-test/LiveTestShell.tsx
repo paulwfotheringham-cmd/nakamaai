@@ -25,7 +25,7 @@ export default function LiveTestShell() {
   const onDashboard = activeNav === null;
 
   return (
-    <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden text-stone-200 grid-rows-[auto_1fr_auto] md:grid-cols-[minmax(12rem,14.5rem)_minmax(0,1fr)_minmax(15rem,20rem)] md:grid-rows-1">
+    <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden text-stone-200 grid-rows-[auto_minmax(0,1fr)_minmax(18rem,44dvh)] md:grid-cols-[minmax(12rem,14.5rem)_minmax(0,1fr)_minmax(15rem,20rem)] md:grid-rows-1">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_45%_at_50%_-8%,rgba(180,130,50,0.12),transparent_55%)]"
         aria-hidden
