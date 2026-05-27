@@ -73,7 +73,7 @@ function CouplesTile({
             </p>
           ) : null}
           <h2
-            className={`font-serif text-base font-bold leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] sm:text-lg ${
+            className={`font-serif text-xl font-bold leading-tight text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)] sm:text-2xl md:text-[1.75rem] ${
               eyebrow ? "mt-1" : ""
             }`}
           >
