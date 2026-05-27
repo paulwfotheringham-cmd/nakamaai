@@ -268,12 +268,7 @@ export default function OnboardingClient() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-500/80">
                 Live preview
               </p>
-              <p className="mt-1 font-serif text-xl text-white">
-                {selectedDisplayName}{" "}
-                <span className="text-sm font-sans font-normal text-stone-500">
-                  · {selectedVoice.name.split("—")[0]?.trim()}
-                </span>
-              </p>
+              <p className="mt-1 font-serif text-xl text-white">{selectedDisplayName}</p>
               <div className="mt-4 aspect-[4/5] max-h-[min(52vh,420px)] w-full overflow-hidden rounded-xl border border-stone-800/80 bg-black">
                 <SimliAvatar
                   key={selectedGuide.id}
