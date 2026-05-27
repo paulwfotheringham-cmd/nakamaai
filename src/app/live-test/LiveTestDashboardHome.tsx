@@ -94,7 +94,7 @@ export default function LiveTestDashboardHome() {
                 aria-hidden
               />
 
-              <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-center px-2.5 pb-[5.5rem] pt-3 text-center sm:px-3 sm:pb-[5.75rem] sm:pt-4 lg:pb-[5.5rem]">
+              <div className="relative z-10 flex h-full min-h-0 flex-col items-center justify-start px-2.5 pb-[5.5rem] pt-4 text-center sm:px-3 sm:pt-5 lg:pb-[5.5rem]">
                 <div className="max-w-[95%]">
                   <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)] sm:text-xs">
                     {item.section}
