@@ -1,20 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchLiveTestPcm16 } from "@/lib/live-test/fetch-pcm-client";
 import { defaultGuidePreferences, readGuidePreferences, type GuidePreferences } from "@/lib/guides/preferences";
 import GuideChatPanel, { type SendHandlers } from "./GuideChatPanel";
 import type { SimliAvatarHandle } from "@/components/SimliAvatar";
-
-const SimliAvatar = dynamic(() => import("@/components/SimliAvatar"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-full min-h-[9rem] items-center justify-center rounded-2xl border border-amber-900/35 bg-black text-xs text-stone-500">
-      Loading avatar…
-    </div>
-  ),
-});
+import SimliAvatar from "@/components/SimliAvatar";
 
 async function readStreamingReply(
   res: Response,
@@ -114,8 +105,8 @@ export default function LiveTestGuideRail() {
             className="h-full w-full"
           />
         ) : (
-          <div className="flex h-full items-center justify-center rounded-2xl border border-amber-900/35 bg-black text-xs text-stone-500">
-            Loading guide…
+          <div className="flex h-full min-h-[9rem] items-center justify-center rounded-2xl border border-amber-900/35 bg-black text-xs text-stone-500">
+            Loading avatar…
           </div>
         )}
       </div>
