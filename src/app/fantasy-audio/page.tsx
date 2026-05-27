@@ -16,6 +16,9 @@ type Row = {
   icon?: ReactNode;
 };
 
+const AUDIOBOOK_LENGTH_OPTIONS = ["5 mins", "10 mins", "15 mins", "more"] as const;
+type AudiobookLength = (typeof AUDIOBOOK_LENGTH_OPTIONS)[number];
+
 /* Category/item labels: keep in sync with lib/fantasy-audio-category-options.ts (admin uploads). */
 const rows: Row[] = [
   {
@@ -184,6 +187,7 @@ function FantasyAudioContent() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [audioDurations, setAudioDurations] = useState<{ [key: string]: number }>({});
+  const [audiobookLength, setAudiobookLength] = useState<AudiobookLength | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const itemImages: { [key: string]: StaticImageData } = {
@@ -351,6 +355,28 @@ function FantasyAudioContent() {
             find the mood, setting, and energy you want.
           </p>
         </div>
+
+        <section className="fantasy-length-section" aria-labelledby="fantasy-length-heading">
+          <h2 id="fantasy-length-heading" className="fantasy-length-question">
+            What length of audiobook are you looking for?
+          </h2>
+          <div className="fantasy-length-options" role="group" aria-label="Audiobook length">
+            {AUDIOBOOK_LENGTH_OPTIONS.map((option) => {
+              const active = audiobookLength === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setAudiobookLength(option)}
+                  className={`fantasy-length-option${active ? " fantasy-length-option-active" : ""}`}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        </section>
 
         <section className="fantasy-panel">
           <div className="fantasy-panel-glow" />
@@ -595,6 +621,69 @@ function FantasyAudioContent() {
 
         .fantasy-page-embed .fantasy-header p {
           max-width: none;
+        }
+
+        .fantasy-length-section {
+          flex-shrink: 0;
+          padding: 14px 16px 16px;
+          border-bottom: 1px solid rgba(41, 37, 36, 0.9);
+          background: rgba(0, 0, 0, 0.25);
+        }
+
+        .fantasy-length-question {
+          margin: 0 0 12px 0;
+          font-family: ui-serif, Georgia, "Times New Roman", serif;
+          font-size: 1.05rem;
+          font-weight: 600;
+          color: #fafaf9;
+          line-height: 1.35;
+        }
+
+        .fantasy-length-options {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        .fantasy-length-option {
+          border-radius: 999px;
+          border: 1px solid rgba(120, 113, 108, 0.85);
+          background: rgba(0, 0, 0, 0.45);
+          color: #d6d3d1;
+          font-size: 0.8125rem;
+          font-weight: 600;
+          padding: 8px 16px;
+          cursor: pointer;
+          transition:
+            border-color 0.15s ease,
+            background 0.15s ease,
+            color 0.15s ease;
+        }
+
+        .fantasy-length-option:hover {
+          border-color: rgba(217, 119, 6, 0.45);
+          color: #fef3c7;
+        }
+
+        .fantasy-length-option-active {
+          border-color: rgba(251, 191, 36, 0.55);
+          background: linear-gradient(180deg, rgba(253, 230, 138, 0.95) 0%, rgba(217, 119, 6, 0.92) 100%);
+          color: #1c1917;
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+        }
+
+        .fantasy-page-embed .fantasy-length-section {
+          padding: 10px 12px 12px;
+        }
+
+        .fantasy-page-embed .fantasy-length-question {
+          font-size: 0.9375rem;
+          margin-bottom: 10px;
+        }
+
+        .fantasy-page-embed .fantasy-length-option {
+          font-size: 0.75rem;
+          padding: 7px 14px;
         }
 
         .fantasy-shell {
