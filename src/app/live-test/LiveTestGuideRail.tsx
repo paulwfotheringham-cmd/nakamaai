@@ -101,8 +101,8 @@ export default function LiveTestGuideRail({ onNavigate }: LiveTestGuideRailProps
   return (
     <div className="flex h-full min-h-0 flex-col gap-3 overflow-hidden">
       <div className="relative mx-auto w-full max-w-full shrink-0 overflow-hidden rounded-xl bg-gradient-to-b from-white/[0.02] to-transparent">
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black/40 to-transparent" />
-        <div className="aspect-[5/4] max-h-[34%] min-h-[7.5rem] w-full sm:max-h-[36%] md:max-h-[38%]">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-6 bg-gradient-to-t from-black/30 to-transparent" />
+        <div className="aspect-[3/4] max-h-[min(52vh,22rem)] min-h-[11rem] w-full sm:min-h-[12rem] md:max-h-[min(54vh,24rem)]">
           {mounted ? (
             <SimliAvatar
               key={prefs.guideId}

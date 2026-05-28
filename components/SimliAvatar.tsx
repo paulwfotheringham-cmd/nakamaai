@@ -455,14 +455,11 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
         className="pointer-events-none absolute h-px w-px opacity-0"
         aria-hidden
       />
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
         <canvas
           ref={canvasRef}
-          className="pointer-events-none absolute left-1/2 top-1/2"
-          style={{
-            transform: "translate(-50%, -48%) scale(1.34)",
-            transformOrigin: "center 30%",
-          }}
+          className="pointer-events-none h-full w-full"
+          style={{ objectFit: "contain", objectPosition: "center center" }}
           aria-hidden
         />
       </div>

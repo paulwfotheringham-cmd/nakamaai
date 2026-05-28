@@ -63,7 +63,7 @@ export default function LiveTestShell() {
   }, [centerPanel]);
 
   return (
-    <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden bg-[#050505] text-stone-200 grid-rows-[auto_minmax(0,1fr)_minmax(18rem,44dvh)] md:grid-cols-[minmax(11rem,13rem)_minmax(0,1fr)_minmax(16rem,22rem)] md:grid-rows-1">
+    <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden bg-[#050505] text-stone-200 grid-rows-[auto_minmax(0,1fr)_minmax(18rem,44dvh)] md:grid-cols-[minmax(14.5rem,17.5rem)_minmax(0,1fr)_minmax(16rem,22rem)] md:grid-rows-1">
       {/* Ambient atmosphere */}
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_50%_at_50%_-12%,rgba(180,130,50,0.14),transparent_60%)]"
