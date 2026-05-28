@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import CouplesPartnerInvitePanel from "@/components/CouplesPartnerInvitePanel";
 
 export default function CcardTrialPage() {
   const router = useRouter();
@@ -19,6 +20,9 @@ export default function CcardTrialPage() {
     const params = new URLSearchParams(window.location.search);
     const name = params.get("name");
     if (name) setCardholderName(name);
+    if (!localStorage.getItem("plan")) {
+      localStorage.setItem("plan", "free");
+    }
   }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -52,7 +56,7 @@ export default function CcardTrialPage() {
           </p>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.85fr_0.85fr]">
           <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
             <h2 className="text-2xl font-semibold">Billing details</h2>
 
@@ -166,6 +170,8 @@ export default function CcardTrialPage() {
               guide and finish setup.
             </p>
           </div>
+
+          <CouplesPartnerInvitePanel />
         </div>
       </section>
     </main>
