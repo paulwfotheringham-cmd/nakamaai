@@ -10,6 +10,7 @@ import {
 import DateNightInvitePage from "./DateNightInvitePage";
 import DateNightMatchingPage from "./DateNightMatchingPage";
 import DateNightMatchRevealPage from "./DateNightMatchRevealPage";
+import DateNightExperiencePage from "./DateNightExperiencePage";
 import LiveTestCouplesProgram from "./LiveTestCouplesProgram";
 import LiveTestDashboardHome from "./LiveTestDashboardHome";
 import LiveTestCreateAudioFrame from "./LiveTestCreateAudioFrame";
@@ -27,7 +28,8 @@ type CouplesCenterView =
   | "menu"
   | "date-night-invite"
   | "date-night-matching"
-  | "date-night-reveal";
+  | "date-night-reveal"
+  | "date-night-experience";
 
 export default function LiveTestShell() {
   const [activeNav, setActiveNav] = useState<LiveTestNavId | null>(null);
@@ -38,6 +40,8 @@ export default function LiveTestShell() {
   const [dateNightMatch, setDateNightMatch] = useState<DateNightScenario | null>(
     null,
   );
+  const onDateNightExperience =
+    centerPanel === "couples-program" && couplesView === "date-night-experience";
 
   useEffect(() => {
     if (centerPanel !== "couples-program") {
@@ -55,7 +59,11 @@ export default function LiveTestShell() {
       />
 
       {/* Left nav */}
-      <aside className="relative z-10 flex shrink-0 flex-col border-b border-stone-800/90 bg-black md:col-start-1 md:row-start-1 md:h-full md:min-h-0 md:border-b-0 md:border-r">
+      <aside
+        className={`relative z-10 flex shrink-0 flex-col border-b border-stone-800/90 bg-black transition md:col-start-1 md:row-start-1 md:h-full md:min-h-0 md:border-b-0 md:border-r ${
+          onDateNightExperience ? "opacity-60" : "opacity-100"
+        }`}
+      >
         <div className="flex shrink-0 flex-col items-center gap-2.5 border-b border-stone-800/80 px-3 py-3 md:gap-3 md:px-4 md:py-4">
           <Link href="/" className="flex w-full justify-center">
             <Image
@@ -117,7 +125,14 @@ export default function LiveTestShell() {
             )}
 
             {couplesView === "date-night-reveal" && dateNightMatch ? (
-              <DateNightMatchRevealPage match={dateNightMatch} />
+              <DateNightMatchRevealPage
+                match={dateNightMatch}
+                onBeginExperience={() => setCouplesView("date-night-experience")}
+              />
+            ) : null}
+
+            {couplesView === "date-night-experience" && dateNightMatch ? (
+              <DateNightExperiencePage match={dateNightMatch} />
             ) : null}
           </>
         )}
@@ -145,7 +160,11 @@ export default function LiveTestShell() {
       </section>
 
       {/* Guide — avatar + chat (always visible, every section) */}
-      <aside className="relative z-20 flex min-h-[18rem] shrink-0 flex-col overflow-hidden border-t border-stone-800/90 bg-black/95 p-2 sm:min-h-[20rem] sm:p-3 md:col-start-3 md:row-start-1 md:h-full md:min-h-0 md:border-l md:border-t-0">
+      <aside
+        className={`relative z-20 flex min-h-[18rem] shrink-0 flex-col overflow-hidden border-t border-stone-800/90 bg-black/95 p-2 transition sm:min-h-[20rem] sm:p-3 md:col-start-3 md:row-start-1 md:h-full md:min-h-0 md:border-l md:border-t-0 ${
+          onDateNightExperience ? "bg-black/98 opacity-85" : ""
+        }`}
+      >
         <LiveTestGuideRail onNavigate={setActiveNav} />
       </aside>
     </div>
