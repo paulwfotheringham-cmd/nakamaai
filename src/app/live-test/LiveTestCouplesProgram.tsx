@@ -15,6 +15,9 @@ const COUPLES_TILES = [
       "A mediated 30-min experience for date night at home — sets the mood, builds anticipation, leads somewhere.",
     image: "/couples/date-night.jpg",
     button: "Start",
+    duration: "30 min",
+    badge: "Most popular",
+    eyebrow: "Tonight's experience",
   },
   {
     id: "surprise",
@@ -23,59 +26,117 @@ const COUPLES_TILES = [
       "Woman makes the story, surprises partner with a fantasy adventure.",
     image: "/couples/surprise.jpg",
     button: "Start",
+    duration: "Curated",
+    eyebrow: "Secret fantasy",
   },
 ] as const;
 
-function CouplesTile({
+function CouplesHeroCard({
   eyebrow,
   title,
   description,
   image,
   button,
-  featured = false,
-  className = "",
+  duration,
+  badge,
   onClick,
 }: {
-  eyebrow?: string;
+  eyebrow: string;
   title: string;
   description: string;
   image: string;
   button: string;
-  featured?: boolean;
-  className?: string;
+  duration: string;
+  badge?: string;
   onClick?: () => void;
 }) {
   return (
-    <article className={`group launcher-card ${featured ? "launcher-card-featured" : ""} ${className}`}>
-      <img src={image} alt="" className="launcher-card-image" />
-      <div
-        className={`pointer-events-none absolute inset-0 ${featured ? "launcher-card-overlay-featured" : "launcher-card-overlay"}`}
-        aria-hidden
+    <article className="couples-hero-card group relative min-h-[min(52vh,28rem)] overflow-hidden rounded-2xl lg:min-h-0 lg:flex-1">
+      <img
+        src={image}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-[900ms] ease-out group-hover:scale-[1.06]"
       />
-      <div className="launcher-card-glow" aria-hidden />
+      <div className="couples-hero-vignette pointer-events-none absolute inset-0" aria-hidden />
+      <div className="couples-hero-glow pointer-events-none absolute inset-0" aria-hidden />
 
-      <div
-        className={`relative z-10 flex h-full min-h-0 flex-col justify-end ${
-          featured ? "p-6 sm:p-8" : "p-5 sm:p-6"
-        }`}
-      >
-        {eyebrow ? <p className="launcher-section-label">{eyebrow}</p> : null}
-        <h2
-          className={`mt-2 font-serif font-semibold leading-tight text-white ${
-            featured ? "text-2xl sm:text-3xl md:text-4xl" : "text-xl sm:text-2xl"
-          }`}
-        >
+      <div className="relative z-10 flex h-full min-h-[min(52vh,28rem)] flex-col justify-end p-6 sm:p-8 lg:min-h-0 lg:p-10">
+        <div className="flex flex-wrap items-center gap-2.5">
+          {badge ? (
+            <span className="rounded-full border border-amber-400/35 bg-amber-950/50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-200/95 backdrop-blur-sm">
+              {badge}
+            </span>
+          ) : null}
+          <span className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-stone-300/90 backdrop-blur-sm">
+            {duration}
+          </span>
+        </div>
+
+        <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-400/75">
+          {eyebrow}
+        </p>
+        <h2 className="mt-3 max-w-xl font-serif text-3xl font-semibold leading-[1.08] tracking-tight text-white sm:text-4xl lg:text-[2.75rem]">
           {title}
         </h2>
-        <p
-          className={`mt-3 leading-snug text-stone-300/90 ${
-            featured ? "text-sm sm:text-base" : "text-xs sm:text-sm"
-          }`}
-        >
+        <p className="mt-4 max-w-lg text-base leading-relaxed text-stone-200/90 sm:text-[17px]">
           {description}
         </p>
-        <div className="mt-5 flex justify-start sm:mt-6">
-          <button type="button" onClick={onClick} className="btn-primary">
+
+        <div className="mt-8 flex flex-wrap items-center gap-4">
+          <button type="button" onClick={onClick} className="couples-cta-primary">
+            {button}
+          </button>
+          <span className="text-xs font-medium text-stone-400/80">
+            Curated for couples · Begin together
+          </span>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function CouplesSecondaryCard({
+  eyebrow,
+  title,
+  description,
+  image,
+  button,
+  duration,
+  onClick,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  image: string;
+  button: string;
+  duration: string;
+  onClick?: () => void;
+}) {
+  return (
+    <article className="couples-secondary-card group relative min-h-[16rem] overflow-hidden rounded-2xl lg:min-h-0 lg:flex-1">
+      <img
+        src={image}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+      />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/92 via-black/45 to-black/20" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 bg-[radial-gradient(ellipse_at_50%_100%,rgba(198,164,106,0.12),transparent_65%)]" aria-hidden />
+
+      <div className="relative z-10 flex h-full flex-col justify-end p-5 sm:p-6">
+        <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-stone-400/80">
+          {duration}
+        </span>
+        <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-500/60">
+          {eyebrow}
+        </p>
+        <h2 className="mt-2 font-serif text-xl font-semibold leading-tight text-white sm:text-2xl">
+          {title}
+        </h2>
+        <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed text-stone-300/85">
+          {description}
+        </p>
+        <div className="mt-5">
+          <button type="button" onClick={onClick} className="couples-cta-secondary">
             {button}
           </button>
         </div>
@@ -160,16 +221,27 @@ export default function LiveTestCouplesProgram({
     }
   }
 
+  const [hero, secondary] = COUPLES_TILES;
+
   return (
-    <div className="launcher-panel animate-panel-in">
-      <header className="launcher-panel-header border-b border-white/[0.04]">
+    <div className="couples-experience-panel animate-panel-in relative flex h-full min-h-0 flex-col overflow-hidden">
+      <div className="couples-atmosphere pointer-events-none absolute inset-0" aria-hidden />
+
+      <header className="relative z-10 shrink-0 px-6 pb-5 pt-7 sm:px-8 sm:pt-8">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <p className="launcher-eyebrow">Reignite</p>
-            <h1 className="launcher-title text-2xl sm:text-3xl">The Couples Program</h1>
-            <p className="launcher-subtitle">
-              Hi {userName} — for long-term partners and married couples. Choose how
-              you want to reconnect tonight.
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-amber-500/60">
+              Reignite · Couples
+            </p>
+            <h1 className="mt-2 font-serif text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl">
+              Tonight begins here,{" "}
+              <span className="bg-gradient-to-r from-amber-200 via-amber-100 to-amber-300/90 bg-clip-text text-transparent">
+                {userName}
+              </span>
+            </h1>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-stone-300/90 sm:text-[15px]">
+              A private space for long-term partners — choose your experience and
+              let the evening unfold.
             </p>
           </div>
 
@@ -207,7 +279,7 @@ export default function LiveTestCouplesProgram({
         </div>
 
         {showTrialTools && inviteStatus === "error" && inviteMessage ? (
-          <p className="mt-2 text-[10px] leading-snug text-rose-300/90 sm:text-[11px]">
+          <p className="mt-3 text-[11px] leading-snug text-rose-300/90">
             {inviteMessage}
             {inviteLink ? (
               <>
@@ -221,29 +293,31 @@ export default function LiveTestCouplesProgram({
         ) : null}
 
         {showTrialTools && inviteStatus === "sent" && inviteLink ? (
-          <PartnerInviteResult
-            inviteLink={inviteLink}
-            partnerEmail={invitedPartnerEmail}
-            emailSent={inviteEmailSent}
-            message={inviteMessage}
-            compact
-          />
+          <div className="mt-3">
+            <PartnerInviteResult
+              inviteLink={inviteLink}
+              partnerEmail={invitedPartnerEmail}
+              emailSent={inviteEmailSent}
+              message={inviteMessage}
+              compact
+            />
+          </div>
         ) : null}
       </header>
 
-      <div className="grid min-h-0 flex-1 auto-rows-[minmax(12rem,1fr)] grid-cols-1 items-stretch gap-4 overflow-y-auto p-6 sm:grid-cols-3 sm:gap-6 sm:overflow-hidden sm:p-8">
-        {COUPLES_TILES.map((tile, index) => (
-          <CouplesTile
-            key={tile.id}
-            {...tile}
-            featured={index === 0}
-            className={index === 0 ? "sm:col-span-2" : undefined}
-            onClick={() => {
-              if (tile.id === "date-night") onStartDateNight?.();
-              if (tile.id === "surprise") onStartSurprise?.();
-            }}
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-6 pt-2 sm:flex-row sm:gap-5 sm:overflow-hidden sm:p-8 sm:pt-3">
+        <div className="flex min-h-0 flex-[7] flex-col">
+          <CouplesHeroCard
+            {...hero}
+            onClick={() => onStartDateNight?.()}
           />
-        ))}
+        </div>
+        <div className="flex min-h-0 flex-[3] flex-col">
+          <CouplesSecondaryCard
+            {...secondary}
+            onClick={() => onStartSurprise?.()}
+          />
+        </div>
       </div>
     </div>
   );
