@@ -12,6 +12,7 @@ import DateNightInvitePage from "./DateNightInvitePage";
 import DateNightMatchingPage from "./DateNightMatchingPage";
 import DateNightMatchRevealPage from "./DateNightMatchRevealPage";
 import DateNightExperiencePage from "./DateNightExperiencePage";
+import SurpriseModePage from "./SurpriseModePage";
 import LiveTestCouplesProgram from "./LiveTestCouplesProgram";
 import LiveTestDashboardHome from "./LiveTestDashboardHome";
 import LiveTestCreateAudioFrame from "./LiveTestCreateAudioFrame";
@@ -30,7 +31,8 @@ type CouplesCenterView =
   | "date-night-invite"
   | "date-night-matching"
   | "date-night-reveal"
-  | "date-night-experience";
+  | "date-night-experience"
+  | "surprise";
 
 export default function LiveTestShell() {
   const searchParams = useSearchParams();
@@ -111,7 +113,12 @@ export default function LiveTestShell() {
             {couplesView === "menu" && (
               <LiveTestCouplesProgram
                 onStartDateNight={() => setCouplesView("date-night-invite")}
+                onStartSurprise={() => setCouplesView("surprise")}
               />
+            )}
+
+            {couplesView === "surprise" && (
+              <SurpriseModePage onBack={() => setCouplesView("menu")} />
             )}
 
             {couplesView === "date-night-invite" && (

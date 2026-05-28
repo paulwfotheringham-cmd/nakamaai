@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { persistAccountEmail } from "@/lib/account-email";
 import { persistAccountUsername } from "@/lib/account-username";
 import { validateUsername } from "@/lib/auth-username";
 
@@ -85,6 +86,7 @@ export default function SignupTrialForm({
 
       const displayUsername = username.trim();
       persistAccountUsername(displayUsername);
+      persistAccountEmail(email.trim());
 
       if (isPartner) {
         localStorage.setItem("plan", "couples-partner");

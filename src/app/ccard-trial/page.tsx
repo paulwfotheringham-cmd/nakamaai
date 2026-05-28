@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import CouplesPartnerInvitePanel from "@/components/CouplesPartnerInvitePanel";
+import { persistAccountEmail } from "@/lib/account-email";
 
 export default function CcardTrialPage() {
   const router = useRouter();
@@ -19,7 +20,9 @@ export default function CcardTrialPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const name = params.get("name");
+    const email = params.get("email");
     if (name) setCardholderName(name);
+    if (email) persistAccountEmail(email);
     if (!localStorage.getItem("plan")) {
       localStorage.setItem("plan", "free");
     }

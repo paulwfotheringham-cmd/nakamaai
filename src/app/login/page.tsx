@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { persistAccountEmail } from "@/lib/account-email";
 import { resolveLoginEmail } from "@/lib/auth-login";
 
 export default function LoginPage() {
@@ -27,6 +28,10 @@ export default function LoginPage() {
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       alert(data.error ?? "Login failed.");
       return;
+    }
+
+    if (email.includes("@")) {
+      persistAccountEmail(email.trim());
     }
 
     router.replace("/live-test");

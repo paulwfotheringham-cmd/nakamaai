@@ -274,7 +274,7 @@ export default function OnboardingClient() {
                 Live preview
               </p>
               <p className="mt-1 font-serif text-xl text-white">{selectedDisplayName}</p>
-              <div className="mt-4 aspect-[4/5] max-h-[min(52vh,420px)] w-full overflow-hidden rounded-xl border border-stone-800/80 bg-black">
+              <div className="mt-4 aspect-[4/5] max-h-[min(52vh,420px)] w-full overflow-hidden rounded-xl bg-transparent">
                 <SimliAvatar
                   key={selectedGuide.id}
                   ref={simliRef}

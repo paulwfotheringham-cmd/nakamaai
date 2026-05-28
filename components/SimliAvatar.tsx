@@ -14,6 +14,7 @@ import {
   releaseSimliSlot,
 } from "@/lib/simli/connection-guard";
 import { formatSimliError } from "@/lib/simli/format-error";
+import { keySimliBackground, sampleVideoBackground } from "@/lib/simli/video-chroma";
 import { LogLevel, SimliClient } from "simli-client";
 
 export type SimliAvatarHandle = {
@@ -57,6 +58,8 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
   ref,
 ) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chromaRafRef = useRef<number>(0);
   const audioRef = useRef<HTMLAudioElement>(null);
   const clientRef = useRef<SimliClient | null>(null);
   const readyRef = useRef(false);
@@ -332,6 +335,64 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
   }, [guideId, faceId, stopClient]);
 
   useEffect(() => {
+    if (phase !== "ready") {
+      if (chromaRafRef.current) {
+        cancelAnimationFrame(chromaRafRef.current);
+        chromaRafRef.current = 0;
+      }
+      return;
+    }
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+
+    const ctx = canvas.getContext("2d", { alpha: true, willReadFrequently: true });
+    if (!ctx) return;
+
+    let bgKey: [number, number, number] | null = null;
+
+    const tick = () => {
+      if (!videoRef.current || !canvasRef.current || !ctx) return;
+      const v = videoRef.current;
+      const c = canvasRef.current;
+
+      if (v.readyState < 2 || v.videoWidth === 0) {
+        chromaRafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
+      const w = v.videoWidth;
+      const h = v.videoHeight;
+      if (c.width !== w || c.height !== h) {
+        c.width = w;
+        c.height = h;
+      }
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(v, 0, 0, w, h);
+
+      const frame = ctx.getImageData(0, 0, w, h);
+      if (!bgKey) {
+        bgKey = sampleVideoBackground(frame.data, w, h);
+      }
+      keySimliBackground(frame.data, bgKey);
+      ctx.putImageData(frame, 0, 0);
+
+      chromaRafRef.current = requestAnimationFrame(tick);
+    };
+
+    chromaRafRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      if (chromaRafRef.current) {
+        cancelAnimationFrame(chromaRafRef.current);
+        chromaRafRef.current = 0;
+      }
+    };
+  }, [phase]);
+
+  useEffect(() => {
     if (retryCountdown <= 0) return;
     const id = window.setInterval(() => {
       const left = Math.max(0, Math.ceil((rateLimitUntilRef.current - Date.now()) / 1000));
@@ -384,15 +445,27 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
 
   return (
     <div
-      className={`relative min-h-[9rem] max-w-full overflow-hidden rounded-2xl border border-amber-900/35 bg-black shadow-[0_0_0_1px_rgba(245,158,11,0.06),0_20px_50px_rgba(0,0,0,0.45)] ${className ?? ""}`}
+      className={`relative min-h-[9rem] max-w-full overflow-hidden rounded-2xl border-0 bg-transparent ${className ?? ""}`}
     >
       <video
         ref={videoRef}
         autoPlay
         playsInline
         muted
-        className="h-full max-h-full min-h-0 w-full object-contain object-center"
+        className="pointer-events-none absolute h-px w-px opacity-0"
+        aria-hidden
       />
+      <div className="absolute inset-0 overflow-hidden">
+        <canvas
+          ref={canvasRef}
+          className="pointer-events-none absolute left-1/2 top-1/2"
+          style={{
+            transform: "translate(-50%, -48%) scale(1.34)",
+            transformOrigin: "center 30%",
+          }}
+          aria-hidden
+        />
+      </div>
       <audio ref={audioRef} autoPlay playsInline className="sr-only" />
 
       {showOverlay && (

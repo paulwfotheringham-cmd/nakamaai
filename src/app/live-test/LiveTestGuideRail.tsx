@@ -110,7 +110,7 @@ export default function LiveTestGuideRail({ onNavigate }: LiveTestGuideRailProps
             className="h-full w-full"
           />
         ) : (
-          <div className="flex h-full min-h-[9rem] items-center justify-center rounded-2xl border border-amber-900/35 bg-black text-xs text-stone-500">
+          <div className="flex h-full min-h-[9rem] items-center justify-center rounded-2xl bg-transparent text-xs text-stone-500">
             Loading avatar…
           </div>
         )}
