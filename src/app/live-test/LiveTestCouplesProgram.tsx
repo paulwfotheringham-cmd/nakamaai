@@ -31,12 +31,14 @@ function CouplesTile({
   description,
   image,
   button,
+  onClick,
 }: {
   eyebrow?: string;
   title: string;
   description: string;
   image: string;
   button: string;
+  onClick?: () => void;
 }) {
   return (
     <article className="relative h-full min-h-0 overflow-hidden rounded-xl border border-stone-800/80 bg-zinc-950">
@@ -74,6 +76,7 @@ function CouplesTile({
           <div className="mt-auto flex w-full justify-center pt-4 sm:pt-5">
             <button
               type="button"
+              onClick={onClick}
               className="flex min-h-[2.75rem] w-full max-w-[14rem] items-center justify-center whitespace-nowrap rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-5 py-2.5 text-center text-xs font-bold leading-none text-zinc-950 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition hover:from-amber-100 hover:to-amber-500 sm:max-w-[16rem] sm:py-3 sm:text-sm"
             >
               {button}
@@ -85,7 +88,13 @@ function CouplesTile({
   );
 }
 
-export default function LiveTestCouplesProgram() {
+export default function LiveTestCouplesProgram({
+  onStartDateNight,
+  onStartSurprise,
+}: {
+  onStartDateNight?: () => void;
+  onStartSurprise?: () => void;
+}) {
   const [userName, setUserName] = useState(DEFAULT_USER_NAME);
 
   useEffect(() => {
@@ -109,7 +118,14 @@ export default function LiveTestCouplesProgram() {
 
       <div className="grid min-h-0 flex-1 auto-rows-[minmax(0,1fr)] grid-cols-1 items-stretch gap-2 overflow-y-auto p-2 sm:grid-cols-2 sm:overflow-hidden sm:gap-3 sm:p-3">
         {COUPLES_TILES.map((tile) => (
-          <CouplesTile key={tile.id} {...tile} />
+          <CouplesTile
+            key={tile.id}
+            {...tile}
+            onClick={() => {
+              if (tile.id === "date-night") onStartDateNight?.();
+              if (tile.id === "surprise") onStartSurprise?.();
+            }}
+          />
         ))}
       </div>
     </div>

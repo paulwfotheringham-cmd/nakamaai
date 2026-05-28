@@ -2,11 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getLiveTestCenterPanel,
   type LiveTestNavId,
 } from "@/lib/nakama-universe-services";
+import DateNightInvitePage from "./DateNightInvitePage";
+import DateNightMatchingPage from "./DateNightMatchingPage";
+import DateNightMatchRevealPage from "./DateNightMatchRevealPage";
 import LiveTestCouplesProgram from "./LiveTestCouplesProgram";
 import LiveTestDashboardHome from "./LiveTestDashboardHome";
 import LiveTestCreateAudioFrame from "./LiveTestCreateAudioFrame";
@@ -16,13 +19,33 @@ import LiveTestGuideRail from "./LiveTestGuideRail";
 import LiveTestInfoPanel from "./LiveTestInfoPanel";
 import LiveTestProfilePanel from "./LiveTestProfilePanel";
 import LiveTestUniverseNav from "./LiveTestUniverseNav";
+import type { DateNightScenario } from "./date-night-scenarios";
 
 export type { LiveTestNavId };
+
+type CouplesCenterView =
+  | "menu"
+  | "date-night-invite"
+  | "date-night-matching"
+  | "date-night-reveal";
 
 export default function LiveTestShell() {
   const [activeNav, setActiveNav] = useState<LiveTestNavId | null>(null);
   const centerPanel = getLiveTestCenterPanel(activeNav);
   const onDashboard = activeNav === null;
+  const [couplesView, setCouplesView] = useState<CouplesCenterView>("menu");
+  const [dateNightPartner, setDateNightPartner] = useState<string>("");
+  const [dateNightMatch, setDateNightMatch] = useState<DateNightScenario | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (centerPanel !== "couples-program") {
+      setCouplesView("menu");
+      setDateNightPartner("");
+      setDateNightMatch(null);
+    }
+  }, [centerPanel]);
 
   return (
     <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden text-stone-200 grid-rows-[auto_minmax(0,1fr)_minmax(18rem,44dvh)] md:grid-cols-[minmax(12rem,14.5rem)_minmax(0,1fr)_minmax(15rem,20rem)] md:grid-rows-1">
@@ -66,7 +89,38 @@ export default function LiveTestShell() {
       <section className="relative z-10 flex min-h-0 min-w-0 flex-col overflow-hidden p-2 sm:p-3 md:col-start-2 md:row-start-1">
         {centerPanel === "fantasy-audio" && <LiveTestFantasyAudioFrame />}
         {centerPanel === "create-audio" && <LiveTestCreateAudioFrame />}
-        {centerPanel === "couples-program" && <LiveTestCouplesProgram />}
+        {centerPanel === "couples-program" && (
+          <>
+            {couplesView === "menu" && (
+              <LiveTestCouplesProgram
+                onStartDateNight={() => setCouplesView("date-night-invite")}
+              />
+            )}
+
+            {couplesView === "date-night-invite" && (
+              <DateNightInvitePage
+                onBeginMatching={(partnerUsername) => {
+                  setDateNightPartner(partnerUsername);
+                  setCouplesView("date-night-matching");
+                }}
+              />
+            )}
+
+            {couplesView === "date-night-matching" && (
+              <DateNightMatchingPage
+                partnerUsername={dateNightPartner}
+                onReveal={(match) => {
+                  setDateNightMatch(match);
+                  setCouplesView("date-night-reveal");
+                }}
+              />
+            )}
+
+            {couplesView === "date-night-reveal" && dateNightMatch ? (
+              <DateNightMatchRevealPage match={dateNightMatch} />
+            ) : null}
+          </>
+        )}
         {centerPanel === "build-adventure" && (
           <LiveTestInfoPanel
             eyebrow="Build adventure"
