@@ -173,7 +173,14 @@
   }
 
   .launcher-nav-item-active {
-    @apply bg-gradient-to-r from-amber-950/40 to-transparent text-amber-100 shadow-[inset_3px_0_0_rgba(198,164,106,0.7),0_4px_24px_rgba(0,0,0,0.35)];
+    @apply bg-gradient-to-r from-amber-950/40 to-transparent text-amber-100;
+    box-shadow:
+      inset 3px 0 0 rgba(198, 164, 106, 0.7),
+      0 4px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .launcher-sidebar {
+    backdrop-filter: blur(20px);
   }
 
   .launcher-companion {
