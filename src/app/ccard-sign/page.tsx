@@ -16,6 +16,7 @@ export default function CcardSignPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
+  const [plan, setPlan] = useState<"paid" | "couples">("paid");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -23,6 +24,8 @@ export default function CcardSignPage() {
     if (name) setCardholderName(name);
     const stored = localStorage.getItem("billing");
     if (stored === "yearly" || stored === "monthly") setBilling(stored);
+    const storedPlan = localStorage.getItem("plan");
+    if (storedPlan === "couples") setPlan("couples");
   }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -124,23 +127,55 @@ export default function CcardSignPage() {
             </p>
 
             <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6">
-              <h2 className="text-3xl font-semibold">Nakama Nights</h2>
+              <h2 className="text-3xl font-semibold">
+                {plan === "couples" ? "Couples" : "Nakama Nights"}
+              </h2>
               <p className="mt-3 text-zinc-300">
-                Dive deep into your fantasies — full platform access with premium
-                voices and all services.
+                {plan === "couples"
+                  ? "One user gets full Nakama Nights access; their partner gets access to the Couples section."
+                  : "Dive deep into your fantasies — full platform access with premium voices and all services."}
               </p>
 
               <ul className="mt-6 space-y-2 text-sm text-zinc-300">
-                <li>• Cancel anytime</li>
-                <li>• Full history</li>
-                <li>• 50 voices</li>
-                <li>• All services</li>
+                {plan === "couples" ? (
+                  <>
+                    <li>• Primary: full platform access</li>
+                    <li>• Partner: Couples section</li>
+                    <li>• Date Night experiences</li>
+                    <li>• Cancel anytime</li>
+                  </>
+                ) : (
+                  <>
+                    <li>• Cancel anytime</li>
+                    <li>• Full history</li>
+                    <li>• 50 voices</li>
+                    <li>• All services</li>
+                  </>
+                )}
               </ul>
 
               <div className="mt-8 flex items-end justify-between border-b border-white/10 pb-6">
                 <span className="text-zinc-400">Subscription</span>
                 <span className="text-right text-2xl font-semibold sm:text-3xl">
-                  {billing === "yearly" ? (
+                  {plan === "couples" ? (
+                    billing === "yearly" ? (
+                      <>
+                        $243
+                        <span className="text-base font-medium text-stone-500 sm:text-lg">
+                          {" "}
+                          / year
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        $22.50
+                        <span className="text-base font-medium text-stone-500 sm:text-lg">
+                          {" "}
+                          / month
+                        </span>
+                      </>
+                    )
+                  ) : billing === "yearly" ? (
                     <>
                       $161.89
                       <span className="text-base font-medium text-stone-500 sm:text-lg">
@@ -161,7 +196,9 @@ export default function CcardSignPage() {
               </div>
               {billing === "yearly" ? (
                 <p className="mt-2 text-right text-sm text-stone-500">
-                  10% annual discount · $13.49/mo equivalent
+                  {plan === "couples"
+                    ? "$20.25/mo billed annually"
+                    : "10% annual discount · $13.49/mo equivalent"}
                 </p>
               ) : null}
 
