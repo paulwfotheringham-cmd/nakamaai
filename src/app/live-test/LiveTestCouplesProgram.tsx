@@ -1,5 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import {
+  DEFAULT_USER_NAME,
+  readGuidePreferences,
+} from "@/lib/guides/preferences";
+
 const COUPLES_TILES = [
   {
     id: "date-night",
@@ -80,6 +86,12 @@ function CouplesTile({
 }
 
 export default function LiveTestCouplesProgram() {
+  const [userName, setUserName] = useState(DEFAULT_USER_NAME);
+
+  useEffect(() => {
+    setUserName(readGuidePreferences().userName || DEFAULT_USER_NAME);
+  }, []);
+
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-amber-900/25 bg-gradient-to-b from-zinc-950/95 to-[#061a1a] shadow-[inset_0_0_60px_rgba(0,0,0,0.25)]">
       <header className="shrink-0 border-b border-stone-800/50 px-3 py-2 sm:px-4 sm:py-2.5">
@@ -90,8 +102,8 @@ export default function LiveTestCouplesProgram() {
           The Couples Program
         </h1>
         <p className="mt-1 line-clamp-2 text-[10px] leading-snug text-stone-400 sm:text-[11px]">
-          For long-term partners and married couples — choose how you want to reconnect
-          tonight.
+          Hi {userName} — for long-term partners and married couples. Choose how you want
+          to reconnect tonight.
         </p>
       </header>
 

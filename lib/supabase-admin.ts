@@ -23,6 +23,7 @@ export async function createSupabaseUser(
   email: string,
   password: string,
   name: string,
+  username: string,
 ): Promise<{ ok: true } | { ok: false; error: string; retryable: boolean }> {
   const admin = getSupabaseAdmin();
   if (!admin) {
@@ -33,7 +34,11 @@ export async function createSupabaseUser(
     email,
     password,
     email_confirm: true,
-    user_metadata: { full_name: name, name: name || undefined },
+    user_metadata: {
+      full_name: name,
+      name: name || undefined,
+      username: username || undefined,
+    },
   });
 
   if (error) {

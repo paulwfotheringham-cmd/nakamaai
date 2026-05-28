@@ -11,7 +11,9 @@ import {
   type GuideTone,
   type OnboardingGuide,
 } from "@/lib/guides/catalog";
+import { readAccountUsername } from "@/lib/account-username";
 import {
+  DEFAULT_USER_NAME,
   readGuidePreferences,
   resolveGuideDisplayName,
   writeGuidePreferences,
@@ -92,7 +94,10 @@ export default function OnboardingClient() {
       voiceId: selectedVoice.id,
       voiceName: selectedVoice.name,
       tone,
-      userName: "Jane",
+      userName:
+        readAccountUsername() ||
+        readGuidePreferences().userName ||
+        DEFAULT_USER_NAME,
       guideDisplayNames: names,
     });
     router.push("/live-test");

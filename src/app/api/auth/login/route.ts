@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifyDemoLogin } from "@/lib/auth-login-server";
 import { resolveLoginEmail } from "@/lib/auth-login";
-import { verifyLocalUser } from "@/lib/auth-local-store";
+import { findEmailByUsername, verifyLocalUser } from "@/lib/auth-local-store";
 import { signInSupabaseUser } from "@/lib/supabase-admin";
 
 const SESSION_COOKIE = "nakama_session";
@@ -36,7 +36,9 @@ export async function POST(req: Request) {
     );
   }
 
-  const email = resolveLoginEmail(identifier);
+  let email = identifier.includes("@")
+    ? identifier.trim().toLowerCase()
+    : (await findEmailByUsername(identifier)) ?? resolveLoginEmail(identifier);
 
   if (verifyDemoLogin(identifier, password)) {
     return sessionResponse("demo");

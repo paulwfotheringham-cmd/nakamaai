@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { persistAccountUsername } from "@/lib/account-username";
+import { validateUsername } from "@/lib/auth-username";
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
@@ -21,6 +23,7 @@ export default function SignupPage() {
   const router = useRouter();
 
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordRepeat, setPasswordRepeat] = useState("");
@@ -41,6 +44,12 @@ export default function SignupPage() {
       return;
     }
 
+    const usernameError = validateUsername(username);
+    if (usernameError) {
+      setError(usernameError);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -52,10 +61,14 @@ export default function SignupPage() {
           email: email.trim(),
           password,
           name: name.trim(),
+          username: username.trim(),
         }),
       });
 
-      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        username?: string;
+      };
 
       if (!res.ok) {
         setError(data.error ?? "Could not create account. Please try again.");
@@ -63,9 +76,14 @@ export default function SignupPage() {
         return;
       }
 
+      const displayUsername = username.trim();
+      persistAccountUsername(displayUsername);
+      const savedUsername = data.username?.trim() || displayUsername;
+
       const params = new URLSearchParams();
       params.set("email", email.trim());
       if (name.trim()) params.set("name", name.trim());
+      if (savedUsername) params.set("username", savedUsername);
       router.push(`/ccard-sign?${params.toString()}`);
     } catch {
       setError("Something went wrong. Please try again.");
@@ -160,6 +178,29 @@ export default function SignupPage() {
             autoComplete="name"
             style={inputStyle}
           />
+
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            autoComplete="username"
+            autoCapitalize="off"
+            spellCheck={false}
+            style={inputStyle}
+          />
+
+          <p
+            style={{
+              margin: "-6px 0 14px 0",
+              fontSize: "13px",
+              lineHeight: 1.45,
+              color: "rgba(255,255,255,0.5)",
+            }}
+          >
+            Used in the couples section and across your account.
+          </p>
 
           <input
             type="email"
