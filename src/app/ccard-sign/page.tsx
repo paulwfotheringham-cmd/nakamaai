@@ -15,10 +15,14 @@ export default function CcardSignPage() {
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const name = params.get("name");
     if (name) setCardholderName(name);
+    const stored = localStorage.getItem("billing");
+    if (stored === "yearly" || stored === "monthly") setBilling(stored);
   }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -136,13 +140,30 @@ export default function CcardSignPage() {
               <div className="mt-8 flex items-end justify-between border-b border-white/10 pb-6">
                 <span className="text-zinc-400">Subscription</span>
                 <span className="text-right text-2xl font-semibold sm:text-3xl">
-                  $14.99
-                  <span className="text-base font-medium text-stone-500 sm:text-lg">
-                    {" "}
-                    / month
-                  </span>
+                  {billing === "yearly" ? (
+                    <>
+                      $161.89
+                      <span className="text-base font-medium text-stone-500 sm:text-lg">
+                        {" "}
+                        / year
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      $14.99
+                      <span className="text-base font-medium text-stone-500 sm:text-lg">
+                        {" "}
+                        / month
+                      </span>
+                    </>
+                  )}
                 </span>
               </div>
+              {billing === "yearly" ? (
+                <p className="mt-2 text-right text-sm text-stone-500">
+                  10% annual discount · $13.49/mo equivalent
+                </p>
+              ) : null}
 
               <div className="mt-6 space-y-3 text-sm text-zinc-300">
                 <div className="flex justify-between">

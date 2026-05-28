@@ -2,6 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+const MONTHLY_PRICE = 14.99;
+const YEARLY_PRICE = Math.round(MONTHLY_PRICE * 12 * 0.9 * 100) / 100;
+const YEARLY_PER_MONTH = Math.round((YEARLY_PRICE / 12) * 100) / 100;
+
+type BillingInterval = "monthly" | "yearly";
 
 type SelectPlanPageProps = {
   searchParams?: {
@@ -12,6 +19,7 @@ type SelectPlanPageProps = {
 
 export default function SelectPlanPage(_props: SelectPlanPageProps) {
   const router = useRouter();
+  const [billing, setBilling] = useState<BillingInterval>("monthly");
 
   const featuresNights = [
     "Cancel anytime",
@@ -91,14 +99,61 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
               </p>
             </div>
 
-            <div className={priceBox}>
-              <p className={`${priceMain} text-amber-100`}>
-                $14.99
-                <span className="text-base font-medium text-stone-500 sm:text-lg">
-                  {" "}
-                  / month
+            <div className="mt-2 flex w-full shrink-0 justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => setBilling("monthly")}
+                className={`rounded-full border px-4 py-2 text-xs font-semibold tracking-wide transition sm:text-sm ${
+                  billing === "monthly"
+                    ? "border-amber-400/55 bg-gradient-to-b from-amber-200/90 to-amber-600 text-zinc-950"
+                    : "border-stone-700/80 bg-black/40 text-stone-400 hover:border-amber-800/40 hover:text-stone-200"
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                type="button"
+                onClick={() => setBilling("yearly")}
+                className={`rounded-full border px-4 py-2 text-xs font-semibold tracking-wide transition sm:text-sm ${
+                  billing === "yearly"
+                    ? "border-amber-400/55 bg-gradient-to-b from-amber-200/90 to-amber-600 text-zinc-950"
+                    : "border-stone-700/80 bg-black/40 text-stone-400 hover:border-amber-800/40 hover:text-stone-200"
+                }`}
+              >
+                Yearly{" "}
+                <span
+                  className={
+                    billing === "yearly" ? "text-zinc-800/80" : "text-amber-400/90"
+                  }
+                >
+                  · Save 10%
                 </span>
-              </p>
+              </button>
+            </div>
+
+            <div className={priceBox}>
+              {billing === "monthly" ? (
+                <p className={`${priceMain} text-amber-100`}>
+                  ${MONTHLY_PRICE.toFixed(2)}
+                  <span className="text-base font-medium text-stone-500 sm:text-lg">
+                    {" "}
+                    / month
+                  </span>
+                </p>
+              ) : (
+                <div className="text-center">
+                  <p className={`${priceMain} text-amber-100`}>
+                    ${YEARLY_PRICE.toFixed(2)}
+                    <span className="text-base font-medium text-stone-500 sm:text-lg">
+                      {" "}
+                      / year
+                    </span>
+                  </p>
+                  <p className="mt-1.5 text-sm font-medium text-stone-500">
+                    ${YEARLY_PER_MONTH.toFixed(2)}/mo billed annually
+                  </p>
+                </div>
+              )}
             </div>
 
             <ul className={featureList}>
@@ -116,6 +171,7 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
               type="button"
               onClick={() => {
                 localStorage.setItem("plan", "paid");
+                localStorage.setItem("billing", billing);
                 router.push("/signup");
               }}
               className="mt-8 inline-flex w-full shrink-0 items-center justify-center rounded-full border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-6 py-3.5 text-center text-sm font-semibold text-zinc-950 shadow-md transition hover:from-amber-100 hover:to-amber-500 sm:py-4 sm:text-[15px]"

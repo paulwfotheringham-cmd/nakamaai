@@ -18,8 +18,10 @@ export default function DateNightExperiencePage({
 }: {
   match: DateNightScenario;
 }) {
-  // Mock timeline (no real audio file yet)
-  const durationSec = 95;
+  // Real ambience audio (looped, subtle). Frontend-only mock.
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const [durationSec, setDurationSec] = useState(95);
 
   const beats: Beat[] = useMemo(
     () => [
@@ -46,107 +48,28 @@ export default function DateNightExperiencePage({
   const [beatIndex, setBeatIndex] = useState(0);
 
   const beatTimerRef = useRef<number | null>(null);
-  const tickRef = useRef<number | null>(null);
-
-  // Lightweight ambience (WebAudio: subtle drone + noise), frontend-only
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const ambienceRef = useRef<{
-    gain: GainNode;
-    oscA: OscillatorNode;
-    oscB: OscillatorNode;
-    noiseSrc: AudioBufferSourceNode;
-    noiseGain: GainNode;
-  } | null>(null);
-
-  const ensureAmbience = async () => {
-    if (ambienceRef.current) return;
-    const Ctx = window.AudioContext || (window as any).webkitAudioContext;
-    const ctx: AudioContext = audioCtxRef.current ?? new Ctx();
-    audioCtxRef.current = ctx;
-
-    const master = ctx.createGain();
-    master.gain.value = 0.0001;
-    master.connect(ctx.destination);
-
-    const oscA = ctx.createOscillator();
-    oscA.type = "sine";
-    oscA.frequency.value = 55;
-    const oscB = ctx.createOscillator();
-    oscB.type = "triangle";
-    oscB.frequency.value = 110;
-
-    const oscGain = ctx.createGain();
-    oscGain.gain.value = 0.015;
-
-    // Noise buffer (soft air / fog)
-    const buffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.18;
-    const noiseSrc = ctx.createBufferSource();
-    noiseSrc.buffer = buffer;
-    noiseSrc.loop = true;
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.value = 0.008;
-
-    oscA.connect(oscGain);
-    oscB.connect(oscGain);
-    oscGain.connect(master);
-
-    noiseSrc.connect(noiseGain);
-    noiseGain.connect(master);
-
-    oscA.start();
-    oscB.start();
-    noiseSrc.start();
-
-    ambienceRef.current = { gain: master, oscA, oscB, noiseSrc, noiseGain };
-  };
-
-  const setAmbienceOn = async (on: boolean) => {
-    await ensureAmbience();
-    const ctx = audioCtxRef.current;
-    const amb = ambienceRef.current;
-    if (!ctx || !amb) return;
-    if (ctx.state === "suspended") await ctx.resume();
-
-    const now = ctx.currentTime;
-    const target = on ? 0.55 : 0.0001;
-    amb.gain.gain.cancelScheduledValues(now);
-    amb.gain.gain.setTargetAtTime(target, now, 0.18);
-
-    // Gentle “ending” dip on last beat
-    if (!on) {
-      amb.noiseGain.gain.setTargetAtTime(0.002, now, 0.3);
-    } else {
-      amb.noiseGain.gain.setTargetAtTime(0.008, now, 0.3);
-    }
-  };
 
   useEffect(() => {
     return () => {
       if (beatTimerRef.current) window.clearTimeout(beatTimerRef.current);
-      if (tickRef.current) window.clearInterval(tickRef.current);
-      const ctx = audioCtxRef.current;
-      try {
-        ctx?.close();
-      } catch {
-        // ignore
-      }
-      ambienceRef.current = null;
-      audioCtxRef.current = null;
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
   useEffect(() => {
     if (!playing) return;
+    const audio = audioRef.current;
+    if (!audio) return;
 
-    tickRef.current = window.setInterval(() => {
-      setElapsed((t) => Math.min(durationSec, t + 0.25));
-    }, 250);
+    const tick = () => {
+      setElapsed(audio.currentTime || 0);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
 
     return () => {
-      if (tickRef.current) window.clearInterval(tickRef.current);
-      tickRef.current = null;
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
     };
   }, [playing]);
 
@@ -169,17 +92,29 @@ export default function DateNightExperiencePage({
     if (!playing) return;
     if (elapsed >= durationSec) {
       setPlaying(false);
-      void setAmbienceOn(true); // keep ambience quietly playing
     }
   }, [elapsed, durationSec, playing]);
 
   const togglePlay = async () => {
-    const next = !playing;
-    setPlaying(next);
-    if (next) {
-      await setAmbienceOn(true);
-      if (beatIndex >= beats.length) setBeatIndex(0);
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (!playing) {
+      try {
+        audio.volume = 0.35;
+        audio.loop = true;
+        await audio.play();
+        setPlaying(true);
+        if (beatIndex >= beats.length) setBeatIndex(0);
+      } catch {
+        // If autoplay is blocked for any reason, keep UI idle.
+        setPlaying(false);
+      }
+      return;
     }
+
+    audio.pause();
+    setPlaying(false);
   };
 
   const progress = elapsed / durationSec;
@@ -188,6 +123,17 @@ export default function DateNightExperiencePage({
 
   return (
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-amber-900/25 bg-black shadow-[inset_0_0_60px_rgba(0,0,0,0.35)]">
+      <audio
+        ref={audioRef}
+        src="/audio/intro.mp3"
+        preload="auto"
+        onLoadedMetadata={(e) => {
+          const d = (e.currentTarget.duration || 0) as number;
+          if (Number.isFinite(d) && d > 1) setDurationSec(d);
+        }}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+      />
       {/* Fullscreen cinematic background */}
       <div className="absolute inset-0">
         <img
