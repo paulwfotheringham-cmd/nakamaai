@@ -22,7 +22,8 @@ const inputStyle: React.CSSProperties = {
 export default function SignupPage() {
   const router = useRouter();
 
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,6 +54,7 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
+      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -60,7 +62,7 @@ export default function SignupPage() {
         body: JSON.stringify({
           email: email.trim(),
           password,
-          name: name.trim(),
+          name: fullName,
           username: username.trim(),
         }),
       });
@@ -82,7 +84,7 @@ export default function SignupPage() {
 
       const params = new URLSearchParams();
       params.set("email", email.trim());
-      if (name.trim()) params.set("name", name.trim());
+      if (fullName) params.set("name", fullName);
       if (savedUsername) params.set("username", savedUsername);
       router.push(`/ccard-sign?${params.toString()}`);
     } catch {
@@ -171,17 +173,27 @@ export default function SignupPage() {
         <form onSubmit={handleSubmit}>
           <input
             type="text"
-            placeholder="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            placeholder="First Name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             required
-            autoComplete="name"
+            autoComplete="given-name"
             style={inputStyle}
           />
 
           <input
             type="text"
-            placeholder="Username"
+            placeholder="Last Name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+            autoComplete="family-name"
+            style={inputStyle}
+          />
+
+          <input
+            type="text"
+            placeholder="Create username -"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -199,7 +211,7 @@ export default function SignupPage() {
               color: "rgba(255,255,255,0.5)",
             }}
           >
-            Used in the couples section and across your account.
+            Internal username for couples and personalization (not your login).
           </p>
 
           <input
@@ -211,6 +223,17 @@ export default function SignupPage() {
             autoComplete="email"
             style={inputStyle}
           />
+
+          <p
+            style={{
+              margin: "-6px 0 14px 0",
+              fontSize: "13px",
+              lineHeight: 1.45,
+              color: "rgba(255,255,255,0.5)",
+            }}
+          >
+            Your email is what you’ll use to log in.
+          </p>
 
           <input
             type="password"
