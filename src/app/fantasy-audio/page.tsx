@@ -2,7 +2,7 @@
 
 import { Suspense, useMemo, useState, useRef, useEffect, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
-import Image, { StaticImageData } from "next/image";
+import { StaticImageData } from "next/image";
 import animeAudio from "./animeaudio.jpg";
 import werewolfImg from "./Images each category/werewolf.jpg";
 import animeImg from "./Images each category/anime3.jpg";
@@ -130,6 +130,32 @@ const rows: Row[] = [
   },
 ];
 
+const SHELF_TITLES = [
+  "Continue Listening",
+  "Popular This Week",
+  "Recommended For You",
+  "New Releases",
+  "Trending Fantasy",
+  "Paranormal Stories",
+  "Relationship Dynamics",
+  "Historical Romance",
+] as const;
+
+const LENGTH_FILTERS: { value: AudiobookLength | null; label: string }[] = [
+  { value: null, label: "All" },
+  { value: "5 mins", label: "5 min" },
+  { value: "10 mins", label: "10 min" },
+  { value: "15 mins", label: "15 min" },
+  { value: "more", label: "30+ min" },
+];
+
+const FEATURED_COPY: Record<string, string> = {
+  "Anime 1": "A vivid anime-inspired fantasy — immersive voice, cinematic mood, and slow-burn tension.",
+  Werewolf:
+    "Moonlit transformation and primal desire — a paranormal romance that pulls you under.",
+  "Star Trek": "Sci-fi seduction among the stars — explore the unknown with every listen.",
+};
+
 function ArrowButton({
   direction,
   onClick,
@@ -146,34 +172,16 @@ function ArrowButton({
       type="button"
       className="fantasy-arrow-btn"
     >
-      {isLeft ? "←" : "→"}
+      {isLeft ? (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+      ) : (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+      )}
     </button>
-  );
-}
-
-function CategoryThumbnail({ row }: { row: Row }) {
-  return (
-    <div className="fantasy-category-card">
-      <div className="fantasy-category-image-wrap">
-        {row.imageSrc ? (
-          <Image
-            src={row.imageSrc}
-            alt={row.thumbnailLabel}
-            width={64}
-            height={64}
-            className="fantasy-category-photo"
-          />
-        ) : row.icon ? (
-          <div className="fantasy-category-icon">{row.icon}</div>
-        ) : (
-          <div className="fantasy-category-fallback" />
-        )}
-      </div>
-
-      <div className="fantasy-category-caption">
-        <div className="fantasy-category-caption-title">{row.thumbnailLabel}</div>
-      </div>
-    </div>
   );
 }
 
@@ -188,6 +196,7 @@ function FantasyAudioContent() {
   const [duration, setDuration] = useState(0);
   const [audioDurations, setAudioDurations] = useState<{ [key: string]: number }>({});
   const [audiobookLength, setAudiobookLength] = useState<AudiobookLength | null>(null);
+  const [savedItems, setSavedItems] = useState<Set<string>>(() => new Set());
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const itemImages: { [key: string]: StaticImageData } = {
@@ -342,131 +351,158 @@ function FantasyAudioContent() {
     });
   }, [positions, tileVisibleCount]);
 
+  const featuredItem =
+    currentlyPlaying ??
+    ("Werewolf" in audioFiles ? "Werewolf" : Object.keys(audioFiles)[0] ?? rows[0].items[0]);
+  const featuredRow =
+    rows.find((row) => row.items.includes(featuredItem)) ?? rows[0];
+  const featuredImageSrc =
+    itemImages[featuredItem]?.src ?? featuredRow.imageSrc?.src ?? animeAudio.src;
+  const featuredDuration = audioDurations[featuredItem];
+  const featuredDescription =
+    FEATURED_COPY[featuredItem] ??
+    `An immersive ${featuredRow.title.toLowerCase()} experience — press play to begin.`;
+
+  function toggleSaved(item: string) {
+    setSavedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(item)) next.delete(item);
+      else next.add(item);
+      return next;
+    });
+  }
+
   return (
     <main className={`fantasy-page${embed ? " fantasy-page-embed" : ""}`}>
+      <div className="fantasy-atmosphere" aria-hidden />
       <div className="fantasy-shell">
-        <div className="fantasy-header">
-          <div className="fantasy-badge">Fantasy Audio</div>
+        <section className="fantasy-hero">
+          <div
+            className="fantasy-hero-art"
+            style={{ backgroundImage: `url(${featuredImageSrc})` }}
+          />
+          <div className="fantasy-hero-overlay" />
+          <div className="fantasy-hero-glow" aria-hidden />
+          <div className="fantasy-hero-content">
+            <p className="fantasy-hero-eyebrow">{featuredRow.title}</p>
+            <h1 className="fantasy-hero-title">{featuredItem}</h1>
+            <p className="fantasy-hero-desc">{featuredDescription}</p>
+            <div className="fantasy-hero-meta">
+              {featuredDuration ? (
+                <span>{formatTime(featuredDuration)}</span>
+              ) : (
+                <span>Immersive audio</span>
+              )}
+              <span className="fantasy-hero-dot" />
+              <span>Fantasy Audio</span>
+            </div>
+            <div className="fantasy-hero-actions">
+              <button
+                type="button"
+                className="fantasy-btn-primary"
+                onClick={() => handleTileClick(featuredItem)}
+              >
+                {currentlyPlaying === featuredItem && isPlaying ? "Pause" : "Play"}
+              </button>
+              <button
+                type="button"
+                className={`fantasy-btn-secondary${savedItems.has(featuredItem) ? " fantasy-btn-secondary-active" : ""}`}
+                onClick={() => toggleSaved(featuredItem)}
+              >
+                {savedItems.has(featuredItem) ? "Saved" : "Save"}
+              </button>
+            </div>
+          </div>
+        </section>
 
-          <h1>Choose Your Fantasy Audio</h1>
-
-          <p>
-            Explore themed story collections and scroll through each category to
-            find the mood, setting, and energy you want.
-          </p>
-        </div>
-
-        <section className="fantasy-length-section" aria-labelledby="fantasy-length-heading">
-          <h2 id="fantasy-length-heading" className="fantasy-length-question">
-            What length of audiobook are you looking for?
-          </h2>
-          <div className="fantasy-length-options" role="group" aria-label="Audiobook length">
-            {AUDIOBOOK_LENGTH_OPTIONS.map((option) => {
-              const active = audiobookLength === option;
+        <section className="fantasy-filters" aria-label="Duration filters">
+          <div className="fantasy-filters-inner">
+            {LENGTH_FILTERS.map(({ value, label }) => {
+              const active = audiobookLength === value;
               return (
                 <button
-                  key={option}
+                  key={label}
                   type="button"
                   aria-pressed={active}
-                  onClick={() => setAudiobookLength(option)}
-                  className={`fantasy-length-option${active ? " fantasy-length-option-active" : ""}`}
+                  onClick={() => setAudiobookLength(value)}
+                  className={`fantasy-filter-chip${active ? " fantasy-filter-chip-active" : ""}`}
                 >
-                  {option}
+                  {label}
                 </button>
               );
             })}
           </div>
         </section>
 
-        <section className="fantasy-panel">
-          <div className="fantasy-panel-glow" />
-
-          <div className="fantasy-panel-top">
-            <div>
-              <h2>Story Categories</h2>
-              <p>
-                Each row has its own carousel. Three options are visible at a
-                time.
-              </p>
-            </div>
-
-            <div className="fantasy-note">
-              <span className="fantasy-note-dot" />
-              Browse by mood, setting, or dynamic
-            </div>
-          </div>
-
-          <div className="fantasy-rows">
-            {rows.map((row, rowIndex) => (
-              <div key={row.title} className="fantasy-row">
-                <CategoryThumbnail row={row} />
-
-                <div className="fantasy-row-scroller">
-                  <div className="fantasy-arrow-wrap">
-                    <ArrowButton
-                      direction="left"
-                      onClick={() => goPrev(rowIndex)}
-                    />
-                  </div>
-
-                  <div className="fantasy-tiles">
-                    {visibleRows[rowIndex].map((item, itemIndex) => (
-                      <div key={`${row.title}-${item}-${itemIndex}`} className="fantasy-tile-wrap">
-                        <button
-                          type="button"
-                          className={`fantasy-tile ${
-                            audioFiles[item] ? "fantasy-tile-playable" : ""
-                          } ${
-                            currentlyPlaying === item && isPlaying ? "fantasy-tile-playing" : ""
-                          }`}
-                          onClick={() => handleTileClick(item)}
-                          style={
-                            itemImages[item]
-                              ? {
-                                  backgroundImage: `url(${itemImages[item].src})`,
-                                  backgroundSize: "cover",
-                                  backgroundPosition: "center",
-                                }
-                              : undefined
-                          }
-                        >
-                          <div className="fantasy-tile-content">
-                            {audioFiles[item] && (
-                              <div className="fantasy-tile-icon">
-                                {currentlyPlaying === item && isPlaying ? "⏸️" : "▶️"}
-                              </div>
-                            )}
-                            <span>{item}</span>
-                            {audioFiles[item] && audioDurations[item] && (
-                              <span className="fantasy-tile-duration">
-                                {formatTime(audioDurations[item])}
-                              </span>
-                            )}
-                          </div>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="fantasy-arrow-wrap">
-                    <ArrowButton
-                      direction="right"
-                      onClick={() => goNext(rowIndex)}
-                    />
-                  </div>
-                </div>
+        <section className="fantasy-shelves">
+          {rows.map((row, rowIndex) => (
+            <div
+              key={row.title}
+              className="fantasy-shelf"
+              style={{ animationDelay: `${rowIndex * 60}ms` }}
+            >
+              <div className="fantasy-shelf-header">
+                <h2 className="fantasy-shelf-title">{SHELF_TITLES[rowIndex] ?? row.title}</h2>
+                <span className="fantasy-shelf-sub">{row.title}</span>
               </div>
-            ))}
-          </div>
-        </section>
 
+              <div className="fantasy-shelf-carousel">
+                <ArrowButton direction="left" onClick={() => goPrev(rowIndex)} />
+
+                <div className="fantasy-tiles">
+                  {visibleRows[rowIndex].map((item, itemIndex) => (
+                    <div key={`${row.title}-${item}-${itemIndex}`} className="fantasy-tile-wrap">
+                      <button
+                        type="button"
+                        className={`fantasy-tile ${
+                          audioFiles[item] ? "fantasy-tile-playable" : ""
+                        } ${
+                          currentlyPlaying === item && isPlaying ? "fantasy-tile-playing" : ""
+                        }`}
+                        onClick={() => handleTileClick(item)}
+                        style={
+                          itemImages[item]
+                            ? {
+                                backgroundImage: `url(${itemImages[item].src})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                              }
+                            : undefined
+                        }
+                      >
+                        <div className="fantasy-tile-shine" aria-hidden />
+                        <div className="fantasy-tile-gradient" aria-hidden />
+                        <div className="fantasy-tile-play">
+                          {currentlyPlaying === item && isPlaying ? "⏸" : "▶"}
+                        </div>
+                        <div className="fantasy-tile-body">
+                          <span className="fantasy-tile-title">{item}</span>
+                          <div className="fantasy-tile-meta">
+                            {row.title}
+                            {audioFiles[item] && audioDurations[item] ? (
+                              <>
+                                <span className="fantasy-tile-meta-dot" />
+                                {formatTime(audioDurations[item])}
+                              </>
+                            ) : null}
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <ArrowButton direction="right" onClick={() => goNext(rowIndex)} />
+              </div>
+            </div>
+          ))}
+        </section>
 
         {!embed && (
           <div className="fantasy-footer">
             <a href="/dashboard" className="fantasy-back">
               Back to Dashboard
             </a>
-
             <div className="fantasy-footer-copy">
               Browse and refine your preferred fantasy style.
             </div>
@@ -518,16 +554,22 @@ function FantasyAudioContent() {
 
       <style jsx>{`
         .fantasy-page {
+          position: relative;
           min-height: 100vh;
-          background:
-            radial-gradient(
-              ellipse 80% 45% at 50% -8%,
-              rgba(180, 130, 50, 0.14),
-              transparent 55%
-            ),
-            linear-gradient(180deg, #0a0a0a 0%, #050505 100%);
+          background: #050505;
           color: #e7e5e4;
-          padding: 32px 20px 48px;
+          padding: 0 0 88px;
+          scroll-behavior: smooth;
+        }
+
+        .fantasy-atmosphere {
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          z-index: 0;
+          background:
+            radial-gradient(ellipse 90% 50% at 50% -10%, rgba(180, 130, 50, 0.12), transparent 55%),
+            radial-gradient(ellipse 40% 30% at 100% 20%, rgba(120, 80, 30, 0.06), transparent 50%);
         }
 
         .fantasy-page-embed {
@@ -542,487 +584,452 @@ function FantasyAudioContent() {
           box-sizing: border-box;
         }
 
+        .fantasy-shell {
+          position: relative;
+          z-index: 1;
+          max-width: none;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          min-height: 100%;
+        }
+
         .fantasy-page-embed .fantasy-shell {
           flex: 1;
-          width: 100%;
           min-height: 0;
           min-width: 0;
+        }
+
+        /* ── Hero ── */
+        .fantasy-hero {
+          position: relative;
+          min-height: clamp(220px, 38vh, 420px);
+          overflow: hidden;
+          flex-shrink: 0;
+        }
+
+        .fantasy-hero-art {
+          position: absolute;
+          inset: 0;
+          background-size: cover;
+          background-position: center 20%;
+          transform: scale(1.02);
+          transition: transform 8s ease;
+        }
+
+        .fantasy-hero:hover .fantasy-hero-art {
+          transform: scale(1.06);
+        }
+
+        .fantasy-hero-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            90deg,
+            rgba(5, 5, 5, 0.95) 0%,
+            rgba(5, 5, 5, 0.72) 42%,
+            rgba(5, 5, 5, 0.25) 100%
+          );
+        }
+
+        .fantasy-hero-overlay::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            to top,
+            rgba(5, 5, 5, 1) 0%,
+            rgba(5, 5, 5, 0.4) 35%,
+            transparent 100%
+          );
+        }
+
+        .fantasy-hero-glow {
+          position: absolute;
+          bottom: -20%;
+          left: 10%;
+          width: 50%;
+          height: 60%;
+          background: radial-gradient(ellipse, rgba(198, 164, 106, 0.15), transparent 70%);
+          pointer-events: none;
+        }
+
+        .fantasy-hero-content {
+          position: relative;
+          z-index: 2;
           display: flex;
           flex-direction: column;
-          max-width: none;
-          margin: 0;
+          justify-content: flex-end;
+          min-height: inherit;
+          padding: clamp(20px, 4vw, 40px) clamp(16px, 4vw, 40px) clamp(24px, 5vw, 36px);
+          max-width: 640px;
         }
 
-        .fantasy-page-embed .fantasy-header {
-          margin-bottom: 0;
-          padding: 12px 12px 10px;
-          border-bottom: 1px solid rgba(41, 37, 36, 0.9);
-          flex-shrink: 0;
-          width: 100%;
-          box-sizing: border-box;
-        }
-
-        .fantasy-page-embed .fantasy-header h1 {
-          font-size: 1.25rem;
-        }
-
-        .fantasy-page-embed .fantasy-header p {
-          font-size: 0.75rem;
-          line-height: 1.45;
-        }
-
-        .fantasy-page-embed .fantasy-badge {
+        .fantasy-hero-eyebrow {
+          margin: 0 0 8px;
           font-size: 10px;
-          padding: 5px 10px;
-          margin-bottom: 8px;
-        }
-
-        .fantasy-page-embed .fantasy-panel {
-          flex: 1;
-          width: 100%;
-          min-height: 0;
-          min-width: 0;
-          border-radius: 0;
-          border: none;
-          box-shadow: none;
-          padding: 10px 8px 12px;
-          display: flex;
-          flex-direction: column;
-          box-sizing: border-box;
-        }
-
-        .fantasy-page-embed .fantasy-panel-top {
-          width: 100%;
-        }
-
-        .fantasy-page-embed .fantasy-row {
-          width: 100%;
-        }
-
-        .fantasy-page-embed .fantasy-row-scroller {
-          width: 100%;
-        }
-
-        .fantasy-page-embed .fantasy-rows {
-          overflow-y: auto;
-          flex: 1;
-          min-height: 0;
-        }
-
-        .fantasy-page-embed .fantasy-player {
-          position: sticky;
-          bottom: 0;
-          width: 100%;
-          max-width: none;
-          margin: 0;
-          left: 0;
-          right: 0;
-        }
-
-        .fantasy-page-embed .fantasy-header p {
-          max-width: none;
-        }
-
-        .fantasy-length-section {
-          flex-shrink: 0;
-          padding: 14px 16px 16px;
-          border-bottom: 1px solid rgba(41, 37, 36, 0.9);
-          background: rgba(0, 0, 0, 0.25);
-        }
-
-        .fantasy-length-question {
-          margin: 0 0 12px 0;
-          font-family: ui-serif, Georgia, "Times New Roman", serif;
-          font-size: 1.05rem;
           font-weight: 600;
-          color: #fafaf9;
-          line-height: 1.35;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: rgba(251, 191, 36, 0.75);
         }
 
-        .fantasy-length-options {
+        .fantasy-hero-title {
+          margin: 0;
+          font-family: ui-serif, Georgia, "Times New Roman", serif;
+          font-size: clamp(1.75rem, 4.5vw, 3rem);
+          font-weight: 700;
+          line-height: 1.05;
+          letter-spacing: -0.02em;
+          color: #fafaf9;
+        }
+
+        .fantasy-hero-desc {
+          margin: 12px 0 0;
+          font-size: clamp(0.8125rem, 1.8vw, 0.9375rem);
+          line-height: 1.55;
+          color: rgba(231, 229, 228, 0.82);
+          max-width: 520px;
+        }
+
+        .fantasy-hero-meta {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-top: 14px;
+          font-size: 12px;
+          font-weight: 500;
+          color: rgba(168, 162, 158, 0.9);
+        }
+
+        .fantasy-hero-dot {
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: rgba(198, 164, 106, 0.7);
+        }
+
+        .fantasy-hero-actions {
           display: flex;
           flex-wrap: wrap;
-          gap: 8px;
+          gap: 12px;
+          margin-top: 20px;
         }
 
-        .fantasy-length-option {
+        .fantasy-btn-primary {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 120px;
+          padding: 12px 28px;
+          border: none;
           border-radius: 999px;
-          border: 1px solid rgba(120, 113, 108, 0.85);
+          background: linear-gradient(180deg, #fde68a 0%, #d97706 100%);
+          color: #1c1917;
+          font-size: 0.9375rem;
+          font-weight: 700;
+          cursor: pointer;
+          box-shadow: 0 4px 24px rgba(198, 164, 106, 0.3);
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .fantasy-btn-primary:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 8px 32px rgba(198, 164, 106, 0.4);
+        }
+
+        .fantasy-btn-secondary {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 100px;
+          padding: 12px 24px;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.12);
           background: rgba(0, 0, 0, 0.45);
-          color: #d6d3d1;
+          color: #e7e5e4;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          cursor: pointer;
+          backdrop-filter: blur(8px);
+          transition: border-color 0.25s ease, background 0.25s ease;
+        }
+
+        .fantasy-btn-secondary:hover {
+          border-color: rgba(198, 164, 106, 0.35);
+          background: rgba(0, 0, 0, 0.6);
+        }
+
+        .fantasy-btn-secondary-active {
+          border-color: rgba(198, 164, 106, 0.45);
+          color: #fde68a;
+        }
+
+        /* ── Filters ── */
+        .fantasy-filters {
+          flex-shrink: 0;
+          padding: 20px clamp(16px, 4vw, 40px) 8px;
+        }
+
+        .fantasy-filters-inner {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .fantasy-filter-chip {
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(0, 0, 0, 0.4);
+          color: #a8a29e;
           font-size: 0.8125rem;
           font-weight: 600;
-          padding: 8px 16px;
+          padding: 9px 18px;
           cursor: pointer;
-          transition:
-            border-color 0.15s ease,
-            background 0.15s ease,
-            color 0.15s ease;
+          transition: all 0.25s ease;
         }
 
-        .fantasy-length-option:hover {
-          border-color: rgba(217, 119, 6, 0.45);
+        .fantasy-filter-chip:hover {
+          border-color: rgba(198, 164, 106, 0.3);
           color: #fef3c7;
         }
 
-        .fantasy-length-option-active {
-          border-color: rgba(251, 191, 36, 0.55);
+        .fantasy-filter-chip-active {
+          border-color: rgba(251, 191, 36, 0.5);
           background: linear-gradient(180deg, rgba(253, 230, 138, 0.95) 0%, rgba(217, 119, 6, 0.92) 100%);
           color: #1c1917;
-          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 0 20px rgba(198, 164, 106, 0.25);
         }
 
-        .fantasy-page-embed .fantasy-length-section {
-          padding: 10px 12px 12px;
-        }
-
-        .fantasy-page-embed .fantasy-length-question {
-          font-size: 0.9375rem;
-          margin-bottom: 10px;
-        }
-
-        .fantasy-page-embed .fantasy-length-option {
-          font-size: 0.75rem;
-          padding: 7px 14px;
-        }
-
-        .fantasy-shell {
-          max-width: 1240px;
-          margin: 0 auto;
-        }
-
-        .fantasy-header {
-          margin-bottom: 24px;
-        }
-
-        .fantasy-badge {
-          display: inline-block;
-          padding: 6px 12px;
-          border-radius: 999px;
-          background: rgba(69, 26, 3, 0.35);
-          border: 1px solid rgba(180, 130, 50, 0.35);
-          color: rgba(251, 191, 36, 0.9);
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          margin-bottom: 12px;
-        }
-
-        .fantasy-header h1 {
-          font-family: ui-serif, Georgia, "Times New Roman", serif;
-          font-size: clamp(1.75rem, 4vw, 2.5rem);
-          line-height: 1.1;
-          font-weight: 600;
-          letter-spacing: -0.02em;
-          margin: 0 0 10px 0;
-          color: #fafaf9;
-        }
-
-        .fantasy-header p {
-          margin: 0;
-          max-width: 760px;
-          font-size: 0.9375rem;
-          line-height: 1.55;
-          color: #a8a29e;
-        }
-
-        .fantasy-panel {
-          position: relative;
-          overflow: hidden;
-          border-radius: 1rem;
-          border: 1px solid rgba(120, 53, 15, 0.28);
-          background: linear-gradient(
-            180deg,
-            rgba(9, 9, 11, 0.98) 0%,
-            rgba(6, 26, 26, 0.95) 100%
-          );
-          padding: 22px;
-          box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.25);
-        }
-
-        .fantasy-panel-glow {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          background: radial-gradient(
-            circle at top right,
-            rgba(180, 130, 50, 0.06),
-            transparent 40%
-          );
-        }
-
-        .fantasy-panel-top {
-          position: relative;
-          z-index: 1;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 16px;
-          margin-bottom: 18px;
-          flex-wrap: wrap;
-        }
-
-        .fantasy-panel-top h2 {
-          margin: 0 0 6px 0;
-          font-family: ui-serif, Georgia, "Times New Roman", serif;
-          font-size: 1.25rem;
-          font-weight: 600;
-          color: #fafaf9;
-        }
-
-        .fantasy-panel-top p {
-          margin: 0;
-          color: #78716c;
-          font-size: 0.8125rem;
-        }
-
-        .fantasy-note {
-          display: inline-flex;
-          align-items: center;
-          gap: 10px;
-          padding: 8px 12px;
-          border-radius: 999px;
-          background: rgba(0, 0, 0, 0.35);
-          border: 1px solid rgba(41, 37, 36, 0.9);
-          color: #a8a29e;
-          font-size: 0.75rem;
-        }
-
-        .fantasy-note-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #d8b26e;
-          display: inline-block;
-          box-shadow: 0 0 12px rgba(216, 178, 110, 0.6);
-        }
-
-        .fantasy-rows {
-          position: relative;
-          z-index: 1;
+        /* ── Shelves ── */
+        .fantasy-shelves {
+          flex: 1;
+          min-height: 0;
+          overflow-y: auto;
+          padding: 16px clamp(16px, 4vw, 40px) 32px;
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: clamp(28px, 5vw, 48px);
         }
 
-        .fantasy-row {
+        .fantasy-page-embed .fantasy-shelves {
+          flex: 1;
+          min-height: 0;
+        }
+
+        .fantasy-shelf {
+          animation: shelfIn 0.55s ease both;
+        }
+
+        @keyframes shelfIn {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .fantasy-shelf-header {
+          display: flex;
+          align-items: baseline;
+          gap: 12px;
+          margin-bottom: 14px;
+        }
+
+        .fantasy-shelf-title {
+          margin: 0;
+          font-family: ui-serif, Georgia, "Times New Roman", serif;
+          font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+          font-weight: 600;
+          color: #fafaf9;
+        }
+
+        .fantasy-shelf-sub {
+          font-size: 11px;
+          font-weight: 500;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: rgba(168, 162, 158, 0.55);
+        }
+
+        .fantasy-shelf-carousel {
           display: grid;
-          grid-template-columns: 4.75rem minmax(0, 1fr);
+          grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
           gap: 8px;
           align-items: center;
-          min-width: 0;
-        }
-
-        .fantasy-row-scroller {
-          display: grid;
-          grid-template-columns: 2rem minmax(0, 1fr) 2rem;
-          gap: 6px;
-          align-items: center;
-          min-width: 0;
-        }
-
-        .fantasy-category-card {
-          width: 4.75rem;
-          min-height: 0;
-          border-radius: 0.625rem;
-          border: 1px solid rgba(41, 37, 36, 0.95);
-          background: rgba(0, 0, 0, 0.35);
-          overflow: hidden;
-          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
-          display: grid;
-          grid-template-columns: 1fr;
-          grid-template-rows: auto auto;
-          align-items: center;
-          justify-items: center;
-        }
-
-        .fantasy-category-image-wrap {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 6px 6px 0;
-        }
-
-        .fantasy-category-photo {
-          width: 2.75rem;
-          height: 2.75rem;
-          object-fit: cover;
-          border-radius: 8px;
-          display: block;
-        }
-
-        .fantasy-category-fallback {
-          width: 2.75rem;
-          height: 2.75rem;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(135deg, #4b5563 0%, #1f2937 100%);
-          color: white;
-          font-size: 1rem;
-          font-weight: 700;
-        }
-
-        .fantasy-category-icon {
-          width: 2.75rem;
-          height: 2.75rem;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(
-            135deg,
-            rgba(120, 53, 15, 0.25) 0%,
-            rgba(0, 0, 0, 0.5) 100%
-          );
-        }
-
-        .fantasy-category-icon :global(svg) {
-          width: 1.75rem !important;
-          height: 1.75rem !important;
-        }
-
-        .fantasy-category-caption {
-          padding: 4px 6px 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-        }
-
-        .fantasy-category-caption-title {
-          font-size: 9px;
-          font-weight: 600;
-          color: rgba(251, 191, 36, 0.92);
-          line-height: 1.15;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-
-        .fantasy-arrow-wrap {
-          display: flex;
-          align-items: center;
-          justify-content: center;
         }
 
         .fantasy-arrow-btn {
-          width: 2rem;
-          height: 2rem;
-          border-radius: 10px;
-          border: 1px solid rgba(41, 37, 36, 0.95);
-          background: rgba(0, 0, 0, 0.4);
+          width: 2.5rem;
+          height: 2.5rem;
+          border-radius: 50%;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(0, 0, 0, 0.55);
           color: #d8b26e;
           cursor: pointer;
-          font-size: 1rem;
-          font-weight: 700;
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.2s ease;
+          transition: all 0.25s ease;
           flex-shrink: 0;
+          backdrop-filter: blur(8px);
         }
 
         .fantasy-arrow-btn:hover {
-          transform: translateY(-1px);
-          background: rgba(216, 178, 110, 0.12);
-          border-color: rgba(216, 178, 110, 0.28);
+          transform: scale(1.06);
+          background: rgba(198, 164, 106, 0.15);
+          border-color: rgba(198, 164, 106, 0.35);
+          box-shadow: 0 0 16px rgba(198, 164, 106, 0.2);
         }
 
         .fantasy-tiles {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 8px;
+          gap: 14px;
+          min-width: 0;
+        }
+
+        .fantasy-tile-wrap {
           min-width: 0;
         }
 
         .fantasy-tile {
-          min-height: 3.25rem;
-          border-radius: 0.625rem;
-          border: 1px solid rgba(41, 37, 36, 0.95);
-          background: rgba(0, 0, 0, 0.45);
+          position: relative;
+          width: 100%;
+          min-height: clamp(10rem, 22vw, 13.5rem);
+          border: none;
+          border-radius: 14px;
+          background-color: #18181b;
+          background-size: cover;
+          background-position: center;
           color: #fafaf9;
-          font-size: 0.75rem;
-          font-weight: 600;
-          padding: 0 8px;
           cursor: pointer;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
-          transition:
-            transform 0.2s ease,
-            border-color 0.2s ease,
-            box-shadow 0.2s ease;
+          overflow: hidden;
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+          transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, filter 0.4s ease;
         }
 
         .fantasy-tile:hover {
-          transform: translateY(-1px);
-          border-color: rgba(180, 130, 50, 0.45);
-          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+          transform: scale(1.04) translateY(-4px);
+          box-shadow: 0 20px 56px rgba(0, 0, 0, 0.55), 0 0 32px rgba(198, 164, 106, 0.12);
+          filter: brightness(1.06);
+          z-index: 2;
         }
 
-        .fantasy-tile-playable {
-          border-color: rgba(180, 130, 50, 0.35);
-        }
-
-        .fantasy-tile-playable:hover {
-          border-color: rgba(251, 191, 36, 0.55);
-        }
-
-        .fantasy-tile-playing {
-          border-color: rgba(251, 191, 36, 0.65);
-          box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.25);
-          animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-          0% {
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 0 rgba(251, 191, 36, 0.35);
-          }
-          70% {
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 6px rgba(251, 191, 36, 0);
-          }
-          100% {
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 0 rgba(251, 191, 36, 0);
-          }
-        }
-
-        .fantasy-tile-content {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          height: 100%;
-          position: relative;
-          z-index: 1;
-          text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
-        }
-
-        .fantasy-tile[style*="background-image"]::before {
-          content: "";
+        .fantasy-tile-gradient {
           position: absolute;
           inset: 0;
-          border-radius: inherit;
+          z-index: 1;
           background: linear-gradient(
-            180deg,
-            rgba(0, 0, 0, 0.35) 0%,
-            rgba(0, 0, 0, 0.65) 100%
+            to top,
+            rgba(0, 0, 0, 0.92) 0%,
+            rgba(0, 0, 0, 0.35) 45%,
+            rgba(0, 0, 0, 0.08) 100%
           );
           pointer-events: none;
         }
 
-        .fantasy-tile[style*="background-image"] {
-          position: relative;
+        .fantasy-tile-shine {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          opacity: 0;
+          background: radial-gradient(ellipse at 50% 100%, rgba(198, 164, 106, 0.2), transparent 65%);
+          transition: opacity 0.4s ease;
+          pointer-events: none;
         }
 
-        .fantasy-tile-icon {
-          font-size: 12px;
-          opacity: 0.8;
+        .fantasy-tile:hover .fantasy-tile-shine {
+          opacity: 1;
+        }
+
+        .fantasy-tile-play {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          z-index: 3;
+          transform: translate(-50%, -50%) scale(0.85);
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(198, 164, 106, 0.92);
+          color: #1c1917;
+          font-size: 14px;
+          font-weight: 700;
+          opacity: 0;
+          transition: opacity 0.3s ease, transform 0.3s ease;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+        }
+
+        .fantasy-tile-playable:hover .fantasy-tile-play,
+        .fantasy-tile-playing .fantasy-tile-play {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+        }
+
+        .fantasy-tile-body {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 2;
+          padding: 14px 14px 16px;
+          text-align: left;
+        }
+
+        .fantasy-tile-title {
+          display: block;
+          font-family: ui-serif, Georgia, serif;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          line-height: 1.25;
+          color: #fafaf9;
+        }
+
+        .fantasy-tile-meta {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-top: 6px;
+          font-size: 11px;
+          font-weight: 500;
+          color: rgba(231, 229, 228, 0.55);
+          opacity: 0;
+          transform: translateY(4px);
+          transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .fantasy-tile:hover .fantasy-tile-meta,
+        .fantasy-tile-playing .fantasy-tile-meta {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .fantasy-tile-meta-dot {
+          width: 3px;
+          height: 3px;
+          border-radius: 50%;
+          background: rgba(198, 164, 106, 0.6);
+        }
+
+        .fantasy-tile-playable {
+          outline: 1px solid rgba(198, 164, 106, 0.12);
+        }
+
+        .fantasy-tile-playing {
+          outline: 2px solid rgba(251, 191, 36, 0.55);
+          box-shadow: 0 0 24px rgba(198, 164, 106, 0.2);
         }
 
         .fantasy-footer {
-          margin-top: 28px;
+          margin-top: 8px;
+          padding: 0 clamp(16px, 4vw, 40px) 24px;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -1041,31 +1048,17 @@ function FantasyAudioContent() {
           font-weight: 700;
           font-size: 0.875rem;
           text-decoration: none;
-          border: 1px solid rgba(251, 191, 36, 0.4);
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+          transition: transform 0.2s ease;
         }
 
         .fantasy-back:hover {
-          background: linear-gradient(180deg, #fef3c7 0%, #f59e0b 100%);
+          transform: translateY(-1px);
         }
 
         .fantasy-footer-copy {
           color: #78716c;
           font-size: 0.875rem;
-        }
-
-        .fantasy-tile-wrap {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .fantasy-tile-duration {
-          display: block;
-          font-size: 9px;
-          font-weight: 500;
-          color: rgba(255, 255, 255, 0.6);
-          margin-top: 2px;
-          letter-spacing: 0.04em;
         }
 
         .fantasy-player {
@@ -1079,9 +1072,43 @@ function FantasyAudioContent() {
           gap: 20px;
           padding: 12px 20px;
           background: rgba(9, 9, 11, 0.97);
-          border-top: 1px solid rgba(120, 53, 15, 0.4);
+          border-top: 1px solid rgba(120, 53, 15, 0.25);
           backdrop-filter: blur(16px);
           box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.55);
+        }
+
+        .fantasy-page-embed .fantasy-player {
+          position: sticky;
+          bottom: 0;
+          width: 100%;
+          max-width: none;
+          margin: 0;
+        }
+
+        .fantasy-page-embed .fantasy-hero {
+          min-height: clamp(180px, 32vh, 320px);
+        }
+
+        .fantasy-page-embed .fantasy-filters {
+          padding: 14px 16px 6px;
+        }
+
+        .fantasy-page-embed .fantasy-shelves {
+          padding: 12px 16px 20px;
+          gap: 28px;
+        }
+
+        .fantasy-page-embed .fantasy-filter-chip {
+          font-size: 0.75rem;
+          padding: 7px 14px;
+        }
+
+        .fantasy-page-embed .fantasy-tiles {
+          gap: 10px;
+        }
+
+        .fantasy-page-embed .fantasy-tile {
+          min-height: clamp(8.5rem, 18vw, 11rem);
         }
 
         .fantasy-player-left {
@@ -1113,7 +1140,7 @@ function FantasyAudioContent() {
           display: flex;
           justify-content: space-between;
           font-size: 11px;
-          color: rgba(255,255,255,0.5);
+          color: rgba(255, 255, 255, 0.5);
           font-variant-numeric: tabular-nums;
         }
 
@@ -1121,8 +1148,8 @@ function FantasyAudioContent() {
           width: 38px;
           height: 38px;
           border-radius: 50%;
-          border: 1px solid rgba(216,178,110,0.5);
-          background: rgba(216,178,110,0.15);
+          border: 1px solid rgba(216, 178, 110, 0.5);
+          background: rgba(216, 178, 110, 0.15);
           color: #d8b26e;
           font-size: 16px;
           cursor: pointer;
@@ -1134,7 +1161,7 @@ function FantasyAudioContent() {
         }
 
         .fantasy-player-playbtn:hover {
-          background: rgba(216,178,110,0.28);
+          background: rgba(216, 178, 110, 0.28);
         }
 
         .fantasy-player-slider {
@@ -1155,7 +1182,7 @@ function FantasyAudioContent() {
           border-radius: 50%;
           background: #d8b26e;
           cursor: pointer;
-          box-shadow: 0 0 6px rgba(216,178,110,0.6);
+          box-shadow: 0 0 6px rgba(216, 178, 110, 0.6);
         }
 
         .fantasy-player-slider::-moz-range-thumb {
@@ -1171,8 +1198,8 @@ function FantasyAudioContent() {
           flex-shrink: 0;
           padding: 9px 16px;
           border-radius: 12px;
-          border: 1px solid rgba(216,178,110,0.35);
-          background: rgba(216,178,110,0.1);
+          border: 1px solid rgba(216, 178, 110, 0.35);
+          background: rgba(216, 178, 110, 0.1);
           color: #d8b26e;
           font-size: 13px;
           font-weight: 600;
@@ -1182,25 +1209,30 @@ function FantasyAudioContent() {
         }
 
         .fantasy-player-download:hover {
-          background: rgba(216,178,110,0.2);
+          background: rgba(216, 178, 110, 0.2);
         }
 
         @media (max-width: 760px) {
-          .fantasy-page:not(.fantasy-page-embed) {
-            padding: 28px 16px 48px;
-          }
-
-          .fantasy-page:not(.fantasy-page-embed) .fantasy-panel {
-            padding: 20px;
-            border-radius: 24px;
-          }
-
-          .fantasy-page:not(.fantasy-page-embed) .fantasy-header p {
-            font-size: 16px;
-          }
-
-          .fantasy-page:not(.fantasy-page-embed) .fantasy-tiles {
+          .fantasy-tiles {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .fantasy-shelf-carousel {
+            grid-template-columns: 2rem minmax(0, 1fr) 2rem;
+          }
+
+          .fantasy-hero-content {
+            max-width: none;
+          }
+        }
+
+        @media (max-width: 520px) {
+          .fantasy-tiles {
+            grid-template-columns: 1fr;
+          }
+
+          .fantasy-shelf-sub {
+            display: none;
           }
         }
       `}</style>
