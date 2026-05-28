@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import PartnerInviteResult from "@/components/PartnerInviteResult";
 
 export default function CouplesPartnerInvitePanel({
   compact = false,
@@ -15,6 +16,8 @@ export default function CouplesPartnerInvitePanel({
   );
   const [message, setMessage] = useState("");
   const [inviteLink, setInviteLink] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
+  const [invitedEmail, setInvitedEmail] = useState("");
 
   async function sendInvite() {
     const email = partnerEmail.trim().toLowerCase();
@@ -37,20 +40,24 @@ export default function CouplesPartnerInvitePanel({
         error?: string;
         message?: string;
         inviteLink?: string;
+        emailSent?: boolean;
       };
+
+      const link =
+        data.inviteLink ?? `${window.location.origin}/couples-trial-partner`;
 
       if (!res.ok) {
         setStatus("error");
         setMessage(data.error ?? "Could not send invitation.");
-        setInviteLink(
-          data.inviteLink ?? `${window.location.origin}/couples-trial-partner`,
-        );
+        setInviteLink(link);
         return;
       }
 
       setStatus("sent");
-      setMessage(data.message ?? "Invitation sent to your partner.");
-      if (data.inviteLink) setInviteLink(data.inviteLink);
+      setMessage(data.message ?? "Invitation ready for your partner.");
+      setInviteLink(link);
+      setEmailSent(Boolean(data.emailSent));
+      setInvitedEmail(email);
       localStorage.setItem("partnerInviteEmail", email);
     } catch {
       setStatus("error");
@@ -120,26 +127,27 @@ export default function CouplesPartnerInvitePanel({
           </div>
         )}
 
-        {message ? (
-          <p
-            className={`mt-3 text-xs leading-relaxed ${
-              status === "error"
-                ? "text-rose-300/90"
-                : status === "sent"
-                  ? "text-amber-200/85"
-                  : "text-zinc-400"
-            }`}
-          >
+        {status === "error" && message ? (
+          <p className="mt-3 text-xs leading-relaxed text-rose-300/90">
             {message}
-            {inviteLink && status === "error" ? (
+            {inviteLink ? (
               <>
                 {" "}
                 <a href={inviteLink} className="underline text-amber-200/90">
-                  Share invite link
+                  Open invite link
                 </a>
               </>
             ) : null}
           </p>
+        ) : null}
+
+        {status === "sent" && inviteLink ? (
+          <PartnerInviteResult
+            inviteLink={inviteLink}
+            partnerEmail={invitedEmail}
+            emailSent={emailSent}
+            message={message}
+          />
         ) : null}
       </div>
     </div>

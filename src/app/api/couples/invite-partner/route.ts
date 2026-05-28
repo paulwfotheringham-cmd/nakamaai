@@ -21,13 +21,16 @@ export async function POST(req: Request) {
   if (!sent.ok) {
     return NextResponse.json(
       { error: sent.error, inviteLink },
-      { status: 503 },
+      { status: 500 },
     );
   }
 
   return NextResponse.json({
     ok: true,
-    message: "Invitation sent.",
+    emailSent: sent.emailSent,
     inviteLink,
+    message: sent.emailSent
+      ? "Invitation email sent to your partner."
+      : "Share this link with your partner to invite them.",
   });
 }

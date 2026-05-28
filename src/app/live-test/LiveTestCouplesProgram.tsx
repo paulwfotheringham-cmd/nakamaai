@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import PartnerInviteResult from "@/components/PartnerInviteResult";
 import {
   DEFAULT_USER_NAME,
   readGuidePreferences,
@@ -110,6 +111,8 @@ export default function LiveTestCouplesProgram({
   >("idle");
   const [inviteMessage, setInviteMessage] = useState("");
   const [inviteLink, setInviteLink] = useState("");
+  const [inviteEmailSent, setInviteEmailSent] = useState(false);
+  const [invitedPartnerEmail, setInvitedPartnerEmail] = useState("");
 
   useEffect(() => {
     setUserName(readGuidePreferences().userName || DEFAULT_USER_NAME);
@@ -137,18 +140,24 @@ export default function LiveTestCouplesProgram({
         error?: string;
         message?: string;
         inviteLink?: string;
+        emailSent?: boolean;
       };
+
+      const link =
+        data.inviteLink ?? `${window.location.origin}/couples-trial-partner`;
 
       if (!res.ok) {
         setInviteStatus("error");
         setInviteMessage(data.error ?? "Could not send invitation.");
-        setInviteLink(data.inviteLink ?? `${window.location.origin}/couples-trial-partner`);
+        setInviteLink(link);
         return;
       }
 
       setInviteStatus("sent");
-      setInviteMessage(data.message ?? "Invitation sent.");
-      if (data.inviteLink) setInviteLink(data.inviteLink);
+      setInviteMessage(data.message ?? "Invitation ready for your partner.");
+      setInviteLink(link);
+      setInviteEmailSent(Boolean(data.emailSent));
+      setInvitedPartnerEmail(email);
       localStorage.setItem("partnerInviteEmail", email);
     } catch {
       setInviteStatus("error");
@@ -206,26 +215,28 @@ export default function LiveTestCouplesProgram({
           ) : null}
         </div>
 
-        {showTrialTools && (inviteMessage || inviteLink) ? (
-          <p
-            className={`mt-2 text-[10px] leading-snug sm:text-[11px] ${
-              inviteStatus === "error"
-                ? "text-rose-300/90"
-                : inviteStatus === "sent"
-                  ? "text-amber-200/85"
-                  : "text-stone-400"
-            }`}
-          >
+        {showTrialTools && inviteStatus === "error" && inviteMessage ? (
+          <p className="mt-2 text-[10px] leading-snug text-rose-300/90 sm:text-[11px]">
             {inviteMessage}
-            {inviteLink && inviteStatus === "error" ? (
+            {inviteLink ? (
               <>
                 {" "}
                 <a href={inviteLink} className="underline text-amber-200/90">
-                  Share invite link
+                  Open invite link
                 </a>
               </>
             ) : null}
           </p>
+        ) : null}
+
+        {showTrialTools && inviteStatus === "sent" && inviteLink ? (
+          <PartnerInviteResult
+            inviteLink={inviteLink}
+            partnerEmail={invitedPartnerEmail}
+            emailSent={inviteEmailSent}
+            message={inviteMessage}
+            compact
+          />
         ) : null}
       </header>
 

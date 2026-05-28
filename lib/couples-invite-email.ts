@@ -36,18 +36,14 @@ export function buildPartnerInviteEmailHtml(inviteLink: string): string {
 export async function sendPartnerInviteEmail(
   to: string,
   inviteLink: string,
-): Promise<{ ok: true } | { ok: false; error: string }> {
+): Promise<{ ok: true; emailSent: boolean } | { ok: false; error: string }> {
   const apiKey = process.env.RESEND_API_KEY;
   const from =
     process.env.EMAIL_FROM ?? "Nakama Nights <onboarding@resend.dev>";
 
   if (!apiKey) {
-    console.warn("[couples-invite] RESEND_API_KEY not set; invite link:", inviteLink);
-    return {
-      ok: false,
-      error:
-        "Email is not configured on the server. Ask your administrator to set RESEND_API_KEY.",
-    };
+    console.warn("[couples-invite] RESEND_API_KEY not set; share link manually:", inviteLink);
+    return { ok: true, emailSent: false };
   }
 
   const res = await fetch("https://api.resend.com/emails", {
@@ -70,5 +66,5 @@ export async function sendPartnerInviteEmail(
     return { ok: false, error: "Could not send the invitation email. Please try again." };
   }
 
-  return { ok: true };
+  return { ok: true, emailSent: true };
 }
