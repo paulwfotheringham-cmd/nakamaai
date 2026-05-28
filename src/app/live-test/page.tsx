@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import LiveGuideStage from "./LiveGuideStage";
 
 export const metadata: Metadata = {
@@ -9,7 +10,15 @@ export const metadata: Metadata = {
 export default function LiveTestPage() {
   return (
     <div className="live-test-root h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-black">
-      <LiveGuideStage />
+      <Suspense
+        fallback={
+          <div className="flex h-full items-center justify-center text-sm text-stone-500">
+            Loading…
+          </div>
+        }
+      >
+        <LiveGuideStage />
+      </Suspense>
     </div>
   );
 }

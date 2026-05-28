@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   getLiveTestCenterPanel,
@@ -32,6 +33,7 @@ type CouplesCenterView =
   | "date-night-experience";
 
 export default function LiveTestShell() {
+  const searchParams = useSearchParams();
   const [activeNav, setActiveNav] = useState<LiveTestNavId | null>(null);
   const centerPanel = getLiveTestCenterPanel(activeNav);
   const onDashboard = activeNav === null;
@@ -42,6 +44,13 @@ export default function LiveTestShell() {
   );
   const onDateNightExperience =
     centerPanel === "couples-program" && couplesView === "date-night-experience";
+
+  useEffect(() => {
+    const nav = searchParams.get("nav");
+    if (nav === "reignite-couples" || nav === "couples") {
+      setActiveNav("reignite-couples");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (centerPanel !== "couples-program") {

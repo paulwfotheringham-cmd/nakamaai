@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 const NIGHTS_MONTHLY = 14.99;
 const NIGHTS_YEARLY = Math.round(NIGHTS_MONTHLY * 12 * 0.9 * 100) / 100;
@@ -21,6 +21,8 @@ type SelectPlanPageProps = {
   };
 };
 
+const billingToggleSlot = "mt-2 min-h-[2.35rem] shrink-0";
+
 function BillingToggle({
   billing,
   onChange,
@@ -31,7 +33,7 @@ function BillingToggle({
   showYearlyDiscount?: boolean;
 }) {
   return (
-    <div className="mt-2 flex w-full shrink-0 justify-center gap-2">
+    <div className={`${billingToggleSlot} flex w-full justify-center gap-2`}>
       <button
         type="button"
         onClick={() => onChange("monthly")}
@@ -68,6 +70,14 @@ function BillingToggle({
   );
 }
 
+function PlanFooter({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return <div className="mt-auto shrink-0 pt-4">{children}</div>;
+}
+
 function AgeConfirm({
   checked,
   onChange,
@@ -80,7 +90,7 @@ function AgeConfirm({
   return (
     <label
       htmlFor={id}
-      className="mt-4 flex cursor-pointer items-start gap-2.5 text-left"
+      className="flex min-h-[2.75rem] cursor-pointer items-center gap-2.5 text-left"
     >
       <input
         id={id}
@@ -113,6 +123,7 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
   const featuresCouples = [
     "Primary: full Nakama Nights access",
     "Partner: Couples section access",
+    "Full access for two users — Couples section",
     "Date Night & shared experiences",
     "Cancel anytime",
   ];
@@ -234,24 +245,26 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
               ))}
             </ul>
 
-            <AgeConfirm
-              id="age-nights"
-              checked={ageNights}
-              onChange={setAgeNights}
-            />
+            <PlanFooter>
+              <AgeConfirm
+                id="age-nights"
+                checked={ageNights}
+                onChange={setAgeNights}
+              />
 
-            <button
-              type="button"
-              disabled={!ageNights}
-              onClick={() => {
-                localStorage.setItem("plan", "paid");
-                localStorage.setItem("billing", nightsBilling);
-                router.push("/signup");
-              }}
-              className={selectBtnPrimary}
-            >
-              Select plan
-            </button>
+              <button
+                type="button"
+                disabled={!ageNights}
+                onClick={() => {
+                  localStorage.setItem("plan", "paid");
+                  localStorage.setItem("billing", nightsBilling);
+                  router.push("/signup");
+                }}
+                className={selectBtnPrimary}
+              >
+                Select plan
+              </button>
+            </PlanFooter>
           </article>
 
           {/* Couples */}
@@ -264,7 +277,11 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
               </p>
             </div>
 
-            <BillingToggle billing={couplesBilling} onChange={setCouplesBilling} />
+            <BillingToggle
+              billing={couplesBilling}
+              onChange={setCouplesBilling}
+              showYearlyDiscount
+            />
 
             <div className={priceBox}>
               {couplesBilling === "monthly" ? (
@@ -302,24 +319,26 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
               ))}
             </ul>
 
-            <AgeConfirm
-              id="age-couples"
-              checked={ageCouples}
-              onChange={setAgeCouples}
-            />
+            <PlanFooter>
+              <AgeConfirm
+                id="age-couples"
+                checked={ageCouples}
+                onChange={setAgeCouples}
+              />
 
-            <button
-              type="button"
-              disabled={!ageCouples}
-              onClick={() => {
-                localStorage.setItem("plan", "couples");
-                localStorage.setItem("billing", couplesBilling);
-                router.push("/signup");
-              }}
-              className={selectBtnPrimary}
-            >
-              Select plan
-            </button>
+              <button
+                type="button"
+                disabled={!ageCouples}
+                onClick={() => {
+                  localStorage.setItem("plan", "couples");
+                  localStorage.setItem("billing", couplesBilling);
+                  router.push("/signup");
+                }}
+                className={selectBtnPrimary}
+              >
+                Select plan
+              </button>
+            </PlanFooter>
           </article>
 
           {/* The Teaser */}
@@ -331,6 +350,8 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
                 Enjoy 10 days free use of the Platform
               </p>
             </div>
+
+            <div className={billingToggleSlot} aria-hidden />
 
             <div className={priceBox}>
               <div className={`${priceMain} leading-tight text-stone-100`}>
@@ -354,23 +375,30 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
               ))}
             </ul>
 
-            <AgeConfirm
-              id="age-teaser"
-              checked={ageTeaser}
-              onChange={setAgeTeaser}
-            />
+            <PlanFooter>
+              <p className="mb-3 text-center text-xs leading-relaxed text-stone-500 sm:text-[13px]">
+                You will be charged $14.99 a month if you do not cancel after the 10
+                day trial period.
+              </p>
 
-            <button
-              type="button"
-              disabled={!ageTeaser}
-              onClick={() => {
-                localStorage.setItem("plan", "free");
-                router.push("/signup-trial");
-              }}
-              className={selectBtnOutline}
-            >
-              Select plan
-            </button>
+              <AgeConfirm
+                id="age-teaser"
+                checked={ageTeaser}
+                onChange={setAgeTeaser}
+              />
+
+              <button
+                type="button"
+                disabled={!ageTeaser}
+                onClick={() => {
+                  localStorage.setItem("plan", "free");
+                  router.push("/signup-trial");
+                }}
+                className={selectBtnOutline}
+              >
+                Select plan
+              </button>
+            </PlanFooter>
           </article>
         </div>
       </section>
