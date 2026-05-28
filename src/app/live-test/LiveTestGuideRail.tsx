@@ -99,33 +99,34 @@ export default function LiveTestGuideRail({ onNavigate }: LiveTestGuideRailProps
   );
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden">
-      <div className="mx-auto aspect-[4/5] max-h-[42%] min-h-[9rem] w-full max-w-full shrink-0 overflow-hidden sm:max-h-[44%] md:max-h-[46%]">
-        {mounted ? (
-          <SimliAvatar
-            key={prefs.guideId}
-            ref={simliRef}
-            guideId={prefs.guideId}
-            faceId={prefs.simliFaceId}
-            className="h-full w-full"
-          />
-        ) : (
-          <div className="flex h-full min-h-[9rem] items-center justify-center rounded-2xl bg-transparent text-xs text-stone-500">
-            Loading avatar…
-          </div>
-        )}
+    <div className="flex h-full min-h-0 flex-col gap-3 overflow-hidden">
+      <div className="relative mx-auto w-full max-w-full shrink-0 overflow-hidden rounded-xl bg-gradient-to-b from-white/[0.02] to-transparent">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black/40 to-transparent" />
+        <div className="aspect-[5/4] max-h-[34%] min-h-[7.5rem] w-full sm:max-h-[36%] md:max-h-[38%]">
+          {mounted ? (
+            <SimliAvatar
+              key={prefs.guideId}
+              ref={simliRef}
+              guideId={prefs.guideId}
+              faceId={prefs.simliFaceId}
+              className="h-full w-full"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center text-xs text-stone-600">
+              Loading avatar…
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="mt-1.5 flex min-h-0 flex-1 flex-col overflow-hidden md:mt-2">
-        <GuideChatPanel
-          onSend={handleSend}
-          onNavigate={onNavigate}
-          isBusy={isBusy}
-          className="min-h-0 flex-1"
-          userName={prefs.userName}
-          guideName={prefs.guideName}
-        />
-      </div>
+      <GuideChatPanel
+        onSend={handleSend}
+        onNavigate={onNavigate}
+        isBusy={isBusy}
+        className="min-h-0 flex-1"
+        userName={prefs.userName}
+        guideName={prefs.guideName}
+      />
     </div>
   );
 }

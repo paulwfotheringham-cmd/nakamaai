@@ -63,49 +63,58 @@ export default function LiveTestShell() {
   }, [centerPanel]);
 
   return (
-    <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden text-stone-200 grid-rows-[auto_minmax(0,1fr)_minmax(18rem,44dvh)] md:grid-cols-[minmax(12rem,14.5rem)_minmax(0,1fr)_minmax(15rem,20rem)] md:grid-rows-1">
+    <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden bg-[#050505] text-stone-200 grid-rows-[auto_minmax(0,1fr)_minmax(18rem,44dvh)] md:grid-cols-[minmax(11rem,13rem)_minmax(0,1fr)_minmax(16rem,22rem)] md:grid-rows-1">
+      {/* Ambient atmosphere */}
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_45%_at_50%_-8%,rgba(180,130,50,0.12),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_50%_at_50%_-12%,rgba(180,130,50,0.14),transparent_60%)]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_100%_50%,rgba(120,80,30,0.06),transparent_55%)]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_35%_at_0%_80%,rgba(80,50,20,0.05),transparent_50%)]"
         aria-hidden
       />
 
       {/* Left nav */}
       <aside
-        className={`relative z-10 flex shrink-0 flex-col border-b border-stone-800/90 bg-black transition md:col-start-1 md:row-start-1 md:h-full md:min-h-0 md:border-b-0 md:border-r ${
+        className={`relative z-10 flex shrink-0 flex-col bg-black/60 backdrop-blur-xl transition md:col-start-1 md:row-start-1 md:h-full md:min-h-0 md:border-r md:border-white/[0.04] ${
           onDateNightExperience ? "opacity-60" : "opacity-100"
         }`}
       >
-        <div className="flex shrink-0 flex-col items-center gap-2.5 border-b border-stone-800/80 px-3 py-3 md:gap-3 md:px-4 md:py-4">
+        <div className="flex shrink-0 flex-col items-center gap-4 px-4 py-6 md:px-5 md:py-8">
           <Link href="/" className="flex w-full justify-center">
             <Image
               src="/Nakama-AI-July25-White.png"
               alt="Nakama Nights"
               width={280}
               height={76}
-              className="h-12 w-auto max-w-[10.5rem] object-contain sm:h-14 md:h-[4.75rem] md:max-w-full"
+              className="h-14 w-auto max-w-full object-contain opacity-95 transition-opacity hover:opacity-100 sm:h-16 md:h-[5.25rem]"
               priority
             />
           </Link>
           <button
             type="button"
             onClick={() => setActiveNav(null)}
-            className={`w-full max-w-[11rem] rounded-full border px-3 py-1.5 text-[11px] font-semibold tracking-wide transition md:max-w-none md:py-2 md:text-xs ${
+            className={`w-full rounded-xl px-4 py-2.5 text-xs font-semibold tracking-wide transition-all duration-300 ${
               onDashboard
-                ? "border-amber-400/55 bg-gradient-to-b from-amber-200/90 to-amber-600 text-zinc-950"
-                : "border-stone-700/80 bg-black/40 text-stone-300 hover:border-amber-700/40 hover:text-amber-100"
+                ? "bg-gradient-to-b from-amber-200/90 to-amber-600/90 text-zinc-950 shadow-glow-amber"
+                : "border border-white/[0.06] bg-white/[0.03] text-stone-400 hover:border-amber-900/30 hover:text-stone-200"
             }`}
           >
             Dashboard
           </button>
         </div>
 
-        <div className="shrink-0 px-2.5 py-2 md:flex md:min-h-0 md:flex-1 md:flex-col md:px-2.5 md:pb-3 md:pt-3">
+        <div className="shrink-0 px-3 pb-6 md:flex md:min-h-0 md:flex-1 md:flex-col md:px-4">
           <LiveTestUniverseNav activeId={activeNav} onSelect={setActiveNav} />
         </div>
       </aside>
 
       {/* Center content */}
-      <section className="relative z-10 flex min-h-0 min-w-0 flex-col overflow-hidden p-2 sm:p-3 md:col-start-2 md:row-start-1">
+      <section className="relative z-10 flex min-h-0 min-w-0 flex-col overflow-hidden p-4 sm:p-6 md:col-start-2 md:row-start-1 md:p-8">
         {centerPanel === "fantasy-audio" && <LiveTestFantasyAudioFrame />}
         {centerPanel === "create-audio" && <LiveTestCreateAudioFrame />}
         {centerPanel === "couples-program" && (
@@ -175,10 +184,10 @@ export default function LiveTestShell() {
         {centerPanel === "dashboard" && <LiveTestDashboardHome />}
       </section>
 
-      {/* Guide — avatar + chat (always visible, every section) */}
+      {/* Guide — avatar + chat */}
       <aside
-        className={`relative z-20 flex min-h-[18rem] shrink-0 flex-col overflow-hidden border-t border-stone-800/90 bg-black/95 p-2 transition sm:min-h-[20rem] sm:p-3 md:col-start-3 md:row-start-1 md:h-full md:min-h-0 md:border-l md:border-t-0 ${
-          onDateNightExperience ? "bg-black/98 opacity-85" : ""
+        className={`relative z-20 flex min-h-[18rem] shrink-0 flex-col overflow-hidden bg-black/50 p-4 backdrop-blur-xl transition sm:min-h-[20rem] sm:p-5 md:col-start-3 md:row-start-1 md:h-full md:min-h-0 md:border-l md:border-white/[0.04] ${
+          onDateNightExperience ? "opacity-85" : ""
         }`}
       >
         <LiveTestGuideRail onNavigate={setActiveNav} />

@@ -66,3 +66,131 @@
 .create-audio-embed [style*="background: rgba(8,60,75"] {
   background: rgba(9, 9, 11, 0.75) !important;
 }
+
+/* ── Live-test cinematic launcher design system ── */
+@layer components {
+  .launcher-panel {
+    @apply flex h-full min-h-0 flex-col overflow-hidden rounded-2xl;
+    background: linear-gradient(to bottom, rgba(9, 9, 11, 0.92), rgba(12, 10, 8, 0.96), #070707);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .launcher-panel-header {
+    @apply shrink-0 px-6 py-6 sm:px-8 sm:py-8;
+  }
+
+  .launcher-eyebrow {
+    @apply text-[10px] font-semibold uppercase tracking-[0.24em] text-amber-500/70;
+  }
+
+  .launcher-title {
+    @apply mt-2 font-serif text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl;
+  }
+
+  .launcher-subtitle {
+    @apply mt-3 max-w-2xl text-sm leading-relaxed text-stone-400/90 sm:text-[15px];
+  }
+
+  .launcher-section-label {
+    @apply text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-500/60;
+  }
+
+  .launcher-card {
+    @apply relative h-full min-h-0 overflow-hidden rounded-xl bg-zinc-950 transition-all duration-500 ease-out hover:-translate-y-1;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(198, 164, 106, 0.06);
+  }
+
+  .launcher-card:hover {
+    box-shadow: 0 20px 56px rgba(0, 0, 0, 0.6), 0 0 32px rgba(198, 164, 106, 0.14);
+  }
+
+  .launcher-card-featured {
+    @apply lg:col-span-2 lg:row-span-2;
+  }
+
+  .launcher-card-image {
+    @apply absolute inset-0 h-full w-full object-cover brightness-[0.92] contrast-[1.05] transition-transform duration-700 ease-out;
+  }
+
+  .group:hover .launcher-card-image {
+    @apply scale-105 brightness-100;
+  }
+
+  .launcher-card-overlay {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.88) 0%,
+      rgba(0, 0, 0, 0.35) 45%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+  }
+
+  .launcher-card-overlay-featured {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.92) 0%,
+      rgba(0, 0, 0, 0.4) 50%,
+      rgba(0, 0, 0, 0.08) 100%
+    );
+  }
+
+  .launcher-card-glow {
+    @apply pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500;
+    background: radial-gradient(
+      ellipse 80% 60% at 50% 100%,
+      rgba(198, 164, 106, 0.12),
+      transparent 70%
+    );
+  }
+
+  .group:hover .launcher-card-glow {
+    @apply opacity-100;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-gradient-to-b from-amber-200 to-amber-600 px-6 py-3 text-sm font-semibold text-zinc-950 transition-all duration-300 hover:from-amber-100 hover:to-amber-500 disabled:cursor-not-allowed disabled:opacity-50;
+    box-shadow: 0 4px 20px rgba(198, 164, 106, 0.25);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 0 24px rgba(198, 164, 106, 0.2);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-full border border-white/[0.08] bg-black/40 px-6 py-3 text-sm font-medium text-stone-200 backdrop-blur-sm transition-all duration-300 hover:border-amber-900/40 hover:bg-black/55 hover:text-white;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-medium text-stone-400 transition-colors duration-300 hover:text-stone-200;
+  }
+
+  .launcher-nav-item {
+    @apply flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all duration-300;
+  }
+
+  .launcher-nav-item-inactive {
+    @apply text-stone-400 hover:bg-white/[0.03] hover:text-stone-200;
+  }
+
+  .launcher-nav-item-active {
+    @apply bg-gradient-to-r from-amber-950/40 to-transparent text-amber-100 shadow-[inset_3px_0_0_rgba(198,164,106,0.7),0_4px_24px_rgba(0,0,0,0.35)];
+  }
+
+  .launcher-companion {
+    @apply flex h-full min-h-0 flex-col overflow-hidden rounded-2xl;
+    background: linear-gradient(to bottom, rgba(9, 9, 11, 0.9), rgba(10, 9, 8, 0.95), #000);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .launcher-chat-input {
+    @apply min-w-0 flex-1 rounded-xl border border-white/[0.06] bg-black/50 px-4 py-2.5 text-sm text-white placeholder:text-stone-600 backdrop-blur-md transition-all duration-300 focus:border-amber-700/40 focus:bg-black/65 focus:outline-none focus:ring-1 focus:ring-amber-600/20 disabled:opacity-50;
+  }
+
+  .launcher-chat-input:focus {
+    box-shadow: 0 0 24px rgba(198, 164, 106, 0.2);
+  }
+}
+
+.live-test-root {
+  scroll-behavior: smooth;
+}

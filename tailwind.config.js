@@ -42,6 +42,14 @@ module.exports = {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },
         },
+        panelIn: {
+          "0%": { opacity: "0", transform: "translateY(8px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        cardGlow: {
+          "0%, 100%": { boxShadow: "0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(198,164,106,0.08)" },
+          "50%": { boxShadow: "0 16px 48px rgba(0,0,0,0.55), 0 0 24px rgba(198,164,106,0.12)" },
+        },
       },
       animation: {
         "fade-in": "fadeIn 1s ease-out both",
@@ -51,6 +59,14 @@ module.exports = {
         "subtitle-out":
           "subtitleHide 0.58s cubic-bezier(0.4, 0, 0.2, 1) forwards",
         "tap-hint-in": "tapHintIn 0.85s ease-out 0.12s both",
+        "panel-in": "panelIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both",
+        "card-glow": "cardGlow 4s ease-in-out infinite",
+      },
+      boxShadow: {
+        "launcher": "0 24px 64px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
+        "launcher-card": "0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(198,164,106,0.06)",
+        "launcher-card-hover": "0 20px 56px rgba(0,0,0,0.6), 0 0 32px rgba(198,164,106,0.14)",
+        "glow-amber": "0 0 24px rgba(198,164,106,0.2)",
       },
     },
   },

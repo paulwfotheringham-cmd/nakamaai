@@ -123,20 +123,26 @@ export default function GuideChatPanel({
   };
 
   return (
-    <div
-      className={`flex flex-col overflow-hidden rounded-2xl border border-amber-900/30 bg-gradient-to-b from-zinc-900/90 to-black shadow-[0_0_0_1px_rgba(245,158,11,0.06),0_20px_50px_rgba(0,0,0,0.45)] ${className}`}
-    >
-      <div ref={scrollRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
+    <div className={`launcher-companion flex flex-col ${className}`}>
+      <div className="shrink-0 px-4 pt-4 pb-2">
+        <p className="launcher-section-label">Companion</p>
+        <p className="mt-0.5 font-serif text-sm font-semibold text-stone-200">{guideName}</p>
+      </div>
+
+      <div
+        ref={scrollRef}
+        className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-2"
+      >
         {messages.map((msg) => (
           <div
             key={msg.id}
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[92%] rounded-xl px-3 py-2 text-sm leading-relaxed whitespace-pre-line ${
+              className={`max-w-[92%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-line ${
                 msg.role === "user"
-                  ? "rounded-br-sm border border-amber-500/25 bg-amber-950/50 text-amber-50"
-                  : "rounded-bl-sm border border-stone-700/80 bg-black/50 text-stone-200"
+                  ? "rounded-br-md bg-amber-950/35 text-amber-50/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+                  : "rounded-bl-md bg-white/[0.04] text-stone-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
               }`}
             >
               {msg.text || (sending && msg.role === "assistant" ? "…" : "")}
@@ -152,7 +158,7 @@ export default function GuideChatPanel({
                 type="button"
                 onClick={() => handleMoodChoice(opt)}
                 disabled={isBusy}
-                className="rounded-full border border-amber-500/30 bg-amber-950/40 px-3.5 py-2 text-xs font-semibold text-amber-100 transition hover:border-amber-400/50 hover:bg-amber-900/50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-full border border-white/[0.06] bg-black/40 px-3.5 py-2 text-xs font-medium text-stone-300 transition-all duration-300 hover:border-amber-900/35 hover:bg-black/55 hover:text-stone-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {opt}
               </button>
@@ -163,7 +169,7 @@ export default function GuideChatPanel({
 
       <form
         onSubmit={(e) => void handleSubmit(e)}
-        className="flex gap-2 border-t border-stone-800/80 bg-black/40 p-3"
+        className="flex gap-2 border-t border-white/[0.04] bg-black/30 p-4 backdrop-blur-sm"
       >
         <input
           type="text"
@@ -171,12 +177,12 @@ export default function GuideChatPanel({
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Type your message…"
           disabled={sending || isBusy}
-          className="min-w-0 flex-1 rounded-xl border border-stone-700/80 bg-zinc-950/80 px-3 py-2.5 text-sm text-white placeholder:text-stone-600 focus:border-amber-500/45 focus:outline-none focus:ring-1 focus:ring-amber-500/25 disabled:opacity-50"
+          className="launcher-chat-input"
         />
         <button
           type="submit"
           disabled={!draft.trim() || sending || isBusy}
-          className="shrink-0 rounded-xl border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:from-amber-100 hover:to-amber-500 disabled:cursor-not-allowed disabled:opacity-40"
+          className="btn-primary shrink-0 px-5 py-2.5"
         >
           {sending || isBusy ? "…" : "Send"}
         </button>
