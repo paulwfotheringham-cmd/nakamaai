@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function LiveTestPage() {
   return (
-    <div className="live-test-root h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-[#0f1729]">
+    <div className="live-test-root h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-[#050505]">
       <Suspense
         fallback={
           <div className="flex h-full items-center justify-center text-sm text-stone-500">

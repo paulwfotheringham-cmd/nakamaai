@@ -60,6 +60,8 @@ export default function LiveTestShell() {
 
   return (
     <div className="pro-shell">
+      <div className="pro-shell-atmosphere" aria-hidden />
+
       <LiveTestProSidebar
         activeId={activeNav}
         onSelect={setActiveNav}
