@@ -347,6 +347,574 @@
   opacity: 1;
 }
 
+/* ── Navigation concept previews & gallery ── */
+.nav-concept-gallery-page {
+  position: relative;
+  min-height: 100%;
+  padding: 2rem 1.25rem 4rem;
+}
+
+@media (min-width: 768px) {
+  .nav-concept-gallery-page {
+    padding: 3rem 2.5rem 5rem;
+  }
+}
+
+.nav-concept-gallery-atmosphere {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(180, 130, 50, 0.16), transparent 55%),
+    radial-gradient(ellipse 40% 35% at 100% 40%, rgba(120, 80, 30, 0.08), transparent 50%);
+}
+
+.nav-concept-gallery-hero {
+  position: relative;
+  z-index: 1;
+  max-width: 56rem;
+  margin: 0 auto 2.5rem;
+}
+
+.nav-concept-gallery-back {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-size: 0.8125rem;
+  color: rgba(214, 211, 209, 0.65);
+  transition: color 0.2s ease;
+}
+
+.nav-concept-gallery-back:hover {
+  color: rgba(253, 230, 138, 0.9);
+}
+
+.nav-concept-gallery-grid {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.nav-concept-gallery-card {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
+  background: rgba(12, 10, 8, 0.72);
+  overflow: hidden;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+}
+
+.nav-concept-gallery-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-concept-gallery-id {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(253, 230, 138, 0.75);
+}
+
+.nav-concept-gallery-name {
+  margin-top: 0.25rem;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: rgba(255, 252, 245, 0.96);
+}
+
+.nav-concept-gallery-tagline {
+  margin-top: 0.375rem;
+  font-size: 0.875rem;
+  color: rgba(214, 211, 209, 0.62);
+}
+
+.nav-concept-gallery-badge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+}
+
+.nav-concept-gallery-badge-live {
+  color: rgba(134, 239, 172, 0.95);
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.nav-concept-gallery-try {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(253, 230, 138, 0.9);
+  transition: color 0.2s ease;
+}
+
+.nav-concept-gallery-try:hover {
+  color: rgba(255, 252, 245, 0.98);
+}
+
+.nav-concept-frame {
+  display: grid;
+  background: #050505;
+  overflow: hidden;
+}
+
+.nav-concept-frame-preview {
+  height: 26rem;
+  grid-template-columns: minmax(0, 1fr) 5.5rem;
+  grid-template-rows: 1fr;
+}
+
+.nav-concept-frame-live {
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 20rem);
+  grid-template-rows: 1fr;
+}
+
+.nav-concept-frame-d {
+  grid-template-columns: 4.5rem minmax(0, 1fr) 5.5rem;
+}
+
+.nav-concept-frame-live.nav-concept-frame-d {
+  grid-template-columns: 4.5rem minmax(0, 1fr) minmax(14rem, 20rem);
+}
+
+@media (max-width: 767px) {
+  .nav-concept-frame-live {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(14rem, 22dvh);
+  }
+
+  .nav-concept-frame-live.nav-concept-frame-d {
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(14rem, 22dvh);
+  }
+
+  .nav-concept-frame-live .nav-concept-guide {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .nav-concept-frame-live.nav-concept-frame-d .nav-concept-guide {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
+.nav-concept-main {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.nav-concept-main-dock {
+  padding-bottom: 4.5rem;
+}
+
+.nav-concept-frame-live .nav-concept-main-dock {
+  padding-bottom: 5.5rem;
+}
+
+.nav-concept-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.nav-concept-guide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.nav-concept-frame-live .nav-concept-guide {
+  align-items: stretch;
+  justify-content: stretch;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(16px);
+}
+
+.nav-concept-guide-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(214, 211, 209, 0.35);
+}
+
+.nav-concept-preview-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 1.5rem;
+}
+
+.nav-preview-content-eyebrow {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(253, 230, 138, 0.65);
+}
+
+.nav-preview-content-title {
+  margin-top: 0.5rem;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgba(255, 252, 245, 0.95);
+}
+
+.nav-preview-content-body {
+  margin-top: 0.625rem;
+  max-width: 22rem;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: rgba(214, 211, 209, 0.55);
+}
+
+/* Concept A — Hub */
+.nav-concept-hub-header {
+  padding: 1rem 1.25rem 0.5rem;
+}
+
+.nav-concept-hub-tagline {
+  margin-top: 0.375rem;
+  font-size: 0.8125rem;
+  color: rgba(214, 211, 209, 0.55);
+}
+
+.nav-concept-hub-grid {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+  padding: 0.75rem 1rem 1rem;
+  overflow-y: auto;
+}
+
+@media (min-width: 640px) {
+  .nav-concept-hub-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.nav-concept-hub-tile {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 5.5rem;
+  padding: 0.75rem;
+  border-radius: 0.625rem;
+  overflow: hidden;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.nav-concept-hub-tile:hover {
+  border-color: rgba(253, 230, 138, 0.35);
+  transform: translateY(-2px);
+}
+
+.nav-concept-hub-tile-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(5, 5, 5, 0.88) 0%, rgba(5, 5, 5, 0.2) 55%, transparent 100%);
+}
+
+.nav-concept-hub-return {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.4375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 252, 245, 0.9);
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-concept-hub-return:hover {
+  border-color: rgba(253, 230, 138, 0.4);
+  color: rgba(253, 230, 138, 0.95);
+}
+
+/* Concept C — Command palette */
+.nav-concept-command-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-concept-command-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4375rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgba(255, 252, 245, 0.92);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.nav-concept-command-trigger:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(253, 230, 138, 0.35);
+}
+
+.nav-concept-command-kbd {
+  font-size: 0.625rem;
+  font-weight: 500;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  color: rgba(214, 211, 209, 0.55);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-concept-palette-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(5, 5, 5, 0.72);
+  backdrop-filter: blur(12px);
+}
+
+.nav-concept-palette {
+  width: min(100%, 36rem);
+  max-height: 100%;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(12, 10, 8, 0.95);
+  overflow-y: auto;
+}
+
+.nav-concept-palette-title {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: rgba(255, 252, 245, 0.95);
+}
+
+.nav-concept-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+  margin-top: 1rem;
+}
+
+.nav-concept-palette-card {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 5rem;
+  padding: 0.625rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-concept-palette-card.is-active {
+  border-color: rgba(253, 230, 138, 0.5);
+  box-shadow: 0 0 0 1px rgba(253, 230, 138, 0.2);
+}
+
+.nav-concept-palette-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(5, 5, 5, 0.9) 0%, transparent 70%);
+}
+
+.nav-concept-palette-close {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(214, 211, 209, 0.65);
+}
+
+.nav-concept-palette-close:hover {
+  color: rgba(255, 252, 245, 0.9);
+}
+
+/* Concept D — Poster strip */
+.nav-concept-poster-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.5rem 0.375rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.35);
+  overflow-y: auto;
+}
+
+.nav-concept-poster-thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-concept-poster-thumb:hover,
+.nav-concept-poster-thumb.is-active {
+  border-color: rgba(253, 230, 138, 0.55);
+  transform: scale(1.03);
+}
+
+.nav-concept-poster-label {
+  position: absolute;
+  bottom: 0.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgba(255, 252, 245, 0.95);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Concept E — Context pill */
+.nav-concept-main-context {
+  padding-top: 0.5rem;
+}
+
+.nav-concept-context-pill {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  z-index: 15;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: rgba(214, 211, 209, 0.75);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+}
+
+.nav-concept-context-back {
+  font-weight: 600;
+  color: rgba(253, 230, 138, 0.85);
+}
+
+.nav-concept-context-back-static {
+  opacity: 0.55;
+}
+
+button.nav-concept-context-back:hover {
+  color: rgba(255, 252, 245, 0.98);
+}
+
+.nav-concept-context-current {
+  font-weight: 600;
+  color: rgba(255, 252, 245, 0.92);
+}
+
+/* Live concept switcher */
+.nav-concept-switcher {
+  position: relative;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(8, 6, 5, 0.92);
+  backdrop-filter: blur(12px);
+}
+
+.nav-concept-switcher-link {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(214, 211, 209, 0.55);
+  white-space: nowrap;
+}
+
+.nav-concept-switcher-link:hover {
+  color: rgba(253, 230, 138, 0.9);
+}
+
+.nav-concept-switcher-pills {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.nav-concept-switcher-pill {
+  min-width: 2rem;
+  padding: 0.3125rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: rgba(214, 211, 209, 0.55);
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.nav-concept-switcher-pill:hover {
+  color: rgba(255, 252, 245, 0.85);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-concept-switcher-pill.is-active {
+  color: rgba(253, 230, 138, 0.95);
+  background: rgba(253, 230, 138, 0.08);
+  border-color: rgba(253, 230, 138, 0.25);
+}
+
 /* ── Couples experience (cinematic opening) ── */
 .couples-experience-panel {
   background: linear-gradient(
