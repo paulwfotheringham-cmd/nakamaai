@@ -14,12 +14,12 @@ import SurpriseModePage from "./SurpriseModePage";
 import LiveTestCouplesProgram from "./LiveTestCouplesProgram";
 import LiveTestDashboardHome from "./LiveTestDashboardHome";
 import LiveTestCreateAudioFrame from "./LiveTestCreateAudioFrame";
+import LiveTestExperienceDock from "./LiveTestExperienceDock";
 import LiveTestFantasyAudioFrame from "./LiveTestFantasyAudioFrame";
 import LiveTestForbiddenChat from "./LiveTestForbiddenChat";
 import LiveTestGuideRail from "./LiveTestGuideRail";
 import LiveTestInfoPanel from "./LiveTestInfoPanel";
 import LiveTestProfilePanel from "./LiveTestProfilePanel";
-import LiveTestUniverseNav from "./LiveTestUniverseNav";
 import type { DateNightScenario } from "./date-night-scenarios";
 
 export type { LiveTestNavId };
@@ -60,7 +60,7 @@ export default function LiveTestShell() {
   }, [centerPanel]);
 
   return (
-    <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden bg-[#050505] text-stone-200 grid-rows-[auto_minmax(0,1fr)_minmax(18rem,44dvh)] md:grid-cols-[minmax(11.25rem,13.75rem)_minmax(0,1fr)_minmax(16rem,22rem)] md:grid-rows-1">
+    <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden bg-[#050505] text-stone-200 grid-rows-[minmax(0,1fr)_minmax(18rem,44dvh)] md:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)] md:grid-rows-1">
       {/* Ambient atmosphere */}
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_50%_at_50%_-12%,rgba(180,130,50,0.14),transparent_60%)]"
@@ -75,27 +75,12 @@ export default function LiveTestShell() {
         aria-hidden
       />
 
-      {/* World launcher — left navigation */}
-      <aside
-        className={`world-launcher-nav relative z-10 flex shrink-0 flex-col md:col-start-1 md:row-start-1 md:h-full md:min-h-0 md:max-w-[13.75rem] ${
-          onDateNightExperience ? "opacity-60" : ""
+      {/* Immersive content + floating dock */}
+      <section
+        className={`relative z-10 flex min-h-0 min-w-0 flex-col overflow-hidden p-4 sm:p-6 md:row-start-1 md:p-8 lg:p-10 ${
+          onDateNightExperience ? "pb-4 md:pb-8" : "pb-24 sm:pb-28 md:pb-32"
         }`}
       >
-        <div className="world-launcher-nav-atmosphere pointer-events-none absolute inset-0" aria-hidden />
-        <div className="world-launcher-nav-edge pointer-events-none absolute inset-y-0 right-0 w-px" aria-hidden />
-
-        <div className="relative min-h-0 flex-1 overflow-hidden px-4 py-5 md:px-5 md:py-7">
-          <LiveTestUniverseNav
-            activeId={activeNav}
-            onHome={() => setActiveNav(null)}
-            onSelect={setActiveNav}
-            subdued={onDateNightExperience}
-          />
-        </div>
-      </aside>
-
-      {/* Cinematic content */}
-      <section className="relative z-10 flex min-h-0 min-w-0 flex-col overflow-hidden p-4 sm:p-6 md:col-start-2 md:row-start-1 md:p-8 lg:p-10">
         {centerPanel === "fantasy-audio" && <LiveTestFantasyAudioFrame />}
         {centerPanel === "create-audio" && <LiveTestCreateAudioFrame />}
         {centerPanel === "couples-program" && (
@@ -163,11 +148,18 @@ export default function LiveTestShell() {
         {centerPanel === "forbidden-chat" && <LiveTestForbiddenChat />}
         {centerPanel === "profile" && <LiveTestProfilePanel />}
         {centerPanel === "dashboard" && <LiveTestDashboardHome />}
+
+        <LiveTestExperienceDock
+          activeId={activeNav}
+          onHome={() => setActiveNav(null)}
+          onSelect={setActiveNav}
+          hidden={onDateNightExperience}
+        />
       </section>
 
       {/* Guide — avatar + chat */}
       <aside
-        className={`relative z-20 flex min-h-[18rem] shrink-0 flex-col overflow-hidden bg-black/50 p-4 backdrop-blur-xl transition sm:min-h-[20rem] sm:p-5 md:col-start-3 md:row-start-1 md:h-full md:min-h-0 md:border-l md:border-white/[0.04] ${
+        className={`relative z-20 flex min-h-[18rem] shrink-0 flex-col overflow-hidden bg-black/50 p-4 backdrop-blur-xl transition sm:min-h-[20rem] sm:p-5 md:row-start-1 md:h-full md:min-h-0 md:border-l md:border-white/[0.04] ${
           onDateNightExperience ? "opacity-85" : ""
         }`}
       >
