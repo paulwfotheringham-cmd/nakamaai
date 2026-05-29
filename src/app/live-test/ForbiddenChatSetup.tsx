@@ -284,7 +284,7 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
                 options={INTERACTION_STYLE_OPTIONS}
                 disabled={disabled}
               />
-              <div className="fc-field fc-field-full">
+              <div className="fc-field">
                 <span className="fc-field-label">Voice</span>
                 <div className="fc-voice-row">
                   <span className="fc-select-wrap fc-select-wrap-grow">
@@ -312,8 +312,9 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
                       if (v) void playVoicePreview(v.id, v.name);
                     }}
                     className="fc-voice-preview"
+                    title="Preview voice"
                   >
-                    {previewingVoice ? "Playing…" : "Preview"}
+                    {previewingVoice ? "…" : "▶"}
                   </button>
                 </div>
               </div>
