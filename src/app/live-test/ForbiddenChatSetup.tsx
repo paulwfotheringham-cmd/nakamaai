@@ -1,58 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GUIDE_VOICES } from "@/lib/guides/catalog";
 import {
-  CHARACTER_OPTIONS,
-  CHAT_MOOD_OPTIONS,
-  EXPERIENCE_LENGTH_OPTIONS,
-  INTERACTION_STYLE_OPTIONS,
-  SCENARIO_OPTIONS,
   buildGuidedStartMessage,
+  INTERACTION_STYLE_OPTIONS,
   type ChatSetupPreferences,
 } from "@/lib/guides/chat-setup";
 import { readGuidePreferences } from "@/lib/guides/preferences";
-
-const SELECT_CLASS =
-  "w-full rounded-lg border border-stone-700/80 bg-zinc-950/90 px-2.5 py-2 text-xs text-white focus:border-amber-500/45 focus:outline-none focus:ring-1 focus:ring-amber-500/25 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm";
-
-function SetupSelect({
-  id,
-  label,
-  value,
-  onChange,
-  options,
-  disabled,
-}: {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: readonly string[];
-  disabled?: boolean;
-}) {
-  return (
-    <label htmlFor={id} className="block">
-      <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-500/90 sm:text-[11px]">
-        {label}
-      </span>
-      <select
-        id={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={disabled}
-        className={SELECT_CLASS}
-      >
-        <option value="">Choose…</option>
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
+import {
+  FORBIDDEN_CHARACTER_TILES,
+  FORBIDDEN_MOOD_TILES,
+  FORBIDDEN_SCENARIO_TILES,
+  FORBIDDEN_WIZARD_STEPS,
+  pickSurprisePreferences,
+} from "./forbidden-chat-ui-data";
 
 export type ForbiddenChatSetupResult = {
   prefs: ChatSetupPreferences;
@@ -65,8 +27,27 @@ type ForbiddenChatSetupProps = {
   disabled?: boolean;
 };
 
+type View = "landing" | "wizard";
+
+function completeGuided(
+  prefs: ChatSetupPreferences,
+  onComplete: (r: ForbiddenChatSetupResult) => void,
+) {
+  const scenarioLabel =
+    prefs.scenario === "Create your own" && prefs.customScenario?.trim()
+      ? prefs.customScenario.trim()
+      : prefs.scenario;
+
+  onComplete({
+    prefs,
+    userMessage: buildGuidedStartMessage(prefs),
+    assistantNote: `Perfect — ${prefs.experienceLength}, ${prefs.mood?.toLowerCase()} mood, ${scenarioLabel}. Tell me how you'd like to begin.`,
+  });
+}
+
 export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenChatSetupProps) {
-  const [experienceLength, setExperienceLength] = useState("");
+  const [view, setView] = useState<View>("landing");
+  const [step, setStep] = useState(0);
   const [mood, setMood] = useState("");
   const [scenario, setScenario] = useState("");
   const [customScenario, setCustomScenario] = useState("");
@@ -74,31 +55,60 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
   const [interactionStyle, setInteractionStyle] = useState("");
   const [voiceId, setVoiceId] = useState("");
   const [setupError, setSetupError] = useState<string | null>(null);
+  const [previewingVoice, setPreviewingVoice] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const savedVoice = readGuidePreferences().voiceId;
-    if (savedVoice && GUIDE_VOICES.some((v) => v.id === savedVoice)) {
-      setVoiceId(savedVoice);
+    const saved = readGuidePreferences().voiceId;
+    if (saved && GUIDE_VOICES.some((v) => v.id === saved)) {
+      setVoiceId(saved);
     }
   }, []);
 
   const selectedVoice = GUIDE_VOICES.find((v) => v.id === voiceId);
+  const currentStep = FORBIDDEN_WIZARD_STEPS[step];
 
-  const guidedReady =
-    experienceLength &&
-    mood &&
-    scenario &&
-    character &&
-    interactionStyle &&
-    voiceId &&
-    (scenario !== "Create your own" || customScenario.trim());
+  const playVoicePreview = useCallback(async (id: string, name: string) => {
+    setPreviewingVoice(id);
+    try {
+      const res = await fetch("/api/preview-voice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          voice: name,
+          text: "Come closer. I've been waiting for you.",
+        }),
+      });
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
+      }
+      audioRef.current.pause();
+      audioRef.current.src = url;
+      await audioRef.current.play();
+    } catch {
+      /* ignore */
+    } finally {
+      setPreviewingVoice(null);
+    }
+  }, []);
+
+  const handleSurpriseMe = () => {
+    if (disabled) return;
+    setSetupError(null);
+    const prefs = pickSurprisePreferences(readGuidePreferences().voiceId);
+    completeGuided(prefs, onComplete);
+  };
 
   const handleUnfettered = () => {
+    if (disabled) return;
     setSetupError(null);
     onComplete({
       prefs: {
         mode: "unfettered",
-        voiceId: selectedVoice?.id,
+        voiceId: selectedVoice?.id ?? readGuidePreferences().voiceId,
         voiceName: selectedVoice?.name,
       },
       assistantNote:
@@ -106,19 +116,29 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
     });
   };
 
-  const handleGuidedStart = () => {
-    if (!guidedReady) {
-      setSetupError("Please choose an option for each dropdown.");
+  const canAdvanceStep = () => {
+    if (step === 0) return Boolean(mood);
+    if (step === 1) return Boolean(scenario) && (scenario !== "Create your own" || customScenario.trim());
+    if (step === 2) return Boolean(character);
+    if (step === 3) return Boolean(interactionStyle);
+    if (step === 4) return Boolean(voiceId);
+    return false;
+  };
+
+  const handleWizardNext = () => {
+    if (!canAdvanceStep()) {
+      setSetupError("Pick an option to continue.");
       return;
     }
-    if (scenario === "Create your own" && !customScenario.trim()) {
-      setSetupError("Describe your custom scenario.");
+    setSetupError(null);
+    if (step < FORBIDDEN_WIZARD_STEPS.length - 1) {
+      setStep((s) => s + 1);
       return;
     }
 
     const prefs: ChatSetupPreferences = {
       mode: "guided",
-      experienceLength,
+      experienceLength: "Slow Burn",
       mood,
       scenario,
       customScenario: scenario === "Create your own" ? customScenario.trim() : undefined,
@@ -127,120 +147,258 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
       voiceId: selectedVoice!.id,
       voiceName: selectedVoice!.name,
     };
-
-    const scenarioLabel =
-      scenario === "Create your own" ? customScenario.trim() : scenario;
-
-    onComplete({
-      prefs,
-      userMessage: buildGuidedStartMessage(prefs),
-      assistantNote: `Perfect — ${experienceLength}, ${mood.toLowerCase()} mood, ${scenarioLabel}. Tell me how you'd like to begin.`,
-    });
+    completeGuided(prefs, onComplete);
   };
 
-  return (
-    <div className="space-y-3 rounded-xl border border-amber-900/35 bg-black/40 p-3 sm:p-3.5">
-      <button
-        type="button"
-        onClick={handleUnfettered}
-        disabled={disabled}
-        className="w-full rounded-full border border-amber-400/50 bg-gradient-to-b from-amber-200/95 to-amber-600 px-4 py-2.5 text-center text-sm font-bold text-zinc-950 shadow-md shadow-black/30 transition hover:from-amber-100 hover:to-amber-500 disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        I just want an unfettered chat
-      </button>
+  const handleWizardBack = () => {
+    setSetupError(null);
+    if (step === 0) {
+      setView("landing");
+      return;
+    }
+    setStep((s) => s - 1);
+  };
 
-      <p className="text-center text-[10px] font-medium uppercase tracking-[0.14em] text-stone-500">
-        or shape your experience
-      </p>
+  const startWizard = () => {
+    setSetupError(null);
+    setStep(0);
+    setView("wizard");
+  };
 
-      <div className="space-y-2.5">
-        <SetupSelect
-          id="forbidden-experience-length"
-          label="Choose your experience length"
-          value={experienceLength}
-          onChange={setExperienceLength}
-          options={EXPERIENCE_LENGTH_OPTIONS}
-          disabled={disabled}
-        />
-        <SetupSelect
-          id="forbidden-chat-mood"
-          label="Choose your mood"
-          value={mood}
-          onChange={setMood}
-          options={CHAT_MOOD_OPTIONS}
-          disabled={disabled}
-        />
-        <SetupSelect
-          id="forbidden-chat-scenario"
-          label="Choose your scenario"
-          value={scenario}
-          onChange={setScenario}
-          options={SCENARIO_OPTIONS}
-          disabled={disabled}
-        />
-        {scenario === "Create your own" && (
-          <label htmlFor="forbidden-custom-scenario" className="block">
-            <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-500/90 sm:text-[11px]">
-              Your scenario
-            </span>
-            <input
-              id="forbidden-custom-scenario"
-              type="text"
-              value={customScenario}
-              onChange={(e) => setCustomScenario(e.target.value)}
-              placeholder="Describe your scene…"
-              disabled={disabled}
-              className={SELECT_CLASS}
-            />
-          </label>
-        )}
-        <SetupSelect
-          id="forbidden-chat-character"
-          label="Choose your character"
-          value={character}
-          onChange={setCharacter}
-          options={CHARACTER_OPTIONS}
-          disabled={disabled}
-        />
-        <SetupSelect
-          id="forbidden-interaction-style"
-          label="Choose your interaction style"
-          value={interactionStyle}
-          onChange={setInteractionStyle}
-          options={INTERACTION_STYLE_OPTIONS}
-          disabled={disabled}
-        />
-        <label htmlFor="forbidden-voice" className="block">
-          <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-500/90 sm:text-[11px]">
-            Choose your voice
-          </span>
-          <select
-            id="forbidden-voice"
-            value={voiceId}
-            onChange={(e) => setVoiceId(e.target.value)}
+  if (view === "landing") {
+    return (
+      <div className="forbidden-chat-setup">
+        <div className="forbidden-chat-setup-atmosphere" aria-hidden />
+        <div className="forbidden-chat-setup-glow forbidden-chat-setup-glow-a" aria-hidden />
+        <div className="forbidden-chat-setup-glow forbidden-chat-setup-glow-b" aria-hidden />
+
+        <header className="forbidden-chat-hero">
+          <p className="forbidden-chat-eyebrow">Forbidden chat</p>
+          <h1 className="forbidden-chat-title">Private desires</h1>
+          <p className="forbidden-chat-lead">
+            Voice or text — intimate, immediate, yours alone. Start in seconds or craft every detail.
+          </p>
+        </header>
+
+        <section className="forbidden-chat-path forbidden-chat-path-primary">
+          <p className="forbidden-chat-path-label">Quick start</p>
+          <button
+            type="button"
             disabled={disabled}
-            className={SELECT_CLASS}
+            onClick={handleSurpriseMe}
+            className="forbidden-surprise-card group"
           >
-            <option value="">Choose…</option>
-            {GUIDE_VOICES.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            <img src="/tiles/tile4.jpg" alt="" className="forbidden-surprise-card-bg" />
+            <div className="forbidden-surprise-card-overlay" aria-hidden />
+            <div className="forbidden-surprise-card-content">
+              <span className="forbidden-surprise-badge">Recommended</span>
+              <h2 className="forbidden-surprise-title">Surprise me</h2>
+              <p className="forbidden-surprise-copy">
+                One tap — Nakama picks mood, character, and scenario from your taste and history.
+              </p>
+              <span className="forbidden-surprise-cta">Begin now →</span>
+            </div>
+          </button>
+        </section>
+
+        <section className="forbidden-chat-path">
+          <p className="forbidden-chat-path-label">Custom experience</p>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={startWizard}
+            className="forbidden-custom-card"
+          >
+            <div className="forbidden-custom-card-visual">
+              <img src="/scenes/werewolf.jpg" alt="" className="forbidden-custom-thumb" />
+              <img src="/scenes/office.jpg" alt="" className="forbidden-custom-thumb" />
+              <img src="/tiles/tile5.jpg" alt="" className="forbidden-custom-thumb" />
+            </div>
+            <div className="forbidden-custom-card-body">
+              <h3 className="forbidden-custom-title">Shape your fantasy</h3>
+              <p className="forbidden-custom-copy">
+                Mood, scenario, character, style, and voice — one choice at a time.
+              </p>
+              <span className="forbidden-custom-cta">Start wizard →</span>
+            </div>
+          </button>
+        </section>
+
+        <footer className="forbidden-chat-setup-footer">
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={handleUnfettered}
+            className="forbidden-link-btn"
+          >
+            Skip setup — open chat with no rules
+          </button>
+        </footer>
+      </div>
+    );
+  }
+
+  return (
+    <div className="forbidden-chat-setup forbidden-chat-setup-wizard">
+      <div className="forbidden-chat-setup-atmosphere" aria-hidden />
+
+      <header className="forbidden-wizard-header">
+        <button type="button" onClick={handleWizardBack} className="forbidden-wizard-back">
+          ← Back
+        </button>
+        <div className="forbidden-wizard-progress" aria-label={`Step ${step + 1} of ${FORBIDDEN_WIZARD_STEPS.length}`}>
+          {FORBIDDEN_WIZARD_STEPS.map((_, i) => (
+            <span
+              key={i}
+              className={`forbidden-wizard-dot${i <= step ? " is-active" : ""}${i === step ? " is-current" : ""}`}
+            />
+          ))}
+        </div>
+        <span className="forbidden-wizard-step-count">
+          {step + 1} / {FORBIDDEN_WIZARD_STEPS.length}
+        </span>
+      </header>
+
+      <div className="forbidden-wizard-step-header">
+        <h2 className="forbidden-wizard-title">{currentStep.title}</h2>
+        <p className="forbidden-wizard-subtitle">{currentStep.subtitle}</p>
       </div>
 
-      {setupError && <p className="text-center text-xs text-red-400/90">{setupError}</p>}
+      <div className="forbidden-wizard-body">
+        {step === 0 && (
+          <div className="forbidden-mood-grid">
+            {FORBIDDEN_MOOD_TILES.map((tile) => (
+              <button
+                key={tile.value}
+                type="button"
+                disabled={disabled}
+                onClick={() => setMood(tile.value)}
+                className={`forbidden-select-card forbidden-mood-card${mood === tile.value ? " is-selected" : ""}`}
+              >
+                <img src={tile.image} alt="" className="forbidden-select-card-img" />
+                <div className="forbidden-select-card-overlay" aria-hidden />
+                <span className="forbidden-select-card-label">{tile.label}</span>
+                <span className="forbidden-select-card-tag">{tile.tagline}</span>
+              </button>
+            ))}
+          </div>
+        )}
 
-      <button
-        type="button"
-        onClick={handleGuidedStart}
-        disabled={disabled || !guidedReady}
-        className="w-full rounded-full border border-stone-500/50 bg-stone-900/80 px-4 py-2.5 text-sm font-semibold text-stone-100 transition hover:border-stone-400 hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        Start with these choices
-      </button>
+        {step === 1 && (
+          <>
+            <div className="forbidden-scenario-grid">
+              {FORBIDDEN_SCENARIO_TILES.map((tile) => (
+                <button
+                  key={tile.value}
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => setScenario(tile.value)}
+                  className={`forbidden-select-card forbidden-scenario-card${scenario === tile.value ? " is-selected" : ""}`}
+                >
+                  <img src={tile.image} alt="" className="forbidden-select-card-img" />
+                  <div className="forbidden-select-card-overlay" aria-hidden />
+                  <span className="forbidden-select-card-label">{tile.label}</span>
+                  <span className="forbidden-select-card-tag">{tile.tagline}</span>
+                </button>
+              ))}
+            </div>
+            {scenario === "Create your own" && (
+              <label className="forbidden-custom-scenario-field">
+                <span className="forbidden-custom-scenario-label">Describe your scene</span>
+                <input
+                  type="text"
+                  value={customScenario}
+                  onChange={(e) => setCustomScenario(e.target.value)}
+                  placeholder="A penthouse, a storm, a secret…"
+                  disabled={disabled}
+                  className="forbidden-custom-scenario-input"
+                />
+              </label>
+            )}
+          </>
+        )}
+
+        {step === 2 && (
+          <div className="forbidden-character-grid">
+            {FORBIDDEN_CHARACTER_TILES.map((tile) => (
+              <button
+                key={tile.value}
+                type="button"
+                disabled={disabled}
+                onClick={() => setCharacter(tile.value)}
+                className={`forbidden-character-card${character === tile.value ? " is-selected" : ""}`}
+              >
+                <img src={tile.image} alt="" className="forbidden-character-img" />
+                <div className="forbidden-character-overlay" aria-hidden />
+                <div className="forbidden-character-body">
+                  <p className="forbidden-character-personality">{tile.personality}</p>
+                  <h3 className="forbidden-character-name">{tile.label}</h3>
+                  <p className="forbidden-character-desc">{tile.description}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="forbidden-style-chips">
+            {INTERACTION_STYLE_OPTIONS.map((style) => (
+              <button
+                key={style}
+                type="button"
+                disabled={disabled}
+                onClick={() => setInteractionStyle(style)}
+                className={`forbidden-style-chip${interactionStyle === style ? " is-selected" : ""}`}
+              >
+                {style}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="forbidden-voice-list">
+            {GUIDE_VOICES.map((v) => (
+              <div
+                key={v.id}
+                className={`forbidden-voice-row${voiceId === v.id ? " is-selected" : ""}`}
+              >
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => setVoiceId(v.id)}
+                  className="forbidden-voice-select"
+                >
+                  <span className="forbidden-voice-name">{v.name}</span>
+                  {voiceId === v.id ? <span className="forbidden-voice-check">Selected</span> : null}
+                </button>
+                <button
+                  type="button"
+                  disabled={disabled || previewingVoice !== null}
+                  onClick={() => playVoicePreview(v.id, v.name)}
+                  className="forbidden-voice-preview"
+                  aria-label={`Preview ${v.name}`}
+                >
+                  {previewingVoice === v.id ? "…" : "▶ Preview"}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {setupError ? <p className="forbidden-setup-error">{setupError}</p> : null}
+
+      <footer className="forbidden-wizard-footer">
+        <button
+          type="button"
+          disabled={disabled || !canAdvanceStep()}
+          onClick={handleWizardNext}
+          className="forbidden-wizard-next"
+        >
+          {step === FORBIDDEN_WIZARD_STEPS.length - 1 ? "Begin chat" : "Continue"}
+        </button>
+      </footer>
     </div>
   );
 }
