@@ -168,6 +168,7 @@ export function NavConceptLayout({
   preview = false,
   hiddenNav = false,
   guide,
+  compact = false,
 }: {
   concept: NavConceptId;
   activeId: LiveTestNavId | null;
@@ -177,6 +178,7 @@ export function NavConceptLayout({
   preview?: boolean;
   hiddenNav?: boolean;
   guide?: React.ReactNode;
+  compact?: boolean;
 }) {
   const navProps: NavConceptNavProps = {
     activeId,
@@ -185,9 +187,13 @@ export function NavConceptLayout({
     hidden: hiddenNav,
   };
 
-  const content = children ?? <MockExperienceContent label={labelForTarget(activeId)} />;
+  const content = children ?? (
+    <MockExperienceContent label={labelForTarget(activeId)} activeId={activeId} />
+  );
   const guideSlot = guide ?? <span className="nav-concept-guide-label">Guide</span>;
-  const frameClass = `nav-concept-frame nav-concept-frame-${concept}${preview ? " nav-concept-frame-preview" : " nav-concept-frame-live"}`;
+  const frameClass = `nav-concept-frame nav-concept-frame-${concept}${
+    compact ? " nav-concept-frame-compact" : preview ? " nav-concept-frame-preview" : " nav-concept-frame-live"
+  }`;
 
   if (concept === "a") {
     const onHub = activeId === null;

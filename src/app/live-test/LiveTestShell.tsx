@@ -75,6 +75,7 @@ export default function LiveTestShell() {
   const [dateNightMatch, setDateNightMatch] = useState<DateNightScenario | null>(null);
   const onDateNightExperience =
     centerPanel === "couples-program" && couplesView === "date-night-experience";
+  const showConceptSwitcher = searchParams.get("concepts") === "1";
 
   useEffect(() => {
     setConcept(parseNavConcept(searchParams.get("concept")));
@@ -177,7 +178,9 @@ export default function LiveTestShell() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_50%_at_50%_-12%,rgba(180,130,50,0.14),transparent_60%)]" aria-hidden />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_100%_50%,rgba(120,80,30,0.06),transparent_55%)]" aria-hidden />
 
-      <ConceptSwitcher active={concept} onChange={setConceptAndUrl} />
+      {showConceptSwitcher ? (
+        <ConceptSwitcher active={concept} onChange={setConceptAndUrl} />
+      ) : null}
 
       <div className="relative z-10 flex min-h-0 flex-1 flex-col">
         <NavConceptLayout

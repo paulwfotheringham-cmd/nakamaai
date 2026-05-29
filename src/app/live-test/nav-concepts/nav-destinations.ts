@@ -46,3 +46,8 @@ export function labelForTarget(activeId: LiveTestNavId | null): string {
   if (activeId === null) return "Dashboard";
   return NAV_DESTINATIONS.find((d) => d.target === activeId)?.label ?? "Experience";
 }
+
+export function posterForTarget(activeId: LiveTestNavId | null): string {
+  if (activeId === null) return "/tiles/tile1.jpg";
+  return NAV_DESTINATIONS.find((d) => d.target === activeId)?.poster ?? "/tiles/tile1.jpg";
+}
