@@ -1,93 +1,54 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
-import type { LiveTestNavId } from "@/lib/nakama-universe-services";
-import { NAV_CONCEPTS, type NavConceptId } from "./nav-destinations";
-import NavConceptCompareStrip, { useScrollToConcept } from "./NavConceptCompareStrip";
-import { NavConceptLayout } from "./NavConceptRenderer";
+import { NAV_CONCEPTS } from "./nav-destinations";
 
-function ConceptPreviewCard({
-  conceptId,
-  name,
-  tagline,
-  live,
-  cardRef,
-}: {
-  conceptId: NavConceptId;
-  name: string;
-  tagline: string;
-  live?: boolean;
-  cardRef?: (el: HTMLElement | null) => void;
-}) {
-  const [activeId, setActiveId] = useState<LiveTestNavId | null>(
-    conceptId === "a" ? null : "audiobooks",
-  );
-
-  return (
-    <article ref={cardRef} className="nav-concept-gallery-card" id={`concept-${conceptId}`}>
-      <header className="nav-concept-gallery-card-header">
-        <div>
-          <p className="nav-concept-gallery-id">Concept {conceptId.toUpperCase()}</p>
-          <h2 className="nav-concept-gallery-name">{name}</h2>
-          <p className="nav-concept-gallery-tagline">{tagline}</p>
-        </div>
-        <div className="flex shrink-0 flex-col items-end gap-2">
-          {live ? (
-            <span className="nav-concept-gallery-badge nav-concept-gallery-badge-live">Live in app</span>
-          ) : null}
-          <Link
-            href={`/live-test?concept=${conceptId}&concepts=1`}
-            className="nav-concept-gallery-try"
-          >
-            Try full screen
-          </Link>
-        </div>
-      </header>
-
-      <NavConceptLayout
-        concept={conceptId}
-        activeId={activeId}
-        onHome={() => setActiveId(null)}
-        onSelect={setActiveId}
-        preview
-      />
-    </article>
-  );
-}
+const CONCEPT_VISUALS: Record<string, { accent: string; hint: string }> = {
+  a: { accent: "Hub grid fills the screen", hint: "PS5 home screen" },
+  b: { accent: "Floating dock at bottom", hint: "Console OS bar" },
+  c: { accent: "Explore opens palette", hint: "Raycast-style picker" },
+  d: { accent: "Poster thumbnails on left", hint: "Game launcher rail" },
+  e: { accent: "Breadcrumb pill only", hint: "Cinema mode" },
+};
 
 export default function NavConceptsGallery() {
-  const { setRef, scrollTo } = useScrollToConcept();
-
   return (
-    <div className="nav-concept-gallery-page">
-      <div className="nav-concept-gallery-atmosphere pointer-events-none absolute inset-0" aria-hidden />
+    <div className="nav-mockup-index">
+      <div className="nav-mockup-index-atmosphere pointer-events-none" aria-hidden />
 
-      <header className="nav-concept-gallery-hero">
+      <header className="nav-mockup-index-hero">
         <p className="launcher-eyebrow">Navigation concepts</p>
-        <h1 className="launcher-title">Five ways to navigate Nakama Nights</h1>
+        <h1 className="launcher-title">Full mockup pages</h1>
         <p className="launcher-subtitle max-w-2xl">
-          Compare layouts side by side, then click inside any preview to test navigation.
-          Open full screen to try with real content.
+          Each concept opens as a full-screen interactive mock — real layout, real imagery,
+          guide panel, and navigation. Pick one to explore.
         </p>
-        <Link href="/live-test" className="nav-concept-gallery-back">
+        <Link href="/live-test" className="nav-mockup-index-back">
           ← Back to Live Test
         </Link>
       </header>
 
-      <NavConceptCompareStrip onSelectConcept={scrollTo} />
-
-      <div className="nav-concept-gallery-grid">
-        {NAV_CONCEPTS.map((c) => (
-          <ConceptPreviewCard
-            key={c.id}
-            conceptId={c.id}
-            name={c.name}
-            tagline={c.tagline}
-            live={c.id === "b"}
-            cardRef={setRef(c.id)}
-          />
-        ))}
+      <div className="nav-mockup-index-grid">
+        {NAV_CONCEPTS.map((c) => {
+          const visual = CONCEPT_VISUALS[c.id];
+          return (
+            <Link
+              key={c.id}
+              href={`/live-test/nav-concepts/${c.id}`}
+              className="nav-mockup-index-card group"
+            >
+              <div className="nav-mockup-index-card-visual" data-concept={c.id}>
+                <span className="nav-mockup-index-card-letter">{c.id.toUpperCase()}</span>
+                <span className="nav-mockup-index-card-hint">{visual.hint}</span>
+              </div>
+              <div className="nav-mockup-index-card-body">
+                <p className="nav-mockup-index-card-id">Concept {c.id.toUpperCase()}</p>
+                <h2 className="nav-mockup-index-card-name">{c.name}</h2>
+                <p className="nav-mockup-index-card-tagline">{c.tagline}</p>
+                <p className="nav-mockup-index-card-accent">{visual.accent}</p>
+                <span className="nav-mockup-index-card-cta">Open full mockup →</span>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
