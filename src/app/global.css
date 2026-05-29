@@ -187,178 +187,225 @@
   scroll-behavior: smooth;
 }
 
-/* ── Platform top navigation (Concept A — streaming) ── */
-.platform-topnav {
-  position: relative;
-  z-index: 30;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(5, 5, 5, 0.72);
-  backdrop-filter: blur(20px) saturate(140%);
-}
-
-.platform-topnav-glow {
-  position: absolute;
-  inset: 0;
+/* ── World launcher navigation (premium left rail) ── */
+.world-launcher-nav {
   background: linear-gradient(
     180deg,
-    rgba(198, 164, 106, 0.06) 0%,
-    transparent 100%
+    rgba(14, 10, 8, 0.92) 0%,
+    rgba(8, 7, 6, 0.88) 45%,
+    rgba(5, 5, 5, 0.82) 100%
+  );
+  backdrop-filter: blur(16px) saturate(120%);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.03);
+}
+
+.world-launcher-nav-atmosphere {
+  background:
+    radial-gradient(ellipse 120% 45% at 0% 0%, rgba(198, 164, 106, 0.12), transparent 55%),
+    radial-gradient(ellipse 80% 35% at 0% 100%, rgba(120, 70, 30, 0.06), transparent 50%);
+}
+
+.world-launcher-nav-edge {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(198, 164, 106, 0.12) 35%,
+    rgba(255, 255, 255, 0.04) 50%,
+    rgba(198, 164, 106, 0.08) 65%,
+    transparent
   );
 }
 
-.platform-topnav-inner {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  max-width: 100%;
-  padding: 0.875rem 1.25rem;
+.world-launcher-brand {
+  margin-bottom: 1.75rem;
 }
 
-@media (min-width: 768px) {
-  .platform-topnav-inner {
-    gap: 2.5rem;
-    padding: 1rem 2rem;
-  }
+.world-launcher-logo {
+  display: block;
+  opacity: 0.88;
+  transition: opacity 0.35s ease;
 }
 
-@media (min-width: 1024px) {
-  .platform-topnav-inner {
-    padding: 1.125rem 2.5rem;
-  }
-}
-
-.platform-topnav-logo {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  opacity: 0.92;
-  transition: opacity 0.3s ease;
-}
-
-.platform-topnav-logo:hover {
+.world-launcher-logo:hover {
   opacity: 1;
 }
 
-.platform-topnav-links {
+.world-launcher-brand-rule {
+  margin-top: 1.25rem;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(198, 164, 106, 0.35),
+    rgba(198, 164, 106, 0.08) 70%,
+    transparent
+  );
+}
+
+.world-launcher-home {
+  margin-bottom: 0.5rem;
+}
+
+.world-launcher-section {
+  margin-top: 1.75rem;
+}
+
+.world-launcher-section-label {
+  margin: 0 0 0.625rem;
+  padding-left: 1.625rem;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(198, 164, 106, 0.42);
+}
+
+.world-launcher-section-items {
   display: flex;
-  min-width: 0;
-  flex: 1;
-  align-items: center;
-  gap: 0.25rem;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  padding-bottom: 1px;
+  flex-direction: column;
+  gap: 0.125rem;
 }
 
-.platform-topnav-links::-webkit-scrollbar {
-  display: none;
-}
-
-@media (min-width: 768px) {
-  .platform-topnav-links {
-    gap: 0.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .platform-topnav-links {
-    gap: 0.75rem;
-  }
-}
-
-.platform-topnav-trailing {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  margin-left: auto;
-  padding-left: 0.5rem;
-}
-
-.platform-topnav-link {
+.world-nav-destination {
   position: relative;
-  flex-shrink: 0;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5625rem 0.5rem 0.5625rem 0.375rem;
   border: none;
   background: none;
+  text-align: left;
   cursor: pointer;
-  padding: 0.625rem 0.75rem;
-  color: rgba(168, 162, 158, 0.78);
+  color: rgba(168, 162, 158, 0.72);
   transition: color 0.35s ease;
 }
 
-@media (min-width: 768px) {
-  .platform-topnav-link {
-    padding: 0.75rem 1rem;
-  }
+.world-nav-destination:hover {
+  color: rgba(231, 229, 228, 0.94);
 }
 
-.platform-topnav-link:hover {
-  color: rgba(245, 245, 244, 0.95);
+.world-nav-destination.is-active {
+  color: rgba(255, 252, 245, 0.98);
+  cursor: default;
 }
 
-.platform-topnav-link.is-active {
-  color: rgba(255, 255, 255, 0.98);
+.world-nav-destination.is-featured {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
 }
 
-.platform-topnav-link-text {
-  display: block;
+.world-nav-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  opacity: 0.38;
+  transition: opacity 0.35s ease, color 0.35s ease;
+}
+
+.world-nav-destination:hover .world-nav-icon {
+  opacity: 0.58;
+}
+
+.world-nav-destination.is-active .world-nav-icon {
+  opacity: 0.82;
+  color: rgba(253, 230, 138, 0.9);
+}
+
+.world-nav-label {
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0.012em;
+}
+
+.world-nav-destination.is-featured .world-nav-label {
+  font-size: 1.0625rem;
+  letter-spacing: 0.018em;
+}
+
+.world-nav-destination.is-active .world-nav-label {
   font-weight: 500;
-  letter-spacing: 0.02em;
-  line-height: 1.2;
-  white-space: nowrap;
 }
 
-@media (min-width: 768px) {
-  .platform-topnav-link-text {
-    font-size: 1rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .platform-topnav-link-text {
-    font-size: 1.0625rem;
-    letter-spacing: 0.025em;
-  }
-}
-
-.platform-topnav-link.is-active .platform-topnav-link-text {
-  font-weight: 600;
-}
-
-.platform-topnav-link-indicator {
+.world-nav-indicator {
   position: absolute;
-  bottom: 0.25rem;
-  left: 0.75rem;
-  right: 0.75rem;
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    rgba(198, 164, 106, 0.15),
-    rgba(253, 230, 138, 0.95) 50%,
-    rgba(198, 164, 106, 0.15)
-  );
-  transform: scaleX(0);
+  left: 0;
+  top: 50%;
+  width: 2px;
+  height: 0;
+  border-radius: 1px;
+  background: linear-gradient(180deg, rgba(253, 230, 138, 0.95), rgba(198, 164, 106, 0.75));
+  box-shadow: none;
+  transform: translateY(-50%);
   opacity: 0;
   transition:
-    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.35s ease;
+    height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s ease,
+    box-shadow 0.4s ease;
 }
 
-@media (min-width: 768px) {
-  .platform-topnav-link-indicator {
-    left: 1rem;
-    right: 1rem;
-    bottom: 0.375rem;
-  }
-}
-
-.platform-topnav-link.is-active .platform-topnav-link-indicator {
-  transform: scaleX(1);
+.world-nav-destination.is-active .world-nav-indicator {
+  height: 1.125rem;
   opacity: 1;
+  box-shadow: 0 0 10px rgba(198, 164, 106, 0.45);
+}
+
+@media (max-width: 767px) {
+  .world-launcher-nav-list {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 0.25rem;
+  }
+
+  .world-launcher-nav-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .world-launcher-home,
+  .world-launcher-section {
+    display: contents;
+  }
+
+  .world-launcher-section-label {
+    display: none;
+  }
+
+  .world-launcher-section-items {
+    display: contents;
+  }
+
+  .world-nav-destination {
+    flex-shrink: 0;
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .world-launcher-brand {
+    margin-bottom: 0;
+    margin-right: 1rem;
+  }
+
+  .world-launcher-brand-rule {
+    display: none;
+  }
+
+  .world-launcher-nav-inner {
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+  }
+
+  .world-launcher-nav-list {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 /* ── Couples experience (cinematic opening) ── */

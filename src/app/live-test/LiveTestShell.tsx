@@ -60,7 +60,7 @@ export default function LiveTestShell() {
   }, [centerPanel]);
 
   return (
-    <div className="relative flex h-full min-h-0 w-full max-w-full flex-col overflow-hidden bg-[#050505] text-stone-200">
+    <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden bg-[#050505] text-stone-200 grid-rows-[auto_minmax(0,1fr)_minmax(18rem,44dvh)] md:grid-cols-[minmax(11.25rem,13.75rem)_minmax(0,1fr)_minmax(16rem,22rem)] md:grid-rows-1">
       {/* Ambient atmosphere */}
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_50%_at_50%_-12%,rgba(180,130,50,0.14),transparent_60%)]"
@@ -75,94 +75,104 @@ export default function LiveTestShell() {
         aria-hidden
       />
 
-      <LiveTestUniverseNav
-        activeId={activeNav}
-        onHome={() => setActiveNav(null)}
-        onSelect={setActiveNav}
-        subdued={onDateNightExperience}
-      />
+      {/* World launcher — left navigation */}
+      <aside
+        className={`world-launcher-nav relative z-10 flex shrink-0 flex-col md:col-start-1 md:row-start-1 md:h-full md:min-h-0 md:max-w-[13.75rem] ${
+          onDateNightExperience ? "opacity-60" : ""
+        }`}
+      >
+        <div className="world-launcher-nav-atmosphere pointer-events-none absolute inset-0" aria-hidden />
+        <div className="world-launcher-nav-edge pointer-events-none absolute inset-y-0 right-0 w-px" aria-hidden />
 
-      <div className="relative z-10 grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_minmax(18rem,44dvh)] md:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)] md:grid-rows-1">
-        {/* Immersive content — full width minus guide rail */}
-        <section className="flex min-h-0 min-w-0 flex-col overflow-hidden p-4 sm:p-6 md:p-8 lg:p-10">
-          {centerPanel === "fantasy-audio" && <LiveTestFantasyAudioFrame />}
-          {centerPanel === "create-audio" && <LiveTestCreateAudioFrame />}
-          {centerPanel === "couples-program" && (
-            <>
-              {couplesView === "menu" && (
-                <LiveTestCouplesProgram
-                  onStartDateNight={() => setCouplesView("date-night-invite")}
-                  onStartSurprise={() => setCouplesView("surprise")}
-                />
-              )}
+        <div className="relative min-h-0 flex-1 overflow-hidden px-4 py-5 md:px-5 md:py-7">
+          <LiveTestUniverseNav
+            activeId={activeNav}
+            onHome={() => setActiveNav(null)}
+            onSelect={setActiveNav}
+            subdued={onDateNightExperience}
+          />
+        </div>
+      </aside>
 
-              {couplesView === "surprise" && (
-                <SurpriseModePage onBack={() => setCouplesView("menu")} />
-              )}
+      {/* Cinematic content */}
+      <section className="relative z-10 flex min-h-0 min-w-0 flex-col overflow-hidden p-4 sm:p-6 md:col-start-2 md:row-start-1 md:p-8 lg:p-10">
+        {centerPanel === "fantasy-audio" && <LiveTestFantasyAudioFrame />}
+        {centerPanel === "create-audio" && <LiveTestCreateAudioFrame />}
+        {centerPanel === "couples-program" && (
+          <>
+            {couplesView === "menu" && (
+              <LiveTestCouplesProgram
+                onStartDateNight={() => setCouplesView("date-night-invite")}
+                onStartSurprise={() => setCouplesView("surprise")}
+              />
+            )}
 
-              {couplesView === "date-night-invite" && (
-                <DateNightInvitePage
-                  onBeginMatching={(partnerUsername) => {
-                    setDateNightPartner(partnerUsername);
-                    setCouplesView("date-night-matching");
-                  }}
-                />
-              )}
+            {couplesView === "surprise" && (
+              <SurpriseModePage onBack={() => setCouplesView("menu")} />
+            )}
 
-              {couplesView === "date-night-matching" && (
-                <DateNightMatchingPage
-                  partnerUsername={dateNightPartner}
-                  onReveal={(match) => {
-                    setDateNightMatch(match);
-                    setCouplesView("date-night-reveal");
-                  }}
-                />
-              )}
+            {couplesView === "date-night-invite" && (
+              <DateNightInvitePage
+                onBeginMatching={(partnerUsername) => {
+                  setDateNightPartner(partnerUsername);
+                  setCouplesView("date-night-matching");
+                }}
+              />
+            )}
 
-              {couplesView === "date-night-reveal" && dateNightMatch ? (
-                <DateNightMatchRevealPage
-                  match={dateNightMatch}
-                  onBeginExperience={() => setCouplesView("date-night-experience")}
-                />
-              ) : null}
+            {couplesView === "date-night-matching" && (
+              <DateNightMatchingPage
+                partnerUsername={dateNightPartner}
+                onReveal={(match) => {
+                  setDateNightMatch(match);
+                  setCouplesView("date-night-reveal");
+                }}
+              />
+            )}
 
-              {couplesView === "date-night-experience" && dateNightMatch ? (
-                <DateNightExperiencePage match={dateNightMatch} />
-              ) : null}
-            </>
-          )}
-          {centerPanel === "build-adventure" && (
-            <LiveTestInfoPanel
-              eyebrow="Build adventure"
-              title="Create your fantasy"
-              description="Shape tone, setting, and heat on your terms."
-              poster="/tiles/tile2.jpg"
-              body="Build Adventure lets you craft custom audio stories step by step — choose characters, mood, pacing, and how far you want to go. Save drafts, revisit scenes, and publish when you’re ready."
-            />
-          )}
-          {centerPanel === "character-voices" && (
-            <LiveTestInfoPanel
-              eyebrow="Characters & voices"
-              title="Your cast, your sound"
-              description="Create a character that stays with you across experiences."
-              poster="/tiles/tile6.jpg"
-              body="Pick or clone the voice you want, define personality and boundaries, and reuse your character in adventures, audiobooks, and chat. Voices and personas travel with you across Nakama Nights."
-            />
-          )}
-          {centerPanel === "forbidden-chat" && <LiveTestForbiddenChat />}
-          {centerPanel === "profile" && <LiveTestProfilePanel />}
-          {centerPanel === "dashboard" && <LiveTestDashboardHome />}
-        </section>
+            {couplesView === "date-night-reveal" && dateNightMatch ? (
+              <DateNightMatchRevealPage
+                match={dateNightMatch}
+                onBeginExperience={() => setCouplesView("date-night-experience")}
+              />
+            ) : null}
 
-        {/* Guide — avatar + chat */}
-        <aside
-          className={`relative z-20 flex min-h-[18rem] shrink-0 flex-col overflow-hidden bg-black/50 p-4 backdrop-blur-xl transition sm:min-h-[20rem] sm:p-5 md:h-full md:min-h-0 md:border-l md:border-white/[0.04] ${
-            onDateNightExperience ? "opacity-85" : ""
-          }`}
-        >
-          <LiveTestGuideRail onNavigate={setActiveNav} />
-        </aside>
-      </div>
+            {couplesView === "date-night-experience" && dateNightMatch ? (
+              <DateNightExperiencePage match={dateNightMatch} />
+            ) : null}
+          </>
+        )}
+        {centerPanel === "build-adventure" && (
+          <LiveTestInfoPanel
+            eyebrow="Build adventure"
+            title="Create your fantasy"
+            description="Shape tone, setting, and heat on your terms."
+            poster="/tiles/tile2.jpg"
+            body="Build Adventure lets you craft custom audio stories step by step — choose characters, mood, pacing, and how far you want to go. Save drafts, revisit scenes, and publish when you’re ready."
+          />
+        )}
+        {centerPanel === "character-voices" && (
+          <LiveTestInfoPanel
+            eyebrow="Characters & voices"
+            title="Your cast, your sound"
+            description="Create a character that stays with you across experiences."
+            poster="/tiles/tile6.jpg"
+            body="Pick or clone the voice you want, define personality and boundaries, and reuse your character in adventures, audiobooks, and chat. Voices and personas travel with you across Nakama Nights."
+          />
+        )}
+        {centerPanel === "forbidden-chat" && <LiveTestForbiddenChat />}
+        {centerPanel === "profile" && <LiveTestProfilePanel />}
+        {centerPanel === "dashboard" && <LiveTestDashboardHome />}
+      </section>
+
+      {/* Guide — avatar + chat */}
+      <aside
+        className={`relative z-20 flex min-h-[18rem] shrink-0 flex-col overflow-hidden bg-black/50 p-4 backdrop-blur-xl transition sm:min-h-[20rem] sm:p-5 md:col-start-3 md:row-start-1 md:h-full md:min-h-0 md:border-l md:border-white/[0.04] ${
+          onDateNightExperience ? "opacity-85" : ""
+        }`}
+      >
+        <LiveTestGuideRail onNavigate={setActiveNav} />
+      </aside>
     </div>
   );
 }
