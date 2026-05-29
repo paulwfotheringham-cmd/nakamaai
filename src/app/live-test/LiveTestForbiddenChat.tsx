@@ -98,49 +98,41 @@ export default function LiveTestForbiddenChat() {
 
   if (!setupComplete) {
     return (
-      <div className="forbidden-chat-panel forbidden-chat-panel-setup">
+      <div className="fc-shell">
         <ForbiddenChatSetup onComplete={handleSetupComplete} />
       </div>
     );
   }
 
   return (
-    <div className="forbidden-chat-panel forbidden-chat-panel-active">
-      <div className="forbidden-chat-active-atmosphere" aria-hidden />
-
-      <header className="forbidden-chat-active-header">
-        <p className="forbidden-chat-eyebrow">Forbidden chat</p>
-        <h1 className="forbidden-chat-title">Private desires</h1>
-        <p className="forbidden-chat-lead">Your scene is live — say what you want.</p>
+    <div className="launcher-panel fc-active">
+      <header className="launcher-panel-header fc-active-header">
+        <p className="launcher-eyebrow">Forbidden chat</p>
+        <h1 className="launcher-title">Private desires</h1>
+        <p className="launcher-subtitle">Your scene is live — say what you want.</p>
       </header>
 
-      <div className="forbidden-chat-thread-wrap">
-        <div ref={scrollRef} className="forbidden-chat-thread">
+      <div className="fc-active-body">
+        <div ref={scrollRef} className="fc-thread">
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`forbidden-chat-bubble-row${msg.role === "user" ? " is-user" : ""}`}
+              className={`fc-bubble-row${msg.role === "user" ? " is-user" : ""}`}
             >
-              <div className={`forbidden-chat-bubble forbidden-chat-bubble-${msg.role}`}>
-                {msg.text}
-              </div>
+              <div className={`fc-bubble fc-bubble-${msg.role}`}>{msg.text}</div>
             </div>
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} className="forbidden-chat-composer">
+        <form onSubmit={handleSubmit} className="fc-composer">
           <input
             type="text"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Type your message…"
-            className="forbidden-chat-input"
+            className="launcher-chat-input"
           />
-          <button
-            type="submit"
-            disabled={!draft.trim()}
-            className="forbidden-chat-send"
-          >
+          <button type="submit" disabled={!draft.trim()} className="btn-primary shrink-0 px-5 py-2.5">
             Send
           </button>
         </form>
