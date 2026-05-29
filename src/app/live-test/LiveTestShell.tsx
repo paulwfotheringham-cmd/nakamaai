@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -38,7 +36,6 @@ export default function LiveTestShell() {
   const searchParams = useSearchParams();
   const [activeNav, setActiveNav] = useState<LiveTestNavId | null>(null);
   const centerPanel = getLiveTestCenterPanel(activeNav);
-  const onDashboard = activeNav === null;
   const [couplesView, setCouplesView] = useState<CouplesCenterView>("menu");
   const [dateNightPartner, setDateNightPartner] = useState<string>("");
   const [dateNightMatch, setDateNightMatch] = useState<DateNightScenario | null>(
@@ -63,7 +60,7 @@ export default function LiveTestShell() {
   }, [centerPanel]);
 
   return (
-    <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden bg-[#050505] text-stone-200 grid-rows-[auto_minmax(0,1fr)_minmax(18rem,44dvh)] md:grid-cols-[minmax(13rem,15.25rem)_minmax(0,1fr)_minmax(16rem,22rem)] md:grid-rows-1">
+    <div className="relative grid h-full min-h-0 w-full max-w-full overflow-hidden bg-[#050505] text-stone-200 grid-rows-[auto_minmax(0,1fr)_minmax(18rem,44dvh)] md:grid-cols-[minmax(0,180px)_minmax(0,1fr)_minmax(16rem,22rem)] md:grid-rows-1">
       {/* Ambient atmosphere */}
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_50%_at_50%_-12%,rgba(180,130,50,0.14),transparent_60%)]"
@@ -78,65 +75,17 @@ export default function LiveTestShell() {
         aria-hidden
       />
 
-      {/* Left nav */}
       <aside
-        className={`launcher-sidebar relative z-10 flex shrink-0 flex-col transition md:col-start-1 md:row-start-1 md:h-full md:min-h-0 ${
-          onDateNightExperience ? "opacity-60" : "opacity-100"
+        className={`editorial-nav-rail relative z-10 flex w-full max-w-[180px] shrink-0 flex-col transition md:col-start-1 md:row-start-1 md:h-full md:min-h-0 ${
+          onDateNightExperience ? "opacity-50" : "opacity-100"
         }`}
       >
-        <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0c0a08]/98 via-[#060606]/96 to-black/98"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_55%_at_0%_0%,rgba(180,130,50,0.1),transparent_58%)]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-amber-900/15 to-transparent"
-          aria-hidden
-        />
-
-        <div className="relative shrink-0 px-4 pb-5 pt-7 md:px-4 md:pb-6 md:pt-9">
-          <Link href="/" className="flex w-full justify-center transition-opacity hover:opacity-100">
-            <Image
-              src="/Nakama-AI-July25-White.png"
-              alt="Nakama Nights"
-              width={280}
-              height={76}
-              className="h-[3.25rem] w-auto max-w-full object-contain opacity-90 md:h-[3.75rem]"
-              priority
-            />
-          </Link>
-
-          <div
-            className="mx-auto mt-6 h-px max-w-[85%] bg-gradient-to-r from-transparent via-amber-900/25 to-transparent"
-            aria-hidden
+        <div className="relative min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-7 md:px-6 md:pb-10 md:pt-9">
+          <LiveTestUniverseNav
+            activeId={activeNav}
+            onHome={() => setActiveNav(null)}
+            onSelect={setActiveNav}
           />
-
-          <button
-            type="button"
-            onClick={() => setActiveNav(null)}
-            className={`mt-5 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold tracking-wide transition-all duration-300 ${
-              onDashboard
-                ? "bg-gradient-to-b from-amber-200 to-amber-600 text-zinc-950 shadow-[0_4px_24px_rgba(198,164,106,0.35),inset_0_1px_0_rgba(255,255,255,0.25)]"
-                : "border border-white/[0.06] bg-white/[0.03] text-stone-400 hover:-translate-y-px hover:border-amber-900/25 hover:bg-white/[0.05] hover:text-stone-200 hover:shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
-            }`}
-          >
-            <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0" aria-hidden>
-              <path
-                d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5Z"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Dashboard
-          </button>
-        </div>
-
-        <div className="relative min-h-0 flex-1 px-3 pb-7 md:px-3 md:pb-8">
-          <LiveTestUniverseNav activeId={activeNav} onSelect={setActiveNav} />
         </div>
       </aside>
 
