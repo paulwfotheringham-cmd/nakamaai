@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import PartnerInviteResult from "@/components/PartnerInviteResult";
@@ -63,19 +63,19 @@ function CouplesHeroCard({
       <div className="relative z-10 flex h-full min-h-[min(52vh,28rem)] flex-col justify-end p-6 sm:p-8 lg:min-h-0 lg:p-10">
         <div className="flex flex-wrap items-center gap-2.5">
           {badge ? (
-            <span className="rounded-full border border-amber-400/35 bg-amber-950/50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-200/95 backdrop-blur-sm">
+            <span className="rounded-full border border-amber-400/35 bg-amber-950/50 px-3 py-1 type-micro text-amber-200/95 backdrop-blur-sm">
               {badge}
             </span>
           ) : null}
-          <span className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-stone-300/90 backdrop-blur-sm">
+          <span className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[10px] font-medium uppercase tracking-micro text-stone-300/90 backdrop-blur-sm">
             {duration}
           </span>
         </div>
 
-        <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-400/75">
+        <p className="mt-5 type-micro text-amber-400/75">
           {eyebrow}
         </p>
-        <h2 className="mt-3 max-w-xl font-serif text-3xl font-semibold leading-[1.08] tracking-tight text-white sm:text-4xl lg:text-[2.75rem]">
+        <h2 className="mt-3 max-w-xl font-serif text-3xl font-semibold leading-[1.08] tracking-tight text-luxury-primary sm:text-4xl lg:text-[2.75rem]">
           {title}
         </h2>
         <p className="mt-4 max-w-lg text-base leading-relaxed text-stone-200/90 sm:text-[17px]">
@@ -123,13 +123,13 @@ function CouplesSecondaryCard({
       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 bg-[radial-gradient(ellipse_at_50%_100%,rgba(198,164,106,0.12),transparent_65%)]" aria-hidden />
 
       <div className="relative z-10 flex h-full flex-col justify-end p-5 sm:p-6">
-        <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-stone-400/80">
+        <span className="text-[10px] font-medium uppercase tracking-micro text-stone-400/80">
           {duration}
         </span>
-        <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-500/60">
+        <p className="mt-2 type-micro text-amber-500/60">
           {eyebrow}
         </p>
-        <h2 className="mt-2 font-serif text-xl font-semibold leading-tight text-white sm:text-2xl">
+        <h2 className="mt-2 font-display text-card font-medium leading-tight text-luxury-primary sm:text-2xl">
           {title}
         </h2>
         <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed text-stone-300/85">
@@ -230,10 +230,10 @@ export default function LiveTestCouplesProgram({
       <header className="relative z-10 shrink-0 px-6 pb-5 pt-7 sm:px-8 sm:pt-8">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-amber-500/60">
+            <p className="type-micro text-amber-500/60">
               Reignite · Couples
             </p>
-            <h1 className="mt-2 font-serif text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl">
+            <h1 className="mt-2 font-display text-card font-medium leading-snug tracking-tight text-luxury-primary sm:text-3xl lg:text-4xl">
               Tonight begins here,{" "}
               <span className="bg-gradient-to-r from-amber-200 via-amber-100 to-amber-300/90 bg-clip-text text-transparent">
                 {userName}

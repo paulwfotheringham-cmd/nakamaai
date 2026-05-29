@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -148,7 +148,7 @@ function ProfileSettingRow({
           <SettingIcon name={icon} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-sm font-semibold text-stone-100 transition-colors group-hover:text-white">
+          <span className="block text-sm font-semibold text-stone-100 transition-colors group-hover:text-luxury-primary">
             {label}
           </span>
           <span className="mt-0.5 block text-xs leading-relaxed text-stone-400/90">
@@ -224,7 +224,7 @@ export default function LiveTestProfilePanel() {
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2.5">
-                <h1 className="font-serif text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl">
+                <h1 className="font-display text-card font-medium leading-snug tracking-tight text-luxury-primary sm:text-3xl">
                   {userName}
                 </h1>
                 <span className="profile-badge profile-badge-tier">{tier}</span>
@@ -243,21 +243,21 @@ export default function LiveTestProfilePanel() {
           <section className="profile-status-card" aria-label="Membership">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-500/65">
+                <p className="type-micro text-amber-500/65">
                   Your membership
                 </p>
-                <p className="mt-2 font-serif text-xl font-semibold text-white">{tier}</p>
+                <p className="mt-2 font-display text-card font-medium text-luxury-primary">{tier}</p>
                 <p className="mt-1 text-sm text-stone-400/90">{billingLabel(billing)}</p>
               </div>
               <div className="flex flex-wrap gap-6 sm:gap-8">
                 <div>
-                  <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-stone-500">
+                  <p className="text-[10px] font-medium uppercase tracking-micro text-stone-500">
                     Status
                   </p>
                   <p className="mt-1 text-sm font-medium text-emerald-300/90">Active</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-stone-500">
+                  <p className="text-[10px] font-medium uppercase tracking-micro text-stone-500">
                     Renewal
                   </p>
                   <p className="mt-1 text-sm font-medium text-stone-200">
@@ -266,7 +266,7 @@ export default function LiveTestProfilePanel() {
                 </div>
                 {isTrial ? (
                   <div>
-                    <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-stone-500">
+                    <p className="text-[10px] font-medium uppercase tracking-micro text-stone-500">
                       Trial
                     </p>
                     <p className="mt-1 text-sm font-medium text-amber-200/90">In progress</p>

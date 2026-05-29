@@ -2,12 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
-/* REQUIRED for Tailwind v3 in Next app router */
+/* ── Luxury typography system ── */
 @layer base {
-  html {
-    -webkit-font-smoothing: antialiased;
+  :root {
+    --text-primary: #f5f2eb;
+    --text-secondary: rgba(245, 242, 235, 0.75);
+    --text-muted: rgba(245, 242, 235, 0.55);
+    --lh-heading: 1.05;
+    --lh-body: 1.6;
+    --lh-card: 1.4;
+    --tracking-micro: 0.04em;
+    --tracking-label: 0.02em;
   }
 
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-body), system-ui, -apple-system, sans-serif;
+    font-size: 1.125rem;
+    font-weight: 400;
+    line-height: var(--lh-body);
+    color: var(--text-primary);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display), Georgia, serif;
+    font-weight: 500;
+    line-height: var(--lh-heading);
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+  }
+
+  h2 {
+    font-size: clamp(1.75rem, 4vw, 3rem);
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    line-height: var(--lh-card);
+  }
+
+  p {
+    line-height: var(--lh-body);
+  }
+
+  a {
+    color: inherit;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+  }
+}
+
+/* REQUIRED for Tailwind v3 in Next app router */
+@layer base {
   html:has(.live-test-root),
   html:has(.live-test-root) body {
     overflow: hidden;
@@ -67,7 +132,94 @@
   background: rgba(9, 9, 11, 0.75) !important;
 }
 
-/* â”€â”€ Live-test cinematic launcher design system â”€â”€ */
+.create-audio-embed {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.create-audio-embed [style*="text-transform: uppercase"] {
+  letter-spacing: 0.04em !important;
+}
+
+.create-audio-embed [style*="letter-spacing: 0.15em"],
+.create-audio-embed [style*="letter-spacing: 0.12em"] {
+  letter-spacing: 0.04em !important;
+}
+
+/* ── Typography utilities ── */
+@layer components {
+  .type-hero {
+    font-family: var(--font-display), Georgia, serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+
+  .type-section {
+    font-family: var(--font-display), Georgia, serif;
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+  }
+
+  .type-card {
+    font-family: var(--font-display), Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--text-primary);
+  }
+
+  .type-body {
+    font-size: 1.125rem;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .type-small {
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .type-nav {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--text-primary);
+  }
+
+  .type-micro {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(198, 164, 106, 0.7);
+  }
+
+  .text-luxury-primary {
+    color: var(--text-primary);
+  }
+
+  .text-luxury-secondary {
+    color: var(--text-secondary);
+  }
+
+  .text-luxury-muted {
+    color: var(--text-muted);
+  }
+}
+
+/* ── Live-test cinematic launcher design system ── */
 @layer components {
   .launcher-panel {
     @apply flex h-full min-h-0 flex-col overflow-hidden rounded-2xl;
@@ -80,19 +232,19 @@
   }
 
   .launcher-eyebrow {
-    @apply text-[10px] font-semibold uppercase tracking-[0.24em] text-amber-500/70;
+    @apply type-micro mt-0;
   }
 
   .launcher-title {
-    @apply mt-2 font-serif text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl;
+    @apply mt-2 font-display text-section font-medium text-luxury-primary;
   }
 
   .launcher-subtitle {
-    @apply mt-3 max-w-2xl text-sm leading-relaxed text-stone-400/90 sm:text-[15px];
+    @apply mt-3 max-w-2xl text-body font-normal text-luxury-secondary;
   }
 
   .launcher-section-label {
-    @apply text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-500/60;
+    @apply type-micro;
   }
 
   .launcher-card {
@@ -148,7 +300,7 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-gradient-to-b from-amber-200 to-amber-600 px-6 py-3 text-sm font-semibold text-zinc-950 transition-all duration-300 hover:from-amber-100 hover:to-amber-500 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center rounded-full bg-gradient-to-b from-amber-200 to-amber-600 px-6 py-3 text-small font-semibold text-zinc-950 transition-all duration-300 hover:from-amber-100 hover:to-amber-500 disabled:cursor-not-allowed disabled:opacity-50;
     box-shadow: 0 4px 20px rgba(198, 164, 106, 0.25);
   }
 
@@ -311,18 +463,18 @@
 }
 
 .experience-dock-label {
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  line-height: 1;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  line-height: 1.3;
   white-space: nowrap;
+  color: var(--text-secondary);
 }
 
 @media (min-width: 768px) {
   .experience-dock-label {
-    font-size: 0.6875rem;
-    letter-spacing: 0.08em;
+    font-size: 0.75rem;
   }
 }
 
@@ -479,11 +631,11 @@
 
 .pro-sidebar-brand-tag {
   margin-top: 0.375rem;
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
 }
 
 .pro-sidebar-nav {
@@ -512,17 +664,17 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1.25rem;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--text-muted);
   transition: color 0.2s ease;
 }
 
 .pro-sidebar-section-toggle:hover,
 .pro-sidebar-section-toggle.has-active {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--text-secondary);
 }
 
 .pro-sidebar-chevron {
@@ -550,7 +702,8 @@
   padding: 0.6875rem 0.875rem;
   font-size: 0.9375rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+  color: var(--text-primary);
   border-radius: 0.5rem;
   border: none;
   border-left: 3px solid transparent;
@@ -1242,14 +1395,14 @@
 .nav-concept-gallery-id {
   font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: rgba(253, 230, 138, 0.75);
 }
 
 .nav-concept-gallery-name {
   margin-top: 0.25rem;
-  font-family: var(--font-serif, Georgia, serif);
+  font-family: var(--font-display), Georgia, serif;
   font-size: 1.375rem;
   font-weight: 600;
   color: rgba(255, 252, 245, 0.96);
@@ -1560,14 +1713,14 @@
 .nav-preview-content-eyebrow {
   font-size: 0.625rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: rgba(253, 230, 138, 0.65);
 }
 
 .nav-preview-content-title {
   margin-top: 0.5rem;
-  font-family: var(--font-serif, Georgia, serif);
+  font-family: var(--font-display), Georgia, serif;
   font-size: 1.5rem;
   font-weight: 600;
   color: rgba(255, 252, 245, 0.95);
@@ -1718,7 +1871,7 @@
 }
 
 .nav-concept-palette-title {
-  font-family: var(--font-serif, Georgia, serif);
+  font-family: var(--font-display), Georgia, serif;
   font-size: 1.25rem;
   font-weight: 600;
   color: rgba(255, 252, 245, 0.95);
@@ -2031,7 +2184,7 @@ button.nav-concept-context-back:hover {
 }
 
 .nav-mockup-index-card-letter {
-  font-family: var(--font-serif, Georgia, serif);
+  font-family: var(--font-display), Georgia, serif;
   font-size: 3rem;
   font-weight: 700;
   line-height: 1;
@@ -2054,14 +2207,14 @@ button.nav-concept-context-back:hover {
 .nav-mockup-index-card-id {
   font-size: 0.625rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: rgba(253, 230, 138, 0.7);
 }
 
 .nav-mockup-index-card-name {
   margin-top: 0.25rem;
-  font-family: var(--font-serif, Georgia, serif);
+  font-family: var(--font-display), Georgia, serif;
   font-size: 1.375rem;
   font-weight: 600;
   color: rgba(255, 252, 245, 0.96);
@@ -2160,7 +2313,7 @@ button.nav-concept-context-back:hover {
 }
 
 .nav-mockup-chrome-title {
-  font-family: var(--font-serif, Georgia, serif);
+  font-family: var(--font-display), Georgia, serif;
   font-size: 1rem;
   font-weight: 600;
   color: rgba(255, 252, 245, 0.95);
@@ -2278,7 +2431,7 @@ button.nav-concept-context-back:hover {
 
 .nav-mockup-hub-title {
   margin-top: 1.25rem;
-  font-family: var(--font-serif, Georgia, serif);
+  font-family: var(--font-display), Georgia, serif;
   font-size: clamp(1.75rem, 4vw, 2.75rem);
   font-weight: 700;
   color: rgba(255, 252, 245, 0.98);
@@ -2465,14 +2618,14 @@ button.nav-concept-context-back:hover {
 .nav-mockup-experience-eyebrow {
   font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: rgba(253, 230, 138, 0.75);
 }
 
 .nav-mockup-experience-title {
   margin-top: 0.625rem;
-  font-family: var(--font-serif, Georgia, serif);
+  font-family: var(--font-display), Georgia, serif;
   font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: 700;
   line-height: 1.08;
@@ -2802,11 +2955,11 @@ button.nav-concept-context-back:hover {
 }
 
 .fc-field-label {
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(198, 164, 106, 0.55);
+  color: rgba(198, 164, 106, 0.6);
 }
 
 .fc-select-wrap {
@@ -2933,10 +3086,11 @@ button.nav-concept-context-back:hover {
 }
 
 .fc-unfiltered-title {
-  font-family: var(--font-serif, Georgia, serif);
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: rgba(255, 252, 245, 0.95);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text-primary);
 }
 
 .fc-unfiltered-copy {
@@ -3266,7 +3420,7 @@ button.nav-concept-context-back:hover {
   padding-left: 0.25rem;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: rgba(198, 164, 106, 0.55);
 }

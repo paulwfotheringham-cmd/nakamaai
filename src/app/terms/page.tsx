@@ -1,10 +1,10 @@
-import MarketingPageShell from "@/components/MarketingPageShell";
+﻿import MarketingPageShell from "@/components/MarketingPageShell";
 
 export default function TermsPage() {
   return (
     <MarketingPageShell showBackLink>
       <div className="mx-auto max-w-2xl px-6 pb-12 pt-4 text-stone-300 sm:pb-16">
-        <h1 className="font-serif text-3xl text-stone-100">Terms and conditions</h1>
+        <h1 className="font-display text-section text-luxury-primary">Terms and conditions</h1>
         <p className="mt-4 text-sm text-stone-500">
           <span className="font-semibold text-stone-300">Last Updated:</span> April 24, 2026
         </p>

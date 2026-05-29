@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -172,10 +172,10 @@ export default function SurpriseModePage({
       <header className="shrink-0 border-b border-stone-800/50 px-3 py-2 sm:px-4 sm:py-2.5">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-amber-600/85">
+            <p className="type-micro text-amber-600/85">
               Surprise Mode
             </p>
-            <h1 className="mt-0.5 font-serif text-base font-semibold leading-tight text-white sm:text-lg">
+            <h1 className="mt-0.5 font-serif text-base font-semibold leading-tight text-luxury-primary sm:text-lg">
               Plan their fantasy
             </h1>
             <p className="mt-1 text-[10px] leading-snug text-stone-400 sm:text-[11px]">
@@ -212,7 +212,7 @@ export default function SurpriseModePage({
                       : "rounded-bl-sm border border-stone-700/80 bg-black/50 text-stone-200"
                   }`}
                 >
-                  <span className="mb-1 block text-[9px] font-semibold uppercase tracking-[0.16em] text-amber-500/70">
+                  <span className="mb-1 block type-micro text-amber-500/70">
                     {msg.role === "user" ? "You" : "Nakama AI"}
                   </span>
                   {msg.text}
@@ -222,7 +222,7 @@ export default function SurpriseModePage({
 
             {showScenarios && !selected ? (
               <div className="space-y-2 pt-1">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-400/80">
+                <p className="type-micro text-amber-400/80">
                   20 scenarios — choose one
                 </p>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -240,7 +240,7 @@ export default function SurpriseModePage({
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
                       <div className="relative z-10 p-3">
-                        <h3 className="font-serif text-sm font-semibold text-white sm:text-base">
+                        <h3 className="font-serif text-sm font-semibold text-luxury-primary sm:text-base">
                           {scenario.title}
                         </h3>
                         <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-stone-200/90">
@@ -296,12 +296,12 @@ export default function SurpriseModePage({
               exit={{ opacity: 0, y: 8, scale: 0.98 }}
               className="w-full max-w-md overflow-hidden rounded-2xl border border-amber-500/25 bg-gradient-to-b from-zinc-950 to-[#061a1a] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.65)]"
             >
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-500/85">
+              <p className="type-micro text-amber-500/85">
                 Surprise Mode
               </p>
               <h2
                 id="surprise-invite-title"
-                className="mt-1 font-serif text-xl font-semibold text-white sm:text-2xl"
+                className="mt-1 font-display text-card font-medium text-luxury-primary sm:text-2xl"
               >
                 Invite your partner to join
               </h2>
@@ -331,7 +331,7 @@ export default function SurpriseModePage({
                     onChange={(e) => setUserEmail(e.target.value)}
                     placeholder="you@example.com"
                     required
-                    className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-amber-500/40"
+                    className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-luxury-primary outline-none placeholder:text-zinc-500 focus:border-amber-500/40"
                   />
                 </label>
                 <label className="block">
@@ -343,7 +343,7 @@ export default function SurpriseModePage({
                     value={partnerEmail}
                     onChange={(e) => setPartnerEmail(e.target.value)}
                     placeholder="partner@example.com"
-                    className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-amber-500/40"
+                    className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-luxury-primary outline-none placeholder:text-zinc-500 focus:border-amber-500/40"
                   />
                 </label>
                 <div className="flex gap-2 pt-1">

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -58,7 +58,7 @@ export function ConceptAHubNav({ activeId, onHome, onSelect, hidden }: NavConcep
         >
           <img src={item.poster} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
           <div className="nav-concept-hub-tile-overlay" aria-hidden />
-          <span className="relative z-10 font-serif text-lg font-semibold text-white">{item.label}</span>
+          <span className="relative z-10 font-serif text-lg font-semibold text-luxury-primary">{item.label}</span>
         </button>
       ))}
     </div>
@@ -98,7 +98,7 @@ export function ConceptCCommandNav({ activeId, onHome, onSelect, hidden }: NavCo
                 >
                   <img src={item.poster} alt="" className="absolute inset-0 h-full w-full object-cover" />
                   <div className="nav-concept-palette-card-overlay" aria-hidden />
-                  <span className="relative z-10 font-serif text-base font-semibold text-white">{item.label}</span>
+                  <span className="relative z-10 font-serif text-base font-semibold text-luxury-primary">{item.label}</span>
                 </button>
               ))}
             </div>

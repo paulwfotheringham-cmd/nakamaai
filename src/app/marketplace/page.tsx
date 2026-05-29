@@ -1,9 +1,9 @@
-export default function MarketplacePage() {
+﻿export default function MarketplacePage() {
   return (
-    <main className="relative min-h-screen bg-[#07040d] text-white">
+    <main className="relative min-h-screen bg-[#07040d] text-luxury-primary">
       <a
         href="/dashboard"
-        className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-white/75 backdrop-blur-md"
+        className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-luxury-primary/75 backdrop-blur-md"
       >
         ← Dashboard
       </a>
@@ -25,7 +25,7 @@ export default function MarketplacePage() {
         {/* Header */}
         <div className="mb-10">
           <p className="text-sm font-medium text-zinc-400">Nakama AI</p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-luxury-primary sm:text-5xl">
             Marketplace
           </h1>
           <div className="mt-6 max-w-3xl">
@@ -81,7 +81,7 @@ function MarketplaceTile({
 
       {/* Content */}
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold tracking-tight text-white">{title}</h3>
+        <h3 className="text-lg font-semibold tracking-tight text-luxury-primary">{title}</h3>
         <p className="text-sm leading-6 text-zinc-300">{description}</p>
       </div>
 

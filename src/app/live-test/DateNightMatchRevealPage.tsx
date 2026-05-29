@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
@@ -42,10 +42,10 @@ export default function DateNightMatchRevealPage({
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-amber-900/25 bg-gradient-to-b from-zinc-950/95 to-[#061a1a] shadow-[inset_0_0_60px_rgba(0,0,0,0.25)]">
       <header className="shrink-0 border-b border-stone-800/50 px-3 py-2 sm:px-4 sm:py-2.5">
-        <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-amber-600/85">
+        <p className="type-micro text-amber-600/85">
           Date Night
         </p>
-        <h1 className="mt-0.5 font-serif text-base font-semibold leading-tight text-white sm:text-lg">
+        <h1 className="mt-0.5 font-serif text-base font-semibold leading-tight text-luxury-primary sm:text-lg">
           Tonight’s Match
         </h1>
         <p className="mt-1 text-[10px] leading-snug text-stone-400 sm:text-[11px]">
@@ -152,7 +152,7 @@ export default function DateNightMatchRevealPage({
               </div>
 
               <div className="relative z-10 p-5 sm:p-7">
-                <p className="select-none text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-300/80 drop-shadow-[0_1px_12px_rgba(0,0,0,0.9)]">
+                <p className="select-none type-micro text-amber-300/80 drop-shadow-[0_1px_12px_rgba(0,0,0,0.9)]">
                   Tonight’s Match
                 </p>
                 <h2 className="select-none mt-2 font-serif text-[2.15rem] font-semibold leading-[1.05] tracking-[-0.02em] text-[#f7f2e8] drop-shadow-[0_2px_18px_rgba(0,0,0,0.95)] sm:text-[3.05rem]">

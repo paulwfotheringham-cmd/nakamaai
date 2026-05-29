@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase-browser";
@@ -181,8 +181,8 @@ export default function ConvertEbookPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#07040d] text-white">
-      <a href="/dashboard" className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-white/75 backdrop-blur-md">← Dashboard</a>
+    <main className="min-h-screen bg-[#07040d] text-luxury-primary">
+      <a href="/dashboard" className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-luxury-primary/75 backdrop-blur-md">← Dashboard</a>
       <div className="mx-auto max-w-3xl px-6 py-16">
         <h1 className="text-center text-4xl font-semibold">
           Convert ebook to fantasy audio
@@ -250,7 +250,7 @@ export default function ConvertEbookPage() {
                   key={uploadedFile.path}
                   className="rounded-xl border border-white/10 bg-white/5 px-4 py-4"
                 >
-                  <p className="break-all text-sm text-white">
+                  <p className="break-all text-sm text-luxury-primary">
                     {uploadedFile.name}
                   </p>
 
@@ -261,7 +261,7 @@ export default function ConvertEbookPage() {
                   <button
                     type="button"
                     onClick={() => handleConvertClick(uploadedFile)}
-                    className="mt-3 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-500"
+                    className="mt-3 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-luxury-primary hover:bg-purple-500"
                   >
                     Convert ebook to audio
                   </button>
@@ -283,7 +283,7 @@ export default function ConvertEbookPage() {
                       type="button"
                       onClick={() => handlePlayAudio(uploadedFile)}
                       disabled={isLoadingAudio}
-                      className="mt-3 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="mt-3 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-luxury-primary hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isLoadingAudio && currentAudioPath === getExpectedAudioPath(uploadedFile.path)
                         ? "Loading audio..."

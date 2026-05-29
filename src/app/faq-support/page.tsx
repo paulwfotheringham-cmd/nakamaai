@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import MarketingPageShell from "@/components/MarketingPageShell";
 import { useState } from "react";
@@ -58,18 +58,18 @@ export default function FaqSupportPage() {
   return (
     <MarketingPageShell>
       <div className="mx-auto max-w-7xl px-6 py-12 text-stone-300">
-        <h1 className="font-serif text-4xl text-stone-100">FAQ &amp; Support</h1>
+        <h1 className="font-display text-section text-luxury-primary">FAQ &amp; Support</h1>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
           <section className="rounded-2xl border border-stone-800 bg-zinc-950/80 p-6">
-            <h2 className="font-serif text-2xl text-white">Frequently asked questions</h2>
+            <h2 className="font-display text-card text-luxury-primary">Frequently asked questions</h2>
             <div className="mt-5 space-y-4">
               {faqs.map((faq) => (
                 <div
                   key={faq.question}
                   className="rounded-xl border border-stone-800 bg-black/60 p-4"
                 >
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-amber-200">
+                  <h3 className="text-small font-medium tracking-label text-amber-200">
                     {faq.question}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-stone-400">
@@ -81,7 +81,7 @@ export default function FaqSupportPage() {
           </section>
 
           <section className="rounded-2xl border border-stone-800 bg-zinc-950/80 p-6">
-            <h2 className="font-serif text-2xl text-white">Submit a support request</h2>
+            <h2 className="font-display text-card text-luxury-primary">Submit a support request</h2>
             <p className="mt-2 text-sm text-stone-400">
               Tell us what you need and we will get back to you as soon as possible.
             </p>
@@ -92,7 +92,7 @@ export default function FaqSupportPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
+                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-luxury-primary placeholder:text-stone-600"
               />
               <input
                 placeholder="Email"
@@ -100,7 +100,7 @@ export default function FaqSupportPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
+                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-luxury-primary placeholder:text-stone-600"
               />
               <textarea
                 placeholder="How can we help?"
@@ -108,11 +108,11 @@ export default function FaqSupportPage() {
                 onChange={(e) => setMessage(e.target.value)}
                 required
                 rows={6}
-                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
+                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-luxury-primary placeholder:text-stone-600"
               />
               <button
                 type="submit"
-                className="w-full rounded-full border border-amber-200/50 bg-amber-100/90 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700 transition hover:bg-amber-100"
+                className="w-full rounded-full border border-amber-200/50 bg-amber-100/90 py-3 type-micro text-stone-700 transition hover:bg-amber-100"
               >
                 Send support request
               </button>

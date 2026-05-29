@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -104,7 +104,7 @@ export default function OnboardingClient() {
   };
 
   return (
-    <main className="relative min-h-screen bg-black text-white antialiased">
+    <main className="relative min-h-screen bg-black text-luxury-primary antialiased">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_85%_50%_at_50%_-10%,rgba(180,130,50,0.12),transparent_55%)]"
         aria-hidden
@@ -125,10 +125,10 @@ export default function OnboardingClient() {
 
       <section className="relative z-10 mx-auto max-w-6xl px-5 pb-20 pt-24 sm:px-8 sm:pt-28">
         <header className="mx-auto max-w-3xl text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-600/85">
+          <p className="type-micro text-amber-600/85">
             Choose your guide
           </p>
-          <h1 className="mt-4 font-serif text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <h1 className="mt-4 type-section font-display font-medium text-luxury-primary sm:text-4xl">
             Meet your{" "}
             <span className="bg-gradient-to-r from-amber-200 via-amber-100 to-amber-300/90 bg-clip-text text-transparent">
               Nakama
@@ -144,9 +144,9 @@ export default function OnboardingClient() {
         <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_1.05fr] lg:items-start">
           <div className="space-y-8">
             <div>
-              <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-500/90">
+              <p className="type-micro text-amber-500/90">
                 Select guide
-              </h2>
+              </p>
               <p className="mt-1 text-sm text-stone-500">
                 3 men · 1 woman · tap to preview · rename each guide below
               </p>
@@ -169,7 +169,7 @@ export default function OnboardingClient() {
                         className="w-full p-4 pb-2 text-left"
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-400/90">
+                          <p className="type-micro text-amber-400/90">
                             {guide.gender}
                           </p>
                           {active && (
@@ -183,7 +183,7 @@ export default function OnboardingClient() {
                       <div className="px-4 pb-4 pt-0">
                         <label
                           htmlFor={`guide-name-${guide.id}`}
-                          className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-stone-500"
+                          className="mb-1 block type-micro text-stone-500"
                         >
                           Guide name
                         </label>
@@ -196,7 +196,7 @@ export default function OnboardingClient() {
                           onFocus={() => setSelectedGuide(guide)}
                           maxLength={32}
                           placeholder={defaultName}
-                          className="w-full rounded-lg border border-stone-700/80 bg-black/50 px-2.5 py-2 font-serif text-lg font-semibold text-white placeholder:text-stone-600 focus:border-amber-500/45 focus:outline-none focus:ring-1 focus:ring-amber-500/25"
+                          className="w-full rounded-lg border border-stone-700/80 bg-black/50 px-2.5 py-2 font-display text-card font-medium text-luxury-primary placeholder:text-stone-600 focus:border-amber-500/45 focus:outline-none focus:ring-1 focus:ring-amber-500/25"
                         />
                       </div>
                     </div>
@@ -206,9 +206,9 @@ export default function OnboardingClient() {
             </div>
 
             <div>
-              <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-500/90">
+              <p className="type-micro text-amber-500/90">
                 Select voice
-              </h2>
+              </p>
               <ul className="mt-4 space-y-2">
                 {GUIDE_VOICES.map((v) => {
                   const active = voiceId === v.id;
@@ -225,7 +225,7 @@ export default function OnboardingClient() {
                         type="button"
                         onClick={() => setVoiceId(v.id)}
                         className={`min-w-0 flex-1 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${
-                          active ? "text-amber-100" : "text-stone-300 hover:text-white"
+                          active ? "text-amber-100" : "text-stone-300 hover:text-luxury-primary"
                         }`}
                       >
                         {v.name}
@@ -246,9 +246,9 @@ export default function OnboardingClient() {
             </div>
 
             <div>
-              <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-500/90">
+              <p className="type-micro text-amber-500/90">
                 Select tone
-              </h2>
+              </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {GUIDE_TONES.map((t) => (
                   <button
@@ -270,10 +270,10 @@ export default function OnboardingClient() {
 
           <div className="lg:sticky lg:top-24">
             <div className="rounded-2xl border border-amber-900/30 bg-gradient-to-b from-zinc-950/95 to-black p-5 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-500/80">
+              <p className="type-micro text-amber-500/80">
                 Live preview
               </p>
-              <p className="mt-1 font-serif text-xl text-white">{selectedDisplayName}</p>
+              <p className="mt-1 font-display text-card font-medium text-luxury-primary">{selectedDisplayName}</p>
               <div className="mt-4 aspect-[4/5] max-h-[min(52vh,420px)] w-full overflow-hidden rounded-xl bg-transparent">
                 <SimliAvatar
                   key={selectedGuide.id}

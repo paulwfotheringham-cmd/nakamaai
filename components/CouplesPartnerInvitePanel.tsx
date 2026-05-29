@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -71,10 +71,10 @@ export default function CouplesPartnerInvitePanel({
         compact ? "p-5" : "p-6"
       }`}
     >
-      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-teal-400/85">
+      <p className="type-micro text-teal-400/85">
         Couples
       </p>
-      <h2 className="mt-2 font-serif text-xl font-semibold text-white sm:text-2xl">
+      <h2 className="mt-2 font-display text-card font-medium text-luxury-primary sm:text-2xl">
         Reignite together
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-zinc-300">
@@ -114,7 +114,7 @@ export default function CouplesPartnerInvitePanel({
               value={partnerEmail}
               onChange={(e) => setPartnerEmail(e.target.value)}
               placeholder="Enter email address"
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-amber-500/40"
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-luxury-primary outline-none placeholder:text-zinc-500 focus:border-amber-500/40"
             />
             <button
               type="button"

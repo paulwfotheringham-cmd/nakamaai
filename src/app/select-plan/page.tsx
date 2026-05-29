@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -137,7 +137,7 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
   const topBlock =
     "flex min-h-[10.5rem] flex-col items-center justify-start text-center sm:min-h-[10rem]";
   const eyebrow =
-    "h-5 shrink-0 text-[10px] font-semibold uppercase tracking-[0.2em]";
+    "h-5 shrink-0 type-micro";
   const tierTitle =
     "mt-2 max-w-[18ch] text-2xl font-bold leading-tight tracking-tight sm:text-[1.85rem] lg:text-[2rem] lg:leading-[1.1]";
   const tagline =
@@ -156,7 +156,7 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
     "mt-4 inline-flex w-full shrink-0 items-center justify-center rounded-full border border-amber-800/50 bg-transparent px-5 py-3 text-center text-sm font-semibold text-amber-100/95 transition hover:border-amber-600/60 hover:bg-amber-950/30 disabled:cursor-not-allowed disabled:opacity-45 sm:py-3.5";
 
   return (
-    <main className="relative min-h-screen bg-black text-white antialiased">
+    <main className="relative min-h-screen bg-black text-luxury-primary antialiased">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_85%_50%_at_50%_-10%,rgba(180,130,50,0.12),transparent_55%)]"
         aria-hidden
@@ -177,10 +177,10 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
 
       <section className="relative z-10 mx-auto max-w-6xl px-5 pb-24 pt-24 sm:px-8 sm:pt-28">
         <header className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-600/85">
+          <p className="type-micro text-amber-600/85">
             Choose your plan
           </p>
-          <h1 className="mt-4 font-serif text-3xl font-semibold tracking-tight text-white sm:text-4xl md:text-[2.65rem] md:leading-[1.12]">
+          <h1 className="mt-4 type-section font-display font-medium text-luxury-primary sm:text-4xl md:text-[2.65rem] md:leading-[1.12]">
             Start your{" "}
             <span className="bg-gradient-to-r from-amber-200 via-amber-100 to-amber-300/90 bg-clip-text text-transparent">
               Nakama
@@ -197,7 +197,7 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
           <article className="flex min-h-full flex-col rounded-2xl bg-gradient-to-b from-zinc-900/95 to-black px-5 py-7 sm:px-7 sm:py-9">
             <div className={topBlock}>
               <p className={`${eyebrow} text-amber-500/70`}>Full access</p>
-              <h2 className={`${tierTitle} text-white`}>Nakama Nights</h2>
+              <h2 className={`${tierTitle} text-luxury-primary`}>Nakama Nights</h2>
               <p className={`${tagline} text-stone-400`}>
                 Dive deep into your fantasies
               </p>
@@ -271,7 +271,7 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
           <article className="flex min-h-full flex-col rounded-2xl border border-teal-900/30 bg-gradient-to-b from-[#061a1a]/90 to-black px-5 py-7 shadow-[0_0_40px_rgba(0,0,0,0.35)] sm:px-7 sm:py-9 lg:scale-[1.02] lg:border-amber-700/25">
             <div className={topBlock}>
               <p className={`${eyebrow} text-teal-400/80`}>For two</p>
-              <h2 className={`${tierTitle} text-white`}>Couples</h2>
+              <h2 className={`${tierTitle} text-luxury-primary`}>Couples</h2>
               <p className={`${tagline} text-stone-400`}>
                 One full account. One couples account. Reconnect together.
               </p>

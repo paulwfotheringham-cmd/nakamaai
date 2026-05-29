@@ -302,20 +302,20 @@ export default function Page() {
           <div className="ml-auto flex flex-wrap items-center justify-end gap-3 sm:gap-4">
             <a
               href="#fantasy-services"
-              className="inline-flex rounded-full border border-amber-400/35 bg-gradient-to-b from-[#e4efd9] via-[#dce8c8] to-[#d0ddb8] px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:border-amber-300/50 hover:from-[#ecf4e4] hover:via-[#e6efd6] hover:to-[#dae6c8]"
+              className="inline-flex rounded-full border border-amber-400/35 bg-gradient-to-b from-[#e4efd9] via-[#dce8c8] to-[#d0ddb8] px-6 py-2.5 type-micro text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:border-amber-300/50 hover:from-[#ecf4e4] hover:via-[#e6efd6] hover:to-[#dae6c8]"
             >
               Fantasy services
             </a>
             <Link
               href="/signup-trial"
-              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
+              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2 type-micro text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
             >
               10 Day Free Trial
             </Link>
 
             <Link
               href="/login"
-              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
+              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-6 py-2.5 type-micro text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
             >
               Login
             </Link>
@@ -335,43 +335,43 @@ export default function Page() {
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/72 via-black/26 to-black/36" />
 
           <div className="relative z-10 max-w-3xl p-6 sm:p-8 lg:p-10">
-            <p className="font-serif text-5xl font-bold tracking-wide text-amber-300 sm:text-6xl">
+            <p className="type-hero font-display font-medium text-amber-300/95">
               Nakama Nights
             </p>
-            <p className="mt-5 text-sm font-medium uppercase tracking-[0.16em] text-stone-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] sm:whitespace-nowrap sm:text-base">
-              ADULT AUDIO ADVENTURES. BUILT FOR WOMEN.
+            <p className="mt-5 text-body font-medium text-luxury-secondary drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)]">
+              Adult audio adventures, built for women.
             </p>
 
             <div className="mt-8 flex flex-col gap-6">
               <div>
-                <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
+                <p className="type-section font-display text-luxury-primary sm:text-5xl">
                   Fantasy<span className="-ml-1">.</span>
                 </p>
-                <p className="mt-4 max-w-full whitespace-normal text-[11px] font-medium uppercase leading-snug tracking-[0.18em] text-stone-100 sm:whitespace-nowrap sm:text-xs sm:tracking-[0.24em] sm:text-stone-300 md:text-sm">
-                  A NEW EXPERIENCE. NOT JUST AUDIOBOOKS. PRIVATE AND IMMERSIVE
+                <p className="mt-4 max-w-xl text-small leading-relaxed text-luxury-secondary">
+                  A new experience — not just audiobooks. Private and immersive.
                 </p>
               </div>
               <div>
-                <p className="font-serif text-4xl leading-[1.08] text-amber-200 sm:text-5xl">
+                <p className="type-section font-display text-amber-200 sm:text-5xl">
                   Escape.
                 </p>
-                <p className="mt-4 text-xs font-medium uppercase tracking-[0.24em] text-stone-300 sm:text-sm">
-                  EXPLORE. BECOME. CONTROL. CONNECT
+                <p className="mt-4 text-small text-luxury-muted">
+                  Explore. Become. Control. Connect.
                 </p>
               </div>
               <div className="pt-4 sm:pt-6">
-                <p className="font-serif text-4xl leading-[1.08] text-white sm:text-5xl">
+                <p className="type-section font-display text-luxury-primary sm:text-5xl">
                   Pleasure.
                 </p>
-                <p className="mt-3 text-xs font-medium uppercase tracking-[0.24em] text-amber-200/90 sm:text-sm">
-                  NAKAMA NIGHTS IS EXCLUSIVE. IT IS PREMIUM. IT IS YOURS
+                <p className="mt-3 text-small text-luxury-secondary">
+                  Nakama Nights is exclusive, premium, and yours.
                 </p>
               </div>
             </div>
 
             <Link
               href="/select-plan"
-              className="mt-12 inline-flex w-full max-w-[280px] items-center justify-center rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100 md:px-7 md:py-3 md:text-[11px] lg:text-xs"
+              className="mt-12 inline-flex w-full max-w-[280px] items-center justify-center rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2.5 type-micro text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100 md:px-7 md:py-3 md:text-[11px] lg:text-xs"
             >
               JOIN NAKAMA NOW
             </Link>
@@ -380,25 +380,25 @@ export default function Page() {
           <div className="relative z-10 mt-10 w-full border-t border-amber-200/25 bg-black/90 px-6 sm:px-8 lg:px-10">
             <div className="flex flex-col gap-6 py-5 md:flex-row md:items-start md:gap-10 md:py-6">
               <div className="flex w-full shrink-0 flex-col items-center gap-4 text-center md:w-[280px]">
-                <p className="font-serif text-base font-semibold uppercase tracking-[0.22em] text-amber-200 sm:text-lg">
-                  NEW TO THIS?
+                <p className="font-display text-card font-medium text-amber-200/90">
+                  New to this?
                 </p>
                 <Link
                   href="/signup-trial"
-                  className="inline-flex w-full max-w-full items-center justify-center rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200 md:w-fit md:px-7 md:py-3 md:pl-8 md:pr-7 md:text-[11px] lg:text-xs"
+                  className="inline-flex w-full max-w-full items-center justify-center rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-5 py-2.5 type-micro text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200 md:w-fit md:px-7 md:py-3 md:pl-8 md:pr-7 md:text-[11px] lg:text-xs"
                 >
                   TRY YOUR FIRST EXPERIENCE
                 </Link>
               </div>
 
               <div className="min-w-0 flex-1 space-y-3 md:space-y-4 md:pt-1">
-                <p className="text-xs font-medium uppercase leading-snug tracking-[0.18em] text-stone-100 md:whitespace-nowrap md:text-[11px] md:tracking-[0.22em] lg:text-sm lg:tracking-[0.24em]">
+                <p className="text-small leading-relaxed text-luxury-secondary">
                   You&apos;re not alone. Most of our users are exploring this for the first time.
                 </p>
-                <p className="text-xs font-medium uppercase leading-snug tracking-[0.18em] text-stone-100 md:whitespace-nowrap md:text-[11px] md:tracking-[0.22em] lg:text-sm lg:tracking-[0.24em]">
-                  Start with a simple story - no pressure, just curiosity.
+                <p className="text-small leading-relaxed text-luxury-secondary">
+                  Start with a simple story — no pressure, just curiosity.
                 </p>
-                <p className="text-xs font-medium uppercase leading-snug tracking-[0.18em] text-stone-100 md:whitespace-nowrap md:text-[11px] md:tracking-[0.22em] lg:text-sm lg:tracking-[0.24em]">
+                <p className="text-small leading-relaxed text-luxury-secondary">
                   Everything is private. Everything is yours.
                 </p>
               </div>
@@ -407,8 +407,8 @@ export default function Page() {
         </section>
 
         <section className="mt-14 pt-6">
-          <p className="font-serif text-2xl leading-tight text-white sm:text-3xl">
-            Nakama Nights Favourite Fantasies
+          <p className="type-section font-display text-luxury-primary">
+            Nakama Nights favourite fantasies
           </p>
           <div
             className="relative mt-10 min-h-[430px] w-full overflow-x-hidden overflow-y-visible pb-2 sm:min-h-[460px]"
@@ -510,7 +510,7 @@ export default function Page() {
         </section>
 
         <section id="fantasy-services" className="mt-8 scroll-mt-28 rounded-2xl bg-zinc-950/80 p-6">
-          <h2 className="font-serif text-2xl leading-tight text-white sm:text-3xl">
+          <h2 className="font-serif text-2xl leading-tight text-luxury-primary sm:text-3xl">
             Nakama Nights Universe
           </h2>
           <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
@@ -526,7 +526,7 @@ export default function Page() {
             className="w-full scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-8 shadow-xl"
           >
 
-            <h2 className="font-serif text-3xl text-white">
+            <h2 className="font-serif text-3xl text-luxury-primary">
               Begin your fantasy
             </h2>
 
@@ -540,7 +540,7 @@ export default function Page() {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
-                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
+                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-luxury-primary placeholder:text-stone-600"
               />
 
               <input
@@ -549,7 +549,7 @@ export default function Page() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
+                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-luxury-primary placeholder:text-stone-600"
               />
 
               <button
@@ -575,7 +575,7 @@ export default function Page() {
           </div>
 
           <div className="w-full rounded-2xl border border-stone-800 bg-zinc-950/80 p-8 shadow-xl">
-            <h2 className="font-serif text-3xl text-white">Contact us</h2>
+            <h2 className="font-serif text-3xl text-luxury-primary">Contact us</h2>
             <p className="mt-2 text-sm text-stone-400">
               Ask us anything about Nakama Nights.
             </p>
@@ -586,7 +586,7 @@ export default function Page() {
                 value={contactName}
                 onChange={(e) => setContactName(e.target.value)}
                 required
-                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
+                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-luxury-primary placeholder:text-stone-600"
               />
               <input
                 placeholder="Email"
@@ -594,7 +594,7 @@ export default function Page() {
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
                 required
-                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
+                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-luxury-primary placeholder:text-stone-600"
               />
               <textarea
                 placeholder="Message"
@@ -602,11 +602,11 @@ export default function Page() {
                 onChange={(e) => setContactMessage(e.target.value)}
                 required
                 rows={5}
-                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-white placeholder:text-stone-600"
+                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-luxury-primary placeholder:text-stone-600"
               />
               <button
                 type="submit"
-                className="w-full rounded-full border border-amber-200/50 bg-amber-100/90 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700 transition hover:bg-amber-100"
+                className="w-full rounded-full border border-amber-200/50 bg-amber-100/90 py-3 type-micro text-stone-700 transition hover:bg-amber-100"
               >
                 Send message
               </button>

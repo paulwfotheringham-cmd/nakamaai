@@ -5,8 +5,8 @@ export function buildSurpriseReadyEmailHtml(
 ): string {
   const greeting = username ? `Hi ${username},` : "Hi there,";
   return `
-    <div style="font-family: Georgia, serif; background:#07040d; color:#f7f2e8; padding:32px;">
-      <p style="color:#c9a96a; font-size:12px; letter-spacing:0.2em; text-transform:uppercase;">Nakama Nights · Surprise Mode</p>
+    <div style="font-family: Georgia, 'Times New Roman', serif; background:#07040d; color:#f5f2eb; padding:32px; line-height:1.6;">
+      <p style="color:#c9a96a; font-size:11px; letter-spacing:0.04em; text-transform:uppercase;">Nakama Nights · Surprise Mode</p>
       <h1 style="font-size:24px; font-weight:600; margin:16px 0;">Your surprise is ready</h1>
       <p style="font-size:16px; line-height:1.6; color:#e9e1d6;">
         ${greeting}

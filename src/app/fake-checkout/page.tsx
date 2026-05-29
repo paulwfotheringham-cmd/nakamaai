@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -79,7 +79,7 @@ export default function FakeCheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#07040d] text-white">
+    <main className="min-h-screen bg-[#07040d] text-luxury-primary">
       <section className="mx-auto max-w-6xl px-6 py-16 sm:px-8 lg:px-10">
         <div className="mb-10">
           <p className="text-sm font-medium text-zinc-400">Dev checkout</p>
@@ -105,33 +105,33 @@ export default function FakeCheckoutPage() {
                   value={cardholderName}
                   onChange={(e) => setCardholderName(e.target.value)}
                   placeholder="Cardholder name"
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white outline-none placeholder:text-zinc-500"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-luxury-primary outline-none placeholder:text-zinc-500"
                 />
                 <input
                   value={cardNumber}
                   onChange={(e) => setCardNumber(e.target.value)}
                   placeholder="Card number"
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white outline-none placeholder:text-zinc-500"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-luxury-primary outline-none placeholder:text-zinc-500"
                 />
                 <div className="grid gap-4 sm:grid-cols-2">
                   <input
                     value={expiry}
                     onChange={(e) => setExpiry(e.target.value)}
                     placeholder="MM / YY"
-                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white outline-none placeholder:text-zinc-500"
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-luxury-primary outline-none placeholder:text-zinc-500"
                   />
                   <input
                     value={cvc}
                     onChange={(e) => setCvc(e.target.value)}
                     placeholder="CVC"
-                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white outline-none placeholder:text-zinc-500"
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-luxury-primary outline-none placeholder:text-zinc-500"
                   />
                 </div>
                 <input
                   value={postcode}
                   onChange={(e) => setPostcode(e.target.value)}
                   placeholder="Billing postcode"
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white outline-none placeholder:text-zinc-500"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-luxury-primary outline-none placeholder:text-zinc-500"
                 />
               </div>
 
@@ -142,7 +142,7 @@ export default function FakeCheckoutPage() {
               <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                 <Link
                   href="/select-plan"
-                  className="rounded-2xl border border-white/10 px-5 py-4 text-center text-base font-medium text-white transition hover:bg-white/5"
+                  className="rounded-2xl border border-white/10 px-5 py-4 text-center text-base font-medium text-luxury-primary transition hover:bg-white/5"
                 >
                   Back
                 </Link>

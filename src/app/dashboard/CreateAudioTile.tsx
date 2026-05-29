@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -58,7 +58,7 @@ export default function CreateAudioTile() {
 
       {/* Title + description */}
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold tracking-tight text-white">
+        <h3 className="text-lg font-semibold tracking-tight text-luxury-primary">
           Create your own fantasy audio
         </h3>
         <p className="text-sm leading-6 text-zinc-300">
@@ -71,7 +71,7 @@ export default function CreateAudioTile() {
         {/* Create New */}
         <Link
           href="/create-audio"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/8 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/8 px-4 py-2 text-sm font-semibold text-luxury-primary transition hover:bg-white/15"
           style={{ background: "rgba(216,178,110,0.15)", borderColor: "rgba(216,178,110,0.3)", color: "#f1d7a1" }}
         >
           Create New →

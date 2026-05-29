@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
@@ -56,10 +56,10 @@ export default function DateNightMatchingPage({
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-amber-900/25 bg-gradient-to-b from-zinc-950/95 to-[#061a1a] shadow-[inset_0_0_60px_rgba(0,0,0,0.25)]">
       <header className="shrink-0 border-b border-stone-800/50 px-3 py-2 sm:px-4 sm:py-2.5">
-        <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-amber-600/85">
+        <p className="type-micro text-amber-600/85">
           Date Night
         </p>
-        <h1 className="mt-0.5 font-serif text-base font-semibold leading-tight text-white sm:text-lg">
+        <h1 className="mt-0.5 font-serif text-base font-semibold leading-tight text-luxury-primary sm:text-lg">
           Choose Tonight’s Fantasy
         </h1>
         <p className="mt-1 text-[10px] leading-snug text-stone-400 sm:text-[11px]">
@@ -94,10 +94,10 @@ export default function DateNightMatchingPage({
                   }}
                 />
                 <div className="relative">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-400/85">
+                  <p className="type-micro text-amber-400/85">
                     Matching
                   </p>
-                  <h2 className="mt-1 font-serif text-2xl font-semibold leading-tight text-white sm:text-[2rem]">
+                  <h2 className="mt-1 font-display text-card font-medium leading-snug text-luxury-primary sm:text-[2rem]">
                     Finding Your Match
                   </h2>
                   <p className="mt-2 text-sm leading-relaxed text-stone-300/80">
@@ -193,7 +193,7 @@ function FantasyCard({
       />
 
       <div className="relative z-10 flex h-full flex-col px-3 pb-3 pt-4 sm:px-4 sm:pt-5">
-        <h3 className="font-serif text-lg font-semibold leading-tight text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+        <h3 className="font-serif text-lg font-semibold leading-tight text-luxury-primary drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
           {scenario.title}
         </h3>
         <p className="mt-1.5 line-clamp-3 text-xs font-semibold leading-relaxed text-stone-100/90 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]">
@@ -201,7 +201,7 @@ function FantasyCard({
         </p>
 
         <div className="mt-auto pt-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-300/80">
+          <p className="type-micro text-amber-300/80">
             Your rating
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">

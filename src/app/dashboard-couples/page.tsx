@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+﻿import type { ReactNode } from "react";
 import Link from "next/link";
 import CreateAudioTile from "../dashboard/CreateAudioTile";
 import ConvertEbookTile from "../dashboard/ConvertEbookTile";
@@ -68,13 +68,13 @@ function TileCard({
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold tracking-tight text-white">
+        <h3 className="text-lg font-semibold tracking-tight text-luxury-primary">
           {tile.title}
         </h3>
         <p className="text-sm leading-6 text-zinc-300">{tile.description}</p>
       </div>
 
-      <div className="mt-6 flex items-center text-sm font-medium text-white">
+      <div className="mt-6 flex items-center text-sm font-medium text-luxury-primary">
         <span>{tile.cta}</span>
         {!tile.disabled && <span className="ml-2">→</span>}
       </div>
@@ -98,10 +98,10 @@ function TileCard({
 
 export default function DashboardCouplesPage() {
   return (
-    <main className="relative min-h-screen bg-[#07040d] text-white">
+    <main className="relative min-h-screen bg-[#07040d] text-luxury-primary">
       <a
         href="/"
-        className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-white/75 backdrop-blur-md"
+        className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-luxury-primary/75 backdrop-blur-md"
       >
         ← Home
       </a>
@@ -122,11 +122,11 @@ export default function DashboardCouplesPage() {
           <p className="text-sm font-medium text-zinc-400">
             Welcome to your dashboard
           </p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-luxury-primary sm:text-5xl">
             Pleasure Portal
           </h1>
           <div className="mt-6 max-w-3xl">
-            <h2 className="text-2xl font-semibold tracking-tight text-white">
+            <h2 className="text-2xl font-semibold tracking-tight text-luxury-primary">
               Pick what you want to do in Nakama
             </h2>
             <p className="mt-3 text-base leading-7 text-zinc-300">

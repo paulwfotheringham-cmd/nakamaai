@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { readGuidePreferences, type GuidePreferences } from "@/lib/guides/preferences";
@@ -69,7 +69,7 @@ function PickUpCard({
       >
         <p className="launcher-section-label">{item.section}</p>
         <h3
-          className={`mt-2 font-serif font-semibold leading-tight text-white ${
+          className={`mt-2 font-serif font-semibold leading-tight text-luxury-primary ${
             featured ? "text-2xl sm:text-3xl lg:text-4xl" : "text-lg sm:text-xl"
           }`}
         >

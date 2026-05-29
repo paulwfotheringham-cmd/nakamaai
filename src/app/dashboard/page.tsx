@@ -46,10 +46,10 @@ function TileCard({ tile }: { tile: Tile }) {
           <span aria-hidden="true">{tile.icon}</span>
         </div>
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold tracking-tight text-white">{tile.title}</h3>
+          <h3 className="text-lg font-semibold tracking-tight text-luxury-primary">{tile.title}</h3>
           <p className="text-sm leading-6 text-zinc-300">{tile.description}</p>
         </div>
-        <div className="mt-6 flex items-center text-sm font-medium text-white">
+        <div className="mt-6 flex items-center text-sm font-medium text-luxury-primary">
           <span>{tile.cta}</span>
           <span className="ml-2">→</span>
         </div>
@@ -213,10 +213,10 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="relative min-h-screen bg-[#07040d] text-white">
+    <main className="relative min-h-screen bg-[#07040d] text-luxury-primary">
       <a
         href="/"
-        className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-white/75 backdrop-blur-md"
+        className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-luxury-primary/75 backdrop-blur-md"
       >
         ← Home
       </a>
@@ -225,7 +225,7 @@ export default function DashboardPage() {
         <div className="flex items-start justify-between gap-12">
           <div className="flex-1 max-w-xl">
             <div className="mb-10">
-              <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+              <h1 className="mt-2 text-4xl font-semibold tracking-tight text-luxury-primary sm:text-5xl">
                 Pleasure Portal
               </h1>
               <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-300">
@@ -299,7 +299,7 @@ export default function DashboardPage() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type your message..."
-                  className="flex-1 rounded-lg bg-[#041f1c] px-3 py-2 text-white outline-none"
+                  className="flex-1 rounded-lg bg-[#041f1c] px-3 py-2 text-luxury-primary outline-none"
                   disabled={stage !== "chat"}
                 />
                 <button

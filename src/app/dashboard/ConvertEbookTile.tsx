@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -65,7 +65,7 @@ export default function ConvertEbookTile() {
 
       {/* Title + description */}
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold tracking-tight text-white">
+        <h3 className="text-lg font-semibold tracking-tight text-luxury-primary">
           Convert ebook to fantasy audio
         </h3>
         <p className="text-sm leading-6 text-zinc-300">

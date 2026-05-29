@@ -1,12 +1,12 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 import CouplesActions from "./CouplesActions";
 
 export default function CouplesPage() {
   return (
-    <main className="min-h-screen bg-[#07040d] text-white">
+    <main className="min-h-screen bg-[#07040d] text-luxury-primary">
       <a
         href="/"
-        className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-white/75 backdrop-blur-md"
+        className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-luxury-primary/75 backdrop-blur-md"
       >
         ← Home
       </a>
@@ -29,7 +29,7 @@ export default function CouplesPage() {
         </div>
 
         <section className="flex flex-1 flex-col justify-center lg:max-w-xl lg:py-8">
-          <h1 className="text-balance text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl lg:text-[2.75rem] xl:text-5xl">
+          <h1 className="text-balance text-4xl font-semibold leading-tight tracking-tight text-luxury-primary sm:text-5xl lg:text-[2.75rem] xl:text-5xl">
             Experience New Adventures. Together
           </h1>
           <CouplesActions />

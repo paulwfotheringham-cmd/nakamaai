@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 type LiveTestInfoPanelProps = {
   eyebrow: string;
@@ -37,7 +37,7 @@ export default function LiveTestInfoPanel({
         ) : null}
 
         <div className="relative z-10 max-w-lg text-center">
-          <p className="font-serif text-2xl font-semibold leading-snug text-white sm:text-3xl">
+          <p className="font-display text-card font-medium leading-snug text-luxury-primary sm:text-3xl">
             Coming soon
           </p>
           <p className="mt-4 text-base leading-relaxed text-stone-300/90 sm:text-lg">

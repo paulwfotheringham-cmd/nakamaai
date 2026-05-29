@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -208,10 +208,10 @@ export default function DateNightExperiencePage({
             }}
             transition={{ duration: 1.0, ease: "easeInOut" }}
           >
-            <p className="select-none text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-300/80 drop-shadow-[0_1px_12px_rgba(0,0,0,0.9)]">
+            <p className="select-none type-micro text-amber-300/80 drop-shadow-[0_1px_12px_rgba(0,0,0,0.9)]">
               Date Night Experience
             </p>
-            <h1 className="select-none mt-2 font-serif text-2xl font-semibold leading-tight text-[#f7f2e8] drop-shadow-[0_2px_18px_rgba(0,0,0,0.95)] sm:text-[2.35rem]">
+            <h1 className="select-none mt-2 font-display text-card font-medium leading-snug text-[#f7f2e8] drop-shadow-[0_2px_18px_rgba(0,0,0,0.95)] sm:text-[2.35rem]">
               {match.title}
             </h1>
 
@@ -291,7 +291,7 @@ export default function DateNightExperiencePage({
             </div>
 
             <motion.p
-              className="select-none mt-5 text-center text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-400/80"
+              className="select-none mt-5 text-center type-micro text-stone-400/80"
               animate={{ opacity: playing ? 0.9 : 0.65 }}
               transition={{ duration: 1.1, ease: "easeInOut" }}
             >

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
@@ -33,10 +33,10 @@ export default function DateNightInvitePage({
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-amber-900/25 bg-gradient-to-b from-zinc-950/95 to-[#061a1a] shadow-[inset_0_0_60px_rgba(0,0,0,0.25)]">
       <header className="shrink-0 border-b border-stone-800/50 px-3 py-2 sm:px-4 sm:py-2.5">
-        <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-amber-600/85">
+        <p className="type-micro text-amber-600/85">
           Date Night
         </p>
-        <h1 className="mt-0.5 font-serif text-base font-semibold leading-tight text-white sm:text-lg">
+        <h1 className="mt-0.5 font-serif text-base font-semibold leading-tight text-luxury-primary sm:text-lg">
           Invite Your Partner
         </h1>
         <p className="mt-1 text-[10px] leading-snug text-stone-400 sm:text-[11px]">
@@ -69,10 +69,10 @@ export default function DateNightInvitePage({
                   aria-hidden
                 />
                 <div className="relative">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-400/85">
+                  <p className="type-micro text-amber-400/85">
                     Invite partner
                   </p>
-                  <h2 className="mt-1 font-serif text-2xl font-semibold leading-tight text-white sm:text-[2rem]">
+                  <h2 className="mt-1 font-display text-card font-medium leading-snug text-luxury-primary sm:text-[2rem]">
                     Invite Your Partner
                   </h2>
                   <p className="mt-1.5 text-sm leading-relaxed text-stone-300/80">
@@ -89,7 +89,7 @@ export default function DateNightInvitePage({
                   </div>
 
                   <div className="mt-4">
-                    <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-400">
+                    <label className="mb-2 block type-micro text-stone-400">
                       Partner username
                     </label>
                     <input
@@ -98,7 +98,7 @@ export default function DateNightInvitePage({
                       placeholder="Enter your partner’s username"
                       autoComplete="off"
                       spellCheck={false}
-                      className="h-[3.25rem] w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white outline-none placeholder:text-stone-500 focus:border-amber-300/40 focus:ring-2 focus:ring-amber-400/15"
+                      className="h-[3.25rem] w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-luxury-primary outline-none placeholder:text-stone-500 focus:border-amber-300/40 focus:ring-2 focus:ring-amber-400/15"
                     />
                     <p className="mt-2 text-xs leading-relaxed text-stone-400">
                       Your email is for login. This username is for internal couples
@@ -147,10 +147,10 @@ export default function DateNightInvitePage({
                 />
 
                 <div className="relative">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-400/85">
+                  <p className="type-micro text-amber-400/85">
                     Invitation Sent
                   </p>
-                  <h2 className="mt-1 font-serif text-2xl font-semibold leading-tight text-white sm:text-[2rem]">
+                  <h2 className="mt-1 font-display text-card font-medium leading-snug text-luxury-primary sm:text-[2rem]">
                     Invitation Sent
                   </h2>
                   <p className="mt-2 text-sm leading-relaxed text-stone-300/80">
@@ -163,7 +163,7 @@ export default function DateNightInvitePage({
 
                   <div className="mt-5 flex items-center gap-2">
                     <PulsingDots />
-                    <span className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">
+                    <span className="type-micro text-stone-400">
                       Connecting
                     </span>
                   </div>
@@ -187,10 +187,10 @@ export default function DateNightInvitePage({
                   aria-hidden
                 />
                 <div className="relative">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-400/85">
+                  <p className="type-micro text-amber-400/85">
                     Connected
                   </p>
-                  <h2 className="mt-1 font-serif text-2xl font-semibold leading-tight text-white sm:text-[2rem]">
+                  <h2 className="mt-1 font-display text-card font-medium leading-snug text-luxury-primary sm:text-[2rem]">
                     You’re connected
                   </h2>
                   <p className="mt-2 text-sm leading-relaxed text-stone-300/80">
@@ -275,7 +275,7 @@ function CircleAvatar({
       transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
     >
       <div className="absolute inset-1 rounded-full bg-black/40 backdrop-blur-sm" />
-      <span className="relative font-serif text-xl font-semibold text-amber-100/95">
+      <span className="relative font-display text-card font-medium text-amber-100/95">
         {initial}
       </span>
     </motion.div>

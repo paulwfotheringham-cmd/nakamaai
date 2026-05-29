@@ -1,4 +1,4 @@
-export default function ConvertEbookPage() {
+﻿export default function ConvertEbookPage() {
   return (
     <main className="min-h-screen bg-white">
       <section className="mx-auto max-w-3xl px-6 py-12">
@@ -30,7 +30,7 @@ export default function ConvertEbookPage() {
             />
 
             <button
-              className="mt-6 rounded-xl bg-black px-6 py-3 text-sm font-medium text-white transition hover:bg-zinc-800"
+              className="mt-6 rounded-xl bg-black px-6 py-3 text-sm font-medium text-luxury-primary transition hover:bg-zinc-800"
             >
               Convert to fantasy audio
             </button>

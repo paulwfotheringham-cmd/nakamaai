@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -62,10 +62,10 @@ export default function FantasyCatalogueEmbed() {
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-amber-900/25 bg-gradient-to-b from-zinc-950/95 to-[#061a1a]">
       <div className="shrink-0 border-b border-stone-800/80 px-4 py-3 sm:px-5">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-500/80">
+        <p className="type-micro text-amber-500/80">
           Fantasy audio
         </p>
-        <h2 className="mt-1 text-lg font-semibold text-white sm:text-xl">
+        <h2 className="mt-1 text-lg font-semibold text-luxury-primary sm:text-xl">
           Choose your fantasy audio
         </h2>
         <p className="mt-1 text-xs leading-relaxed text-stone-400">

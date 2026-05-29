@@ -1,4 +1,5 @@
 import "./global.css";
+import { fontBody, fontClassNames } from "@/lib/fonts";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
@@ -24,8 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className={fontClassNames}>
+      <body className={`${fontBody.className} antialiased`}>{children}</body>
     </html>
   );
 }
