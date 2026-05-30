@@ -302,20 +302,20 @@ export default function Page() {
           <div className="ml-auto flex flex-wrap items-center justify-end gap-3 sm:gap-4">
             <a
               href="#fantasy-services"
-              className="inline-flex rounded-full border border-amber-400/35 bg-gradient-to-b from-[#e4efd9] via-[#dce8c8] to-[#d0ddb8] px-6 py-2.5 type-micro text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:border-amber-300/50 hover:from-[#ecf4e4] hover:via-[#e6efd6] hover:to-[#dae6c8]"
+              className="inline-flex rounded-full border border-amber-400/35 bg-gradient-to-b from-[#e4efd9] via-[#dce8c8] to-[#d0ddb8] px-6 py-2.5 type-label text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:border-amber-300/50 hover:from-[#ecf4e4] hover:via-[#e6efd6] hover:to-[#dae6c8]"
             >
               Fantasy services
             </a>
             <Link
               href="/signup-trial"
-              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2 type-micro text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
+              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2 type-label text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
             >
               10 Day Free Trial
             </Link>
 
             <Link
               href="/login"
-              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-6 py-2.5 type-micro text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
+              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-6 py-2.5 type-label text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
             >
               Login
             </Link>
@@ -335,16 +335,16 @@ export default function Page() {
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/72 via-black/26 to-black/36" />
 
           <div className="relative z-10 max-w-3xl p-6 sm:p-8 lg:p-10">
-            <p className="type-hero font-display font-medium text-amber-300/95">
+            <p className="type-hero text-luxury-primary">
               Nakama Nights
             </p>
-            <p className="mt-5 text-body font-medium text-luxury-secondary drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)]">
+            <p className="type-body mt-5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)]">
               Adult audio adventures, built for women.
             </p>
 
             <div className="mt-8 flex flex-col gap-6">
               <div>
-                <p className="type-section font-display text-luxury-primary sm:text-5xl">
+                <p className="type-card-title">
                   Fantasy<span className="-ml-1">.</span>
                 </p>
                 <p className="mt-4 max-w-xl text-small leading-relaxed text-luxury-secondary">
@@ -352,7 +352,7 @@ export default function Page() {
                 </p>
               </div>
               <div>
-                <p className="type-section font-display text-amber-200 sm:text-5xl">
+                <p className="type-card-title text-luxury-secondary">
                   Escape.
                 </p>
                 <p className="mt-4 text-small text-luxury-muted">
@@ -360,7 +360,7 @@ export default function Page() {
                 </p>
               </div>
               <div className="pt-4 sm:pt-6">
-                <p className="type-section font-display text-luxury-primary sm:text-5xl">
+                <p className="type-card-title">
                   Pleasure.
                 </p>
                 <p className="mt-3 text-small text-luxury-secondary">
@@ -371,7 +371,7 @@ export default function Page() {
 
             <Link
               href="/select-plan"
-              className="mt-12 inline-flex w-full max-w-[280px] items-center justify-center rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2.5 type-micro text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100 md:px-7 md:py-3 md:text-[11px] lg:text-xs"
+              className="mt-12 inline-flex w-full max-w-[280px] items-center justify-center rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2.5 type-label text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100 md:px-7 md:py-3 md:text-[11px] lg:text-xs"
             >
               JOIN NAKAMA NOW
             </Link>
@@ -380,12 +380,12 @@ export default function Page() {
           <div className="relative z-10 mt-10 w-full border-t border-amber-200/25 bg-black/90 px-6 sm:px-8 lg:px-10">
             <div className="flex flex-col gap-6 py-5 md:flex-row md:items-start md:gap-10 md:py-6">
               <div className="flex w-full shrink-0 flex-col items-center gap-4 text-center md:w-[280px]">
-                <p className="font-display text-card font-medium text-amber-200/90">
+                <p className="type-card-title text-amber-200/90">
                   New to this?
                 </p>
                 <Link
                   href="/signup-trial"
-                  className="inline-flex w-full max-w-full items-center justify-center rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-5 py-2.5 type-micro text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200 md:w-fit md:px-7 md:py-3 md:pl-8 md:pr-7 md:text-[11px] lg:text-xs"
+                  className="inline-flex w-full max-w-full items-center justify-center rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-5 py-2.5 type-label text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200 md:w-fit md:px-7 md:py-3 md:pl-8 md:pr-7 md:text-[11px] lg:text-xs"
                 >
                   TRY YOUR FIRST EXPERIENCE
                 </Link>
@@ -407,7 +407,7 @@ export default function Page() {
         </section>
 
         <section className="mt-14 pt-6">
-          <p className="type-section font-display text-luxury-primary">
+          <p className="type-section-heading">
             Nakama Nights favourite fantasies
           </p>
           <div
@@ -554,7 +554,7 @@ export default function Page() {
 
               <button
                 type="submit"
-                className="w-full rounded-full bg-stone-300 py-3 text-sm font-semibold text-black transition hover:bg-stone-400"
+                className="w-full rounded-full bg-stone-300 py-3 type-section-heading text-black transition hover:bg-stone-400"
               >
                 Create account
               </button>
@@ -606,7 +606,7 @@ export default function Page() {
               />
               <button
                 type="submit"
-                className="w-full rounded-full border border-amber-200/50 bg-amber-100/90 py-3 type-micro text-stone-700 transition hover:bg-amber-100"
+                className="w-full rounded-full border border-amber-200/50 bg-amber-100/90 py-3 type-label text-stone-700 transition hover:bg-amber-100"
               >
                 Send message
               </button>

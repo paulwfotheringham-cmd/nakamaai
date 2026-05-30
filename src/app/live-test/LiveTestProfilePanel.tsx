@@ -148,7 +148,7 @@ function ProfileSettingRow({
           <SettingIcon name={icon} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-sm font-semibold text-stone-100 transition-colors group-hover:text-luxury-primary">
+          <span className="block type-section-heading text-stone-100 transition-colors group-hover:text-luxury-primary">
             {label}
           </span>
           <span className="mt-0.5 block text-xs leading-relaxed text-stone-400/90">
@@ -224,7 +224,7 @@ export default function LiveTestProfilePanel() {
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2.5">
-                <h1 className="font-display text-card font-medium leading-snug tracking-tight text-luxury-primary sm:text-3xl">
+                <h1 className="type-card-title leading-snug tracking-tight text-luxury-primary sm:text-3xl">
                   {userName}
                 </h1>
                 <span className="profile-badge profile-badge-tier">{tier}</span>
@@ -243,10 +243,10 @@ export default function LiveTestProfilePanel() {
           <section className="profile-status-card" aria-label="Membership">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="type-micro text-amber-500/65">
+                <p className="type-label text-amber-500/65">
                   Your membership
                 </p>
-                <p className="mt-2 font-display text-card font-medium text-luxury-primary">{tier}</p>
+                <p className="mt-2 type-card-title text-luxury-primary">{tier}</p>
                 <p className="mt-1 text-sm text-stone-400/90">{billingLabel(billing)}</p>
               </div>
               <div className="flex flex-wrap gap-6 sm:gap-8">

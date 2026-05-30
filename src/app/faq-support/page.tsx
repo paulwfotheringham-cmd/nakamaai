@@ -112,7 +112,7 @@ export default function FaqSupportPage() {
               />
               <button
                 type="submit"
-                className="w-full rounded-full border border-amber-200/50 bg-amber-100/90 py-3 type-micro text-stone-700 transition hover:bg-amber-100"
+                className="w-full rounded-full border border-amber-200/50 bg-amber-100/90 py-3 type-label text-stone-700 transition hover:bg-amber-100"
               >
                 Send support request
               </button>

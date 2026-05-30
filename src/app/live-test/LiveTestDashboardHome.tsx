@@ -47,52 +47,30 @@ function PickUpCard({
   featured?: boolean;
 }) {
   return (
-    <li className={`group launcher-card ${featured ? "launcher-card-featured" : ""}`}>
+    <li className={`group dash-story-card ${featured ? "dash-story-card-featured" : ""}`}>
       <img
         src={item.image}
         alt=""
-        className="launcher-card-image"
+        className="dash-story-card-image"
         style={
           "imagePosition" in item ? { objectPosition: item.imagePosition } : undefined
         }
       />
-      <div
-        className={`pointer-events-none absolute inset-0 ${featured ? "launcher-card-overlay-featured" : "launcher-card-overlay"}`}
-        aria-hidden
-      />
-      <div className="launcher-card-glow" aria-hidden />
+      <div className="dash-story-card-overlay" aria-hidden />
 
-      <div
-        className={`relative z-10 flex h-full min-h-0 flex-col justify-end ${
-          featured ? "p-6 sm:p-8" : "p-4 sm:p-5"
-        }`}
-      >
-        <p className="launcher-section-label">{item.section}</p>
-        <h3
-          className={`mt-2 font-serif font-semibold leading-tight text-luxury-primary ${
-            featured ? "text-2xl sm:text-3xl lg:text-4xl" : "text-lg sm:text-xl"
-          }`}
-        >
+      <div className={`dash-story-card-content ${featured ? "is-featured" : ""}`}>
+        <p className="type-label text-luxury-muted">{item.section}</p>
+        <h3 className={`dash-story-card-title ${featured ? "is-featured" : ""}`}>
           {item.lastActivity}
         </h3>
-        <p
-          className={`mt-2 font-normal text-stone-400/90 ${
-            featured ? "text-sm sm:text-base" : "text-xs sm:text-sm"
-          }`}
-        >
-          {item.when}
-        </p>
+        <p className="dash-story-card-meta">{item.when}</p>
 
-        <div
-          className={`mt-5 flex flex-wrap items-center gap-3 ${
-            featured ? "mt-6 sm:mt-8" : "mt-4"
-          }`}
-        >
+        <div className="dash-story-card-actions">
           <button type="button" className="btn-primary">
-            Yes, continue
+            Continue
           </button>
           <button type="button" className="btn-ghost">
-            Not now
+            Later
           </button>
         </div>
       </div>
@@ -115,29 +93,25 @@ export default function LiveTestDashboardHome() {
   const [featured, ...secondary] = PICK_UP_ITEMS;
 
   return (
-    <div className="launcher-panel animate-panel-in">
-      <header className="launcher-panel-header">
-        <p className="launcher-eyebrow">Dashboard</p>
-        <h1 className="launcher-title">
-          Welcome back,{" "}
-          <span className="bg-gradient-to-r from-amber-200 via-amber-100 to-amber-300/90 bg-clip-text text-transparent">
-            {userName}
-          </span>
+    <div className="dash-home animate-panel-in">
+      <header className="dash-home-header">
+        <p className="type-label">Dashboard</p>
+        <h1 className="type-hero mt-4">
+          Welcome back, {userName}
         </h1>
-        <p className="launcher-subtitle">
-          Pick up where you left off. Your guide{" "}
-          <span className="font-medium text-stone-300">{guideName}</span> ({voiceLabel},{" "}
-          {tone} tone) is ready when you are.
+        <p className="type-body mt-5 max-w-lg">
+          Pick up where you left off. {guideName} ({voiceLabel}, {tone} tone) is ready when you
+          are.
         </p>
       </header>
 
-      <section className="flex min-h-0 flex-1 flex-col overflow-hidden px-6 pb-6 sm:px-8 sm:pb-8">
-        <div className="mb-6 shrink-0">
-          <h2 className="launcher-section-label">Continue your story</h2>
-          <p className="mt-1 text-sm text-stone-500">Where do you want to go tonight?</p>
+      <section className="dash-home-stories">
+        <div className="dash-home-stories-intro">
+          <h2 className="type-section-heading">Continue your story</h2>
+          <p className="type-small mt-2">Where do you want to go tonight?</p>
         </div>
 
-        <ul className="grid min-h-0 flex-1 auto-rows-[minmax(10rem,1fr)] grid-cols-1 gap-4 overflow-y-auto sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:grid-rows-2 lg:gap-6 lg:overflow-hidden">
+        <ul className="dash-home-grid">
           <PickUpCard item={featured} featured />
           {secondary.map((item) => (
             <PickUpCard key={item.section} item={item} />

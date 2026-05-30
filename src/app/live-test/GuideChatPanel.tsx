@@ -125,8 +125,8 @@ export default function GuideChatPanel({
   return (
     <div className={`launcher-companion flex flex-col ${className}`}>
       <div className="shrink-0 px-4 pt-4 pb-2">
-        <p className="launcher-section-label">Companion</p>
-        <p className="mt-0.5 font-serif text-sm font-semibold text-stone-200">{guideName}</p>
+        <p className="type-label">Companion</p>
+        <p className="type-card-title mt-2 text-[1.375rem]">{guideName}</p>
       </div>
 
       <div

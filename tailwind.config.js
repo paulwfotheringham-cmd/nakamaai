@@ -22,71 +22,31 @@ module.exports = {
         body: ["var(--font-body)", "system-ui", "-apple-system", "sans-serif"],
       },
       fontSize: {
-        hero: ["4.5rem", { lineHeight: "1.05", fontWeight: "500" }],
-        section: ["3rem", { lineHeight: "1.05", fontWeight: "500" }],
-        card: ["1.5rem", { lineHeight: "1.4", fontWeight: "500" }],
-        body: ["1.125rem", { lineHeight: "1.6", fontWeight: "400" }],
-        small: ["0.875rem", { lineHeight: "1.6", fontWeight: "400" }],
+        hero: ["3.5rem", { lineHeight: "1.05", fontWeight: "400" }],
+        "card-title": ["1.75rem", { lineHeight: "1.15", fontWeight: "400" }],
+        section: ["1.25rem", { lineHeight: "1.35", fontWeight: "500" }],
+        body: ["1rem", { lineHeight: "1.6", fontWeight: "400" }],
         nav: ["0.9375rem", { lineHeight: "1.4", fontWeight: "500" }],
-        micro: ["0.6875rem", { lineHeight: "1.4", fontWeight: "600" }],
+        label: ["0.6875rem", { lineHeight: "1.3", fontWeight: "400" }],
+        small: ["0.875rem", { lineHeight: "1.55", fontWeight: "400" }],
       },
       letterSpacing: {
-        micro: "0.04em",
-        label: "0.02em",
+        label: "0.12em",
+        micro: "0.12em",
       },
       keyframes: {
         fadeIn: {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },
         },
-        alive: {
-          "0%, 100%": {
-            transform: "scale(1) translateY(0px) rotate(-0.35deg)",
-          },
-          "33%": {
-            transform: "scale(1.016) translateY(-7px) rotate(0.42deg)",
-          },
-          "66%": {
-            transform: "scale(1.024) translateY(5px) rotate(-0.28deg)",
-          },
-        },
-        subtitleReveal: {
-          "0%": { opacity: "0", filter: "blur(12px)" },
-          "100%": { opacity: "1", filter: "blur(0px)" },
-        },
-        subtitleHide: {
-          "0%": { opacity: "1", filter: "blur(0px)" },
-          "100%": { opacity: "0", filter: "blur(10px)" },
-        },
-        tapHintIn: {
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
-        },
         panelIn: {
-          "0%": { opacity: "0", transform: "translateY(8px)" },
+          "0%": { opacity: "0", transform: "translateY(6px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        cardGlow: {
-          "0%, 100%": {
-            boxShadow:
-              "0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(198,164,106,0.08)",
-          },
-          "50%": {
-            boxShadow:
-              "0 16px 48px rgba(0,0,0,0.55), 0 0 24px rgba(198,164,106,0.12)",
-          },
         },
       },
       animation: {
         "fade-in": "fadeIn 1s ease-out both",
-        alive: "alive 10s ease-in-out infinite",
-        "subtitle-in":
-          "subtitleReveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.42s forwards",
-        "subtitle-out":
-          "subtitleHide 0.58s cubic-bezier(0.4, 0, 0.2, 1) forwards",
-        "tap-hint-in": "tapHintIn 0.85s ease-out 0.12s both",
-        "panel-in": "panelIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both",
-        "card-glow": "cardGlow 4s ease-in-out infinite",
+        "panel-in": "panelIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both",
       },
       boxShadow: {
         launcher:
@@ -94,8 +54,8 @@ module.exports = {
         "launcher-card":
           "0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(198,164,106,0.06)",
         "launcher-card-hover":
-          "0 20px 56px rgba(0,0,0,0.6), 0 0 32px rgba(198,164,106,0.14)",
-        "glow-amber": "0 0 24px rgba(198, 164, 106, 0.2)",
+          "0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(198,164,106,0.08)",
+        "glow-amber": "0 0 20px rgba(198, 164, 106, 0.15)",
       },
     },
   },

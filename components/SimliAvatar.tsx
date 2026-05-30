@@ -480,7 +480,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
           <button
             type="button"
             onClick={() => void initClient()}
-            className="rounded-lg border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-3 py-1.5 text-xs font-semibold text-zinc-950"
+            className="rounded-lg border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-3 py-1.5 type-label text-zinc-950"
           >
             Reconnect
           </button>
@@ -503,7 +503,7 @@ const SimliAvatar = forwardRef<SimliAvatarHandle, SimliAvatarProps>(function Sim
             type="button"
             disabled={rateLimited}
             onClick={() => void initClient()}
-            className="mt-2 rounded-lg border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-4 py-2 text-xs font-semibold text-zinc-950 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-2 rounded-lg border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-4 py-2 type-label text-zinc-950 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {rateLimited ? `Wait ${retryCountdown}s` : "Retry"}
           </button>

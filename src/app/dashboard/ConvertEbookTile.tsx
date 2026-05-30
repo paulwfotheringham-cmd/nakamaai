@@ -65,7 +65,7 @@ export default function ConvertEbookTile() {
 
       {/* Title + description */}
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold tracking-tight text-luxury-primary">
+        <h3 className="type-section-heading tracking-tight text-luxury-primary">
           Convert ebook to fantasy audio
         </h3>
         <p className="text-sm leading-6 text-zinc-300">

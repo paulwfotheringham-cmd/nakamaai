@@ -63,7 +63,7 @@ function CouplesHeroCard({
       <div className="relative z-10 flex h-full min-h-[min(52vh,28rem)] flex-col justify-end p-6 sm:p-8 lg:min-h-0 lg:p-10">
         <div className="flex flex-wrap items-center gap-2.5">
           {badge ? (
-            <span className="rounded-full border border-amber-400/35 bg-amber-950/50 px-3 py-1 type-micro text-amber-200/95 backdrop-blur-sm">
+            <span className="rounded-full border border-amber-400/35 bg-amber-950/50 px-3 py-1 type-label text-amber-200/95 backdrop-blur-sm">
               {badge}
             </span>
           ) : null}
@@ -72,10 +72,10 @@ function CouplesHeroCard({
           </span>
         </div>
 
-        <p className="mt-5 type-micro text-amber-400/75">
+        <p className="mt-5 type-label text-amber-400/75">
           {eyebrow}
         </p>
-        <h2 className="mt-3 max-w-xl font-serif text-3xl font-semibold leading-[1.08] tracking-tight text-luxury-primary sm:text-4xl lg:text-[2.75rem]">
+        <h2 className="type-card-title mt-3 max-w-xl">
           {title}
         </h2>
         <p className="mt-4 max-w-lg text-base leading-relaxed text-stone-200/90 sm:text-[17px]">
@@ -126,10 +126,10 @@ function CouplesSecondaryCard({
         <span className="text-[10px] font-medium uppercase tracking-micro text-stone-400/80">
           {duration}
         </span>
-        <p className="mt-2 type-micro text-amber-500/60">
+        <p className="mt-2 type-label text-amber-500/60">
           {eyebrow}
         </p>
-        <h2 className="mt-2 font-display text-card font-medium leading-tight text-luxury-primary sm:text-2xl">
+        <h2 className="mt-2 type-card-title leading-tight text-luxury-primary sm:text-2xl">
           {title}
         </h2>
         <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed text-stone-300/85">
@@ -230,16 +230,16 @@ export default function LiveTestCouplesProgram({
       <header className="relative z-10 shrink-0 px-6 pb-5 pt-7 sm:px-8 sm:pt-8">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <p className="type-micro text-amber-500/60">
+            <p className="type-label text-amber-500/60">
               Reignite · Couples
             </p>
-            <h1 className="mt-2 font-display text-card font-medium leading-snug tracking-tight text-luxury-primary sm:text-3xl lg:text-4xl">
+            <h1 className="type-hero mt-3">
               Tonight begins here,{" "}
-              <span className="bg-gradient-to-r from-amber-200 via-amber-100 to-amber-300/90 bg-clip-text text-transparent">
+              <span className="text-luxury-primary">
                 {userName}
               </span>
             </h1>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-stone-300/90 sm:text-[15px]">
+            <p className="type-body mt-4 max-w-xl">
               A private space for long-term partners — choose your experience and
               let the evening unfold.
             </p>

@@ -23,9 +23,7 @@ export default function ContactPage() {
         <div className="relative overflow-hidden rounded-[2rem] border border-stone-700/65 bg-zinc-950 shadow-[0_0_0_1px_rgba(245,158,11,0.08),0_26px_62px_rgba(0,0,0,0.5)]">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_45%_at_50%_-10%,rgba(180,130,50,0.14),transparent_55%)]" />
           <div className="relative p-8 sm:p-10">
-            <h1 className="font-serif text-3xl font-semibold leading-tight text-luxury-primary sm:text-4xl">
-              Contact us
-            </h1>
+            <h1 className="type-hero">Contact us</h1>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-stone-400 sm:text-base">
               Ask us anything about Nakama Nights.
             </p>
@@ -60,7 +58,7 @@ export default function ContactPage() {
 
               <button
                 type="submit"
-                className="w-full rounded-full border border-amber-200/50 bg-amber-100/90 py-3 type-micro text-stone-700 transition hover:bg-amber-100"
+                className="w-full rounded-full border border-amber-200/50 bg-amber-100/90 py-3 type-label text-stone-700 transition hover:bg-amber-100"
               >
                 Send message
               </button>

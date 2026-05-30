@@ -68,7 +68,7 @@ function TileCard({
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold tracking-tight text-luxury-primary">
+        <h3 className="type-section-heading tracking-tight text-luxury-primary">
           {tile.title}
         </h3>
         <p className="text-sm leading-6 text-zinc-300">{tile.description}</p>
@@ -101,7 +101,7 @@ export default function DashboardCouplesPage() {
     <main className="relative min-h-screen bg-[#07040d] text-luxury-primary">
       <a
         href="/"
-        className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-luxury-primary/75 backdrop-blur-md"
+        className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 type-section-heading text-luxury-primary/75 backdrop-blur-md"
       >
         ← Home
       </a>

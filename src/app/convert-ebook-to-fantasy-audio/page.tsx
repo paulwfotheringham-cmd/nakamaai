@@ -182,7 +182,7 @@ export default function ConvertEbookPage() {
 
   return (
     <main className="min-h-screen bg-[#07040d] text-luxury-primary">
-      <a href="/dashboard" className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-luxury-primary/75 backdrop-blur-md">← Dashboard</a>
+      <a href="/dashboard" className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 type-section-heading text-luxury-primary/75 backdrop-blur-md">← Dashboard</a>
       <div className="mx-auto max-w-3xl px-6 py-16">
         <h1 className="text-center text-4xl font-semibold">
           Convert ebook to fantasy audio

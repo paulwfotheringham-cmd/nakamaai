@@ -125,12 +125,12 @@ export default function OnboardingClient() {
 
       <section className="relative z-10 mx-auto max-w-6xl px-5 pb-20 pt-24 sm:px-8 sm:pt-28">
         <header className="mx-auto max-w-3xl text-center">
-          <p className="type-micro text-amber-600/85">
+          <p className="type-label text-amber-600/85">
             Choose your guide
           </p>
           <h1 className="mt-4 type-section font-display font-medium text-luxury-primary sm:text-4xl">
             Meet your{" "}
-            <span className="bg-gradient-to-r from-amber-200 via-amber-100 to-amber-300/90 bg-clip-text text-transparent">
+            <span className="text-luxury-primary">
               Nakama
             </span>{" "}
             guide
@@ -144,7 +144,7 @@ export default function OnboardingClient() {
         <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_1.05fr] lg:items-start">
           <div className="space-y-8">
             <div>
-              <p className="type-micro text-amber-500/90">
+              <p className="type-label text-amber-500/90">
                 Select guide
               </p>
               <p className="mt-1 text-sm text-stone-500">
@@ -169,11 +169,11 @@ export default function OnboardingClient() {
                         className="w-full p-4 pb-2 text-left"
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <p className="type-micro text-amber-400/90">
+                          <p className="type-label text-amber-400/90">
                             {guide.gender}
                           </p>
                           {active && (
-                            <span className="shrink-0 rounded-full bg-amber-400/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-zinc-950">
+                            <span className="shrink-0 rounded-full bg-amber-400/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-zinc-950">
                               Selected
                             </span>
                           )}
@@ -183,7 +183,7 @@ export default function OnboardingClient() {
                       <div className="px-4 pb-4 pt-0">
                         <label
                           htmlFor={`guide-name-${guide.id}`}
-                          className="mb-1 block type-micro text-stone-500"
+                          className="mb-1 block type-label text-stone-500"
                         >
                           Guide name
                         </label>
@@ -196,7 +196,7 @@ export default function OnboardingClient() {
                           onFocus={() => setSelectedGuide(guide)}
                           maxLength={32}
                           placeholder={defaultName}
-                          className="w-full rounded-lg border border-stone-700/80 bg-black/50 px-2.5 py-2 font-display text-card font-medium text-luxury-primary placeholder:text-stone-600 focus:border-amber-500/45 focus:outline-none focus:ring-1 focus:ring-amber-500/25"
+                          className="w-full rounded-lg border border-stone-700/80 bg-black/50 px-2.5 py-2 type-card-title text-luxury-primary placeholder:text-stone-600 focus:border-amber-500/45 focus:outline-none focus:ring-1 focus:ring-amber-500/25"
                         />
                       </div>
                     </div>
@@ -206,7 +206,7 @@ export default function OnboardingClient() {
             </div>
 
             <div>
-              <p className="type-micro text-amber-500/90">
+              <p className="type-label text-amber-500/90">
                 Select voice
               </p>
               <ul className="mt-4 space-y-2">
@@ -246,7 +246,7 @@ export default function OnboardingClient() {
             </div>
 
             <div>
-              <p className="type-micro text-amber-500/90">
+              <p className="type-label text-amber-500/90">
                 Select tone
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
@@ -255,7 +255,7 @@ export default function OnboardingClient() {
                     key={t}
                     type="button"
                     onClick={() => setTone(t)}
-                    className={`rounded-full border px-5 py-2.5 text-sm font-semibold tracking-wide transition ${
+                    className={`rounded-full border px-5 py-2.5 type-section-heading tracking-wide transition ${
                       tone === t
                         ? "border-amber-400/50 bg-gradient-to-b from-amber-200 to-amber-600 text-zinc-950"
                         : "border-stone-700 bg-zinc-950/80 text-stone-300 hover:border-amber-800/50"
@@ -270,10 +270,10 @@ export default function OnboardingClient() {
 
           <div className="lg:sticky lg:top-24">
             <div className="rounded-2xl border border-amber-900/30 bg-gradient-to-b from-zinc-950/95 to-black p-5 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
-              <p className="type-micro text-amber-500/80">
+              <p className="type-label text-amber-500/80">
                 Live preview
               </p>
-              <p className="mt-1 font-display text-card font-medium text-luxury-primary">{selectedDisplayName}</p>
+              <p className="mt-1 type-card-title text-luxury-primary">{selectedDisplayName}</p>
               <div className="mt-4 aspect-[4/5] max-h-[min(52vh,420px)] w-full overflow-hidden rounded-xl bg-transparent">
                 <SimliAvatar
                   key={selectedGuide.id}
@@ -292,7 +292,7 @@ export default function OnboardingClient() {
               type="button"
               disabled={saving}
               onClick={handleSave}
-              className="mt-6 w-full rounded-full border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-6 py-4 text-center text-sm font-bold text-zinc-950 shadow-md transition hover:from-amber-100 hover:to-amber-500 disabled:opacity-70"
+              className="mt-6 w-full rounded-full border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-6 py-4 text-center text-sm font-medium text-zinc-950 shadow-md transition hover:from-amber-100 hover:to-amber-500 disabled:opacity-70"
             >
               {saving ? "Saving…" : "Save & go to dashboard"}
             </button>

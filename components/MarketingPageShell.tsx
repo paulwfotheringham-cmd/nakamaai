@@ -25,13 +25,13 @@ export default function MarketingPageShell({
           <div className="ml-auto flex items-center gap-3">
             <Link
               href="/signup-trial"
-              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2 type-micro text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
+              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2 type-label text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
             >
               10 Day Free Trial
             </Link>
             <Link
               href="/login"
-              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-6 py-2.5 type-micro text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
+              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-6 py-2.5 type-label text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
             >
               Login
             </Link>
@@ -44,7 +44,7 @@ export default function MarketingPageShell({
           <div className="mx-auto max-w-2xl px-6 pt-6 sm:px-6">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-stone-300 transition hover:border-white/20 hover:bg-white/10 hover:text-luxury-primary"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 type-section-heading text-stone-300 transition hover:border-white/20 hover:bg-white/10 hover:text-luxury-primary"
             >
               ← Back
             </Link>

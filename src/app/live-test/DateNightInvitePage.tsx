@@ -33,10 +33,10 @@ export default function DateNightInvitePage({
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-amber-900/25 bg-gradient-to-b from-zinc-950/95 to-[#061a1a] shadow-[inset_0_0_60px_rgba(0,0,0,0.25)]">
       <header className="shrink-0 border-b border-stone-800/50 px-3 py-2 sm:px-4 sm:py-2.5">
-        <p className="type-micro text-amber-600/85">
+        <p className="type-label text-amber-600/85">
           Date Night
         </p>
-        <h1 className="mt-0.5 font-serif text-base font-semibold leading-tight text-luxury-primary sm:text-lg">
+        <h1 className="mt-0.5 type-section-heading text-luxury-primary sm:text-lg">
           Invite Your Partner
         </h1>
         <p className="mt-1 text-[10px] leading-snug text-stone-400 sm:text-[11px]">
@@ -69,10 +69,10 @@ export default function DateNightInvitePage({
                   aria-hidden
                 />
                 <div className="relative">
-                  <p className="type-micro text-amber-400/85">
+                  <p className="type-label text-amber-400/85">
                     Invite partner
                   </p>
-                  <h2 className="mt-1 font-display text-card font-medium leading-snug text-luxury-primary sm:text-[2rem]">
+                  <h2 className="mt-1 type-card-title leading-snug text-luxury-primary sm:text-[2rem]">
                     Invite Your Partner
                   </h2>
                   <p className="mt-1.5 text-sm leading-relaxed text-stone-300/80">
@@ -80,16 +80,16 @@ export default function DateNightInvitePage({
                   </p>
 
                   <div className="mt-4 rounded-xl border border-stone-800/80 bg-black/35 px-3 py-2.5">
-                    <p className="text-xs font-semibold text-stone-200/90">
+                    <p className="type-label text-stone-200/90">
                       You are connected as:{" "}
-                      <span className="font-bold text-amber-200/95">
+                      <span className="font-medium text-amber-200/95">
                         @{currentUsername}
                       </span>
                     </p>
                   </div>
 
                   <div className="mt-4">
-                    <label className="mb-2 block type-micro text-stone-400">
+                    <label className="mb-2 block type-label text-stone-400">
                       Partner username
                     </label>
                     <input
@@ -98,7 +98,7 @@ export default function DateNightInvitePage({
                       placeholder="Enter your partner’s username"
                       autoComplete="off"
                       spellCheck={false}
-                      className="h-[3.25rem] w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-luxury-primary outline-none placeholder:text-stone-500 focus:border-amber-300/40 focus:ring-2 focus:ring-amber-400/15"
+                      className="h-[3.25rem] w-full rounded-2xl border border-white/10 bg-white/5 px-4 type-section-heading text-luxury-primary outline-none placeholder:text-stone-500 focus:border-amber-300/40 focus:ring-2 focus:ring-amber-400/15"
                     />
                     <p className="mt-2 text-xs leading-relaxed text-stone-400">
                       Your email is for login. This username is for internal couples
@@ -110,7 +110,7 @@ export default function DateNightInvitePage({
                     type="button"
                     onClick={() => setState("waiting")}
                     disabled={!partnerUsername.trim()}
-                    className="mt-5 flex h-[3.25rem] w-full items-center justify-center rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-5 text-sm font-bold text-zinc-950 shadow-[0_14px_38px_rgba(0,0,0,0.55)] transition hover:from-amber-100 hover:to-amber-500 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="mt-5 flex h-[3.25rem] w-full items-center justify-center rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-5 text-sm font-medium text-zinc-950 shadow-[0_14px_38px_rgba(0,0,0,0.55)] transition hover:from-amber-100 hover:to-amber-500 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Send Invite
                   </button>
@@ -147,10 +147,10 @@ export default function DateNightInvitePage({
                 />
 
                 <div className="relative">
-                  <p className="type-micro text-amber-400/85">
+                  <p className="type-label text-amber-400/85">
                     Invitation Sent
                   </p>
-                  <h2 className="mt-1 font-display text-card font-medium leading-snug text-luxury-primary sm:text-[2rem]">
+                  <h2 className="mt-1 type-card-title leading-snug text-luxury-primary sm:text-[2rem]">
                     Invitation Sent
                   </h2>
                   <p className="mt-2 text-sm leading-relaxed text-stone-300/80">
@@ -163,7 +163,7 @@ export default function DateNightInvitePage({
 
                   <div className="mt-5 flex items-center gap-2">
                     <PulsingDots />
-                    <span className="type-micro text-stone-400">
+                    <span className="type-label text-stone-400">
                       Connecting
                     </span>
                   </div>
@@ -187,10 +187,10 @@ export default function DateNightInvitePage({
                   aria-hidden
                 />
                 <div className="relative">
-                  <p className="type-micro text-amber-400/85">
+                  <p className="type-label text-amber-400/85">
                     Connected
                   </p>
-                  <h2 className="mt-1 font-display text-card font-medium leading-snug text-luxury-primary sm:text-[2rem]">
+                  <h2 className="mt-1 type-card-title leading-snug text-luxury-primary sm:text-[2rem]">
                     You’re connected
                   </h2>
                   <p className="mt-2 text-sm leading-relaxed text-stone-300/80">
@@ -203,7 +203,7 @@ export default function DateNightInvitePage({
                     <CircleAvatar label={partnerLabel} variant="partner" />
                   </div>
 
-                  <div className="mt-4 flex items-center justify-center gap-5 text-xs font-semibold text-stone-300/85">
+                  <div className="mt-4 flex items-center justify-center gap-5 type-label text-stone-300/85">
                     <span className="rounded-full border border-stone-800/80 bg-black/35 px-3 py-1.5">
                       @{currentUsername}
                     </span>
@@ -215,7 +215,7 @@ export default function DateNightInvitePage({
                   <button
                     type="button"
                     onClick={() => onBeginMatching(partnerLabel)}
-                    className="mt-6 flex h-[3.25rem] w-full items-center justify-center rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-5 text-sm font-bold text-zinc-950 shadow-[0_14px_38px_rgba(0,0,0,0.55)] transition hover:from-amber-100 hover:to-amber-500"
+                    className="mt-6 flex h-[3.25rem] w-full items-center justify-center rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-5 text-sm font-medium text-zinc-950 shadow-[0_14px_38px_rgba(0,0,0,0.55)] transition hover:from-amber-100 hover:to-amber-500"
                   >
                     Begin Fantasy Matching
                   </button>
@@ -275,7 +275,7 @@ function CircleAvatar({
       transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
     >
       <div className="absolute inset-1 rounded-full bg-black/40 backdrop-blur-sm" />
-      <span className="relative font-display text-card font-medium text-amber-100/95">
+      <span className="relative type-card-title text-amber-100/95">
         {initial}
       </span>
     </motion.div>

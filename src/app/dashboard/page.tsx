@@ -46,7 +46,7 @@ function TileCard({ tile }: { tile: Tile }) {
           <span aria-hidden="true">{tile.icon}</span>
         </div>
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold tracking-tight text-luxury-primary">{tile.title}</h3>
+          <h3 className="type-section-heading tracking-tight text-luxury-primary">{tile.title}</h3>
           <p className="text-sm leading-6 text-zinc-300">{tile.description}</p>
         </div>
         <div className="mt-6 flex items-center text-sm font-medium text-luxury-primary">
@@ -216,7 +216,7 @@ export default function DashboardPage() {
     <main className="relative min-h-screen bg-[#07040d] text-luxury-primary">
       <a
         href="/"
-        className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-luxury-primary/75 backdrop-blur-md"
+        className="fixed left-6 top-5 z-50 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 type-section-heading text-luxury-primary/75 backdrop-blur-md"
       >
         ← Home
       </a>
@@ -264,7 +264,7 @@ export default function DashboardPage() {
                         key={opt}
                         type="button"
                         onClick={() => handleIntroChoice(opt)}
-                        className="rounded-full border border-emerald-200/30 bg-emerald-400/20 px-3 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-emerald-300/30"
+                        className="rounded-full border border-emerald-200/30 bg-emerald-400/20 px-3 py-1.5 type-label text-emerald-100 hover:bg-emerald-300/30"
                       >
                         {opt}
                       </button>
@@ -279,7 +279,7 @@ export default function DashboardPage() {
                         key={opt}
                         type="button"
                         onClick={() => handleMoodChoice(opt)}
-                        className="rounded-full border border-emerald-200/30 bg-[#0b3f37] px-3 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-[#0f5248]"
+                        className="rounded-full border border-emerald-200/30 bg-[#0b3f37] px-3 py-1.5 type-label text-emerald-100 hover:bg-[#0f5248]"
                       >
                         {opt}
                       </button>

@@ -71,10 +71,10 @@ export default function CouplesPartnerInvitePanel({
         compact ? "p-5" : "p-6"
       }`}
     >
-      <p className="type-micro text-teal-400/85">
+      <p className="type-label text-teal-400/85">
         Couples
       </p>
-      <h2 className="mt-2 font-display text-card font-medium text-luxury-primary sm:text-2xl">
+      <h2 className="mt-2 type-card-title text-luxury-primary sm:text-2xl">
         Reignite together
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-zinc-300">
@@ -90,7 +90,7 @@ export default function CouplesPartnerInvitePanel({
 
       <Link
         href="/live-test?nav=reignite-couples"
-        className="mt-5 flex w-full items-center justify-center rounded-2xl border border-amber-400/40 bg-gradient-to-b from-amber-200/90 to-amber-600 px-4 py-3 text-center text-sm font-semibold text-zinc-950 transition hover:from-amber-100 hover:to-amber-500"
+        className="mt-5 flex w-full items-center justify-center rounded-2xl border border-amber-400/40 bg-gradient-to-b from-amber-200/90 to-amber-600 px-4 py-3 text-center type-section-heading text-zinc-950 transition hover:from-amber-100 hover:to-amber-500"
       >
         Open Couples
       </Link>
@@ -100,7 +100,7 @@ export default function CouplesPartnerInvitePanel({
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="flex w-full items-center justify-center rounded-2xl border border-amber-800/50 bg-black/30 px-4 py-3 text-sm font-semibold text-amber-100/95 transition hover:border-amber-600/60 hover:bg-amber-950/30"
+            className="flex w-full items-center justify-center rounded-2xl border border-amber-800/50 bg-black/30 px-4 py-3 type-section-heading text-amber-100/95 transition hover:border-amber-600/60 hover:bg-amber-950/30"
           >
             Add your partner
           </button>
@@ -120,7 +120,7 @@ export default function CouplesPartnerInvitePanel({
               type="button"
               onClick={() => void sendInvite()}
               disabled={status === "sending"}
-              className="flex w-full items-center justify-center rounded-2xl border border-amber-400/45 bg-gradient-to-b from-amber-200/90 to-amber-600 px-4 py-3 text-sm font-semibold text-zinc-950 transition hover:from-amber-100 hover:to-amber-500 disabled:opacity-60"
+              className="flex w-full items-center justify-center rounded-2xl border border-amber-400/45 bg-gradient-to-b from-amber-200/90 to-amber-600 px-4 py-3 type-section-heading text-zinc-950 transition hover:from-amber-100 hover:to-amber-500 disabled:opacity-60"
             >
               {status === "sending" ? "Sending…" : "Submit"}
             </button>

@@ -62,10 +62,10 @@ export default function FantasyCatalogueEmbed() {
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-amber-900/25 bg-gradient-to-b from-zinc-950/95 to-[#061a1a]">
       <div className="shrink-0 border-b border-stone-800/80 px-4 py-3 sm:px-5">
-        <p className="type-micro text-amber-500/80">
+        <p className="type-label text-amber-500/80">
           Fantasy audio
         </p>
-        <h2 className="mt-1 text-lg font-semibold text-luxury-primary sm:text-xl">
+        <h2 className="mt-1 type-section-heading text-luxury-primary sm:text-xl">
           Choose your fantasy audio
         </h2>
         <p className="mt-1 text-xs leading-relaxed text-stone-400">
@@ -84,7 +84,7 @@ export default function FantasyCatalogueEmbed() {
               key={row.categoryTitle}
               className="rounded-xl border border-stone-800/80 bg-black/30 p-2.5 sm:p-3"
             >
-              <p className="mb-2 truncate text-xs font-semibold text-amber-200/90 sm:text-sm">
+              <p className="mb-2 truncate type-label text-amber-200/90 sm:text-sm">
                 {row.categoryTitle}
               </p>
 

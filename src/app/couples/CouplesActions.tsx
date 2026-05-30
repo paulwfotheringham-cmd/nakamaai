@@ -45,7 +45,7 @@ export default function CouplesActions() {
         const inner = (
           <span className="flex gap-4 text-left">
             <span
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10 text-sm font-semibold text-[#f1d7a1]"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10 type-section-heading text-[#f1d7a1]"
               aria-hidden
             >
               {n}

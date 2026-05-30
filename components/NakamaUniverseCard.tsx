@@ -24,7 +24,7 @@ export function NakamaUniverseCard({
     <>
       <img src={poster} alt="" className="h-36 w-full object-cover sm:h-40" />
       <div className="px-3 pb-4 pt-7">
-        <h3 className="min-h-[2.2rem] font-display text-card font-medium leading-snug text-luxury-primary">
+        <h3 className="min-h-[2.2rem] type-card-title leading-snug text-luxury-primary">
           {title}
         </h3>
         <p className="mt-2 min-h-[3.6rem] text-small leading-relaxed text-luxury-secondary">

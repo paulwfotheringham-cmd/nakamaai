@@ -56,10 +56,10 @@ export default function DateNightMatchingPage({
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-amber-900/25 bg-gradient-to-b from-zinc-950/95 to-[#061a1a] shadow-[inset_0_0_60px_rgba(0,0,0,0.25)]">
       <header className="shrink-0 border-b border-stone-800/50 px-3 py-2 sm:px-4 sm:py-2.5">
-        <p className="type-micro text-amber-600/85">
+        <p className="type-label text-amber-600/85">
           Date Night
         </p>
-        <h1 className="mt-0.5 font-serif text-base font-semibold leading-tight text-luxury-primary sm:text-lg">
+        <h1 className="mt-0.5 type-section-heading text-luxury-primary sm:text-lg">
           Choose Tonight’s Fantasy
         </h1>
         <p className="mt-1 text-[10px] leading-snug text-stone-400 sm:text-[11px]">
@@ -94,10 +94,10 @@ export default function DateNightMatchingPage({
                   }}
                 />
                 <div className="relative">
-                  <p className="type-micro text-amber-400/85">
+                  <p className="type-label text-amber-400/85">
                     Matching
                   </p>
-                  <h2 className="mt-1 font-display text-card font-medium leading-snug text-luxury-primary sm:text-[2rem]">
+                  <h2 className="mt-1 type-card-title leading-snug text-luxury-primary sm:text-[2rem]">
                     Finding Your Match
                   </h2>
                   <p className="mt-2 text-sm leading-relaxed text-stone-300/80">
@@ -108,7 +108,7 @@ export default function DateNightMatchingPage({
                     .
                   </p>
 
-                  <div className="mt-5 flex items-center justify-between rounded-xl border border-stone-800/80 bg-black/35 px-3 py-2.5 text-xs font-semibold text-stone-300/85">
+                  <div className="mt-5 flex items-center justify-between rounded-xl border border-stone-800/80 bg-black/35 px-3 py-2.5 type-label text-stone-300/85">
                     <span>@{currentUsername}</span>
                     <span className="text-amber-200/90">AI compatibility</span>
                     <span>@{partnerUsername}</span>
@@ -161,7 +161,7 @@ export default function DateNightMatchingPage({
           type="button"
           onClick={findMatch}
           disabled={finding || !canFind}
-          className="flex h-[3.25rem] w-full items-center justify-center rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-5 text-sm font-bold text-zinc-950 shadow-[0_14px_38px_rgba(0,0,0,0.55)] transition hover:from-amber-100 hover:to-amber-500 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-[3.25rem] w-full items-center justify-center rounded-full border border-amber-400/55 bg-gradient-to-b from-amber-200/95 to-amber-600 px-5 text-sm font-medium text-zinc-950 shadow-[0_14px_38px_rgba(0,0,0,0.55)] transition hover:from-amber-100 hover:to-amber-500 disabled:cursor-not-allowed disabled:opacity-60"
         >
           Find Our Match
         </button>
@@ -193,15 +193,15 @@ function FantasyCard({
       />
 
       <div className="relative z-10 flex h-full flex-col px-3 pb-3 pt-4 sm:px-4 sm:pt-5">
-        <h3 className="font-serif text-lg font-semibold leading-tight text-luxury-primary drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+        <h3 className="font-serif type-section-heading leading-tight text-luxury-primary drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
           {scenario.title}
         </h3>
-        <p className="mt-1.5 line-clamp-3 text-xs font-semibold leading-relaxed text-stone-100/90 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]">
+        <p className="mt-1.5 line-clamp-3 type-label leading-relaxed text-stone-100/90 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]">
           {scenario.teaser}
         </p>
 
         <div className="mt-auto pt-4">
-          <p className="type-micro text-amber-300/80">
+          <p className="type-label text-amber-300/80">
             Your rating
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -213,7 +213,7 @@ function FantasyCard({
                   key={n}
                   type="button"
                   onClick={() => onChange(n)}
-                  className={`h-8 min-w-8 rounded-full border px-2 text-xs font-bold transition ${
+                  className={`h-8 min-w-8 rounded-full border px-2 text-xs font-medium transition ${
                     active
                       ? "border-amber-300/70 bg-gradient-to-b from-amber-200/95 to-amber-600 text-zinc-950 shadow-[0_10px_26px_rgba(0,0,0,0.5)]"
                       : "border-stone-700/80 bg-black/45 text-stone-200/90 hover:border-amber-700/40 hover:text-amber-100"

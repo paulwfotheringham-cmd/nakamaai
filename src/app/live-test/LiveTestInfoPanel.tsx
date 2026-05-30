@@ -37,7 +37,7 @@ export default function LiveTestInfoPanel({
         ) : null}
 
         <div className="relative z-10 max-w-lg text-center">
-          <p className="font-display text-card font-medium leading-snug text-luxury-primary sm:text-3xl">
+          <p className="type-card-title leading-snug text-luxury-primary sm:text-3xl">
             Coming soon
           </p>
           <p className="mt-4 text-base leading-relaxed text-stone-300/90 sm:text-lg">

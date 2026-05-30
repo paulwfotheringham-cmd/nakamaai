@@ -137,9 +137,9 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
   const topBlock =
     "flex min-h-[10.5rem] flex-col items-center justify-start text-center sm:min-h-[10rem]";
   const eyebrow =
-    "h-5 shrink-0 type-micro";
+    "h-5 shrink-0 type-label";
   const tierTitle =
-    "mt-2 max-w-[18ch] text-2xl font-bold leading-tight tracking-tight sm:text-[1.85rem] lg:text-[2rem] lg:leading-[1.1]";
+    "mt-2 max-w-[18ch] text-2xl font-medium leading-tight tracking-tight sm:text-[1.85rem] lg:text-[2rem] lg:leading-[1.1]";
   const tagline =
     "mx-auto mt-3 max-w-[17rem] flex-1 text-sm leading-relaxed sm:text-[14px]";
   const priceBox =
@@ -151,9 +151,9 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
     "flex min-h-[2.5rem] items-center justify-center rounded-full px-2.5 text-center text-[12px] font-medium leading-snug tracking-wide sm:min-h-[2.65rem] sm:px-3 sm:text-[13px]";
 
   const selectBtnPrimary =
-    "mt-4 inline-flex w-full shrink-0 items-center justify-center rounded-full border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-5 py-3 text-center text-sm font-semibold text-zinc-950 shadow-md transition hover:from-amber-100 hover:to-amber-500 disabled:cursor-not-allowed disabled:opacity-45 sm:py-3.5";
+    "mt-4 inline-flex w-full shrink-0 items-center justify-center rounded-full border border-amber-400/40 bg-gradient-to-b from-amber-200 to-amber-600 px-5 py-3 text-center type-section-heading text-zinc-950 shadow-md transition hover:from-amber-100 hover:to-amber-500 disabled:cursor-not-allowed disabled:opacity-45 sm:py-3.5";
   const selectBtnOutline =
-    "mt-4 inline-flex w-full shrink-0 items-center justify-center rounded-full border border-amber-800/50 bg-transparent px-5 py-3 text-center text-sm font-semibold text-amber-100/95 transition hover:border-amber-600/60 hover:bg-amber-950/30 disabled:cursor-not-allowed disabled:opacity-45 sm:py-3.5";
+    "mt-4 inline-flex w-full shrink-0 items-center justify-center rounded-full border border-amber-800/50 bg-transparent px-5 py-3 text-center type-section-heading text-amber-100/95 transition hover:border-amber-600/60 hover:bg-amber-950/30 disabled:cursor-not-allowed disabled:opacity-45 sm:py-3.5";
 
   return (
     <main className="relative min-h-screen bg-black text-luxury-primary antialiased">
@@ -177,12 +177,12 @@ export default function SelectPlanPage(_props: SelectPlanPageProps) {
 
       <section className="relative z-10 mx-auto max-w-6xl px-5 pb-24 pt-24 sm:px-8 sm:pt-28">
         <header className="mx-auto max-w-2xl text-center">
-          <p className="type-micro text-amber-600/85">
+          <p className="type-label text-amber-600/85">
             Choose your plan
           </p>
           <h1 className="mt-4 type-section font-display font-medium text-luxury-primary sm:text-4xl md:text-[2.65rem] md:leading-[1.12]">
             Start your{" "}
-            <span className="bg-gradient-to-r from-amber-200 via-amber-100 to-amber-300/90 bg-clip-text text-transparent">
+            <span className="text-luxury-primary">
               Nakama
             </span>{" "}
             journey
