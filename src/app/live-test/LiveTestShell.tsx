@@ -49,7 +49,11 @@ export default function LiveTestShell() {
   }, [centerPanel]);
 
   useEffect(() => {
-    if (!inDateNightFlow) setGuideRailHidden(false);
+    if (inDateNightFlow) {
+      setGuideRailHidden(true);
+    } else {
+      setGuideRailHidden(false);
+    }
   }, [inDateNightFlow]);
 
   return (
@@ -84,7 +88,7 @@ export default function LiveTestShell() {
               hideGuideRail ? " pro-main-body-guide-hidden" : ""
             }`}
           >
-            <section className="pro-content">
+            <section className={`pro-content${inDateNightFlow ? " pro-content-dn" : ""}`}>
               {centerPanel === "fantasy-audio" && <LiveTestFantasyAudioFrame />}
               {centerPanel === "create-audio" && <LiveTestCreateAudioFrame />}
               {centerPanel === "couples-program" && (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import {
   DATE_NIGHT_MOODS,
   MOCK_FEMALE_VOICES,
@@ -8,7 +8,9 @@ import {
   PROTOTYPE_PARTNER_USERNAME,
   STORY_DURATION_SEC,
 } from "@/lib/date-night-prototype/constants";
+import { isStepAtLeast, matchCompatibility } from "@/lib/date-night-prototype/journey";
 import { findBestMatch } from "@/lib/date-night-prototype/match";
+import { getScenarioImage } from "@/lib/date-night-prototype/scenario-images";
 import { freshScenarioSet } from "@/lib/date-night-prototype/scenarios";
 import {
   createNewSession,
@@ -22,54 +24,100 @@ import {
 } from "@/lib/date-night-prototype/storage";
 import type { DateNightSession, SharedDateNightStory } from "@/lib/date-night-prototype/types";
 import { readGuidePreferences, DEFAULT_USER_NAME } from "@/lib/guides/preferences";
+import DateNightPlayer from "./DateNightPlayer";
+import DateNightRatingPicker from "./DateNightRatingPicker";
+import DateNightSharedSidebar from "./DateNightSharedSidebar";
 import PartnerSimulationPanel, { RatingLegend } from "./PartnerSimulationPanel";
 
 type DateNightPrototypeFlowProps = {
   onBack: () => void;
 };
 
-function formatTime(sec: number): string {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
+function JourneySection({
+  id,
+  step,
+  title,
+  subtitle,
+  unlocked,
+  complete,
+  children,
+}: {
+  id: string;
+  step: number;
+  title: string;
+  subtitle?: string;
+  unlocked: boolean;
+  complete: boolean;
+  children: ReactNode;
+}) {
+  if (!unlocked) return null;
+
+  return (
+    <section id={id} className={`dn-journey-section${complete ? " dn-journey-section-complete" : ""}`}>
+      <header className="dn-journey-section-header">
+        <span className="dn-journey-step">{complete ? "✓" : step}</span>
+        <div>
+          <h2 className="dn-journey-section-title">{title}</h2>
+          {subtitle ? <p className="dn-journey-section-sub">{subtitle}</p> : null}
+        </div>
+      </header>
+      <div className="dn-journey-section-body">{children}</div>
+    </section>
+  );
+}
+
+function ProgressTimeline({ session }: { session: DateNightSession }) {
+  const items = [
+    { label: "Invitation sent", done: session.inviteStatus !== "idle" },
+    { label: "Invitation accepted", done: session.inviteStatus === "accepted" },
+    {
+      label: "Partner ranking stories",
+      done: isStepAtLeast(session.step, "match-loading") && session.inviteStatus === "accepted",
+    },
+    { label: "Match found", done: isStepAtLeast(session.step, "match-reveal") },
+  ];
+
+  return (
+    <ul className="dn-progress-timeline">
+      {items.map((item) => (
+        <li key={item.label} className={item.done ? "dn-progress-timeline-done" : ""}>
+          <span className="dn-progress-dot" aria-hidden />
+          {item.label}
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 export default function DateNightPrototypeFlow({ onBack }: DateNightPrototypeFlowProps) {
-  const [showTutorial, setShowTutorial] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(true);
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [session, setSession] = useState<DateNightSession | null>(null);
   const [sharedStories, setSharedStories] = useState<SharedDateNightStory[]>([]);
   const [creatorUsername, setCreatorUsername] = useState(DEFAULT_USER_NAME);
-  const [banner, setBanner] = useState<string | null>(null);
-  const [manageStoryId, setManageStoryId] = useState<string | null>(null);
+  const [partnerUsername, setPartnerUsername] = useState(PROTOTYPE_PARTNER_USERNAME);
+  const journeyRef = useRef<HTMLDivElement>(null);
 
   const persist = useCallback((next: DateNightSession | null) => {
     setSession(next);
     writeActiveSession(next);
   }, []);
 
-  const updateSession = useCallback(
-    (patch: Partial<DateNightSession>) => {
-      setSession((prev) => {
-        if (!prev) return prev;
-        const next = { ...prev, ...patch };
-        writeActiveSession(next);
-        return next;
-      });
-    },
-    [],
-  );
+  const updateSession = useCallback((patch: Partial<DateNightSession>) => {
+    setSession((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, ...patch };
+      writeActiveSession(next);
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     setCreatorUsername(readGuidePreferences().userName || DEFAULT_USER_NAME);
     setSharedStories(readSharedStories());
     const existing = readActiveSession();
-    if (existing) {
-      setSession(existing);
-      setShowTutorial(false);
-    } else if (!isTutorialDismissed()) {
-      setShowTutorial(true);
-    }
+    if (existing) setSession(existing);
+    setShowTutorial(!isTutorialDismissed());
   }, []);
 
   useEffect(() => {
@@ -87,9 +135,18 @@ export default function DateNightPrototypeFlow({ onBack }: DateNightPrototypeFlo
   }, [session?.step]);
 
   useEffect(() => {
+    if (session?.step !== "story-generated") return;
+    const t = setTimeout(() => updateSession({ step: "story-starting" }), 3000);
+    return () => clearTimeout(t);
+  }, [session?.step, updateSession]);
+
+  useEffect(() => {
     if (session?.step !== "story-starting") return;
     const t = setTimeout(() => {
-      updateSession({ step: "player", playback: { playing: false, timeRemainingSec: STORY_DURATION_SEC } });
+      updateSession({
+        step: "player",
+        playback: { playing: false, timeRemainingSec: STORY_DURATION_SEC },
+      });
     }, 2000);
     return () => clearTimeout(t);
   }, [session?.step, updateSession]);
@@ -111,27 +168,23 @@ export default function DateNightPrototypeFlow({ onBack }: DateNightPrototypeFlo
     return () => clearInterval(iv);
   }, [session?.playback.playing, session?.step]);
 
-  const showPartnerPanel =
-    session &&
-    ["connect", "partner-ratings", "match-loading", "match-reveal", "story-config", "story-generated", "story-starting", "player"].includes(
-      session.step,
-    );
-
-  function startTutorialContinue() {
+  function dismissTutorialBanner() {
     if (dontShowAgain) dismissTutorial(true);
     setShowTutorial(false);
   }
 
   function startCreateNew() {
-    const s = createNewSession();
-    persist(s);
-    setBanner(null);
-    setManageStoryId(null);
+    persist(createNewSession());
+    requestAnimationFrame(() => {
+      document.getElementById("dn-matching")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   function continueExisting(story: SharedDateNightStory) {
     persist({ ...story.sessionSnapshot, step: "player" });
-    setBanner(null);
+    requestAnimationFrame(() => {
+      document.getElementById("dn-player")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   function refreshScenarios() {
@@ -143,10 +196,10 @@ export default function DateNightPrototypeFlow({ onBack }: DateNightPrototypeFlo
     updateSession({ step: "connect" });
   }
 
-  function connectPartner(username: string) {
+  function connectPartner() {
     if (!session) return;
     updateSession({
-      partnerUsername: username.trim() || PROTOTYPE_PARTNER_USERNAME,
+      partnerUsername: partnerUsername.trim() || PROTOTYPE_PARTNER_USERNAME,
       inviteStatus: "pending",
       step: "connect",
     });
@@ -154,12 +207,10 @@ export default function DateNightPrototypeFlow({ onBack }: DateNightPrototypeFlo
 
   function acceptInvite() {
     updateSession({ inviteStatus: "accepted", step: "partner-ratings", partnerRatings: {} });
-    setBanner(`${PROTOTYPE_PARTNER_USERNAME} accepted your invitation.`);
   }
 
   function rejectInvite() {
     updateSession({ inviteStatus: "rejected" });
-    setBanner(`${PROTOTYPE_PARTNER_USERNAME} declined your invitation.`);
   }
 
   function submitPartnerRatings(ratings: Record<string, number>) {
@@ -172,7 +223,6 @@ export default function DateNightPrototypeFlow({ onBack }: DateNightPrototypeFlo
 
   function generateStory() {
     updateSession({ storyGenerated: true, step: "story-generated" });
-    setTimeout(() => updateSession({ step: "story-starting" }), 1200);
   }
 
   function saveStory() {
@@ -193,541 +243,364 @@ export default function DateNightPrototypeFlow({ onBack }: DateNightPrototypeFlo
     };
     upsertSharedStory(story);
     setSharedStories(readSharedStories());
-    setBanner("Story saved to Shared Stories.");
   }
 
-  if (showTutorial) {
-    return (
-      <div className="dn-flow">
-        <div className="dn-modal-backdrop">
-          <div className="dn-modal" role="dialog" aria-labelledby="dn-tutorial-title">
-            <p className="type-label text-amber-500/70">Date Night</p>
-            <h2 id="dn-tutorial-title" className="type-card-title mt-2">
-              Welcome to Date Night
-            </h2>
-            <p className="type-body mt-3">
-              A 30-minute curated adventure audio story for you and your partner.
-            </p>
-            <ol className="dn-tutorial-steps">
-              <li>Connect with your partner.</li>
-              <li>Rate tonight&apos;s story possibilities.</li>
-              <li>Discover your best shared match.</li>
-              <li>Choose voices and mood.</li>
-              <li>Begin your adventure.</li>
-            </ol>
-            <RatingLegend />
-            <label className="dn-checkbox">
-              <input
-                type="checkbox"
-                checked={dontShowAgain}
-                onChange={(e) => setDontShowAgain(e.target.checked)}
-              />
-              <span className="type-small">Don&apos;t show again</span>
-            </label>
-            <button type="button" className="btn-primary mt-6 w-full" onClick={startTutorialContinue}>
-              Continue
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const ratingsComplete =
+    session?.scenarios.every(
+      (s) => session.creatorRatings[s.id] >= 1 && session.creatorRatings[s.id] <= 10,
+    ) ?? false;
 
-  if (!session) {
-    return (
-      <div className="dn-flow">
-        <div className="dn-flow-main">
-          <button type="button" className="btn-ghost mb-4" onClick={onBack}>
-            ← Back to Reignite
-          </button>
-          <header className="dn-flow-header">
-            <p className="type-label text-amber-500/60">Date Night</p>
-            <h1 className="type-hero mt-3">Welcome to Date Night</h1>
-            <p className="type-body mt-4 max-w-lg">
-              A 30-minute curated adventure audio story for you and your partner.
-            </p>
-          </header>
-          <div className="dn-home-actions">
-            <button type="button" className="btn-primary" onClick={startCreateNew}>
-              Create new story
-            </button>
-            <button
-              type="button"
-              className="btn-secondary"
-              disabled={sharedStories.length === 0}
-              onClick={() => sharedStories[0] && continueExisting(sharedStories[0])}
-            >
-              Continue existing story
-            </button>
-          </div>
-          <SharedStoriesSection
-            stories={sharedStories}
-            manageId={manageStoryId}
-            onManage={setManageStoryId}
-            onContinue={continueExisting}
-            onDelete={(id) => {
-              deleteSharedStory(id);
-              setSharedStories(readSharedStories());
-            }}
-            onUpdate={(story) => {
-              upsertSharedStory(story);
-              setSharedStories(readSharedStories());
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
+  const partner = session?.partnerUsername || PROTOTYPE_PARTNER_USERNAME;
+  const compatibility = session ? matchCompatibility(session) : 0;
 
   return (
-    <div className={`dn-flow${showPartnerPanel ? " dn-flow-with-partner" : ""}`}>
-      <div className="dn-flow-main">
-        <button type="button" className="btn-ghost mb-4" onClick={onBack}>
-          ← Back to Reignite
-        </button>
+    <div className="dn-workspace">
+      <DateNightSharedSidebar
+        stories={sharedStories}
+        activeStoryId={session?.id ?? null}
+        onResume={continueExisting}
+        onNewAdventure={startCreateNew}
+      />
 
-        {banner ? <div className="dn-banner">{banner}</div> : null}
-
-        {session.step === "ratings" && (
-          <RatingsStep
-            session={session}
-            onRefresh={refreshScenarios}
-            onSubmit={submitCreatorRatings}
-            onChangeRating={(id, v) =>
-              updateSession({ creatorRatings: { ...session.creatorRatings, [id]: v } })
-            }
-          />
-        )}
-
-        {session.step === "connect" && session.inviteStatus === "idle" && (
-          <ConnectStep
-            onConnect={(u) => connectPartner(u)}
-            defaultUsername={PROTOTYPE_PARTNER_USERNAME}
-          />
-        )}
-
-        {session.step === "connect" && session.inviteStatus === "pending" && (
-          <div className="dn-panel">
-            <p className="type-body">Invitation sent. Waiting for your partner to respond in the simulation panel →</p>
-          </div>
-        )}
-
-        {session.step === "connect" && session.inviteStatus === "rejected" && (
-          <div className="dn-panel">
-            <p className="type-body text-luxury-secondary">
-              {PROTOTYPE_PARTNER_USERNAME} declined your invitation. You can go back and start again.
-            </p>
-            <button type="button" className="btn-secondary mt-4" onClick={() => persist(null)}>
-              Return home
+      <div className="dn-workspace-center">
+        <div className="dn-workspace-scroll" ref={journeyRef}>
+          <header className="dn-page-header">
+            <button type="button" className="dn-back-link" onClick={onBack}>
+              ← Reignite
             </button>
-          </div>
-        )}
+            <div>
+              <p className="dn-page-eyebrow">Date Night</p>
+              <h1 className="dn-page-title">Tonight&apos;s Adventure</h1>
+              <p className="dn-page-sub">
+                A 30-minute narrated adventure designed for you and your partner.
+              </p>
+            </div>
+          </header>
 
-        {session.step === "match-loading" && (
-          <div className="dn-panel dn-panel-centered">
-            <p className="type-card-title">Finding tonight&apos;s match…</p>
-            <div className="dn-spinner" aria-hidden />
-          </div>
-        )}
+          {showTutorial ? (
+            <section className="dn-tutorial-banner">
+              <div className="dn-tutorial-banner-copy">
+                <p className="dn-tutorial-banner-label">How Date Night works</p>
+                <p className="dn-tutorial-banner-desc">
+                  A 30-minute narrated adventure designed for couples.
+                </p>
+                <ul className="dn-tutorial-checklist">
+                  <li>Connect with your partner</li>
+                  <li>Discover tonight&apos;s shared match</li>
+                  <li>Choose voices and mood</li>
+                  <li>Begin your story</li>
+                </ul>
+                <label className="dn-tutorial-dismiss">
+                  <input
+                    type="checkbox"
+                    checked={dontShowAgain}
+                    onChange={(e) => setDontShowAgain(e.target.checked)}
+                  />
+                  <span>Don&apos;t show again</span>
+                </label>
+              </div>
+              <button type="button" className="dn-tutorial-close" onClick={dismissTutorialBanner} aria-label="Dismiss">
+                ×
+              </button>
+            </section>
+          ) : null}
 
-        {session.step === "match-reveal" && session.matchedScenario && (
-          <div className="dn-panel">
-            <p className="type-label text-amber-500/70">✨ Tonight&apos;s match found</p>
-            <h2 className="type-card-title mt-3">{session.matchedScenario.title}</h2>
-            <p className="type-body mt-4">{session.matchedScenario.description}</p>
-            <button type="button" className="btn-primary mt-8" onClick={beginStoryConfig}>
-              Configure story
-            </button>
-          </div>
-        )}
+          {!session ? (
+            <section className="dn-hero-start">
+              <div className="dn-hero-start-card">
+                <p className="dn-hero-start-eyebrow">Ready when you are</p>
+                <h2 className="dn-hero-start-title">Match tonight&apos;s adventure</h2>
+                <p className="dn-hero-start-desc">
+                  Rank ten curated scenarios, connect with your partner, and discover the story you both want tonight.
+                </p>
+                <button type="button" className="dn-btn-gold" onClick={startCreateNew}>
+                  Begin matching
+                </button>
+              </div>
+            </section>
+          ) : (
+            <div className="dn-journey">
+              <JourneySection
+                id="dn-matching"
+                step={1}
+                title="Match tonight's adventure"
+                subtitle="Rank each scenario privately — we'll reveal your best shared match."
+                unlocked
+                complete={isStepAtLeast(session.step, "connect")}
+              >
+                <RatingLegend />
+                <ul className="dn-scenario-grid">
+                  {session.scenarios.map((s) => (
+                    <li key={s.id} className="dn-scenario-card">
+                      <div
+                        className="dn-scenario-card-image"
+                        style={{ backgroundImage: `url(${getScenarioImage(s.title)})` }}
+                      />
+                      <div className="dn-scenario-card-body">
+                        <h3 className="dn-scenario-card-title">{s.title}</h3>
+                        <p className="dn-scenario-card-desc">{s.description}</p>
+                        <DateNightRatingPicker
+                          value={session.creatorRatings[s.id]}
+                          onChange={(v) =>
+                            updateSession({
+                              creatorRatings: { ...session.creatorRatings, [s.id]: v },
+                            })
+                          }
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <div className="dn-section-actions">
+                  <button type="button" className="dn-btn-ghost-ivory" onClick={refreshScenarios}>
+                    Show me different scenarios
+                  </button>
+                  {!isStepAtLeast(session.step, "connect") ? (
+                    <button
+                      type="button"
+                      className="dn-btn-gold"
+                      disabled={!ratingsComplete}
+                      onClick={submitCreatorRatings}
+                    >
+                      Continue to partner
+                    </button>
+                  ) : null}
+                </div>
+              </JourneySection>
 
-        {session.step === "story-config" && session.matchedScenario && (
-          <StoryConfigStep session={session} onChange={updateSession} onGenerate={generateStory} />
-        )}
+              <JourneySection
+                id="dn-partner"
+                step={2}
+                title="Partner connection"
+                subtitle="Invite your partner and watch the shared journey unfold."
+                unlocked={isStepAtLeast(session.step, "connect")}
+                complete={isStepAtLeast(session.step, "match-loading")}
+              >
+                <div className="dn-partner-connect">
+                  <div className="dn-partner-connect-left">
+                    <h3 className="dn-subsection-title">Invite your partner</h3>
+                    <p className="dn-subsection-desc">Enter your partner&apos;s Nakama username.</p>
+                    {session.inviteStatus === "idle" ? (
+                      <>
+                        <label className="dn-lux-field">
+                          <span>Partner username</span>
+                          <input
+                            className="dn-lux-input"
+                            value={partnerUsername}
+                            onChange={(e) => setPartnerUsername(e.target.value)}
+                            placeholder={PROTOTYPE_PARTNER_USERNAME}
+                          />
+                        </label>
+                        <button type="button" className="dn-btn-gold" onClick={connectPartner}>
+                          Connect
+                        </button>
+                      </>
+                    ) : session.inviteStatus === "pending" ? (
+                      <p className="dn-waiting-text">Invitation sent — awaiting response from @{partner}.</p>
+                    ) : session.inviteStatus === "rejected" ? (
+                      <>
+                        <p className="dn-waiting-text">{partner} declined your invitation.</p>
+                        <button type="button" className="dn-btn-ghost-ivory" onClick={() => persist(null)}>
+                          Start over
+                        </button>
+                      </>
+                    ) : (
+                      <ProgressTimeline session={session} />
+                    )}
+                  </div>
+                  <div className="dn-partner-connect-right">
+                    <h3 className="dn-subsection-title">Partner preview</h3>
+                    <dl className="dn-preview-card">
+                      <div>
+                        <dt>Username</dt>
+                        <dd>@{partner}</dd>
+                      </div>
+                      <div>
+                        <dt>Status</dt>
+                        <dd>
+                          {session.inviteStatus === "pending"
+                            ? "Invited"
+                            : session.inviteStatus === "accepted"
+                              ? "Accepted"
+                              : session.inviteStatus === "rejected"
+                                ? "Declined"
+                                : "Waiting"}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Step</dt>
+                        <dd>
+                          {session.step === "partner-ratings"
+                            ? "Ranking"
+                            : isStepAtLeast(session.step, "match-reveal")
+                              ? "Matched"
+                              : session.inviteStatus === "accepted"
+                                ? "Connected"
+                                : "Waiting"}
+                        </dd>
+                      </div>
+                    </dl>
+                    {session.inviteStatus === "accepted" ? <ProgressTimeline session={session} /> : null}
+                  </div>
+                </div>
+              </JourneySection>
 
-        {session.step === "story-generated" && (
-          <div className="dn-panel dn-panel-centered">
-            <p className="type-body">Story generated successfully.</p>
-          </div>
-        )}
+              <JourneySection
+                id="dn-match"
+                step={3}
+                title="Tonight's match"
+                subtitle="The adventure you both chose."
+                unlocked={isStepAtLeast(session.step, "match-loading")}
+                complete={isStepAtLeast(session.step, "story-config")}
+              >
+                {session.step === "match-loading" ? (
+                  <div className="dn-match-loading">
+                    <div className="dn-spinner dn-spinner-gold" aria-hidden />
+                    <p className="dn-match-loading-text">Finding tonight&apos;s match…</p>
+                  </div>
+                ) : session.matchedScenario ? (
+                  <div className="dn-match-reveal-card">
+                    <p className="dn-match-reveal-label">✨ Tonight&apos;s match</p>
+                    <div
+                      className="dn-match-reveal-art"
+                      style={{ backgroundImage: `url(${getScenarioImage(session.matchedScenario.title)})` }}
+                    />
+                    <h3 className="dn-match-reveal-title">{session.matchedScenario.title}</h3>
+                    <p className="dn-match-reveal-desc">{session.matchedScenario.description}</p>
+                    {compatibility > 0 ? (
+                      <p className="dn-match-reveal-score">Matched compatibility: {compatibility}%</p>
+                    ) : null}
+                    {session.step === "match-reveal" ? (
+                      <button type="button" className="dn-btn-gold" onClick={beginStoryConfig}>
+                        Continue
+                      </button>
+                    ) : null}
+                  </div>
+                ) : null}
+              </JourneySection>
 
-        {session.step === "story-starting" && (
-          <div className="dn-panel dn-panel-centered">
-            <p className="type-card-title">Story starting…</p>
-          </div>
-        )}
+              <JourneySection
+                id="dn-setup"
+                step={4}
+                title="Story setup"
+                subtitle="Name your adventure and set the mood."
+                unlocked={isStepAtLeast(session.step, "story-config")}
+                complete={isStepAtLeast(session.step, "story-generated")}
+              >
+                <div className="dn-config-grid">
+                  <label className="dn-config-card">
+                    <span className="dn-config-card-label">Friendly story name</span>
+                    <input
+                      className="dn-lux-input"
+                      value={session.friendlyName}
+                      onChange={(e) => updateSession({ friendlyName: e.target.value })}
+                      placeholder="Our evening adventure"
+                    />
+                  </label>
+                  <label className="dn-config-card">
+                    <span className="dn-config-card-label">Male voice</span>
+                    <select
+                      className="dn-lux-select"
+                      value={session.maleVoice}
+                      onChange={(e) => updateSession({ maleVoice: e.target.value })}
+                    >
+                      {MOCK_MALE_VOICES.map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="dn-config-card">
+                    <span className="dn-config-card-label">Female voice</span>
+                    <select
+                      className="dn-lux-select"
+                      value={session.femaleVoice}
+                      onChange={(e) => updateSession({ femaleVoice: e.target.value })}
+                    >
+                      {MOCK_FEMALE_VOICES.map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="dn-config-card">
+                    <span className="dn-config-card-label">Mood</span>
+                    <select
+                      className="dn-lux-select"
+                      value={session.mood}
+                      onChange={(e) => updateSession({ mood: e.target.value as DateNightSession["mood"] })}
+                    >
+                      {DATE_NIGHT_MOODS.map((m) => (
+                        <option key={m} value={m}>
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+                {session.step === "story-config" ? (
+                  <button type="button" className="dn-btn-gold dn-config-generate" onClick={generateStory}>
+                    Generate story
+                  </button>
+                ) : null}
+              </JourneySection>
 
-        {session.step === "player" && session.matchedScenario && (
-          <PlayerStep
-            session={session}
-            creatorUsername={creatorUsername}
-            onUpdate={updateSession}
-            onSave={saveStory}
-          />
-        )}
+              <JourneySection
+                id="dn-generating"
+                step={5}
+                title="Your adventure"
+                unlocked={isStepAtLeast(session.step, "story-generated")}
+                complete={session.step === "player"}
+              >
+                {session.step === "story-generated" ? (
+                  <div className="dn-generating">
+                    <div className="dn-spinner dn-spinner-gold" aria-hidden />
+                    <p className="dn-generating-title">Generating your adventure…</p>
+                    <p className="dn-generating-sub">Crafting voices, mood, and tonight&apos;s narrative.</p>
+                  </div>
+                ) : session.step === "story-starting" ? (
+                  <div className="dn-ready-banner">
+                    <p className="dn-ready-banner-title">Your story is ready.</p>
+                    <p className="dn-ready-banner-sub">Press play when you&apos;re both settled in.</p>
+                  </div>
+                ) : session.step === "player" && session.matchedScenario ? (
+                  <div id="dn-player">
+                    <DateNightPlayer
+                      session={session}
+                      partnerName={partner}
+                      onUpdate={updateSession}
+                      onSave={saveStory}
+                    />
+                  </div>
+                ) : null}
+              </JourneySection>
+            </div>
+          )}
+        </div>
       </div>
 
-      {showPartnerPanel && session ? (
+      {session ? (
         <PartnerSimulationPanel
           session={session}
           creatorUsername={creatorUsername}
           onAcceptInvite={acceptInvite}
           onRejectInvite={rejectInvite}
           onPartnerRatingsSubmit={submitPartnerRatings}
+          onUpdate={updateSession}
         />
-      ) : null}
+      ) : (
+        <aside className="dn-partner-phone dn-partner-phone-idle">
+          <div className="dn-partner-phone-frame">
+            <header className="dn-partner-phone-header">
+              <p className="dn-partner-phone-label">Partner View</p>
+              <p className="dn-partner-phone-user">@{PROTOTYPE_PARTNER_USERNAME}</p>
+            </header>
+            <p className="dn-partner-muted">Start matching to preview your partner&apos;s experience.</p>
+          </div>
+        </aside>
+      )}
     </div>
-  );
-}
-
-function RatingsStep({
-  session,
-  onChangeRating,
-  onRefresh,
-  onSubmit,
-}: {
-  session: DateNightSession;
-  onChangeRating: (id: string, v: number) => void;
-  onRefresh: () => void;
-  onSubmit: () => void;
-}) {
-  const complete = session.scenarios.every(
-    (s) => session.creatorRatings[s.id] >= 1 && session.creatorRatings[s.id] <= 10,
-  );
-
-  return (
-    <div className="dn-panel">
-      <h2 className="type-section-heading">Create new story</h2>
-      <RatingLegend />
-      <ul className="dn-scenario-list">
-        {session.scenarios.map((s) => (
-          <li key={s.id} className="dn-scenario-row">
-            <div className="dn-scenario-copy">
-              <p className="dn-scenario-title">{s.title}</p>
-              <p className="dn-scenario-desc">{s.description}</p>
-            </div>
-            <select
-              className="dn-rating-select"
-              value={session.creatorRatings[s.id] ?? ""}
-              onChange={(e) => onChangeRating(s.id, Number(e.target.value))}
-            >
-              <option value="" disabled>
-                Rate
-              </option>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-          </li>
-        ))}
-      </ul>
-      <div className="dn-actions-row">
-        <button type="button" className="btn-secondary" onClick={onRefresh}>
-          Show me different scenarios
-        </button>
-        <button type="button" className="btn-primary" disabled={!complete} onClick={onSubmit}>
-          Continue
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function ConnectStep({
-  onConnect,
-  defaultUsername,
-}: {
-  onConnect: (username: string) => void;
-  defaultUsername: string;
-}) {
-  const [username, setUsername] = useState(defaultUsername);
-
-  return (
-    <div className="dn-panel">
-      <h2 className="type-section-heading">Invite your partner</h2>
-      <p className="type-body mt-3">Enter your partner&apos;s Nakama username.</p>
-      <label className="dn-field mt-6">
-        <span className="type-label">Partner username</span>
-        <input
-          className="launcher-chat-input mt-2"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Partner username"
-        />
-      </label>
-      <button type="button" className="btn-primary mt-6" onClick={() => onConnect(username)}>
-        Connect
-      </button>
-    </div>
-  );
-}
-
-function StoryConfigStep({
-  session,
-  onChange,
-  onGenerate,
-}: {
-  session: DateNightSession;
-  onChange: (p: Partial<DateNightSession>) => void;
-  onGenerate: () => void;
-}) {
-  return (
-    <div className="dn-panel">
-      <h2 className="type-section-heading">Story configuration</h2>
-      <p className="type-small mt-2 text-luxury-muted">{session.matchedScenario?.title}</p>
-      <label className="dn-field mt-6">
-        <span className="type-label">Friendly story name</span>
-        <input
-          className="launcher-chat-input mt-2"
-          value={session.friendlyName}
-          onChange={(e) => onChange({ friendlyName: e.target.value })}
-          placeholder="Our evening adventure"
-        />
-      </label>
-      <label className="dn-field">
-        <span className="type-label">Male voice</span>
-        <select
-          className="fc-select mt-2"
-          value={session.maleVoice}
-          onChange={(e) => onChange({ maleVoice: e.target.value })}
-        >
-          {MOCK_MALE_VOICES.map((v) => (
-            <option key={v} value={v}>
-              {v}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="dn-field">
-        <span className="type-label">Female voice</span>
-        <select
-          className="fc-select mt-2"
-          value={session.femaleVoice}
-          onChange={(e) => onChange({ femaleVoice: e.target.value })}
-        >
-          {MOCK_FEMALE_VOICES.map((v) => (
-            <option key={v} value={v}>
-              {v}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="dn-field">
-        <span className="type-label">Mood</span>
-        <select
-          className="fc-select mt-2"
-          value={session.mood}
-          onChange={(e) => onChange({ mood: e.target.value as DateNightSession["mood"] })}
-        >
-          {DATE_NIGHT_MOODS.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))}
-        </select>
-      </label>
-      <button type="button" className="btn-primary mt-8 w-full" onClick={onGenerate}>
-        Generate story
-      </button>
-    </div>
-  );
-}
-
-function PlayerStep({
-  session,
-  creatorUsername,
-  onUpdate,
-  onSave,
-}: {
-  session: DateNightSession;
-  creatorUsername: string;
-  onUpdate: (p: Partial<DateNightSession>) => void;
-  onSave: () => void;
-}) {
-  const partner = session.partnerUsername || PROTOTYPE_PARTNER_USERNAME;
-
-  return (
-    <div className="dn-panel">
-      <h2 className="type-card-title">{session.friendlyName || session.matchedScenario?.title}</h2>
-      <p className="type-small mt-2 text-luxury-muted">{session.matchedScenario?.title}</p>
-      <dl className="dn-meta-grid">
-        <div>
-          <dt className="type-label">Partner</dt>
-          <dd className="type-body mt-1">{partner}</dd>
-        </div>
-        <div>
-          <dt className="type-label">Time remaining</dt>
-          <dd className="type-body mt-1">{formatTime(session.playback.timeRemainingSec)}</dd>
-        </div>
-      </dl>
-      <div className="dn-player-controls">
-        <button
-          type="button"
-          className="btn-secondary"
-          onClick={() =>
-            onUpdate({
-              playback: {
-                ...session.playback,
-                playing: true,
-              },
-            })
-          }
-        >
-          Play
-        </button>
-        <button
-          type="button"
-          className="btn-secondary"
-          onClick={() => onUpdate({ playback: { ...session.playback, playing: false } })}
-        >
-          Pause
-        </button>
-        <button
-          type="button"
-          className="btn-secondary"
-          onClick={() =>
-            onUpdate({
-              playback: { playing: false, timeRemainingSec: STORY_DURATION_SEC },
-            })
-          }
-        >
-          Stop
-        </button>
-        <button type="button" className="btn-primary" onClick={onSave}>
-          Save
-        </button>
-      </div>
-      <div className="dn-voice-toggles mt-6">
-        <label className="dn-field">
-          <span className="type-label">Male voice</span>
-          <select
-            className="fc-select mt-2"
-            value={session.maleVoice}
-            onChange={(e) => onUpdate({ maleVoice: e.target.value })}
-          >
-            {MOCK_MALE_VOICES.map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="dn-field">
-          <span className="type-label">Female voice</span>
-          <select
-            className="fc-select mt-2"
-            value={session.femaleVoice}
-            onChange={(e) => onUpdate({ femaleVoice: e.target.value })}
-          >
-            {MOCK_FEMALE_VOICES.map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <p className="type-small mt-6 text-luxury-muted">
-        Prototype playback — no audio required. Creator: {creatorUsername}
-      </p>
-    </div>
-  );
-}
-
-function SharedStoriesSection({
-  stories,
-  manageId,
-  onManage,
-  onContinue,
-  onDelete,
-  onUpdate,
-}: {
-  stories: SharedDateNightStory[];
-  manageId: string | null;
-  onManage: (id: string | null) => void;
-  onContinue: (s: SharedDateNightStory) => void;
-  onDelete: (id: string) => void;
-  onUpdate: (s: SharedDateNightStory) => void;
-}) {
-  if (stories.length === 0) return null;
-
-  return (
-    <section className="dn-shared-stories mt-10">
-      <h2 className="type-section-heading">Shared stories</h2>
-      <ul className="dn-shared-list">
-        {stories.map((s) => (
-          <li key={s.id} className="dn-shared-item">
-            <div className="dn-shared-summary">
-              <p className="type-body text-luxury-primary">{s.storyName}</p>
-              <p className="type-small mt-1">
-                {s.partnerName} · {new Date(s.dateCreated).toLocaleDateString()} · {s.progressPercent}%
-                progress
-              </p>
-            </div>
-            <div className="dn-shared-actions">
-              <button type="button" className="btn-ghost text-sm" onClick={() => onContinue(s)}>
-                Open
-              </button>
-              <button type="button" className="btn-ghost text-sm" onClick={() => onManage(manageId === s.id ? null : s.id)}>
-                Manage
-              </button>
-            </div>
-            {manageId === s.id ? (
-              <div className="dn-manage-form">
-                <input
-                  className="launcher-chat-input"
-                  value={s.storyName}
-                  onChange={(e) => onUpdate({ ...s, storyName: e.target.value })}
-                />
-                <input
-                  className="launcher-chat-input mt-2"
-                  value={s.partnerName}
-                  onChange={(e) => onUpdate({ ...s, partnerName: e.target.value })}
-                  placeholder="Partner name"
-                />
-                <select
-                  className="fc-select mt-2"
-                  value={s.maleVoice}
-                  onChange={(e) => onUpdate({ ...s, maleVoice: e.target.value })}
-                >
-                  {MOCK_MALE_VOICES.map((v) => (
-                    <option key={v} value={v}>
-                      {v}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  className="fc-select mt-2"
-                  value={s.femaleVoice}
-                  onChange={(e) => onUpdate({ ...s, femaleVoice: e.target.value })}
-                >
-                  {MOCK_FEMALE_VOICES.map((v) => (
-                    <option key={v} value={v}>
-                      {v}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  className="fc-select mt-2"
-                  value={s.mood}
-                  onChange={(e) => onUpdate({ ...s, mood: e.target.value as SharedDateNightStory["mood"] })}
-                >
-                  {DATE_NIGHT_MOODS.map((m) => (
-                    <option key={m} value={m}>
-                      {m}
-                    </option>
-                  ))}
-                </select>
-                <button type="button" className="btn-secondary mt-3 w-full" onClick={() => onDelete(s.id)}>
-                  Delete
-                </button>
-              </div>
-            ) : null}
-          </li>
-        ))}
-      </ul>
-    </section>
   );
 }
