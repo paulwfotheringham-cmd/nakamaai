@@ -30,9 +30,10 @@ export default function LiveTestShell() {
   const centerPanel = getLiveTestCenterPanel(activeNav);
   const [couplesView, setCouplesView] = useState<CouplesCenterView>("menu");
 
-  const inDateNightFlow = centerPanel === "couples-program" && couplesView === "date-night";
-  const hideGuideRail = guideRailHidden && inDateNightFlow;
-  const showGuideRail = inDateNightFlow ? !guideRailHidden : centerPanel !== null;
+  const inCouplesExperience = centerPanel === "couples-program";
+  const inDateNightFlow = inCouplesExperience && couplesView === "date-night";
+  const hideGuideRail = inCouplesExperience && guideRailHidden;
+  const showGuideRail = inCouplesExperience ? !guideRailHidden : centerPanel !== null;
 
   useEffect(() => {
     const nav = searchParams.get("nav");
@@ -49,12 +50,14 @@ export default function LiveTestShell() {
   }, [centerPanel]);
 
   useEffect(() => {
-    if (inDateNightFlow) {
+    if (inCouplesExperience) {
       setGuideRailHidden(true);
-    } else {
-      setGuideRailHidden(false);
     }
-  }, [inDateNightFlow]);
+  }, [inCouplesExperience, couplesView]);
+
+  function toggleGuideRail() {
+    setGuideRailHidden((hidden) => !hidden);
+  }
 
   return (
     <div className="pro-shell">
@@ -135,7 +138,7 @@ export default function LiveTestShell() {
                 <div className="pro-guide-inner">
                   <LiveTestGuideRail
                     onNavigate={setActiveNav}
-                    onHide={inDateNightFlow ? () => setGuideRailHidden(true) : undefined}
+                    onHide={inCouplesExperience ? toggleGuideRail : undefined}
                   />
                 </div>
               </aside>
@@ -144,20 +147,30 @@ export default function LiveTestShell() {
         </div>
       </div>
 
-      {hideGuideRail ? (
+      {inCouplesExperience ? (
         <button
           type="button"
-          className="pro-guide-restore-fab"
-          aria-label="Show companion"
-          onClick={() => setGuideRailHidden(false)}
+          className={`pro-guide-restore-fab${guideRailHidden ? "" : " pro-guide-restore-fab-active"}`}
+          aria-label={guideRailHidden ? "Show companion" : "Hide companion"}
+          aria-pressed={!guideRailHidden}
+          onClick={toggleGuideRail}
         >
           <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
-            <path
-              d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"
-              stroke="currentColor"
-              strokeWidth="1"
-              strokeLinejoin="round"
-            />
+            {guideRailHidden ? (
+              <path
+                d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeLinejoin="round"
+              />
+            ) : (
+              <path
+                d="M6 6l12 12M18 6 6 18"
+                stroke="currentColor"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+              />
+            )}
           </svg>
         </button>
       ) : null}

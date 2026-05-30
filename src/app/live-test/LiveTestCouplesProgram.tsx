@@ -7,137 +7,62 @@ import {
   readGuidePreferences,
 } from "@/lib/guides/preferences";
 
-const COUPLES_TILES = [
+const COUPLES_EXPERIENCES = [
   {
     id: "date-night",
     title: "Date Night Mode",
     description:
-      "A mediated 30-min experience for date night at home — sets the mood, builds anticipation, leads somewhere.",
+      "A guided 30-minute experience designed to bring partners closer through shared storytelling.",
     image: "/couples/date-night-hero.jpg",
-    button: "Start",
-    duration: "30 min",
-    badge: "Most popular",
-    eyebrow: "Tonight's experience",
   },
   {
     id: "surprise",
     title: "Surprise Mode",
     description:
-      "Woman makes the story, surprises partner with a fantasy adventure.",
+      "Create a personalised adventure for your partner and reveal it one chapter at a time.",
     image: "/couples/surprise.jpg",
-    button: "Start",
-    duration: "Curated",
-    eyebrow: "Secret fantasy",
   },
 ] as const;
 
-function CouplesHeroCard({
-  eyebrow,
+function displayFirstName(raw: string): string {
+  const trimmed = raw.trim();
+  const first = trimmed.split(/\s+/)[0] ?? "";
+  if (/^[A-Z][a-z]{1,19}$/.test(first)) return first;
+  if (/^[A-Za-z]{2,20}$/.test(first) && !/\d/.test(first)) {
+    return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+  }
+  return DEFAULT_USER_NAME;
+}
+
+function CouplesExperienceCard({
   title,
   description,
   image,
-  button,
-  duration,
-  badge,
   onClick,
 }: {
-  eyebrow: string;
   title: string;
   description: string;
   image: string;
-  button: string;
-  duration: string;
-  badge?: string;
   onClick?: () => void;
 }) {
   return (
-    <article className="couples-hero-card group relative min-h-[min(52vh,28rem)] overflow-hidden rounded-2xl lg:min-h-0 lg:flex-1">
+    <article className="couples-experience-card group relative min-h-[min(44vh,22rem)] overflow-hidden rounded-2xl lg:min-h-[min(52vh,26rem)] lg:flex-1">
       <img
         src={image}
         alt=""
-        className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-[900ms] ease-out group-hover:scale-[1.06]"
+        className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-[900ms] ease-out group-hover:scale-[1.05]"
       />
       <div className="couples-hero-vignette pointer-events-none absolute inset-0" aria-hidden />
       <div className="couples-hero-glow pointer-events-none absolute inset-0" aria-hidden />
 
-      <div className="relative z-10 flex h-full min-h-[min(52vh,28rem)] flex-col justify-end p-6 sm:p-8 lg:min-h-0 lg:p-10">
-        <div className="flex flex-wrap items-center gap-2.5">
-          {badge ? (
-            <span className="rounded-full border border-amber-400/35 bg-amber-950/50 px-3 py-1 type-label text-amber-200/95 backdrop-blur-sm">
-              {badge}
-            </span>
-          ) : null}
-          <span className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[10px] font-medium uppercase tracking-micro text-stone-300/90 backdrop-blur-sm">
-            {duration}
-          </span>
-        </div>
-
-        <p className="mt-5 type-label text-amber-400/75">
-          {eyebrow}
-        </p>
-        <h2 className="type-card-title mt-3 max-w-xl">
-          {title}
-        </h2>
-        <p className="mt-4 max-w-lg text-base leading-relaxed text-stone-200/90 sm:text-[17px]">
+      <div className="relative z-10 flex h-full min-h-[min(44vh,22rem)] flex-col justify-end p-6 sm:p-8 lg:min-h-[min(52vh,26rem)] lg:p-9">
+        <h2 className="type-card-title max-w-lg">{title}</h2>
+        <p className="couples-card-desc mt-3 max-w-md text-base leading-relaxed text-stone-200/88 sm:text-[16px]">
           {description}
         </p>
-
-        <div className="mt-8 flex flex-wrap items-center gap-4">
+        <div className="mt-7">
           <button type="button" onClick={onClick} className="couples-cta-primary">
-            {button}
-          </button>
-          <span className="text-xs font-medium text-stone-400/80">
-            Curated for couples · Begin together
-          </span>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function CouplesSecondaryCard({
-  eyebrow,
-  title,
-  description,
-  image,
-  button,
-  duration,
-  onClick,
-}: {
-  eyebrow: string;
-  title: string;
-  description: string;
-  image: string;
-  button: string;
-  duration: string;
-  onClick?: () => void;
-}) {
-  return (
-    <article className="couples-secondary-card group relative min-h-[16rem] overflow-hidden rounded-2xl lg:min-h-0 lg:flex-1">
-      <img
-        src={image}
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
-      />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/92 via-black/45 to-black/20" aria-hidden />
-      <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 bg-[radial-gradient(ellipse_at_50%_100%,rgba(198,164,106,0.12),transparent_65%)]" aria-hidden />
-
-      <div className="relative z-10 flex h-full flex-col justify-end p-5 sm:p-6">
-        <span className="text-[10px] font-medium uppercase tracking-micro text-stone-400/80">
-          {duration}
-        </span>
-        <p className="mt-2 type-label text-amber-500/60">
-          {eyebrow}
-        </p>
-        <h2 className="mt-2 type-card-title leading-tight text-luxury-primary sm:text-2xl">
-          {title}
-        </h2>
-        <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed text-stone-300/85">
-          {description}
-        </p>
-        <div className="mt-5">
-          <button type="button" onClick={onClick} className="couples-cta-secondary">
-            {button}
+            Start
           </button>
         </div>
       </div>
@@ -158,7 +83,7 @@ export default function LiveTestCouplesProgram({
   onStartDateNight?: () => void;
   onStartSurprise?: () => void;
 }) {
-  const [userName, setUserName] = useState(DEFAULT_USER_NAME);
+  const [firstName, setFirstName] = useState(DEFAULT_USER_NAME);
   const [showTrialTools, setShowTrialTools] = useState(false);
   const [showPartnerForm, setShowPartnerForm] = useState(false);
   const [partnerEmail, setPartnerEmail] = useState("");
@@ -171,7 +96,8 @@ export default function LiveTestCouplesProgram({
   const [invitedPartnerEmail, setInvitedPartnerEmail] = useState("");
 
   useEffect(() => {
-    setUserName(readGuidePreferences().userName || DEFAULT_USER_NAME);
+    const prefs = readGuidePreferences();
+    setFirstName(displayFirstName(prefs.userName || DEFAULT_USER_NAME));
     setShowTrialTools(isTrialPlan());
   }, []);
 
@@ -221,27 +147,25 @@ export default function LiveTestCouplesProgram({
     }
   }
 
-  const [hero, secondary] = COUPLES_TILES;
+  function handleStart(id: (typeof COUPLES_EXPERIENCES)[number]["id"]) {
+    if (id === "date-night") onStartDateNight?.();
+    if (id === "surprise") onStartSurprise?.();
+  }
 
   return (
     <div className="couples-experience-panel animate-panel-in relative flex h-full min-h-0 flex-col overflow-hidden">
       <div className="couples-atmosphere pointer-events-none absolute inset-0" aria-hidden />
 
-      <header className="relative z-10 shrink-0 px-6 pb-5 pt-7 sm:px-8 sm:pt-8">
+      <header className="relative z-10 shrink-0 px-6 pb-4 pt-7 sm:px-10 sm:pt-8">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <p className="type-label text-amber-500/60">
-              Reignite · Couples
-            </p>
-            <h1 className="type-hero mt-3">
-              Tonight begins here,{" "}
-              <span className="text-luxury-primary">
-                {userName}
-              </span>
+            <p className="type-label text-amber-500/60">Reignite · Couples</p>
+            <h1 className="couples-greeting type-hero mt-3">
+              Good evening,{" "}
+              <span className="text-luxury-primary">{firstName}</span>
             </h1>
-            <p className="type-body mt-4 max-w-xl">
-              A private space for long-term partners — choose your experience and
-              let the evening unfold.
+            <p className="couples-header-subtitle type-body mt-3">
+              A private space for long-term partners — choose your experience and let the evening unfold.
             </p>
           </div>
 
@@ -305,19 +229,16 @@ export default function LiveTestCouplesProgram({
         ) : null}
       </header>
 
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-6 pt-2 sm:flex-row sm:gap-5 sm:overflow-hidden sm:p-8 sm:pt-3">
-        <div className="flex min-h-0 flex-[7] flex-col">
-          <CouplesHeroCard
-            {...hero}
-            onClick={() => onStartDateNight?.()}
+      <div className="couples-cards-grid relative z-10 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-6 pt-1 sm:gap-5 sm:overflow-hidden sm:p-8 sm:pt-2 lg:flex-row">
+        {COUPLES_EXPERIENCES.map((experience) => (
+          <CouplesExperienceCard
+            key={experience.id}
+            title={experience.title}
+            description={experience.description}
+            image={experience.image}
+            onClick={() => handleStart(experience.id)}
           />
-        </div>
-        <div className="flex min-h-0 flex-[3] flex-col">
-          <CouplesSecondaryCard
-            {...secondary}
-            onClick={() => onStartSurprise?.()}
-          />
-        </div>
+        ))}
       </div>
     </div>
   );
