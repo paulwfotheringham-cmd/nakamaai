@@ -6,10 +6,7 @@ import {
   getLiveTestCenterPanel,
   type LiveTestNavId,
 } from "@/lib/nakama-universe-services";
-import DateNightInvitePage from "./DateNightInvitePage";
-import DateNightMatchingPage from "./DateNightMatchingPage";
-import DateNightMatchRevealPage from "./DateNightMatchRevealPage";
-import DateNightExperiencePage from "./DateNightExperiencePage";
+import DateNightPrototypeFlow from "./date-night/DateNightPrototypeFlow";
 import SurpriseModePage from "./SurpriseModePage";
 import LiveTestCouplesProgram from "./LiveTestCouplesProgram";
 import LiveTestDashboardHome from "./LiveTestDashboardHome";
@@ -20,28 +17,22 @@ import LiveTestGuideRail from "./LiveTestGuideRail";
 import LiveTestInfoPanel from "./LiveTestInfoPanel";
 import LiveTestProSidebar from "./LiveTestProSidebar";
 import LiveTestProfilePanel from "./LiveTestProfilePanel";
-import type { DateNightScenario } from "./date-night-scenarios";
 
 export type { LiveTestNavId };
 
-type CouplesCenterView =
-  | "menu"
-  | "date-night-invite"
-  | "date-night-matching"
-  | "date-night-reveal"
-  | "date-night-experience"
-  | "surprise";
+type CouplesCenterView = "menu" | "date-night" | "surprise";
 
 export default function LiveTestShell() {
   const searchParams = useSearchParams();
   const [activeNav, setActiveNav] = useState<LiveTestNavId | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [guideRailHidden, setGuideRailHidden] = useState(false);
   const centerPanel = getLiveTestCenterPanel(activeNav);
   const [couplesView, setCouplesView] = useState<CouplesCenterView>("menu");
-  const [dateNightPartner, setDateNightPartner] = useState<string>("");
-  const [dateNightMatch, setDateNightMatch] = useState<DateNightScenario | null>(null);
-  const onDateNightExperience =
-    centerPanel === "couples-program" && couplesView === "date-night-experience";
+
+  const inDateNightFlow = centerPanel === "couples-program" && couplesView === "date-night";
+  const hideGuideRail = guideRailHidden && inDateNightFlow;
+  const showGuideRail = inDateNightFlow ? !guideRailHidden : centerPanel !== null;
 
   useEffect(() => {
     const nav = searchParams.get("nav");
@@ -53,10 +44,13 @@ export default function LiveTestShell() {
   useEffect(() => {
     if (centerPanel !== "couples-program") {
       setCouplesView("menu");
-      setDateNightPartner("");
-      setDateNightMatch(null);
+      setGuideRailHidden(false);
     }
   }, [centerPanel]);
+
+  useEffect(() => {
+    if (!inDateNightFlow) setGuideRailHidden(false);
+  }, [inDateNightFlow]);
 
   return (
     <div className="pro-shell">
@@ -87,7 +81,7 @@ export default function LiveTestShell() {
 
           <div
             className={`pro-main-body${
-              onDateNightExperience ? " pro-main-body-immersive" : ""
+              hideGuideRail ? " pro-main-body-guide-hidden" : ""
             }`}
           >
             <section className="pro-content">
@@ -97,39 +91,16 @@ export default function LiveTestShell() {
                 <>
                   {couplesView === "menu" && (
                     <LiveTestCouplesProgram
-                      onStartDateNight={() => setCouplesView("date-night-invite")}
+                      onStartDateNight={() => setCouplesView("date-night")}
                       onStartSurprise={() => setCouplesView("surprise")}
                     />
                   )}
                   {couplesView === "surprise" && (
                     <SurpriseModePage onBack={() => setCouplesView("menu")} />
                   )}
-                  {couplesView === "date-night-invite" && (
-                    <DateNightInvitePage
-                      onBeginMatching={(partnerUsername) => {
-                        setDateNightPartner(partnerUsername);
-                        setCouplesView("date-night-matching");
-                      }}
-                    />
+                  {couplesView === "date-night" && (
+                    <DateNightPrototypeFlow onBack={() => setCouplesView("menu")} />
                   )}
-                  {couplesView === "date-night-matching" && (
-                    <DateNightMatchingPage
-                      partnerUsername={dateNightPartner}
-                      onReveal={(match) => {
-                        setDateNightMatch(match);
-                        setCouplesView("date-night-reveal");
-                      }}
-                    />
-                  )}
-                  {couplesView === "date-night-reveal" && dateNightMatch ? (
-                    <DateNightMatchRevealPage
-                      match={dateNightMatch}
-                      onBeginExperience={() => setCouplesView("date-night-experience")}
-                    />
-                  ) : null}
-                  {couplesView === "date-night-experience" && dateNightMatch ? (
-                    <DateNightExperiencePage match={dateNightMatch} />
-                  ) : null}
                 </>
               )}
               {centerPanel === "build-adventure" && (
@@ -155,16 +126,37 @@ export default function LiveTestShell() {
               {centerPanel === "dashboard" && <LiveTestDashboardHome />}
             </section>
 
-            {!onDateNightExperience ? (
+            {showGuideRail ? (
               <aside className="pro-guide">
                 <div className="pro-guide-inner">
-                  <LiveTestGuideRail onNavigate={setActiveNav} />
+                  <LiveTestGuideRail
+                    onNavigate={setActiveNav}
+                    onHide={inDateNightFlow ? () => setGuideRailHidden(true) : undefined}
+                  />
                 </div>
               </aside>
             ) : null}
           </div>
         </div>
       </div>
+
+      {hideGuideRail ? (
+        <button
+          type="button"
+          className="pro-guide-restore-fab"
+          aria-label="Show companion"
+          onClick={() => setGuideRailHidden(false)}
+        >
+          <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
+            <path
+              d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"
+              stroke="currentColor"
+              strokeWidth="1"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      ) : null}
     </div>
   );
 }

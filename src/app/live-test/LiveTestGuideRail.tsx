@@ -10,6 +10,7 @@ import SimliAvatar from "@/components/SimliAvatar";
 
 type LiveTestGuideRailProps = {
   onNavigate?: (navId: LiveTestNavId) => void;
+  onHide?: () => void;
 };
 
 async function readStreamingReply(
@@ -35,7 +36,7 @@ async function readStreamingReply(
 }
 
 /** Persistent guide avatar + chat — always mounted in the right column. */
-export default function LiveTestGuideRail({ onNavigate }: LiveTestGuideRailProps) {
+export default function LiveTestGuideRail({ onNavigate, onHide }: LiveTestGuideRailProps) {
   const simliRef = useRef<SimliAvatarHandle>(null);
   const [isBusy, setIsBusy] = useState(false);
   const [prefs, setPrefs] = useState<GuidePreferences>(() => defaultGuidePreferences());
@@ -101,6 +102,18 @@ export default function LiveTestGuideRail({ onNavigate }: LiveTestGuideRailProps
   return (
     <div className="flex h-full min-h-0 flex-col gap-3 overflow-hidden">
       <div className="relative mx-auto w-full max-w-full shrink-0 overflow-hidden rounded-xl bg-gradient-to-b from-white/[0.02] to-transparent">
+        {onHide ? (
+          <button
+            type="button"
+            className="pro-guide-hide-btn"
+            aria-label="Hide companion"
+            onClick={onHide}
+          >
+            <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden>
+              <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+            </svg>
+          </button>
+        ) : null}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-6 bg-gradient-to-t from-black/30 to-transparent" />
         <div className="aspect-[3/4] max-h-[min(52vh,22rem)] min-h-[11rem] w-full sm:min-h-[12rem] md:max-h-[min(54vh,24rem)]">
           {mounted ? (

@@ -13,7 +13,7 @@ const COUPLES_TILES = [
     title: "Date Night Mode",
     description:
       "A mediated 30-min experience for date night at home — sets the mood, builds anticipation, leads somewhere.",
-    image: "/couples/date-night.jpg",
+    image: "/tiles/lover.jpg",
     button: "Start",
     duration: "30 min",
     badge: "Most popular",
