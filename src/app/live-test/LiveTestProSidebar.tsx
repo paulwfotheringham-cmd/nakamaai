@@ -23,45 +23,48 @@ type NavSection = {
 const ICON = {
   home: (
     <svg viewBox="0 0 24 24" fill="none" className="pro-sidebar-icon" aria-hidden>
-      <path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-5v-6H9v6H5a1 1 0 0 1-1-1v-8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M5 10.5 12 5l7 5.5V19a1 1 0 0 1-1 1h-4.5v-5.5H10.5V20H6a1 1 0 0 1-1-1v-8.5Z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
     </svg>
   ),
   audio: (
     <svg viewBox="0 0 24 24" fill="none" className="pro-sidebar-icon" aria-hidden>
-      <path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 17V7l11-1.5v10" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="6" cy="17" r="2.5" stroke="currentColor" strokeWidth="1" />
+      <circle cx="17" cy="15.5" r="2.5" stroke="currentColor" strokeWidth="1" />
     </svg>
   ),
   build: (
     <svg viewBox="0 0 24 24" fill="none" className="pro-sidebar-icon" aria-hidden>
-      <path d="M12 3 4 7v10l8 4 8-4V7l-8-4Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M12 4 5 7.5v9L12 20l7-3.5v-9L12 4Z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
+      <path d="M12 4v16M5 7.5l7 3.5 7-3.5" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
     </svg>
   ),
   adventure: (
     <svg viewBox="0 0 24 24" fill="none" className="pro-sidebar-icon" aria-hidden>
-      <path d="M6 4h12v16H6V4Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-      <path d="M10 9h4M10 13h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <rect x="7" y="5" width="10" height="14" rx="1" stroke="currentColor" strokeWidth="1" />
+      <path d="M10 9h4M10 12.5h4" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
     </svg>
   ),
   chat: (
     <svg viewBox="0 0 24 24" fill="none" className="pro-sidebar-icon" aria-hidden>
-      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M5 8.5a6.5 6.5 0 0 1 11.3-4.5A6.5 6.5 0 0 1 19 12v5.5H14l-3.5 3-3.5-3H5V8.5Z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
     </svg>
   ),
   couples: (
     <svg viewBox="0 0 24 24" fill="none" className="pro-sidebar-icon" aria-hidden>
-      <path d="M12 21s-6-4.35-6-10a4 4 0 0 1 7-2.4A4 4 0 0 1 18 11c0 5.65-6 10-6 10Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M12 20.5S6.5 16.5 6.5 11a4 4 0 0 1 7-2.4A4 4 0 0 1 17.5 11c0 5.5-5.5 9.5-5.5 9.5Z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
     </svg>
   ),
   character: (
     <svg viewBox="0 0 24 24" fill="none" className="pro-sidebar-icon" aria-hidden>
-      <circle cx="12" cy="9" r="3" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M19 10v1a7 7 0 0 1-14 0v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="12" cy="8.5" r="2.75" stroke="currentColor" strokeWidth="1" />
+      <path d="M6.5 19c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
     </svg>
   ),
   profile: (
     <svg viewBox="0 0 24 24" fill="none" className="pro-sidebar-icon" aria-hidden>
-      <path d="M20 21a8 8 0 1 0-16 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="12" cy="8" r="3" stroke="currentColor" strokeWidth="1" />
+      <path d="M5.5 20.5c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
     </svg>
   ),
 };
@@ -162,9 +165,9 @@ export default function LiveTestProSidebar({
               <Image
                 src="/Nakama-AI-July25-White.png"
                 alt="Nakama Nights"
-                width={140}
-                height={36}
-                className="h-7 w-auto"
+                width={120}
+                height={32}
+                className="h-6 w-auto opacity-90"
               />
             </Link>
             <p className="pro-sidebar-brand-tag">Universe</p>
@@ -190,7 +193,7 @@ export default function LiveTestProSidebar({
                       className={`pro-sidebar-chevron${isOpen ? " is-open" : ""}`}
                       aria-hidden
                     >
-                      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
                     </svg>
                   </button>
 
