@@ -4897,19 +4897,29 @@ button.nav-concept-context-back:hover {
 }
 
 .couples-how-link {
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.75rem;
   font-size: 0.625rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.34);
-  background: none;
-  border: none;
+  color: rgba(212, 175, 55, 0.88);
+  background: linear-gradient(145deg, rgba(212, 175, 55, 0.1), rgba(12, 10, 8, 0.45));
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  border-radius: 9999px;
   cursor: pointer;
-  transition: color 0.2s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .couples-how-link:hover {
-  color: rgba(212, 175, 55, 0.82);
+  color: rgba(255, 248, 235, 0.95);
+  border-color: rgba(212, 175, 55, 0.48);
+  background: linear-gradient(145deg, rgba(212, 175, 55, 0.16), rgba(12, 10, 8, 0.55));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 20px rgba(212, 175, 55, 0.1);
 }
 
 .couples-card-scrim {
