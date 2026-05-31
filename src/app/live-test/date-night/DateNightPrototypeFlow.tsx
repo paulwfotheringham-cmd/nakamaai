@@ -175,14 +175,12 @@ export default function DateNightPrototypeFlow({
     }
 
     setSharedStories(readSharedStories());
-    // Restore mid-flow sessions; discard tutorial/null and start fresh at ratings
-    if (stored && stored.step !== "tutorial") {
-      setSession(stored);
-    } else {
-      const fresh = createNewSession();
-      writeActiveSession(fresh);
-      setSession(fresh);
-    }
+    // Always boot to scenario matching — never resume a stored step on entry.
+    // In-progress sessions (connect, waiting, etc.) are discarded; the user
+    // starts fresh each visit. Completed stories live in Shared Stories.
+    const fresh = createNewSession();
+    writeActiveSession(fresh);
+    setSession(fresh);
   }, []);
 
   useEffect(() => {
