@@ -1960,6 +1960,79 @@
   max-width: 26rem;
 }
 
+/* ── Simulator two-column layout ─────────────────────────── */
+.dn-sim-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  padding: 2.5rem 0 3.5rem;
+}
+
+/* When partner is ranking, initiator column narrows, partner expands */
+.dn-sim-layout--ranking {
+  grid-template-columns: minmax(0, 18rem) 1fr;
+}
+
+.dn-sim-initiator {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.dn-sim-initiator .dn-connect-waiting-card {
+  max-width: none;
+  width: 100%;
+}
+
+/* "Partner Accepted" success tint */
+.dn-accepted-card {
+  border-color: rgba(212, 175, 55, 0.3);
+  background: linear-gradient(170deg, rgba(212, 175, 55, 0.09) 0%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+.dn-accepted-check {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  border: 1.5px solid rgba(212, 175, 55, 0.55);
+  background: rgba(212, 175, 55, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(212, 175, 55, 0.9);
+  margin-bottom: 0.5rem;
+}
+
+/* Partner simulator column */
+.dn-sim-partner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dn-sim-partner .dn-partner-notif-card {
+  max-width: none;
+  width: 100%;
+}
+
+/* Partner ranking area */
+.dn-sim-ranking-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.dn-sim-ranking-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.dn-sim-ranking-grid {
+  /* inherits dn-scenario-grid + dn-scenario-grid-4col */
+}
+
 /* ── Simulated partner notification card ──────────────────── */
 .dn-partner-notif-card {
   flex: 1 1 20rem;

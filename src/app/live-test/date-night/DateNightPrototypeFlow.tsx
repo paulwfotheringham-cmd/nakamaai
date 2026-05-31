@@ -126,6 +126,9 @@ export default function DateNightPrototypeFlow({
   const [creatorUsername, setCreatorUsername] = useState(DEFAULT_USER_NAME);
   const [partnerUsername, setPartnerUsername] = useState(PROTOTYPE_PARTNER_USERNAME);
   const [dontShowTutorialAgain, setDontShowTutorialAgain] = useState(false);
+  // Partner simulator state (dev/test only — simulates the invited partner's experience)
+  const [simPartnerState, setSimPartnerState] = useState<"invitation" | "ranking">("invitation");
+  const [simPartnerRatings, setSimPartnerRatings] = useState<Record<string, number>>({});
 
   const persist = useCallback((next: DateNightSession | null) => {
     setSession(next);
@@ -399,46 +402,118 @@ export default function DateNightPrototypeFlow({
     }
 
     if (session.step === "connect" && session.inviteStatus === "pending") {
+      const isRanking = simPartnerState === "ranking";
       return (
-        <section className="dn-connect-waiting-section dn-connect-waiting-split">
-          {/* Left — initiating user's waiting card (unchanged) */}
-          <div className="dn-connect-waiting-card">
-            <div className="dn-connect-pulse-ring" aria-hidden />
-            <h2 className="dn-connect-waiting-heading">Waiting for your partner</h2>
-            <p className="dn-connect-waiting-sub">
-              Invitation sent to{" "}
-              <strong className="dn-connect-partner-name">@{partner}</strong>
-            </p>
-            <p className="dn-connect-waiting-hint">
-              Waiting for your partner to respond&hellip;
-            </p>
+        <section className={`dn-sim-layout${isRanking ? " dn-sim-layout--ranking" : ""}`}>
+
+          {/* ── Left: Initiator (User A) ──────────────────────────── */}
+          <div className="dn-sim-initiator">
+            {!isRanking ? (
+              /* Still waiting */
+              <div className="dn-connect-waiting-card">
+                <div className="dn-connect-pulse-ring" aria-hidden />
+                <h2 className="dn-connect-waiting-heading">Waiting for your partner</h2>
+                <p className="dn-connect-waiting-sub">
+                  Invitation sent to{" "}
+                  <strong className="dn-connect-partner-name">@{partner}</strong>
+                </p>
+                <p className="dn-connect-waiting-hint">
+                  Waiting for your partner to respond&hellip;
+                </p>
+              </div>
+            ) : (
+              /* Partner accepted — success state */
+              <div className="dn-connect-waiting-card dn-accepted-card">
+                <div className="dn-accepted-check" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.2" />
+                    <path d="M7.5 12.5l3 3 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <h2 className="dn-connect-waiting-heading">Partner Accepted</h2>
+                <p className="dn-connect-waiting-sub">
+                  <strong className="dn-connect-partner-name">@{partner}</strong>{" "}
+                  is choosing their scenarios.
+                </p>
+                <p className="dn-connect-waiting-hint">
+                  Waiting for their rankings&hellip;
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* Right — simulated partner notification (dev/test only) */}
-          <div className="dn-partner-notif-card">
-            <p className="dn-partner-notif-eyebrow">Simulated Partner View</p>
-            <div className="dn-partner-notif-icon" aria-hidden>
-              <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
-                <path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
-                <circle cx="12" cy="9" r="2.5" stroke="currentColor" strokeWidth="1.2" />
-              </svg>
-            </div>
-            <h2 className="dn-partner-notif-title">Date Night Invitation</h2>
-            <p className="dn-partner-notif-body">
-              <strong className="dn-partner-notif-sender">@{creatorUsername}</strong>{" "}
-              wants to start a Date Night with you.
-            </p>
-            <p className="dn-partner-notif-desc">
-              You will both be matched to the same adventure based on your scenario rankings.
-            </p>
-            <div className="dn-partner-notif-actions">
-              <button type="button" className="dn-btn-gold dn-btn-gold-lg dn-partner-notif-accept">
-                Accept Invitation
-              </button>
-              <button type="button" className="dn-partner-notif-decline">
-                Decline
-              </button>
-            </div>
+          {/* ── Right: Partner Simulator ──────────────────────────── */}
+          <div className="dn-sim-partner">
+            <p className="dn-partner-notif-eyebrow">Partner Simulator</p>
+
+            {!isRanking ? (
+              /* Invitation card */
+              <div className="dn-partner-notif-card">
+                <div className="dn-partner-notif-icon" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+                    <path d="M21 8.5V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8.5" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+                    <path d="M3 7l9 6 9-6" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+                    <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2" stroke="currentColor" strokeWidth="1.2" />
+                  </svg>
+                </div>
+                <h2 className="dn-partner-notif-title">Date Night Invitation</h2>
+                <p className="dn-partner-notif-body">
+                  <strong className="dn-partner-notif-sender">@{creatorUsername}</strong>{" "}
+                  wants to start a Date Night with you.
+                </p>
+                <p className="dn-partner-notif-desc">
+                  You will both be matched to the same adventure based on your scenario rankings.
+                </p>
+                <div className="dn-partner-notif-actions">
+                  <button
+                    type="button"
+                    className="dn-btn-gold dn-btn-gold-lg dn-partner-notif-accept"
+                    onClick={() => setSimPartnerState("ranking")}
+                  >
+                    Accept
+                  </button>
+                  <button type="button" className="dn-partner-notif-decline">
+                    Decline
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Partner ranking grid */
+              <div className="dn-sim-ranking-panel">
+                <div className="dn-sim-ranking-header">
+                  <p className="dn-page-eyebrow">Partner&apos;s Turn</p>
+                  <h2 className="dn-page-title" style={{ fontSize: "1.5rem" }}>
+                    Rank Tonight&apos;s Possibilities
+                  </h2>
+                  <RatingLegend />
+                </div>
+                <ul className="dn-scenario-grid dn-scenario-grid-4col dn-sim-ranking-grid">
+                  {session.scenarios.map((s) => (
+                    <li key={s.id} className="dn-scenario-card dn-scenario-card-compact">
+                      <div
+                        className="dn-scenario-card-image"
+                        style={{ backgroundImage: `url(${getScenarioImage(s.title)})` }}
+                      />
+                      <div className="dn-scenario-card-body">
+                        <h3 className="dn-scenario-card-title">{s.title}</h3>
+                        <p className="dn-scenario-card-desc">{s.description}</p>
+                        <DateNightRatingPicker
+                          value={simPartnerRatings[s.id]}
+                          onChange={(v) =>
+                            setSimPartnerRatings((prev) => ({ ...prev, [s.id]: v }))
+                          }
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <div className="dn-submit-row">
+                  <button type="button" className="dn-btn-gold dn-btn-gold-lg" disabled>
+                    Submit Rankings
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </section>
       );
