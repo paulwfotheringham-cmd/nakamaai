@@ -127,10 +127,18 @@ export default function DateNightPrototypeFlow({
   const [partnerUsername, setPartnerUsername] = useState(PROTOTYPE_PARTNER_USERNAME);
   const [dontShowTutorialAgain, setDontShowTutorialAgain] = useState(false);
   // Partner simulator state (dev/test only — simulates the invited partner's experience)
-  const [simPartnerState, setSimPartnerState] = useState<"invitation" | "ranking" | "rankings_submitted" | "match_found">("invitation");
+  const [simPartnerState, setSimPartnerState] = useState<
+    "invitation" | "ranking" | "rankings_submitted" | "match_found" | "story_setup" | "generating"
+  >("invitation");
   const [simPartnerRatings, setSimPartnerRatings] = useState<Record<string, number>>({});
   const [simRatingError, setSimRatingError] = useState<string | null>(null);
   const [simMatchedScenario, setSimMatchedScenario] = useState<import("@/lib/date-night-prototype/types").DateNightScenarioConcept | null>(null);
+  // Story setup form state (initiator only)
+  const [simStoryName, setSimStoryName] = useState("");
+  const [simMaleVoice, setSimMaleVoice] = useState(MOCK_MALE_VOICES[0] ?? "");
+  const [simFemaleVoice, setSimFemaleVoice] = useState(MOCK_FEMALE_VOICES[0] ?? "");
+  const [simMood, setSimMood] = useState<DateNightMood | null>(null);
+  const [simSetupError, setSimSetupError] = useState<string | null>(null);
 
   const persist = useCallback((next: DateNightSession | null) => {
     setSession(next);
@@ -253,6 +261,22 @@ export default function DateNightPrototypeFlow({
   function submitCreatorRatings() {
     if (!session) return;
     updateSession({ step: "connect" });
+  }
+
+  function generateSimAdventure() {
+    if (!simStoryName.trim()) { setSimSetupError("Please enter a story name."); return; }
+    if (!simMood) { setSimSetupError("Please choose a mood."); return; }
+    setSimSetupError(null);
+    setSimPartnerState("generating");
+    updateSession({
+      friendlyName: simStoryName.trim(),
+      maleVoice: simMaleVoice,
+      femaleVoice: simFemaleVoice,
+      mood: simMood,
+      partnerRatings: simPartnerRatings,
+      matchedScenario: simMatchedScenario,
+      step: "story-generated",
+    });
   }
 
   function submitSimPartnerRankings() {
@@ -425,159 +449,251 @@ export default function DateNightPrototypeFlow({
     }
 
     if (session.step === "connect" && session.inviteStatus === "pending") {
-      const accepted = simPartnerState !== "invitation";
+      const sim = simPartnerState;
+      const activeSession = session;
+
+      // ── LEFT panel content by state ──────────────────────────────
+      function renderLeftPanel() {
+        if (sim === "invitation") {
+          return (
+            <div className="dn-duo-panel-body">
+              <span className="dn-duo-status dn-duo-status-sent">Invitation Sent</span>
+              <p className="dn-duo-message">
+                Invitation sent to <strong className="dn-duo-name">@{partner}</strong>.
+              </p>
+              <p className="dn-duo-hint">Waiting for your partner to respond.</p>
+              <div className="dn-connect-pulse-ring dn-duo-pulse" aria-hidden />
+            </div>
+          );
+        }
+        if (sim === "ranking" || sim === "rankings_submitted") {
+          return (
+            <div className="dn-duo-panel-body">
+              <span className="dn-duo-status dn-duo-status-accepted">
+                <svg viewBox="0 0 16 16" fill="none" width="11" height="11" aria-hidden>
+                  <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.2" />
+                  <path d="M5 8.5l2 2 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Partner Accepted
+              </span>
+              <p className="dn-duo-message">
+                <strong className="dn-duo-name">@{partner}</strong> accepted your invitation.
+              </p>
+              <p className="dn-duo-hint">Waiting for your partner to complete their scenario rankings.</p>
+            </div>
+          );
+        }
+        if (sim === "match_found") {
+          return (
+            <div className="dn-duo-panel-body dn-sim-match-left">
+              <p className="dn-page-eyebrow">Tonight&apos;s Match Found</p>
+              <h2 className="dn-sim-match-title">{simMatchedScenario?.title ?? "Your Adventure"}</h2>
+              {simMatchedScenario && (
+                <div className="dn-sim-match-image" style={{ backgroundImage: `url(${getScenarioImage(simMatchedScenario.title)})` }} />
+              )}
+              <p className="dn-duo-message">{simMatchedScenario?.description}</p>
+              <button type="button" className="dn-btn-gold dn-btn-gold-lg" onClick={() => setSimPartnerState("story_setup")}>
+                Continue to Story Setup
+              </button>
+            </div>
+          );
+        }
+        if (sim === "story_setup") {
+          return (
+            <div className="dn-duo-panel-body dn-sim-setup">
+              <p className="dn-page-eyebrow">Story Setup</p>
+              <p className="dn-sim-setup-match-name">{simMatchedScenario?.title}</p>
+
+              <div className="dn-sim-setup-step">
+                <p className="dn-sim-setup-label">Story Name</p>
+                <input
+                  className="dn-lux-input"
+                  value={simStoryName}
+                  onChange={(e) => setSimStoryName(e.target.value)}
+                  placeholder="e.g. The Night Behind The Mask"
+                />
+              </div>
+
+              <div className="dn-sim-setup-step">
+                <p className="dn-sim-setup-label">Choose Voices</p>
+                <div className="dn-sim-voice-row">
+                  <label className="dn-sim-voice-label">
+                    <span>Male Voice</span>
+                    <select className="dn-lux-select" value={simMaleVoice} onChange={(e) => setSimMaleVoice(e.target.value)}>
+                      {MOCK_MALE_VOICES.map((v) => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </label>
+                  <label className="dn-sim-voice-label">
+                    <span>Female Voice</span>
+                    <select className="dn-lux-select" value={simFemaleVoice} onChange={(e) => setSimFemaleVoice(e.target.value)}>
+                      {MOCK_FEMALE_VOICES.map((v) => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div className="dn-sim-setup-step">
+                <p className="dn-sim-setup-label">Choose Mood</p>
+                <div className="dn-sim-mood-grid">
+                  {DATE_NIGHT_MOODS.map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      className={`dn-sim-mood-btn${simMood === m ? " dn-sim-mood-btn-active" : ""}`}
+                      onClick={() => { setSimMood(m); setSimSetupError(null); }}
+                    >
+                      {m}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {simSetupError && <p className="dn-sim-rating-error">{simSetupError}</p>}
+
+              <button type="button" className="dn-btn-gold dn-btn-gold-lg" onClick={generateSimAdventure}>
+                Generate Adventure
+              </button>
+            </div>
+          );
+        }
+        // generating
+        return (
+          <div className="dn-duo-panel-body dn-sim-calculating">
+            <div className="dn-spinner dn-spinner-gold" aria-hidden />
+            <h2 className="dn-sim-calc-title">Generating Your Adventure</h2>
+            <p className="dn-sim-calc-sub"><strong className="dn-duo-name">{simMatchedScenario?.title}</strong></p>
+            <p className="dn-sim-calc-hint">Preparing your story&hellip;</p>
+          </div>
+        );
+      }
+
+      // ── RIGHT panel content by state ─────────────────────────────
+      function renderRightPanel() {
+        if (sim === "invitation") {
+          return (
+            <div className="dn-duo-panel-body dn-duo-invitation">
+              <p className="dn-duo-invitation-title">Date Night Invitation</p>
+              <p className="dn-duo-message">
+                <strong className="dn-duo-name">@{creatorUsername}</strong>{" "}
+                wants to start a Date Night with you.
+              </p>
+              <div className="dn-duo-invite-actions">
+                <button type="button" className="dn-btn-gold dn-btn-gold-lg" onClick={() => setSimPartnerState("ranking")}>
+                  Accept
+                </button>
+                <button type="button" className="dn-partner-notif-decline">Decline</button>
+              </div>
+            </div>
+          );
+        }
+        if (sim === "ranking") {
+          return (
+            <div className="dn-duo-panel-body dn-duo-ranking">
+              <div className="dn-duo-ranking-header">
+                <p className="dn-page-eyebrow">Partner&apos;s Rankings</p>
+                <h2 className="dn-duo-ranking-title">Rank Tonight&apos;s Possibilities</h2>
+                <RatingLegend />
+              </div>
+              <ul className="dn-scenario-grid dn-scenario-grid-4col">
+                {activeSession.scenarios.map((s) => (
+                  <li key={s.id} className="dn-scenario-card dn-scenario-card-compact">
+                    <div className="dn-scenario-card-image" style={{ backgroundImage: `url(${getScenarioImage(s.title)})` }} />
+                    <div className="dn-scenario-card-body">
+                      <h3 className="dn-scenario-card-title">{s.title}</h3>
+                      <p className="dn-scenario-card-desc">{s.description}</p>
+                      <DateNightRatingPicker
+                        value={simPartnerRatings[s.id]}
+                        onChange={(v) => { setSimRatingError(null); setSimPartnerRatings((prev) => ({ ...prev, [s.id]: v })); }}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              {simRatingError && <p className="dn-sim-rating-error">{simRatingError}</p>}
+              <div className="dn-submit-row">
+                <button type="button" className="dn-btn-gold dn-btn-gold-lg" onClick={submitSimPartnerRankings}>
+                  Submit Rankings
+                </button>
+              </div>
+            </div>
+          );
+        }
+        if (sim === "rankings_submitted") {
+          return (
+            <div className="dn-duo-panel-body dn-sim-calculating">
+              <div className="dn-spinner dn-spinner-gold" aria-hidden />
+              <h2 className="dn-sim-calc-title">Partner Rankings Submitted</h2>
+              <p className="dn-sim-calc-sub">✓ Rankings received from <strong className="dn-duo-name">@{partner}</strong></p>
+              <p className="dn-sim-calc-hint">Calculating your shared match&hellip;</p>
+              <p className="dn-sim-calc-detail">Finding your highest mutual scenario.</p>
+            </div>
+          );
+        }
+        if (sim === "match_found") {
+          return (
+            <div className="dn-duo-panel-body dn-sim-match-found">
+              <span className="dn-duo-status dn-duo-status-accepted" style={{ alignSelf: "center" }}>
+                <svg viewBox="0 0 16 16" fill="none" width="11" height="11" aria-hidden>
+                  <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.2" />
+                  <path d="M5 8.5l2 2 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Shared Match Found
+              </span>
+              <h2 className="dn-sim-match-title">{simMatchedScenario?.title ?? "Your Adventure"}</h2>
+              <p className="dn-sim-match-sub">Your strongest mutual match.</p>
+              {simMatchedScenario && (
+                <div className="dn-sim-match-image" style={{ backgroundImage: `url(${getScenarioImage(simMatchedScenario.title)})` }} />
+              )}
+              <p className="dn-duo-hint">Story setup is being completed by <strong className="dn-duo-name">@{creatorUsername}</strong>.</p>
+            </div>
+          );
+        }
+        if (sim === "story_setup") {
+          return (
+            <div className="dn-duo-panel-body dn-sim-match-found">
+              <div className="dn-spinner dn-spinner-gold" aria-hidden />
+              <h2 className="dn-sim-match-title">{simMatchedScenario?.title}</h2>
+              <p className="dn-duo-message">
+                Story setup is being completed by{" "}
+                <strong className="dn-duo-name">@{creatorUsername}</strong>.
+              </p>
+              <p className="dn-duo-hint">Waiting for story configuration&hellip;</p>
+            </div>
+          );
+        }
+        // generating
+        return (
+          <div className="dn-duo-panel-body dn-sim-match-found">
+            <div className="dn-spinner dn-spinner-gold" aria-hidden />
+            <h2 className="dn-sim-match-title">{simMatchedScenario?.title}</h2>
+            <p className="dn-duo-message">
+              Story Name: <strong className="dn-duo-name">{simStoryName}</strong>
+            </p>
+            <p className="dn-duo-message">
+              Configured by <strong className="dn-duo-name">@{creatorUsername}</strong>
+            </p>
+            <p className="dn-duo-hint">Preparing your adventure&hellip;</p>
+          </div>
+        );
+      }
+
       return (
         <section className="dn-duo-layout">
-
-          {/* ══ LEFT — YOU ══════════════════════════════════════════ */}
           <div className="dn-duo-panel dn-duo-panel-you">
             <div className="dn-duo-panel-header">
               <span className="dn-duo-panel-role">You</span>
               <span className="dn-duo-panel-username">@{creatorUsername}</span>
             </div>
-
-            {!accepted ? (
-              <div className="dn-duo-panel-body">
-                <span className="dn-duo-status dn-duo-status-sent">Invitation Sent</span>
-                <p className="dn-duo-message">
-                  Invitation sent to{" "}
-                  <strong className="dn-duo-name">@{partner}</strong>.
-                </p>
-                <p className="dn-duo-hint">Waiting for your partner to respond.</p>
-                <div className="dn-connect-pulse-ring dn-duo-pulse" aria-hidden />
-              </div>
-            ) : (
-              <div className="dn-duo-panel-body">
-                <span className="dn-duo-status dn-duo-status-accepted">
-                  <svg viewBox="0 0 16 16" fill="none" width="11" height="11" aria-hidden>
-                    <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.2" />
-                    <path d="M5 8.5l2 2 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  Partner Accepted
-                </span>
-                <p className="dn-duo-message">
-                  <strong className="dn-duo-name">@{partner}</strong>{" "}
-                  accepted your invitation.
-                </p>
-                <p className="dn-duo-hint">
-                  Waiting for your partner to complete their scenario rankings.
-                </p>
-              </div>
-            )}
+            {renderLeftPanel()}
           </div>
 
-          {/* ══ RIGHT — PARTNER ═════════════════════════════════════ */}
           <div className="dn-duo-panel dn-duo-panel-partner">
             <div className="dn-duo-panel-header">
               <span className="dn-duo-panel-role">Partner</span>
               <span className="dn-duo-panel-username">@{partner}</span>
             </div>
-
-            {!accepted ? (
-              /* Invitation state */
-              <div className="dn-duo-panel-body dn-duo-invitation">
-                <p className="dn-duo-invitation-title">Date Night Invitation</p>
-                <p className="dn-duo-message">
-                  <strong className="dn-duo-name">@{creatorUsername}</strong>{" "}
-                  wants to start a Date Night with you.
-                </p>
-                <div className="dn-duo-invite-actions">
-                  <button
-                    type="button"
-                    className="dn-btn-gold dn-btn-gold-lg"
-                    onClick={() => setSimPartnerState("ranking")}
-                  >
-                    Accept
-                  </button>
-                  <button type="button" className="dn-partner-notif-decline">
-                    Decline
-                  </button>
-                </div>
-              </div>
-            ) : simPartnerState === "ranking" ? (
-              /* ── Ranking grid ── */
-              <div className="dn-duo-panel-body dn-duo-ranking">
-                <div className="dn-duo-ranking-header">
-                  <p className="dn-page-eyebrow">Partner&apos;s Rankings</p>
-                  <h2 className="dn-duo-ranking-title">Rank Tonight&apos;s Possibilities</h2>
-                  <RatingLegend />
-                </div>
-                <ul className="dn-scenario-grid dn-scenario-grid-4col">
-                  {session.scenarios.map((s) => (
-                    <li key={s.id} className="dn-scenario-card dn-scenario-card-compact">
-                      <div
-                        className="dn-scenario-card-image"
-                        style={{ backgroundImage: `url(${getScenarioImage(s.title)})` }}
-                      />
-                      <div className="dn-scenario-card-body">
-                        <h3 className="dn-scenario-card-title">{s.title}</h3>
-                        <p className="dn-scenario-card-desc">{s.description}</p>
-                        <DateNightRatingPicker
-                          value={simPartnerRatings[s.id]}
-                          onChange={(v) => {
-                            setSimRatingError(null);
-                            setSimPartnerRatings((prev) => ({ ...prev, [s.id]: v }));
-                          }}
-                        />
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                {simRatingError && (
-                  <p className="dn-sim-rating-error">{simRatingError}</p>
-                )}
-                <div className="dn-submit-row">
-                  <button
-                    type="button"
-                    className="dn-btn-gold dn-btn-gold-lg"
-                    onClick={submitSimPartnerRankings}
-                  >
-                    Submit Rankings
-                  </button>
-                </div>
-              </div>
-
-            ) : simPartnerState === "rankings_submitted" ? (
-              /* ── Calculating match ── */
-              <div className="dn-duo-panel-body dn-sim-calculating">
-                <div className="dn-spinner dn-spinner-gold" aria-hidden />
-                <h2 className="dn-sim-calc-title">Partner Rankings Submitted</h2>
-                <p className="dn-sim-calc-sub">
-                  <span className="dn-duo-name">✓</span>{" "}
-                  Rankings received from{" "}
-                  <strong className="dn-duo-name">@{partner}</strong>
-                </p>
-                <p className="dn-sim-calc-hint">Calculating your shared match…</p>
-                <p className="dn-sim-calc-detail">Finding your highest mutual scenario.</p>
-              </div>
-
-            ) : (
-              /* ── Match found ── */
-              <div className="dn-duo-panel-body dn-sim-match-found">
-                <span className="dn-duo-status dn-duo-status-accepted" style={{ alignSelf: "center" }}>
-                  <svg viewBox="0 0 16 16" fill="none" width="11" height="11" aria-hidden>
-                    <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.2" />
-                    <path d="M5 8.5l2 2 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  Shared Match Found
-                </span>
-                <h2 className="dn-sim-match-title">
-                  {simMatchedScenario?.title ?? "Your Adventure"}
-                </h2>
-                <p className="dn-sim-match-sub">Your strongest mutual match.</p>
-                {simMatchedScenario && (
-                  <div
-                    className="dn-sim-match-image"
-                    style={{ backgroundImage: `url(${getScenarioImage(simMatchedScenario.title)})` }}
-                  />
-                )}
-                <button type="button" className="dn-btn-gold dn-btn-gold-lg" disabled>
-                  Continue to Story Setup
-                </button>
-              </div>
-            )}
+            {renderRightPanel()}
           </div>
-
         </section>
       );
     }

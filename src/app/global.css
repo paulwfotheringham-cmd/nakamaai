@@ -2158,6 +2158,112 @@
   margin: 0.25rem 0;
 }
 
+/* ── Story Setup form (initiator panel) ───────────────────── */
+.dn-sim-setup {
+  gap: 1.25rem;
+  overflow-y: auto;
+}
+
+.dn-sim-setup-match-name {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.1rem;
+  color: rgba(212, 175, 55, 0.85);
+  font-weight: 500;
+  margin-bottom: -0.25rem;
+}
+
+.dn-sim-setup-step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.dn-sim-setup-label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.6);
+  font-weight: 600;
+}
+
+.dn-lux-input {
+  width: 100%;
+  padding: 0.65rem 0.875rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 0.5rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.9375rem;
+  transition: border-color 0.18s;
+  outline: none;
+}
+.dn-lux-input::placeholder { color: rgba(255, 255, 255, 0.22); }
+.dn-lux-input:focus { border-color: rgba(212, 175, 55, 0.5); }
+
+.dn-sim-voice-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.dn-sim-voice-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.dn-lux-select {
+  padding: 0.55rem 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 0.5rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.875rem;
+  outline: none;
+  cursor: pointer;
+}
+.dn-lux-select:focus { border-color: rgba(212, 175, 55, 0.5); }
+
+.dn-sim-mood-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.dn-sim-mood-btn {
+  padding: 0.4rem 0.9rem;
+  border-radius: 2rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+}
+.dn-sim-mood-btn:hover {
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.3);
+  color: rgba(255, 255, 255, 0.75);
+}
+.dn-sim-mood-btn-active {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: rgba(212, 175, 55, 0.6);
+  color: rgba(212, 175, 55, 0.95);
+}
+
+/* Left panel match found (different alignment than right) */
+.dn-sim-match-left {
+  align-items: flex-start;
+  text-align: left;
+}
+.dn-sim-match-left .dn-sim-match-image {
+  max-width: 100%;
+}
+
 /* ── Simulated partner notification card ──────────────────── */
 .dn-partner-notif-card {
   flex: 1 1 20rem;
