@@ -50,9 +50,9 @@ export function RatingLegend() {
     <p className="dn-rating-inline">
       <span className="dn-rating-inline-strong">Rate tonight&apos;s possibilities</span>
       <span className="dn-rating-inline-sep" aria-hidden>·</span>
-      <span className="dn-rating-inline-dim">10 = I&apos;d love this</span>
-      <span className="dn-rating-inline-sep" aria-hidden>·</span>
       <span className="dn-rating-inline-dim">1 = Not for me</span>
+      <span className="dn-rating-inline-sep" aria-hidden>·</span>
+      <span className="dn-rating-inline-dim">10 = I&apos;d love this</span>
     </p>
   );
 }

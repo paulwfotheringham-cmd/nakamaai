@@ -1360,10 +1360,18 @@
 
 .dn-page-sub {
   margin-top: 0.5rem;
-  max-width: 32rem;
   font-size: 0.9375rem;
-  line-height: 1.55;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 600px) {
+  .dn-page-sub {
+    white-space: normal;
+  }
 }
 
 .dn-tutorial-banner {
@@ -1662,26 +1670,58 @@
 
 /* ── 4-column scenario grid ────────────────────────────────── */
 .dn-scenario-grid-4col {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
 }
 
-@media (min-width: 860px) {
+@media (min-width: 480px) {
+  .dn-scenario-grid-4col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
   .dn-scenario-grid-4col {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
+/* ── Compact card refinements ──────────────────────────────── */
+.dn-scenario-card-compact {
+  border-radius: 0.625rem;
+  border-color: rgba(255, 255, 255, 0.07);
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dn-scenario-card-compact:hover {
+  border-color: rgba(212, 175, 55, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 175, 55, 0.08);
+}
+
 .dn-scenario-card-compact .dn-scenario-card-image {
-  height: 5rem;
+  height: 6.5rem;
+  background-size: cover;
+  background-position: center top;
+  position: relative;
+}
+
+.dn-scenario-card-compact .dn-scenario-card-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.45));
 }
 
 .dn-scenario-card-compact .dn-scenario-card-body {
-  padding: 0.6rem 0.7rem 0.75rem;
+  padding: 0.65rem 0.75rem 0.8rem;
 }
 
 .dn-scenario-card-compact .dn-scenario-card-title {
-  font-size: 0.8125rem;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 0.875rem;
+  font-weight: 400;
   line-height: 1.3;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .dn-scenario-card-compact .dn-scenario-card-desc {
@@ -1690,7 +1730,9 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-size: 0.6875rem;
-  margin-top: 0.2rem;
+  line-height: 1.45;
+  margin-top: 0.25rem;
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .dn-submit-row {
