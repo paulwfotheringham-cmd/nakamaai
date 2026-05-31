@@ -2359,22 +2359,9 @@
   color: rgba(212, 175, 55, 0.8);
 }
 
-/* Synopsis */
-.dn-adv-synopsis {
-  padding: 0 1.25rem 0.875rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  margin-bottom: 0;
-}
-
-.dn-adv-synopsis-para {
-  font-size: 0.875rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.5);
-  font-style: italic;
-}
+/* Synopsis CSS kept but content suppressed — story is audio-only */
+.dn-adv-synopsis { display: none !important; }
+.dn-adv-synopsis-para { display: none !important; }
 
 /* Player chrome (inside premium panel) */
 .dn-adv-panel .dn-sim-player {

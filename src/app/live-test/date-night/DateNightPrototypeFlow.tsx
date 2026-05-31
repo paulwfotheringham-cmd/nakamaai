@@ -512,7 +512,7 @@ export default function DateNightPrototypeFlow({
         );
       }
 
-      // ── Shared premium meta block (image + title + synopsis) ──────
+      // ── Shared premium meta block (image + titles only, no text content) ──
       function renderPremiumMeta(showMood: boolean) {
         const scenarioTitle = simMatchedScenario?.title ?? "";
         const imageUrl = scenarioTitle ? getScenarioImage(scenarioTitle) : "";
