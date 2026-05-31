@@ -1945,92 +1945,141 @@
   margin-top: 0.1rem;
 }
 
-/* ── Side-by-side layout for dev testing ──────────────────── */
-.dn-connect-waiting-split {
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  padding: 2.5rem 0 3.5rem;
-}
-
-.dn-connect-waiting-split .dn-connect-waiting-card {
-  flex: 1 1 20rem;
-  max-width: 26rem;
-}
-
-/* ── Simulator two-column layout ─────────────────────────── */
-.dn-sim-layout {
+/* ── Duo two-panel layout (post-Connect) ──────────────────── */
+.dn-duo-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  align-items: start;
-  padding: 2.5rem 0 3.5rem;
+  gap: 0;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+  margin: 1.5rem 0 3rem;
 }
 
-/* When partner is ranking, initiator column narrows, partner expands */
-.dn-sim-layout--ranking {
-  grid-template-columns: minmax(0, 18rem) 1fr;
-}
-
-.dn-sim-initiator {
+.dn-duo-panel {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  min-height: 0;
 }
 
-.dn-sim-initiator .dn-connect-waiting-card {
-  max-width: none;
-  width: 100%;
+.dn-duo-panel-you {
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  background: linear-gradient(170deg, rgba(255, 255, 255, 0.025), rgba(0, 0, 0, 0.28));
 }
 
-/* "Partner Accepted" success tint */
-.dn-accepted-card {
-  border-color: rgba(212, 175, 55, 0.3);
-  background: linear-gradient(170deg, rgba(212, 175, 55, 0.09) 0%, rgba(0, 0, 0, 0.35) 100%);
+.dn-duo-panel-partner {
+  background: linear-gradient(170deg, rgba(212, 175, 55, 0.04), rgba(0, 0, 0, 0.28));
 }
 
-.dn-accepted-check {
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 50%;
-  border: 1.5px solid rgba(212, 175, 55, 0.55);
-  background: rgba(212, 175, 55, 0.1);
+/* Panel header */
+.dn-duo-panel-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: rgba(212, 175, 55, 0.9);
-  margin-bottom: 0.5rem;
+  justify-content: space-between;
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Partner simulator column */
-.dn-sim-partner {
+.dn-duo-panel-role {
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.dn-duo-panel-username {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(212, 175, 55, 0.8);
+}
+
+/* Panel body */
+.dn-duo-panel-body {
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.dn-sim-partner .dn-partner-notif-card {
-  max-width: none;
-  width: 100%;
+/* Status badges */
+.dn-duo-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  padding: 0.22rem 0.65rem;
+  border-radius: 9999px;
+  align-self: flex-start;
 }
 
-/* Partner ranking area */
-.dn-sim-ranking-panel {
+.dn-duo-status-sent {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dn-duo-status-accepted {
+  background: rgba(212, 175, 55, 0.1);
+  color: rgba(212, 175, 55, 0.88);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+.dn-duo-message {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+}
+
+.dn-duo-name {
+  color: rgba(212, 175, 55, 0.88);
+  font-weight: 500;
+}
+
+.dn-duo-hint {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.28);
+  font-style: italic;
+}
+
+.dn-duo-pulse {
+  margin-top: 0.5rem;
+  align-self: flex-start;
+}
+
+/* Invitation content inside partner panel */
+.dn-duo-invitation-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.375rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: -0.01em;
+}
+
+.dn-duo-invite-actions {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
 }
 
-.dn-sim-ranking-header {
+/* Ranking content inside partner panel */
+.dn-duo-ranking {
+  gap: 1rem;
+}
+
+.dn-duo-ranking-header {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.35rem;
+  margin-bottom: 0.25rem;
 }
 
-.dn-sim-ranking-grid {
-  /* inherits dn-scenario-grid + dn-scenario-grid-4col */
+.dn-duo-ranking-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.375rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 /* ── Simulated partner notification card ──────────────────── */

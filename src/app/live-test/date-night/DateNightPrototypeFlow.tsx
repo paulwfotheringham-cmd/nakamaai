@@ -402,72 +402,66 @@ export default function DateNightPrototypeFlow({
     }
 
     if (session.step === "connect" && session.inviteStatus === "pending") {
-      const isRanking = simPartnerState === "ranking";
+      const accepted = simPartnerState === "ranking";
       return (
-        <section className={`dn-sim-layout${isRanking ? " dn-sim-layout--ranking" : ""}`}>
+        <section className="dn-duo-layout">
 
-          {/* ── Left: Initiator (User A) ──────────────────────────── */}
-          <div className="dn-sim-initiator">
-            {!isRanking ? (
-              /* Still waiting */
-              <div className="dn-connect-waiting-card">
-                <div className="dn-connect-pulse-ring" aria-hidden />
-                <h2 className="dn-connect-waiting-heading">Waiting for your partner</h2>
-                <p className="dn-connect-waiting-sub">
+          {/* ══ LEFT — YOU ══════════════════════════════════════════ */}
+          <div className="dn-duo-panel dn-duo-panel-you">
+            <div className="dn-duo-panel-header">
+              <span className="dn-duo-panel-role">You</span>
+              <span className="dn-duo-panel-username">@{creatorUsername}</span>
+            </div>
+
+            {!accepted ? (
+              <div className="dn-duo-panel-body">
+                <span className="dn-duo-status dn-duo-status-sent">Invitation Sent</span>
+                <p className="dn-duo-message">
                   Invitation sent to{" "}
-                  <strong className="dn-connect-partner-name">@{partner}</strong>
+                  <strong className="dn-duo-name">@{partner}</strong>.
                 </p>
-                <p className="dn-connect-waiting-hint">
-                  Waiting for your partner to respond&hellip;
-                </p>
+                <p className="dn-duo-hint">Waiting for your partner to respond.</p>
+                <div className="dn-connect-pulse-ring dn-duo-pulse" aria-hidden />
               </div>
             ) : (
-              /* Partner accepted — success state */
-              <div className="dn-connect-waiting-card dn-accepted-card">
-                <div className="dn-accepted-check" aria-hidden>
-                  <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.2" />
-                    <path d="M7.5 12.5l3 3 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <div className="dn-duo-panel-body">
+                <span className="dn-duo-status dn-duo-status-accepted">
+                  <svg viewBox="0 0 16 16" fill="none" width="11" height="11" aria-hidden>
+                    <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.2" />
+                    <path d="M5 8.5l2 2 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                </div>
-                <h2 className="dn-connect-waiting-heading">Partner Accepted</h2>
-                <p className="dn-connect-waiting-sub">
-                  <strong className="dn-connect-partner-name">@{partner}</strong>{" "}
+                  Partner Accepted
+                </span>
+                <p className="dn-duo-message">
+                  <strong className="dn-duo-name">@{partner}</strong>{" "}
                   accepted your invitation.
                 </p>
-                <p className="dn-connect-waiting-hint">
-                  Waiting for your partner to complete their scenario rankings&hellip;
+                <p className="dn-duo-hint">
+                  Waiting for your partner to complete their scenario rankings.
                 </p>
               </div>
             )}
           </div>
 
-          {/* ── Right: Partner Simulator ──────────────────────────── */}
-          <div className="dn-sim-partner">
+          {/* ══ RIGHT — PARTNER ═════════════════════════════════════ */}
+          <div className="dn-duo-panel dn-duo-panel-partner">
+            <div className="dn-duo-panel-header">
+              <span className="dn-duo-panel-role">Partner</span>
+              <span className="dn-duo-panel-username">@{partner}</span>
+            </div>
 
-            {!isRanking ? (
-              /* ── Invitation card (disappears on Accept) ── */
-              <div className="dn-partner-notif-card">
-                <p className="dn-partner-notif-eyebrow">Partner Simulator</p>
-                <div className="dn-partner-notif-icon" aria-hidden>
-                  <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
-                    <path d="M21 8.5V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8.5" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
-                    <path d="M3 7l9 6 9-6" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
-                    <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2" stroke="currentColor" strokeWidth="1.2" />
-                  </svg>
-                </div>
-                <h2 className="dn-partner-notif-title">Date Night Invitation</h2>
-                <p className="dn-partner-notif-body">
-                  <strong className="dn-partner-notif-sender">@{creatorUsername}</strong>{" "}
+            {!accepted ? (
+              /* Invitation state */
+              <div className="dn-duo-panel-body dn-duo-invitation">
+                <p className="dn-duo-invitation-title">Date Night Invitation</p>
+                <p className="dn-duo-message">
+                  <strong className="dn-duo-name">@{creatorUsername}</strong>{" "}
                   wants to start a Date Night with you.
                 </p>
-                <p className="dn-partner-notif-desc">
-                  You will both be matched to the same adventure based on your scenario rankings.
-                </p>
-                <div className="dn-partner-notif-actions">
+                <div className="dn-duo-invite-actions">
                   <button
                     type="button"
-                    className="dn-btn-gold dn-btn-gold-lg dn-partner-notif-accept"
+                    className="dn-btn-gold dn-btn-gold-lg"
                     onClick={() => setSimPartnerState("ranking")}
                   >
                     Accept
@@ -478,16 +472,14 @@ export default function DateNightPrototypeFlow({
                 </div>
               </div>
             ) : (
-              /* ── Partner ranking grid (invitation card gone) ── */
-              <div className="dn-sim-ranking-panel">
-                <div className="dn-sim-ranking-header">
-                  <p className="dn-page-eyebrow">Partner Simulator — Ranking</p>
-                  <h2 className="dn-page-title" style={{ fontSize: "1.5rem" }}>
-                    Rank Tonight&apos;s Possibilities
-                  </h2>
+              /* Ranking state */
+              <div className="dn-duo-panel-body dn-duo-ranking">
+                <div className="dn-duo-ranking-header">
+                  <p className="dn-page-eyebrow">Partner&apos;s Rankings</p>
+                  <h2 className="dn-duo-ranking-title">Rank Tonight&apos;s Possibilities</h2>
                   <RatingLegend />
                 </div>
-                <ul className="dn-scenario-grid dn-scenario-grid-4col dn-sim-ranking-grid">
+                <ul className="dn-scenario-grid dn-scenario-grid-4col">
                   {session.scenarios.map((s) => (
                     <li key={s.id} className="dn-scenario-card dn-scenario-card-compact">
                       <div
@@ -515,6 +507,7 @@ export default function DateNightPrototypeFlow({
               </div>
             )}
           </div>
+
         </section>
       );
     }
