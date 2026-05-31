@@ -399,13 +399,8 @@ export default function DateNightPrototypeFlow({
     }
 
     if (session.step === "connect" && session.inviteStatus === "pending") {
-      const sentAt = new Date(session.createdAt).toLocaleTimeString(undefined, {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
       return (
         <section className="dn-connect-waiting-section">
-          {/* Premium waiting card */}
           <div className="dn-connect-waiting-card">
             <div className="dn-connect-pulse-ring" aria-hidden />
             <h2 className="dn-connect-waiting-heading">Waiting for your partner</h2>
@@ -416,58 +411,6 @@ export default function DateNightPrototypeFlow({
             <p className="dn-connect-waiting-hint">
               Waiting for your partner to respond&hellip;
             </p>
-          </div>
-
-          {/* Two-panel split */}
-          <div className="dn-connect-split">
-            {/* Left — You */}
-            <div className="dn-connect-user-panel">
-              <p className="dn-connect-panel-role">You</p>
-              <div className="dn-connect-panel-avatar">
-                {creatorUsername.charAt(0).toUpperCase()}
-              </div>
-              <p className="dn-connect-panel-username">@{creatorUsername}</p>
-              <div className="dn-connect-panel-status dn-connect-panel-status-sent">
-                <span className="dn-connect-status-dot" />
-                Invitation Sent
-              </div>
-              <p className="dn-connect-panel-time">Sent at {sentAt}</p>
-              <div className="dn-connect-panel-progress">
-                <div className="dn-connect-panel-progress-bar" />
-              </div>
-            </div>
-
-            <div className="dn-connect-split-divider" aria-hidden />
-
-            {/* Right — Partner */}
-            <div className="dn-connect-user-panel dn-connect-user-panel-partner">
-              <p className="dn-connect-panel-role">Partner</p>
-              <div className="dn-connect-panel-avatar dn-connect-panel-avatar-dim">
-                {partner.charAt(0).toUpperCase()}
-              </div>
-              <p className="dn-connect-panel-username">@{partner}</p>
-              <div className="dn-connect-panel-status dn-connect-panel-status-waiting">
-                <span className="dn-connect-status-dot dn-connect-status-dot-dim" />
-                Awaiting Response
-              </div>
-              <p className="dn-connect-panel-time">Notification sent</p>
-              <div className="dn-connect-panel-placeholder" aria-hidden>
-                <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
-                  <path
-                    d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10Z"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                    strokeDasharray="3 3"
-                  />
-                  <path
-                    d="M12 8v4l3 3"
-                    stroke="currentColor"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </div>
-            </div>
           </div>
         </section>
       );
