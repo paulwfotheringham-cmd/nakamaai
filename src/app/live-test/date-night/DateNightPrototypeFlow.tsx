@@ -127,8 +127,10 @@ export default function DateNightPrototypeFlow({
   const [partnerUsername, setPartnerUsername] = useState(PROTOTYPE_PARTNER_USERNAME);
   const [dontShowTutorialAgain, setDontShowTutorialAgain] = useState(false);
   // Partner simulator state (dev/test only — simulates the invited partner's experience)
-  const [simPartnerState, setSimPartnerState] = useState<"invitation" | "ranking">("invitation");
+  const [simPartnerState, setSimPartnerState] = useState<"invitation" | "ranking" | "rankings_submitted" | "match_found">("invitation");
   const [simPartnerRatings, setSimPartnerRatings] = useState<Record<string, number>>({});
+  const [simRatingError, setSimRatingError] = useState<string | null>(null);
+  const [simMatchedScenario, setSimMatchedScenario] = useState<import("@/lib/date-night-prototype/types").DateNightScenarioConcept | null>(null);
 
   const persist = useCallback((next: DateNightSession | null) => {
     setSession(next);
@@ -251,6 +253,27 @@ export default function DateNightPrototypeFlow({
   function submitCreatorRatings() {
     if (!session) return;
     updateSession({ step: "connect" });
+  }
+
+  function submitSimPartnerRankings() {
+    if (!session) return;
+    console.log("submit clicked");
+    console.log(simPartnerRatings);
+
+    const allRated = session.scenarios.every((s) => simPartnerRatings[s.id] != null);
+    if (!allRated) {
+      setSimRatingError("Please rate all scenarios before continuing.");
+      return;
+    }
+    setSimRatingError(null);
+    console.log("moving to rankings_submitted");
+    setSimPartnerState("rankings_submitted");
+
+    setTimeout(() => {
+      const match = findBestMatch(session.scenarios, session.creatorRatings, simPartnerRatings);
+      setSimMatchedScenario(match);
+      setSimPartnerState("match_found");
+    }, 2500);
   }
 
   function connectPartner() {
@@ -402,7 +425,7 @@ export default function DateNightPrototypeFlow({
     }
 
     if (session.step === "connect" && session.inviteStatus === "pending") {
-      const accepted = simPartnerState === "ranking";
+      const accepted = simPartnerState !== "invitation";
       return (
         <section className="dn-duo-layout">
 
@@ -471,8 +494,8 @@ export default function DateNightPrototypeFlow({
                   </button>
                 </div>
               </div>
-            ) : (
-              /* Ranking state */
+            ) : simPartnerState === "ranking" ? (
+              /* ── Ranking grid ── */
               <div className="dn-duo-panel-body dn-duo-ranking">
                 <div className="dn-duo-ranking-header">
                   <p className="dn-page-eyebrow">Partner&apos;s Rankings</p>
@@ -491,19 +514,66 @@ export default function DateNightPrototypeFlow({
                         <p className="dn-scenario-card-desc">{s.description}</p>
                         <DateNightRatingPicker
                           value={simPartnerRatings[s.id]}
-                          onChange={(v) =>
-                            setSimPartnerRatings((prev) => ({ ...prev, [s.id]: v }))
-                          }
+                          onChange={(v) => {
+                            setSimRatingError(null);
+                            setSimPartnerRatings((prev) => ({ ...prev, [s.id]: v }));
+                          }}
                         />
                       </div>
                     </li>
                   ))}
                 </ul>
+                {simRatingError && (
+                  <p className="dn-sim-rating-error">{simRatingError}</p>
+                )}
                 <div className="dn-submit-row">
-                  <button type="button" className="dn-btn-gold dn-btn-gold-lg" disabled>
+                  <button
+                    type="button"
+                    className="dn-btn-gold dn-btn-gold-lg"
+                    onClick={submitSimPartnerRankings}
+                  >
                     Submit Rankings
                   </button>
                 </div>
+              </div>
+
+            ) : simPartnerState === "rankings_submitted" ? (
+              /* ── Calculating match ── */
+              <div className="dn-duo-panel-body dn-sim-calculating">
+                <div className="dn-spinner dn-spinner-gold" aria-hidden />
+                <h2 className="dn-sim-calc-title">Partner Rankings Submitted</h2>
+                <p className="dn-sim-calc-sub">
+                  <span className="dn-duo-name">✓</span>{" "}
+                  Rankings received from{" "}
+                  <strong className="dn-duo-name">@{partner}</strong>
+                </p>
+                <p className="dn-sim-calc-hint">Calculating your shared match…</p>
+                <p className="dn-sim-calc-detail">Finding your highest mutual scenario.</p>
+              </div>
+
+            ) : (
+              /* ── Match found ── */
+              <div className="dn-duo-panel-body dn-sim-match-found">
+                <span className="dn-duo-status dn-duo-status-accepted" style={{ alignSelf: "center" }}>
+                  <svg viewBox="0 0 16 16" fill="none" width="11" height="11" aria-hidden>
+                    <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.2" />
+                    <path d="M5 8.5l2 2 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Shared Match Found
+                </span>
+                <h2 className="dn-sim-match-title">
+                  {simMatchedScenario?.title ?? "Your Adventure"}
+                </h2>
+                <p className="dn-sim-match-sub">Your strongest mutual match.</p>
+                {simMatchedScenario && (
+                  <div
+                    className="dn-sim-match-image"
+                    style={{ backgroundImage: `url(${getScenarioImage(simMatchedScenario.title)})` }}
+                  />
+                )}
+                <button type="button" className="dn-btn-gold dn-btn-gold-lg" disabled>
+                  Continue to Story Setup
+                </button>
               </div>
             )}
           </div>
