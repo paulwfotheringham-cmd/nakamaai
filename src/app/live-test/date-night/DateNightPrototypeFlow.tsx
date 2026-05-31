@@ -11,7 +11,6 @@ import {
 import { matchCompatibility } from "@/lib/date-night-prototype/journey";
 import { findBestMatch } from "@/lib/date-night-prototype/match";
 import { getScenarioImage } from "@/lib/date-night-prototype/scenario-images";
-import { getStorySynopsis } from "@/lib/date-night-prototype/story-synopses";
 import { freshScenarioSet } from "@/lib/date-night-prototype/scenarios";
 import {
   createNewSession,
@@ -516,7 +515,6 @@ export default function DateNightPrototypeFlow({
       // ── Shared premium meta block (image + title + synopsis) ──────
       function renderPremiumMeta(showMood: boolean) {
         const scenarioTitle = simMatchedScenario?.title ?? "";
-        const synopsis = getStorySynopsis(scenarioTitle);
         const imageUrl = scenarioTitle ? getScenarioImage(scenarioTitle) : "";
         return (
           <>
@@ -538,12 +536,7 @@ export default function DateNightPrototypeFlow({
               </div>
             </div>
 
-            {/* Synopsis */}
-            <div className="dn-adv-synopsis">
-              {synopsis.map((para, i) => (
-                <p key={i} className="dn-adv-synopsis-para">{para}</p>
-              ))}
-            </div>
+            {/* Synopsis intentionally omitted — story is experienced through audio narration only */}
           </>
         );
       }
@@ -706,7 +699,7 @@ export default function DateNightPrototypeFlow({
                 <div className="dn-sim-match-image" style={{ backgroundImage: `url(${getScenarioImage(simMatchedScenario.title)})` }} />
               )}
               <p className="dn-duo-message">{simMatchedScenario?.description}</p>
-              <button type="button" className="dn-btn-gold dn-btn-gold-lg" onClick={() => setSimPartnerState("story_setup")}>
+              <button type="button" className="dn-btn-gold dn-btn-gold-lg" style={{ marginTop: "1.75rem" }} onClick={() => setSimPartnerState("story_setup")}>
                 Continue to Story Setup
               </button>
             </div>
