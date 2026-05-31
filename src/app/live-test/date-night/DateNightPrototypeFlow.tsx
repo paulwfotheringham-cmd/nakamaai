@@ -382,7 +382,6 @@ export default function DateNightPrototypeFlow({
       return (
         <StepPanel
           title="Invite your partner"
-          description="Enter your partner's Nakama username. Usernames can be found in the Profile section."
           actionLabel="Connect"
           onAction={connectPartner}
         >
@@ -593,7 +592,7 @@ export default function DateNightPrototypeFlow({
   }
 
   return (
-    <div className={`dn-workspace ${isRatingsStep ? "dn-workspace-solo" : "dn-workspace-focused"}`}>
+    <div className="dn-workspace dn-workspace-solo">
       <div className="dn-workspace-center dn-workspace-center-full">
         <div className="dn-workspace-scroll">
           <header className="dn-page-header">
@@ -604,44 +603,43 @@ export default function DateNightPrototypeFlow({
                 </button>
               </div>
               <div className="dn-page-header-right">
-                <button type="button" className="dn-saved-stories-link" onClick={() => setShowSharedModal(true)}>
-                  Saved Stories
+                <button type="button" className="dn-saved-stories-btn" onClick={() => setShowSharedModal(true)}>
+                  <span className="dn-saved-stories-btn-glow" aria-hidden />
+                  <span className="dn-saved-stories-btn-icon" aria-hidden>
+                    <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden>
+                      <path d="M5 5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16l-7-3.5L5 21V5Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  <span className="dn-saved-stories-btn-copy">
+                    <span className="dn-saved-stories-btn-label">Saved Stories</span>
+                    <span className="dn-saved-stories-btn-sub">Your adventures</span>
+                  </span>
                 </button>
                 {onToggleGuide ? (
                   <CouplesGuideConcierge guideHidden={guideRailHidden} onToggle={onToggleGuide} />
                 ) : null}
               </div>
             </div>
-            <div>
-              <p className="dn-page-eyebrow">Date Night</p>
-              <div className="dn-title-row">
-                <h1 className="dn-page-title">Match Tonight&apos;s Adventure</h1>
-                {isRatingsStep ? (
+            {isRatingsStep && (
+              <div>
+                <p className="dn-page-eyebrow">Date Night</p>
+                <div className="dn-title-row">
+                  <h1 className="dn-page-title">Match Tonight&apos;s Adventure</h1>
                   <button type="button" className="dn-btn-gold dn-btn-sm" onClick={refreshScenarios}>
                     Show Different Scenarios
                   </button>
-                ) : null}
+                </div>
+                <p className="dn-page-sub">
+                  Rank scenarios with your partner, discover your shared match, and begin a guided audio experience together.
+                </p>
               </div>
-              <p className="dn-page-sub">
-                Rank scenarios with your partner, discover your shared match, and begin a guided audio experience together.
-              </p>
-            </div>
+            )}
           </header>
 
           {renderMainStep()}
         </div>
       </div>
 
-      {session && !isRatingsStep ? (
-        <PartnerSimulationPanel
-          session={session}
-          creatorUsername={creatorUsername}
-          onAcceptInvite={acceptInvite}
-          onRejectInvite={rejectInvite}
-          onPartnerRatingsSubmit={submitPartnerRatings}
-          onUpdate={updateSession}
-        />
-      ) : null}
 
       {showSharedModal ? (
         <SharedStoriesModal
