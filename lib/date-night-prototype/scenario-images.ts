@@ -1,31 +1,30 @@
-// source.unsplash.com keyword + sig: same sig always resolves to the same photo.
-// Each scenario gets a unique sig so cards are visually distinct.
-const src = (keywords: string, sig: number) =>
-  `https://source.unsplash.com/480x260/?${encodeURIComponent(keywords)}&sig=${sig}`;
+// picsum.photos/seed/{seed}/480/260 — free, no API key, consistent per seed
+const picsumSrc = (seed: string) =>
+  `https://picsum.photos/seed/${encodeURIComponent(seed)}/480/260`;
 
 const SCENARIO_IMAGES: Record<string, string> = {
-  "Robin Hood & Maid Marian":   src("misty forest medieval trees moonlight",     101),
-  "Venice After Midnight":      src("venice canal gondola night water",           102),
-  "Secret Society":             src("masquerade mask candlelight ballroom",       103),
-  "The Last Letter":            src("candlelight letter writing desk vintage",    104),
-  "Moonlit Train":              src("luxury sleeper train night railway",         105),
-  "Hidden Kingdom":             src("castle palace garden fantasy dusk",          106),
-  "Runaway Royalty":            src("horse carriage royal cobblestone night",     107),
-  "Lost in Paris":              src("paris eiffel tower night streets rain",      108),
-  "Desert Oasis":               src("desert dunes stars night sahara",           109),
-  "Forbidden Masquerade":       src("masquerade carnival venice mask feathers",  110),
-  "Storm on the Coast":         src("dramatic stormy ocean cliff waves",          111),
-  "The Private Library":        src("dark library bookshelves candle leather",   112),
-  "Midnight Rooftop":           src("rooftop city lights night skyline",          113),
-  "Winter Chalet":              src("cozy chalet snow firelight winter cabin",    114),
-  "The Art Collector":          src("art gallery painting elegant museum night",  115),
-  "Harbor at Dusk":             src("harbor boats golden dusk port sailing",      116),
-  "Garden of Echoes":           src("overgrown garden path mystery twilight",     117),
-  "The Jazz Lounge":            src("jazz lounge saxophone low light club",       118),
-  "Castle by the Lake":         src("fairytale castle lake reflection moonlight", 119),
-  "Neon Afterglow":             src("neon city night lights rain reflections",    120),
+  "Robin Hood & Maid Marian":  picsumSrc("dn-forest-midnight"),
+  "Venice After Midnight":     picsumSrc("dn-venice-canal"),
+  "Secret Society":            picsumSrc("dn-masquerade-ballroom"),
+  "The Last Letter":           picsumSrc("dn-candlelight-letter"),
+  "Moonlit Train":             picsumSrc("dn-sleeper-train"),
+  "Hidden Kingdom":            picsumSrc("dn-castle-dusk"),
+  "Runaway Royalty":           picsumSrc("dn-cobblestone-royal"),
+  "Lost in Paris":             picsumSrc("dn-paris-night"),
+  "Desert Oasis":              picsumSrc("dn-desert-stars"),
+  "Forbidden Masquerade":      picsumSrc("dn-carnival-mask"),
+  "Storm on the Coast":        picsumSrc("dn-stormy-ocean"),
+  "The Private Library":       picsumSrc("dn-dark-library"),
+  "Midnight Rooftop":          picsumSrc("dn-rooftop-skyline"),
+  "Winter Chalet":             picsumSrc("dn-winter-chalet"),
+  "The Art Collector":         picsumSrc("dn-art-gallery"),
+  "Harbor at Dusk":            picsumSrc("dn-harbor-dusk"),
+  "Garden of Echoes":          picsumSrc("dn-garden-twilight"),
+  "The Jazz Lounge":           picsumSrc("dn-jazz-lounge"),
+  "Castle by the Lake":        picsumSrc("dn-castle-lake"),
+  "Neon Afterglow":            picsumSrc("dn-neon-city"),
 };
 
 export function getScenarioImage(title: string): string {
-  return SCENARIO_IMAGES[title] ?? src("romantic evening candle night", 199);
+  return SCENARIO_IMAGES[title] ?? picsumSrc("dn-romantic-default");
 }
