@@ -1945,7 +1945,113 @@
   margin-top: 0.1rem;
 }
 
-/* Split-panel CSS removed — partner dashboard belongs on partner's account, not initiator's */
+/* ── Side-by-side layout for dev testing ──────────────────── */
+.dn-connect-waiting-split {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 2.5rem 0 3.5rem;
+}
+
+.dn-connect-waiting-split .dn-connect-waiting-card {
+  flex: 1 1 20rem;
+  max-width: 26rem;
+}
+
+/* ── Simulated partner notification card ──────────────────── */
+.dn-partner-notif-card {
+  flex: 1 1 20rem;
+  max-width: 26rem;
+  padding: 2rem 2rem 1.75rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: linear-gradient(170deg, rgba(255, 255, 255, 0.035) 0%, rgba(0, 0, 0, 0.3) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.dn-partner-notif-eyebrow {
+  font-size: 0.5875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  margin-bottom: 0.25rem;
+}
+
+.dn-partner-notif-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: rgba(212, 175, 55, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(212, 175, 55, 0.75);
+}
+
+.dn-partner-notif-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.94);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.dn-partner-notif-body {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.52);
+  line-height: 1.5;
+}
+
+.dn-partner-notif-sender {
+  color: rgba(212, 175, 55, 0.88);
+  font-weight: 500;
+}
+
+.dn-partner-notif-desc {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1.55;
+}
+
+.dn-partner-notif-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.dn-partner-notif-accept {
+  width: 100%;
+}
+
+.dn-partner-notif-decline {
+  width: 100%;
+  padding: 0.65rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.dn-partner-notif-decline:hover {
+  color: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.16);
+}
 
 .dn-connect-panel,
 .dn-waiting-panel,

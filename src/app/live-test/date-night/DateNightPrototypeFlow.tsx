@@ -400,7 +400,8 @@ export default function DateNightPrototypeFlow({
 
     if (session.step === "connect" && session.inviteStatus === "pending") {
       return (
-        <section className="dn-connect-waiting-section">
+        <section className="dn-connect-waiting-section dn-connect-waiting-split">
+          {/* Left — initiating user's waiting card (unchanged) */}
           <div className="dn-connect-waiting-card">
             <div className="dn-connect-pulse-ring" aria-hidden />
             <h2 className="dn-connect-waiting-heading">Waiting for your partner</h2>
@@ -411,6 +412,33 @@ export default function DateNightPrototypeFlow({
             <p className="dn-connect-waiting-hint">
               Waiting for your partner to respond&hellip;
             </p>
+          </div>
+
+          {/* Right — simulated partner notification (dev/test only) */}
+          <div className="dn-partner-notif-card">
+            <p className="dn-partner-notif-eyebrow">Simulated Partner View</p>
+            <div className="dn-partner-notif-icon" aria-hidden>
+              <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+                <path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+                <circle cx="12" cy="9" r="2.5" stroke="currentColor" strokeWidth="1.2" />
+              </svg>
+            </div>
+            <h2 className="dn-partner-notif-title">Date Night Invitation</h2>
+            <p className="dn-partner-notif-body">
+              <strong className="dn-partner-notif-sender">@{creatorUsername}</strong>{" "}
+              wants to start a Date Night with you.
+            </p>
+            <p className="dn-partner-notif-desc">
+              You will both be matched to the same adventure based on your scenario rankings.
+            </p>
+            <div className="dn-partner-notif-actions">
+              <button type="button" className="dn-btn-gold dn-btn-gold-lg dn-partner-notif-accept">
+                Accept Invitation
+              </button>
+              <button type="button" className="dn-partner-notif-decline">
+                Decline
+              </button>
+            </div>
           </div>
         </section>
       );
