@@ -343,9 +343,6 @@ export default function DateNightPrototypeFlow({
         <section className="dn-step dn-step-ratings">
           <div className="dn-ratings-header">
             <RatingLegend />
-            <button type="button" className="dn-btn-ghost-ivory dn-btn-sm" onClick={refreshScenarios}>
-              Show Different Scenarios
-            </button>
           </div>
           <ul className="dn-scenario-grid dn-scenario-grid-4col">
             {session.scenarios.map((s) => (
@@ -617,7 +614,14 @@ export default function DateNightPrototypeFlow({
             </div>
             <div>
               <p className="dn-page-eyebrow">Date Night</p>
-              <h1 className="dn-page-title">Match Tonight&apos;s Adventure</h1>
+              <div className="dn-title-row">
+                <h1 className="dn-page-title">Match Tonight&apos;s Adventure</h1>
+                {isRatingsStep ? (
+                  <button type="button" className="dn-btn-gold dn-btn-sm" onClick={refreshScenarios}>
+                    Show Different Scenarios
+                  </button>
+                ) : null}
+              </div>
               <p className="dn-page-sub">
                 Rank scenarios with your partner, discover your shared match, and begin a guided audio experience together.
               </p>

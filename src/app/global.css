@@ -1355,6 +1355,18 @@
   color: rgba(212, 175, 55, 0.65);
 }
 
+.dn-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.dn-title-row .dn-page-title {
+  margin-top: 0;
+}
+
 .dn-page-title {
   margin-top: 0.5rem;
   font-family: var(--font-display), Georgia, serif;
