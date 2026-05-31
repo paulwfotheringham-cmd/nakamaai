@@ -629,7 +629,6 @@ export default function DateNightPrototypeFlow({
               </div>
             </div>
 
-            {renderVolumeControl(simHostVolume, setSimHostVolume)}
           </div>
         );
       }
@@ -654,8 +653,6 @@ export default function DateNightPrototypeFlow({
             </p>
 
             {renderProgressBlock()}
-
-            {renderVolumeControl(simPartnerVolume, setSimPartnerVolume)}
           </div>
         );
       }
