@@ -225,7 +225,7 @@ export default function SurpriseModePage({
                 <p className="type-label text-amber-400/80">
                   20 scenarios — choose one
                 </p>
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {DATE_NIGHT_SCENARIOS.map((scenario) => (
                     <button
                       key={scenario.id}
