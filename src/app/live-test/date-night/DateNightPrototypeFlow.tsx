@@ -11,6 +11,7 @@ import {
 import { matchCompatibility } from "@/lib/date-night-prototype/journey";
 import { findBestMatch } from "@/lib/date-night-prototype/match";
 import { getScenarioImage } from "@/lib/date-night-prototype/scenario-images";
+import { getStorySynopsis } from "@/lib/date-night-prototype/story-synopses";
 import { freshScenarioSet } from "@/lib/date-night-prototype/scenarios";
 import {
   createNewSession,
@@ -145,6 +146,7 @@ export default function DateNightPrototypeFlow({
   // Local volume controls (independent per user)
   const [simHostVolume, setSimHostVolume] = useState(80);
   const [simPartnerVolume, setSimPartnerVolume] = useState(80);
+  const [simSaved, setSimSaved] = useState(false);
 
   const persist = useCallback((next: DateNightSession | null) => {
     setSession(next);
@@ -511,83 +513,126 @@ export default function DateNightPrototypeFlow({
         );
       }
 
+      // ── Shared premium meta block (image + title + synopsis) ──────
+      function renderPremiumMeta(showMood: boolean) {
+        const scenarioTitle = simMatchedScenario?.title ?? "";
+        const synopsis = getStorySynopsis(scenarioTitle);
+        const imageUrl = scenarioTitle ? getScenarioImage(scenarioTitle) : "";
+        return (
+          <>
+            {/* Hero image */}
+            {imageUrl && (
+              <div className="dn-adv-hero" style={{ backgroundImage: `url(${imageUrl})` }}>
+                <div className="dn-adv-hero-overlay">
+                  <span className="dn-adv-scenario-eyebrow">{scenarioTitle.toUpperCase()}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Titles + tags */}
+            <div className="dn-adv-titles">
+              <h2 className="dn-adv-story-name">{simStoryName || "Untitled Adventure"}</h2>
+              <div className="dn-adv-tag-row">
+                <span className="dn-adv-scenario-tag">{scenarioTitle}</span>
+                {showMood && simMood && <span className="dn-adv-mood-tag">{simMood}</span>}
+              </div>
+            </div>
+
+            {/* Synopsis */}
+            <div className="dn-adv-synopsis">
+              {synopsis.map((para, i) => (
+                <p key={i} className="dn-adv-synopsis-para">{para}</p>
+              ))}
+            </div>
+          </>
+        );
+      }
+
       // ── Host adventure player (left / YOU panel) ──────────────────
       function renderHostAdventure() {
         return (
-          <div className="dn-duo-panel-body dn-sim-adventure">
-            <span className="dn-duo-status dn-duo-status-accepted">
-              <svg viewBox="0 0 16 16" fill="none" width="11" height="11" aria-hidden>
-                <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.2" />
-                <path d="M5 8.5l2 2 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              Adventure Ready
-            </span>
-
-            <div className="dn-sim-adv-meta">
-              <div className="dn-sim-adv-row">
-                <span className="dn-sim-adv-label">Story</span>
-                <span className="dn-sim-adv-value">{simStoryName || "Untitled Adventure"}</span>
-              </div>
-              <div className="dn-sim-adv-row">
-                <span className="dn-sim-adv-label">Scenario</span>
-                <span className="dn-sim-adv-value">{simMatchedScenario?.title}</span>
-              </div>
-              <div className="dn-sim-adv-row">
-                <span className="dn-sim-adv-label">Mood</span>
-                <span className="dn-sim-adv-tag">{simMood}</span>
-              </div>
-            </div>
+          <div className="dn-duo-panel-body dn-adv-panel">
+            {renderPremiumMeta(true)}
 
             {renderProgressBlock()}
 
             {/* Host transport controls */}
-            <div className="dn-sim-controls">
-              <button
-                type="button"
-                className="dn-sim-ctrl-btn"
-                title="Rewind 15s"
-                onClick={() => setSimAudioProgress((p) => Math.max(0, p - 15))}
-              >
-                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden>
-                  <path d="M10 3a7 7 0 1 0 7 7h-2a5 5 0 1 1-1.1-3.14L11 9h5V4l-1.76 1.76A7 7 0 0 0 10 3z" />
-                  <text x="6.5" y="12.5" fontSize="5" textAnchor="middle" fill="currentColor">15</text>
-                </svg>
-              </button>
-
-              <button
-                type="button"
-                className="dn-sim-ctrl-play"
-                onClick={() => setSimAudioPlaying((p) => !p)}
-                aria-label={simAudioPlaying ? "Pause" : "Play"}
-              >
-                {simAudioPlaying ? (
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden>
-                    <rect x="5" y="4" width="3" height="12" rx="1" />
-                    <rect x="12" y="4" width="3" height="12" rx="1" />
+            <div className="dn-sim-controls dn-sim-controls-host">
+              {/* Replay 15s */}
+              <div className="dn-sim-ctrl-group">
+                <button
+                  type="button"
+                  className="dn-sim-ctrl-btn"
+                  title="Replay 15s"
+                  onClick={() => setSimAudioProgress((p) => Math.max(0, p - 15))}
+                >
+                  <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15" aria-hidden>
+                    <path d="M10 3a7 7 0 1 0 6.32 3.97l1.64-1.64A9 9 0 1 1 10 1v2z" />
+                    <path d="M10 1v6l-4-3 4-3z" />
+                    <text x="10" y="14" fontSize="4.5" textAnchor="middle" fill="currentColor">15</text>
                   </svg>
-                ) : (
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden>
-                    <path d="M6 4l12 6-12 6V4z" />
+                </button>
+                <span className="dn-sim-ctrl-label">Replay</span>
+              </div>
+
+              {/* Play / Pause */}
+              <div className="dn-sim-ctrl-group">
+                <button
+                  type="button"
+                  className="dn-sim-ctrl-play"
+                  onClick={() => setSimAudioPlaying((p) => !p)}
+                  aria-label={simAudioPlaying ? "Pause" : "Play"}
+                >
+                  {simAudioPlaying ? (
+                    <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden>
+                      <rect x="5" y="4" width="3" height="12" rx="1" />
+                      <rect x="12" y="4" width="3" height="12" rx="1" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden>
+                      <path d="M6 4l12 6-12 6V4z" />
+                    </svg>
+                  )}
+                </button>
+                <span className="dn-sim-ctrl-label">{simAudioPlaying ? "Pause" : "Play"}</span>
+              </div>
+
+              {/* Save Progress */}
+              <div className="dn-sim-ctrl-group">
+                <button
+                  type="button"
+                  className={`dn-sim-ctrl-btn${simSaved ? " dn-sim-ctrl-saved" : ""}`}
+                  title="Save Progress"
+                  onClick={() => setSimSaved(true)}
+                >
+                  {simSaved ? (
+                    <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden>
+                      <path d="M4 10l5 5 7-8" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden>
+                      <path d="M4 2h9l3 3v13H4V2zm5 13h2v-4H9v4zm1-10a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" opacity=".8"/>
+                      <path d="M13 2v5H7V2" fill="none" stroke="currentColor" strokeWidth="1.2"/>
+                    </svg>
+                  )}
+                </button>
+                <span className="dn-sim-ctrl-label">{simSaved ? "Saved" : "Save"}</span>
+              </div>
+
+              {/* End Session */}
+              <div className="dn-sim-ctrl-group">
+                <button
+                  type="button"
+                  className="dn-sim-ctrl-btn dn-sim-ctrl-end"
+                  title="End Session"
+                  onClick={() => { setSimAudioPlaying(false); setSimPartnerState("session_ended"); }}
+                >
+                  <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden>
+                    <rect x="4" y="4" width="12" height="12" rx="1.5" />
                   </svg>
-                )}
-              </button>
-
-              <button
-                type="button"
-                className="dn-sim-ctrl-btn dn-sim-ctrl-end"
-                title="End Session"
-                onClick={() => { setSimAudioPlaying(false); setSimPartnerState("session_ended"); }}
-              >
-                <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden>
-                  <rect x="4" y="4" width="12" height="12" rx="1.5" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="dn-sim-ctrl-labels">
-              <span>−15s</span>
-              <span>{simAudioPlaying ? "Pause" : "Play"}</span>
-              <span>End</span>
+                </button>
+                <span className="dn-sim-ctrl-label">End</span>
+              </div>
             </div>
 
             {renderVolumeControl(simHostVolume, setSimHostVolume)}
@@ -598,36 +643,21 @@ export default function DateNightPrototypeFlow({
       // ── Listener adventure player (right / PARTNER panel) ─────────
       function renderListenerAdventure() {
         return (
-          <div className="dn-duo-panel-body dn-sim-adventure">
-            <span className="dn-duo-status dn-duo-status-accepted">
-              <svg viewBox="0 0 16 16" fill="none" width="11" height="11" aria-hidden>
-                <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.2" />
-                <path d="M5 8.5l2 2 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              Adventure Ready
-            </span>
+          <div className="dn-duo-panel-body dn-adv-panel">
+            {renderPremiumMeta(false)}
 
-            <div className="dn-sim-adv-meta">
-              <div className="dn-sim-adv-row">
-                <span className="dn-sim-adv-label">Story</span>
-                <span className="dn-sim-adv-value">{simStoryName || "Untitled Adventure"}</span>
-              </div>
-              <div className="dn-sim-adv-row">
-                <span className="dn-sim-adv-label">Scenario</span>
-                <span className="dn-sim-adv-value">{simMatchedScenario?.title}</span>
-              </div>
-            </div>
-
-            {/* Listener status — no transport controls */}
+            {/* Listener status badge */}
             <div className="dn-sim-listener-status">
-              <svg viewBox="0 0 20 20" fill="none" width="18" height="18" aria-hidden>
-                <path d="M10 2a8 8 0 1 0 0 16A8 8 0 0 0 10 2zm-1 5l5 3-5 3V7z" fill="currentColor" opacity=".5" />
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden>
+                <path d="M10 2a8 8 0 1 0 0 16A8 8 0 0 0 10 2zm-1 5l5 3-5 3V7z" opacity=".6"/>
               </svg>
               <span className="dn-sim-listener-label">
                 Listening with <strong className="dn-duo-name">@{creatorUsername}</strong>
               </span>
             </div>
-            <p className="dn-duo-hint" style={{ textAlign: "center" }}>Playback controlled by host</p>
+            <p className="dn-duo-hint" style={{ textAlign: "center", marginTop: "-0.25rem" }}>
+              Playback controlled by host
+            </p>
 
             {renderProgressBlock()}
 
