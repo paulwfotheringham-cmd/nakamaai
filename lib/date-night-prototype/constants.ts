@@ -35,4 +35,4 @@ export const MOCK_FEMALE_VOICES = [
 
 export const STORY_DURATION_SEC = 30 * 60;
 
-export const DATE_NIGHT_HERO_IMAGE = "/couples/date-night-hero.jpg";
+export const DATE_NIGHT_HERO_IMAGE = "/couples/date-night-home.jpg";

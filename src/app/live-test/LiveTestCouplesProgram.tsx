@@ -7,20 +7,26 @@ import {
   readGuidePreferences,
 } from "@/lib/guides/preferences";
 
+const REIGNITE_HOW_IT_WORKS_KEY = "nakama_reignite_how_it_works_dismissed";
+
 const COUPLES_EXPERIENCES = [
   {
     id: "date-night",
-    title: "Date Night Mode",
+    variant: "warm" as const,
+    tagline: "Shared · Together",
+    title: "Date Night",
     description:
       "A guided 30-minute experience designed to bring partners closer through shared storytelling.",
-    image: "/couples/date-night-hero.jpg",
+    image: "/couples/date-night-home.jpg",
   },
   {
     id: "surprise",
-    title: "Surprise Mode",
+    variant: "playful" as const,
+    tagline: "Playful · Partner-led",
+    title: "Surprise Adventure",
     description:
       "Create a personalised adventure for your partner and reveal it one chapter at a time.",
-    image: "/couples/surprise.jpg",
+    image: "/couples/surprise-adventure.jpg",
   },
 ] as const;
 
@@ -35,31 +41,36 @@ function displayFirstName(raw: string): string {
 }
 
 function CouplesExperienceCard({
+  variant,
+  tagline,
   title,
   description,
   image,
   onClick,
 }: {
+  variant: "warm" | "playful";
+  tagline: string;
   title: string;
   description: string;
   image: string;
   onClick?: () => void;
 }) {
   return (
-    <article className="couples-experience-card group relative min-h-[min(44vh,22rem)] overflow-hidden rounded-2xl lg:min-h-[min(52vh,26rem)] lg:flex-1">
+    <article
+      className={`couples-experience-card couples-experience-card--${variant} group relative min-h-[min(44vh,22rem)] overflow-hidden rounded-2xl lg:min-h-[min(52vh,26rem)] lg:flex-1`}
+    >
       <img
         src={image}
         alt=""
         className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-[900ms] ease-out group-hover:scale-[1.05]"
       />
-      <div className="couples-hero-vignette pointer-events-none absolute inset-0" aria-hidden />
-      <div className="couples-hero-glow pointer-events-none absolute inset-0" aria-hidden />
+      <div className="couples-card-scrim pointer-events-none absolute inset-0" aria-hidden />
+      <div className={`couples-card-accent couples-card-accent--${variant}`} aria-hidden />
 
       <div className="relative z-10 flex h-full min-h-[min(44vh,22rem)] flex-col justify-end p-6 sm:p-8 lg:min-h-[min(52vh,26rem)] lg:p-9">
-        <h2 className="type-card-title max-w-lg">{title}</h2>
-        <p className="couples-card-desc mt-3 max-w-md text-base leading-relaxed text-stone-200/88 sm:text-[16px]">
-          {description}
-        </p>
+        <p className={`couples-card-tagline couples-card-tagline--${variant}`}>{tagline}</p>
+        <h2 className={`couples-card-title couples-card-title--${variant}`}>{title}</h2>
+        <p className={`couples-card-desc couples-card-desc--${variant}`}>{description}</p>
         <div className="mt-7">
           <button type="button" onClick={onClick} className="couples-cta-primary">
             Start
@@ -67,6 +78,67 @@ function CouplesExperienceCard({
         </div>
       </div>
     </article>
+  );
+}
+
+function HowItWorksModal({
+  dontShowAgain,
+  onDontShowAgainChange,
+  onClose,
+}: {
+  dontShowAgain: boolean;
+  onDontShowAgainChange: (value: boolean) => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="couples-modal-backdrop" role="presentation" onClick={onClose}>
+      <div
+        className="couples-modal"
+        role="dialog"
+        aria-labelledby="couples-how-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button type="button" className="couples-modal-close" aria-label="Close" onClick={onClose}>
+          ×
+        </button>
+        <p className="couples-modal-eyebrow">Reignite</p>
+        <h2 id="couples-how-title" className="couples-modal-title">
+          How it works
+        </h2>
+
+        <section className="couples-modal-section">
+          <h3 className="couples-modal-section-title">Date Night</h3>
+          <p className="couples-modal-lead">A shared 30-minute narrated adventure for couples.</p>
+          <ul className="couples-modal-list">
+            <li>Both partners privately rate a set of story ideas.</li>
+            <li>Nakama discovers the best mutual match.</li>
+            <li>Choose voices and mood.</li>
+            <li>Then begin your shared journey together.</li>
+          </ul>
+        </section>
+
+        <section className="couples-modal-section">
+          <h3 className="couples-modal-section-title couples-modal-section-title--playful">
+            Surprise Adventure
+          </h3>
+          <p className="couples-modal-lead">One partner creates the experience.</p>
+          <ul className="couples-modal-list">
+            <li>Choose the scenario, mood and story direction.</li>
+            <li>The other partner discovers the adventure as it unfolds.</li>
+            <li>A more personalised and playful experience.</li>
+          </ul>
+        </section>
+
+        <label className="couples-modal-dismiss">
+          <input
+            type="checkbox"
+            checked={dontShowAgain}
+            onChange={(e) => onDontShowAgainChange(e.target.checked)}
+          />
+          <span>Don&apos;t show again</span>
+        </label>
+      </div>
+    </div>
   );
 }
 
@@ -94,12 +166,25 @@ export default function LiveTestCouplesProgram({
   const [inviteLink, setInviteLink] = useState("");
   const [inviteEmailSent, setInviteEmailSent] = useState(false);
   const [invitedPartnerEmail, setInvitedPartnerEmail] = useState("");
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
+  const [dontShowHowItWorks, setDontShowHowItWorks] = useState(false);
 
   useEffect(() => {
     const prefs = readGuidePreferences();
     setFirstName(displayFirstName(prefs.userName || DEFAULT_USER_NAME));
     setShowTrialTools(isTrialPlan());
   }, []);
+
+  function openHowItWorks() {
+    setShowHowItWorks(true);
+  }
+
+  function closeHowItWorks() {
+    if (dontShowHowItWorks && typeof window !== "undefined") {
+      localStorage.setItem(REIGNITE_HOW_IT_WORKS_KEY, "1");
+    }
+    setShowHowItWorks(false);
+  }
 
   async function sendPartnerInvite() {
     const email = partnerEmail.trim().toLowerCase();
@@ -169,37 +254,43 @@ export default function LiveTestCouplesProgram({
             </p>
           </div>
 
-          {showTrialTools ? (
-            <div className="flex shrink-0 flex-col items-end gap-2">
-              {!showPartnerForm ? (
-                <button
-                  type="button"
-                  onClick={() => setShowPartnerForm(true)}
-                  className="btn-secondary whitespace-nowrap px-4 py-2 text-xs"
-                >
-                  Add your partner
-                </button>
-              ) : (
-                <div className="flex w-full max-w-[min(100%,22rem)] flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
-                  <input
-                    type="email"
-                    value={partnerEmail}
-                    onChange={(e) => setPartnerEmail(e.target.value)}
-                    placeholder="Enter email address"
-                    className="launcher-chat-input h-9 min-w-0 flex-1 rounded-full px-4 text-xs"
-                  />
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <button type="button" className="couples-how-link" onClick={openHowItWorks}>
+              How it works
+            </button>
+
+            {showTrialTools ? (
+              <>
+                {!showPartnerForm ? (
                   <button
                     type="button"
-                    onClick={() => void sendPartnerInvite()}
-                    disabled={inviteStatus === "sending"}
-                    className="btn-primary h-9 shrink-0 px-4 py-2 text-xs disabled:opacity-60"
+                    onClick={() => setShowPartnerForm(true)}
+                    className="btn-secondary whitespace-nowrap px-4 py-2 text-xs"
                   >
-                    {inviteStatus === "sending" ? "Sending…" : "Submit"}
+                    Add your partner
                   </button>
-                </div>
-              )}
-            </div>
-          ) : null}
+                ) : (
+                  <div className="flex w-full max-w-[min(100%,22rem)] flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
+                    <input
+                      type="email"
+                      value={partnerEmail}
+                      onChange={(e) => setPartnerEmail(e.target.value)}
+                      placeholder="Enter email address"
+                      className="launcher-chat-input h-9 min-w-0 flex-1 rounded-full px-4 text-xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void sendPartnerInvite()}
+                      disabled={inviteStatus === "sending"}
+                      className="btn-primary h-9 shrink-0 px-4 py-2 text-xs disabled:opacity-60"
+                    >
+                      {inviteStatus === "sending" ? "Sending…" : "Submit"}
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : null}
+          </div>
         </div>
 
         {showTrialTools && inviteStatus === "error" && inviteMessage ? (
@@ -233,6 +324,8 @@ export default function LiveTestCouplesProgram({
         {COUPLES_EXPERIENCES.map((experience) => (
           <CouplesExperienceCard
             key={experience.id}
+            variant={experience.variant}
+            tagline={experience.tagline}
             title={experience.title}
             description={experience.description}
             image={experience.image}
@@ -240,6 +333,14 @@ export default function LiveTestCouplesProgram({
           />
         ))}
       </div>
+
+      {showHowItWorks ? (
+        <HowItWorksModal
+          dontShowAgain={dontShowHowItWorks}
+          onDontShowAgainChange={setDontShowHowItWorks}
+          onClose={closeHowItWorks}
+        />
+      ) : null}
     </div>
   );
 }
