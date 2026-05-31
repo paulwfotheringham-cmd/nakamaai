@@ -433,10 +433,10 @@ export default function DateNightPrototypeFlow({
                 <h2 className="dn-connect-waiting-heading">Partner Accepted</h2>
                 <p className="dn-connect-waiting-sub">
                   <strong className="dn-connect-partner-name">@{partner}</strong>{" "}
-                  is choosing their scenarios.
+                  accepted your invitation.
                 </p>
                 <p className="dn-connect-waiting-hint">
-                  Waiting for their rankings&hellip;
+                  Waiting for your partner to complete their scenario rankings&hellip;
                 </p>
               </div>
             )}
@@ -444,11 +444,11 @@ export default function DateNightPrototypeFlow({
 
           {/* ── Right: Partner Simulator ──────────────────────────── */}
           <div className="dn-sim-partner">
-            <p className="dn-partner-notif-eyebrow">Partner Simulator</p>
 
             {!isRanking ? (
-              /* Invitation card */
+              /* ── Invitation card (disappears on Accept) ── */
               <div className="dn-partner-notif-card">
+                <p className="dn-partner-notif-eyebrow">Partner Simulator</p>
                 <div className="dn-partner-notif-icon" aria-hidden>
                   <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
                     <path d="M21 8.5V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8.5" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
@@ -478,10 +478,10 @@ export default function DateNightPrototypeFlow({
                 </div>
               </div>
             ) : (
-              /* Partner ranking grid */
+              /* ── Partner ranking grid (invitation card gone) ── */
               <div className="dn-sim-ranking-panel">
                 <div className="dn-sim-ranking-header">
-                  <p className="dn-page-eyebrow">Partner&apos;s Turn</p>
+                  <p className="dn-page-eyebrow">Partner Simulator — Ranking</p>
                   <h2 className="dn-page-title" style={{ fontSize: "1.5rem" }}>
                     Rank Tonight&apos;s Possibilities
                   </h2>
