@@ -24,7 +24,7 @@ import {
 import type { DateNightMood, DateNightSession, SharedDateNightStory } from "@/lib/date-night-prototype/types";
 import { readGuidePreferences, DEFAULT_USER_NAME } from "@/lib/guides/preferences";
 import DateNightPlayer from "./DateNightPlayer";
-import DateNightRatingPicker, { RatingLegendCompact } from "./DateNightRatingPicker";
+import DateNightRatingPicker, { RatingLegend } from "./DateNightRatingPicker";
 import PartnerSimulationPanel from "./PartnerSimulationPanel";
 import CouplesGuideConcierge from "../CouplesGuideConcierge";
 
@@ -175,11 +175,13 @@ export default function DateNightPrototypeFlow({
     }
 
     setSharedStories(readSharedStories());
-    // Only restore sessions that are actively mid-flow (not completed, not stale tutorial)
+    // Restore mid-flow sessions; discard tutorial/null and start fresh at ratings
     if (stored && stored.step !== "tutorial") {
       setSession(stored);
     } else {
-      writeActiveSession(null);
+      const fresh = createNewSession();
+      writeActiveSession(fresh);
+      setSession(fresh);
     }
   }, []);
 
@@ -337,13 +339,13 @@ export default function DateNightPrototypeFlow({
     if (session.step === "ratings") {
       return (
         <section className="dn-step dn-step-ratings">
-          <div className="dn-scenario-toolbar">
-            <RatingLegendCompact />
-            <button type="button" className="dn-btn-ghost-ivory" onClick={refreshScenarios}>
-              Show me different scenarios
+          <div className="dn-ratings-header">
+            <RatingLegend />
+            <button type="button" className="dn-btn-ghost-ivory dn-btn-sm" onClick={refreshScenarios}>
+              Show Different Scenarios
             </button>
           </div>
-          <ul className="dn-scenario-grid dn-scenario-grid-compact">
+          <ul className="dn-scenario-grid dn-scenario-grid-4col">
             {session.scenarios.map((s) => (
               <li key={s.id} className="dn-scenario-card dn-scenario-card-compact">
                 <div
@@ -613,33 +615,18 @@ export default function DateNightPrototypeFlow({
             </div>
             <div>
               <p className="dn-page-eyebrow">Date Night</p>
-              <h1 className="dn-page-title">Tonight&apos;s Adventure</h1>
+              <h1 className="dn-page-title">Match Tonight&apos;s Adventure</h1>
               <p className="dn-page-sub">
-                A 30-minute narrated adventure designed for you and your partner.
+                Rank scenarios with your partner, discover your shared match, and begin a guided audio experience together.
               </p>
             </div>
           </header>
 
-          {!session ? (
-            <section className="dn-hero-start">
-              <div className="dn-hero-start-card">
-                <p className="dn-hero-start-eyebrow">Date Night</p>
-                <h2 className="dn-hero-start-title">Tonight&apos;s adventure awaits</h2>
-                <p className="dn-hero-start-desc">
-                  Rank scenarios with your partner, discover your shared match, and begin a guided audio experience together.
-                </p>
-                <button type="button" className="dn-btn-gold" onClick={startCreateNew}>
-                  Start Date Night
-                </button>
-              </div>
-            </section>
-          ) : (
-            renderMainStep()
-          )}
+          {renderMainStep()}
         </div>
       </div>
 
-      {session && session.step !== "tutorial" ? (
+      {session ? (
         <PartnerSimulationPanel
           session={session}
           creatorUsername={creatorUsername}
@@ -648,17 +635,7 @@ export default function DateNightPrototypeFlow({
           onPartnerRatingsSubmit={submitPartnerRatings}
           onUpdate={updateSession}
         />
-      ) : (
-        <aside className="dn-partner-phone dn-partner-phone-idle">
-          <div className="dn-partner-phone-frame">
-            <header className="dn-partner-phone-header">
-              <p className="dn-partner-phone-label">Partner View</p>
-              <p className="dn-partner-phone-user">@{PROTOTYPE_PARTNER_USERNAME}</p>
-            </header>
-            <p className="dn-partner-muted">Your partner&apos;s experience appears here once matching begins.</p>
-          </div>
-        </aside>
-      )}
+      ) : null}
 
       {showSharedModal ? (
         <SharedStoriesModal
