@@ -6,6 +6,7 @@ import {
   DEFAULT_USER_NAME,
   readGuidePreferences,
 } from "@/lib/guides/preferences";
+import CouplesGuideConcierge from "./CouplesGuideConcierge";
 
 const REIGNITE_HOW_IT_WORKS_KEY = "nakama_reignite_how_it_works_dismissed";
 
@@ -13,7 +14,7 @@ const COUPLES_EXPERIENCES = [
   {
     id: "date-night",
     variant: "warm" as const,
-    tagline: "Shared · Together",
+    tagline: "Shared · Discover Together",
     title: "Date Night",
     description:
       "A guided 30-minute experience designed to bring partners closer through shared storytelling.",
@@ -22,7 +23,7 @@ const COUPLES_EXPERIENCES = [
   {
     id: "surprise",
     variant: "playful" as const,
-    tagline: "Playful · Partner-led",
+    tagline: "Unexpected · Created For You",
     title: "Surprise Adventure",
     description:
       "Create a personalised adventure for your partner and reveal it one chapter at a time.",
@@ -66,12 +67,13 @@ function CouplesExperienceCard({
       />
       <div className="couples-card-scrim pointer-events-none absolute inset-0" aria-hidden />
       <div className={`couples-card-accent couples-card-accent--${variant}`} aria-hidden />
+      <div className={`couples-card-shimmer couples-card-shimmer--${variant}`} aria-hidden />
 
-      <div className="relative z-10 flex h-full min-h-[min(44vh,22rem)] flex-col justify-end p-6 sm:p-8 lg:min-h-[min(52vh,26rem)] lg:p-9">
-        <p className={`couples-card-tagline couples-card-tagline--${variant}`}>{tagline}</p>
+      <div className="relative z-10 flex h-full min-h-[min(44vh,22rem)] flex-col justify-end p-6 sm:p-8 lg:min-h-[min(52vh,26rem)] lg:p-10">
         <h2 className={`couples-card-title couples-card-title--${variant}`}>{title}</h2>
+        <p className={`couples-card-tagline couples-card-tagline--${variant}`}>{tagline}</p>
         <p className={`couples-card-desc couples-card-desc--${variant}`}>{description}</p>
-        <div className="mt-7">
+        <div className="mt-8">
           <button type="button" onClick={onClick} className="couples-cta-primary">
             Start
           </button>
@@ -93,7 +95,7 @@ function HowItWorksModal({
   return (
     <div className="couples-modal-backdrop" role="presentation" onClick={onClose}>
       <div
-        className="couples-modal"
+        className="couples-modal couples-modal--aspirational"
         role="dialog"
         aria-labelledby="couples-how-title"
         onClick={(e) => e.stopPropagation()}
@@ -103,29 +105,32 @@ function HowItWorksModal({
         </button>
         <p className="couples-modal-eyebrow">Reignite</p>
         <h2 id="couples-how-title" className="couples-modal-title">
-          How it works
+          Two ways to spend the evening
         </h2>
+        <p className="couples-modal-intro">
+          Designed for connection, discovery and surprise — choose the experience that calls to you tonight.
+        </p>
 
-        <section className="couples-modal-section">
-          <h3 className="couples-modal-section-title">Date Night</h3>
-          <p className="couples-modal-lead">A shared 30-minute narrated adventure for couples.</p>
-          <ul className="couples-modal-list">
-            <li>Both partners privately rate a set of story ideas.</li>
-            <li>Nakama discovers the best mutual match.</li>
-            <li>Choose voices and mood.</li>
-            <li>Then begin your shared journey together.</li>
+        <section className="couples-modal-section couples-modal-section--warm">
+          <p className="couples-modal-kicker">Date Night</p>
+          <h3 className="couples-modal-section-title">A shared narrated adventure designed for two.</h3>
+          <ul className="couples-modal-steps">
+            <li>Privately rate story ideas.</li>
+            <li>Discover your strongest shared match.</li>
+            <li>Choose your mood and voices.</li>
+            <li>Begin a journey together.</li>
           </ul>
         </section>
 
-        <section className="couples-modal-section">
+        <section className="couples-modal-section couples-modal-section--playful">
+          <p className="couples-modal-kicker couples-modal-kicker--playful">Surprise Adventure</p>
           <h3 className="couples-modal-section-title couples-modal-section-title--playful">
-            Surprise Adventure
+            Create the experience yourself.
           </h3>
-          <p className="couples-modal-lead">One partner creates the experience.</p>
-          <ul className="couples-modal-list">
-            <li>Choose the scenario, mood and story direction.</li>
-            <li>The other partner discovers the adventure as it unfolds.</li>
-            <li>A more personalised and playful experience.</li>
+          <ul className="couples-modal-steps">
+            <li>Choose the story.</li>
+            <li>Choose the mood.</li>
+            <li>Reveal the adventure as it unfolds.</li>
           </ul>
         </section>
 
@@ -151,9 +156,13 @@ function isTrialPlan(): boolean {
 export default function LiveTestCouplesProgram({
   onStartDateNight,
   onStartSurprise,
+  guideRailHidden = true,
+  onToggleGuide,
 }: {
   onStartDateNight?: () => void;
   onStartSurprise?: () => void;
+  guideRailHidden?: boolean;
+  onToggleGuide?: () => void;
 }) {
   const [firstName, setFirstName] = useState(DEFAULT_USER_NAME);
   const [showTrialTools, setShowTrialTools] = useState(false);
@@ -240,25 +249,18 @@ export default function LiveTestCouplesProgram({
   return (
     <div className="couples-experience-panel animate-panel-in relative flex h-full min-h-0 flex-col overflow-hidden">
       <div className="couples-atmosphere pointer-events-none absolute inset-0" aria-hidden />
+      <div className="couples-hero-glow-top pointer-events-none absolute inset-x-0 top-0 h-48" aria-hidden />
 
-      <header className="relative z-10 shrink-0 px-6 pb-4 pt-7 sm:px-10 sm:pt-8">
-        <div className="flex items-start justify-between gap-4">
+      <header className="couples-hero relative z-10 shrink-0 px-6 pb-4 pt-7 sm:px-10 sm:pt-8">
+        <div className="couples-hero-top flex items-start justify-between gap-5">
           <div className="min-w-0 flex-1">
             <p className="type-label text-amber-500/60">Reignite · Couples</p>
-            <h1 className="couples-greeting type-hero mt-3">
-              Good evening,{" "}
-              <span className="text-luxury-primary">{firstName}</span>
-            </h1>
-            <p className="couples-header-subtitle type-body mt-3">
-              A private space for long-term partners — choose your experience and let the evening unfold.
-            </p>
           </div>
 
-          <div className="flex shrink-0 flex-col items-end gap-2">
-            <button type="button" className="couples-how-link" onClick={openHowItWorks}>
-              How it works
-            </button>
-
+          <div className="flex shrink-0 flex-col items-end gap-2.5">
+            {onToggleGuide ? (
+              <CouplesGuideConcierge guideHidden={guideRailHidden} onToggle={onToggleGuide} />
+            ) : null}
             {showTrialTools ? (
               <>
                 {!showPartnerForm ? (
@@ -291,6 +293,22 @@ export default function LiveTestCouplesProgram({
               </>
             ) : null}
           </div>
+        </div>
+
+        <div className="couples-hero-body mt-3">
+          <div className="couples-hero-heading-row flex flex-wrap items-end gap-x-4 gap-y-2">
+            <h1 className="couples-greeting type-hero">
+              Good evening,{" "}
+              <span className="text-luxury-primary">{firstName}</span>
+            </h1>
+            <button type="button" className="couples-how-link" onClick={openHowItWorks}>
+              How it works
+            </button>
+          </div>
+          <p className="couples-hero-magic">Choose how tonight unfolds.</p>
+          <p className="couples-header-subtitle type-body mt-2">
+            A private space for long-term partners — choose your experience and let the evening unfold.
+          </p>
         </div>
 
         {showTrialTools && inviteStatus === "error" && inviteMessage ? (

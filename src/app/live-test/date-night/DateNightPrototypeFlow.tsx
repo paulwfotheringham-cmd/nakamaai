@@ -28,9 +28,12 @@ import DateNightPlayer from "./DateNightPlayer";
 import DateNightRatingPicker from "./DateNightRatingPicker";
 import DateNightSharedSidebar from "./DateNightSharedSidebar";
 import PartnerSimulationPanel, { RatingLegend } from "./PartnerSimulationPanel";
+import CouplesGuideConcierge from "../CouplesGuideConcierge";
 
 type DateNightPrototypeFlowProps = {
   onBack: () => void;
+  guideRailHidden?: boolean;
+  onToggleGuide?: () => void;
 };
 
 function JourneySection({
@@ -89,7 +92,11 @@ function ProgressTimeline({ session }: { session: DateNightSession }) {
   );
 }
 
-export default function DateNightPrototypeFlow({ onBack }: DateNightPrototypeFlowProps) {
+export default function DateNightPrototypeFlow({
+  onBack,
+  guideRailHidden = true,
+  onToggleGuide,
+}: DateNightPrototypeFlowProps) {
   const [showTutorial, setShowTutorial] = useState(true);
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [session, setSession] = useState<DateNightSession | null>(null);
@@ -265,9 +272,14 @@ export default function DateNightPrototypeFlow({ onBack }: DateNightPrototypeFlo
       <div className="dn-workspace-center">
         <div className="dn-workspace-scroll" ref={journeyRef}>
           <header className="dn-page-header">
-            <button type="button" className="dn-back-link" onClick={onBack}>
-              ← Reignite
-            </button>
+            <div className="dn-page-header-row">
+              <button type="button" className="dn-back-link" onClick={onBack}>
+                ← Reignite
+              </button>
+              {onToggleGuide ? (
+                <CouplesGuideConcierge guideHidden={guideRailHidden} onToggle={onToggleGuide} />
+              ) : null}
+            </div>
             <div>
               <p className="dn-page-eyebrow">Date Night</p>
               <h1 className="dn-page-title">Tonight&apos;s Adventure</h1>
