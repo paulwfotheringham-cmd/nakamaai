@@ -1,3 +1,4 @@
+// v2026-05-31 — audio-only player, no synopsis text
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
