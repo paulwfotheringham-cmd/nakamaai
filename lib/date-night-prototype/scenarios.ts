@@ -51,13 +51,23 @@ const SCENARIO_POOL: Omit<DateNightScenarioConcept, "id">[] = [
   },
 ];
 
-function slug(title: string, index: number): string {
-  return `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${index}-${Date.now()}`;
+function slug(title: string): string {
+  return `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+/** Fisher-Yates shuffle — returns a new array in random order */
+function shuffled<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 export function freshScenarioSet(): DateNightScenarioConcept[] {
-  return SCENARIO_POOL.map((src, i) => ({
-    id: slug(src.title, i),
+  return shuffled(SCENARIO_POOL).map((src) => ({
+    id: slug(src.title),
     title: src.title,
     description: src.description,
   }));
