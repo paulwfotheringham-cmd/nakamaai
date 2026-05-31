@@ -1269,6 +1269,11 @@
   .dn-workspace.dn-workspace-focused {
     grid-template-columns: minmax(0, 1fr) minmax(14rem, 17rem);
   }
+
+  /* Full-width solo layout — no sidebar, no partner panel */
+  .dn-workspace.dn-workspace-solo {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .dn-workspace-center-full {
@@ -1679,8 +1684,16 @@
   }
 }
 
-@media (min-width: 768px) {
-  .dn-scenario-grid-4col {
+/* Full-width solo layout gets 4 cols earlier */
+@media (min-width: 640px) {
+  .dn-workspace-solo .dn-scenario-grid-4col {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Focused (with partner panel) layout gets 4 cols at wider breakpoint */
+@media (min-width: 860px) {
+  .dn-workspace-focused .dn-scenario-grid-4col {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }

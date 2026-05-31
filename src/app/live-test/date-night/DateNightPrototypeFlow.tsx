@@ -297,6 +297,8 @@ export default function DateNightPrototypeFlow({
     setSharedStories(readSharedStories());
   }
 
+  const isRatingsStep = !session || session.step === "ratings";
+
   const ratingsComplete =
     session?.scenarios.every(
       (s) => session.creatorRatings[s.id] >= 1 && session.creatorRatings[s.id] <= 10,
@@ -596,7 +598,7 @@ export default function DateNightPrototypeFlow({
   }
 
   return (
-    <div className="dn-workspace dn-workspace-focused">
+    <div className={`dn-workspace ${isRatingsStep ? "dn-workspace-solo" : "dn-workspace-focused"}`}>
       <div className="dn-workspace-center dn-workspace-center-full">
         <div className="dn-workspace-scroll">
           <header className="dn-page-header">
@@ -626,7 +628,7 @@ export default function DateNightPrototypeFlow({
         </div>
       </div>
 
-      {session ? (
+      {session && !isRatingsStep ? (
         <PartnerSimulationPanel
           session={session}
           creatorUsername={creatorUsername}
