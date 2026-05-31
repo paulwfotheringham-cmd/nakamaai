@@ -1201,11 +1201,27 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
-.pro-guide-restore-fab {
+.pro-guide-restore-wrap {
   position: fixed;
   top: 1rem;
   right: 1rem;
   z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.pro-guide-restore-label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.38);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.pro-guide-restore-fab {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1217,6 +1233,7 @@
   border: 1px solid rgba(212, 175, 55, 0.25);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   transition: border-color 0.2s ease, background 0.2s ease;
+  flex-shrink: 0;
 }
 
 .pro-guide-restore-fab:hover {
