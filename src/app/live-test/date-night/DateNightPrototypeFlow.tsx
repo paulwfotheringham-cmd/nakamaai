@@ -143,8 +143,44 @@ export default function DateNightPrototypeFlow({
 
   useEffect(() => {
     setCreatorUsername(readGuidePreferences().userName || DEFAULT_USER_NAME);
+
+    const stored = readActiveSession();
+
+    // A completed player session must never auto-restore on entry —
+    // it belongs in Shared Stories, not as the default landing screen.
+    if (stored?.step === "player" && stored.matchedScenario) {
+      const existing = readSharedStories();
+      const alreadySaved = existing.some((s) => s.id === stored.id);
+      if (!alreadySaved) {
+        const story: SharedDateNightStory = {
+          id: stored.id,
+          storyName: stored.friendlyName || stored.matchedScenario.title,
+          scenarioTitle: stored.matchedScenario.title,
+          partnerName: stored.partnerUsername || PROTOTYPE_PARTNER_USERNAME,
+          dateCreated: stored.createdAt,
+          progressPercent: Math.round(
+            ((STORY_DURATION_SEC - stored.playback.timeRemainingSec) / STORY_DURATION_SEC) * 100,
+          ),
+          maleVoice: stored.maleVoice,
+          femaleVoice: stored.femaleVoice,
+          mood: stored.mood,
+          sessionSnapshot: stored,
+        };
+        upsertSharedStory(story);
+      }
+      writeActiveSession(null);
+      setSharedStories(readSharedStories());
+      setSession(null);
+      return;
+    }
+
     setSharedStories(readSharedStories());
-    setSession(readActiveSession());
+    // Only restore sessions that are actively mid-flow (not completed, not stale tutorial)
+    if (stored && stored.step !== "tutorial") {
+      setSession(stored);
+    } else {
+      writeActiveSession(null);
+    }
   }, []);
 
   useEffect(() => {

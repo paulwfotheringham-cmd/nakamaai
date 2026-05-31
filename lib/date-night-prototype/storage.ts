@@ -11,7 +11,9 @@ import type { DateNightFlowStep, DateNightSession, SharedDateNightStory } from "
 
 const LEGACY_STEP_MAP: Record<string, DateNightFlowStep> = {
   "story-config": "story-name",
-  "story-starting": "player",
+  // "story-starting" previously mapped to "player" — now we let it surface
+  // as "story-generated" so the player doesn't auto-show on entry
+  "story-starting": "story-generated",
   home: "tutorial",
 };
 
