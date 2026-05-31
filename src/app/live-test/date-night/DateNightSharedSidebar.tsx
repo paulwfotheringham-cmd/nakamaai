@@ -19,7 +19,7 @@ export default function DateNightSharedSidebar({
     <aside className="dn-sidebar">
       <div className="dn-sidebar-header">
         <p className="dn-sidebar-eyebrow">Library</p>
-        <h2 className="dn-sidebar-title">Shared Stories</h2>
+        <h2 className="dn-sidebar-title">Saved Stories</h2>
       </div>
 
       <button type="button" className="dn-sidebar-new" onClick={onNewAdventure}>

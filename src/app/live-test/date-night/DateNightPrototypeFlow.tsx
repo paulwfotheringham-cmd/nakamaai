@@ -84,7 +84,7 @@ function SharedStoriesModal({
           ×
         </button>
         <h2 id="dn-shared-title" className="dn-shared-modal-title">
-          Shared Stories
+          Saved Stories
         </h2>
         {stories.length === 0 ? (
           <p className="dn-shared-modal-empty">Saved adventures appear here after your first story.</p>
@@ -602,13 +602,15 @@ export default function DateNightPrototypeFlow({
                 <button type="button" className="dn-back-link" onClick={onBack}>
                   ← Reignite
                 </button>
-                <button type="button" className="dn-nav-link" onClick={() => setShowSharedModal(true)}>
-                  Shared Stories
-                </button>
               </div>
-              {onToggleGuide ? (
-                <CouplesGuideConcierge guideHidden={guideRailHidden} onToggle={onToggleGuide} />
-              ) : null}
+              <div className="dn-page-header-right">
+                <button type="button" className="dn-saved-stories-link" onClick={() => setShowSharedModal(true)}>
+                  Saved Stories
+                </button>
+                {onToggleGuide ? (
+                  <CouplesGuideConcierge guideHidden={guideRailHidden} onToggle={onToggleGuide} />
+                ) : null}
+              </div>
             </div>
             <div>
               <p className="dn-page-eyebrow">Date Night</p>
