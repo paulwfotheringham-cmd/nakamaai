@@ -128,7 +128,7 @@ export default function DateNightPrototypeFlow({
   const [dontShowTutorialAgain, setDontShowTutorialAgain] = useState(false);
   // Partner simulator state (dev/test only — simulates the invited partner's experience)
   const [simPartnerState, setSimPartnerState] = useState<
-    "invitation" | "ranking" | "rankings_submitted" | "match_found" | "story_setup" | "generating"
+    "invitation" | "ranking" | "rankings_submitted" | "match_found" | "story_setup" | "generating" | "adventure_ready"
   >("invitation");
   const [simPartnerRatings, setSimPartnerRatings] = useState<Record<string, number>>({});
   const [simRatingError, setSimRatingError] = useState<string | null>(null);
@@ -139,6 +139,9 @@ export default function DateNightPrototypeFlow({
   const [simFemaleVoice, setSimFemaleVoice] = useState(MOCK_FEMALE_VOICES[0] ?? "");
   const [simMood, setSimMood] = useState<DateNightMood | null>(null);
   const [simSetupError, setSimSetupError] = useState<string | null>(null);
+  // Shared audio player state for adventure_ready
+  const [simAudioPlaying, setSimAudioPlaying] = useState(false);
+  const [simAudioProgress, setSimAudioProgress] = useState(0); // seconds elapsed
 
   const persist = useCallback((next: DateNightSession | null) => {
     setSession(next);
@@ -221,6 +224,18 @@ export default function DateNightPrototypeFlow({
     return () => clearTimeout(t);
   }, [session?.step, updateSession]);
 
+  // Shared audio tick — advances simAudioProgress when playing in the duo simulator
+  useEffect(() => {
+    if (!simAudioPlaying || simPartnerState !== "adventure_ready") return;
+    const id = setInterval(() => {
+      setSimAudioProgress((prev) => {
+        if (prev >= STORY_DURATION_SEC) { setSimAudioPlaying(false); return STORY_DURATION_SEC; }
+        return prev + 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [simAudioPlaying, simPartnerState]);
+
   useEffect(() => {
     if (!session?.playback.playing || session.step !== "player") return;
     const iv = setInterval(() => {
@@ -268,15 +283,12 @@ export default function DateNightPrototypeFlow({
     if (!simMood) { setSimSetupError("Please choose a mood."); return; }
     setSimSetupError(null);
     setSimPartnerState("generating");
-    updateSession({
-      friendlyName: simStoryName.trim(),
-      maleVoice: simMaleVoice,
-      femaleVoice: simFemaleVoice,
-      mood: simMood,
-      partnerRatings: simPartnerRatings,
-      matchedScenario: simMatchedScenario,
-      step: "story-generated",
-    });
+    // Stay in the duo-layout; advance to adventure_ready after a brief generation delay
+    setTimeout(() => {
+      setSimAudioProgress(0);
+      setSimAudioPlaying(false);
+      setSimPartnerState("adventure_ready");
+    }, 2500);
   }
 
   function submitSimPartnerRankings() {
@@ -452,6 +464,105 @@ export default function DateNightPrototypeFlow({
       const sim = simPartnerState;
       const activeSession = session;
 
+      // ── Shared adventure player (both panels render this when adventure_ready) ──
+      function renderAdventurePlayer() {
+        const totalSec = STORY_DURATION_SEC;
+        const remaining = Math.max(0, totalSec - simAudioProgress);
+        const pct = Math.min(100, (simAudioProgress / totalSec) * 100);
+        const fmt = (s: number) => {
+          const m = Math.floor(s / 60);
+          const sec = Math.floor(s % 60);
+          return `${m}:${sec.toString().padStart(2, "0")}`;
+        };
+        return (
+          <div className="dn-duo-panel-body dn-sim-adventure">
+            <span className="dn-duo-status dn-duo-status-accepted">
+              <svg viewBox="0 0 16 16" fill="none" width="11" height="11" aria-hidden>
+                <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.2" />
+                <path d="M5 8.5l2 2 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Adventure Ready
+            </span>
+
+            <div className="dn-sim-adv-meta">
+              <div className="dn-sim-adv-row">
+                <span className="dn-sim-adv-label">Story</span>
+                <span className="dn-sim-adv-value">{simStoryName || "Untitled Adventure"}</span>
+              </div>
+              <div className="dn-sim-adv-row">
+                <span className="dn-sim-adv-label">Scenario</span>
+                <span className="dn-sim-adv-value">{simMatchedScenario?.title}</span>
+              </div>
+              <div className="dn-sim-adv-row">
+                <span className="dn-sim-adv-label">Mood</span>
+                <span className="dn-sim-adv-tag">{simMood}</span>
+              </div>
+            </div>
+
+            <div className="dn-sim-player">
+              {/* Waveform / progress bar */}
+              <div
+                className="dn-sim-waveform"
+                role="progressbar"
+                aria-valuenow={Math.round(pct)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <div className="dn-sim-waveform-fill" style={{ width: `${pct}%` }} />
+              </div>
+
+              <div className="dn-sim-time-row">
+                <span className="dn-sim-time">{fmt(simAudioProgress)}</span>
+                <span className="dn-sim-time dn-sim-time-remain">−{fmt(remaining)}</span>
+              </div>
+
+              <div className="dn-sim-controls">
+                <button
+                  type="button"
+                  className="dn-sim-ctrl-btn"
+                  title="Rewind 15s"
+                  onClick={() => setSimAudioProgress((p) => Math.max(0, p - 15))}
+                >
+                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden>
+                    <path d="M10 3a7 7 0 1 0 7 7h-2a5 5 0 1 1-1.1-3.14L11 9h5V4l-1.76 1.76A7 7 0 0 0 10 3z" />
+                    <text x="6.5" y="12.5" fontSize="5" textAnchor="middle" fill="currentColor">15</text>
+                  </svg>
+                </button>
+
+                <button
+                  type="button"
+                  className="dn-sim-ctrl-play"
+                  onClick={() => setSimAudioPlaying((p) => !p)}
+                  aria-label={simAudioPlaying ? "Pause" : "Play"}
+                >
+                  {simAudioPlaying ? (
+                    <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden>
+                      <rect x="5" y="4" width="3" height="12" rx="1" />
+                      <rect x="12" y="4" width="3" height="12" rx="1" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden>
+                      <path d="M6 4l12 6-12 6V4z" />
+                    </svg>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  className="dn-sim-ctrl-btn"
+                  title="Stop"
+                  onClick={() => { setSimAudioPlaying(false); setSimAudioProgress(0); }}
+                >
+                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden>
+                    <rect x="4" y="4" width="12" height="12" rx="1.5" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       // ── LEFT panel content by state ──────────────────────────────
       function renderLeftPanel() {
         if (sim === "invitation") {
@@ -555,6 +666,9 @@ export default function DateNightPrototypeFlow({
               </button>
             </div>
           );
+        }
+        if (sim === "adventure_ready") {
+          return renderAdventurePlayer();
         }
         // generating
         return (
@@ -660,6 +774,9 @@ export default function DateNightPrototypeFlow({
               <p className="dn-duo-hint">Waiting for story configuration&hellip;</p>
             </div>
           );
+        }
+        if (sim === "adventure_ready") {
+          return renderAdventurePlayer();
         }
         // generating
         return (

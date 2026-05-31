@@ -2264,6 +2264,149 @@
   max-width: 100%;
 }
 
+/* ── Adventure Ready player panel ─────────────────────────── */
+.dn-sim-adventure {
+  gap: 1.1rem;
+  justify-content: flex-start;
+}
+
+.dn-sim-adv-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(212, 175, 55, 0.12);
+  border-radius: 0.75rem;
+}
+
+.dn-sim-adv-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.dn-sim-adv-label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+  width: 4.5rem;
+}
+
+.dn-sim-adv-value {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 400;
+}
+
+.dn-sim-adv-tag {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: rgba(212, 175, 55, 0.85);
+}
+
+/* Player chrome */
+.dn-sim-player {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 1rem 1rem 0.875rem;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 0.875rem;
+}
+
+.dn-sim-waveform {
+  position: relative;
+  width: 100%;
+  height: 0.375rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2rem;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.dn-sim-waveform-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.7) 0%, rgba(212, 175, 55, 1) 100%);
+  border-radius: inherit;
+  transition: width 0.9s linear;
+}
+
+.dn-sim-time-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.dn-sim-time {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.38);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.dn-sim-time-remain {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.dn-sim-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding-top: 0.25rem;
+}
+
+.dn-sim-ctrl-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.dn-sim-ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.dn-sim-ctrl-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.9) 0%, rgba(184, 142, 28, 0.95) 100%);
+  border: none;
+  color: #1a1208;
+  cursor: pointer;
+  box-shadow: 0 2px 14px rgba(212, 175, 55, 0.3);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.dn-sim-ctrl-play:hover {
+  transform: scale(1.06);
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.45);
+}
+.dn-sim-ctrl-play:active {
+  transform: scale(0.96);
+}
+
 /* ── Simulated partner notification card ──────────────────── */
 .dn-partner-notif-card {
   flex: 1 1 20rem;
