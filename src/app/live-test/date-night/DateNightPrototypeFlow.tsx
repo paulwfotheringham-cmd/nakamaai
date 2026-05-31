@@ -128,7 +128,7 @@ export default function DateNightPrototypeFlow({
   const [dontShowTutorialAgain, setDontShowTutorialAgain] = useState(false);
   // Partner simulator state (dev/test only — simulates the invited partner's experience)
   const [simPartnerState, setSimPartnerState] = useState<
-    "invitation" | "ranking" | "rankings_submitted" | "match_found" | "story_setup" | "generating" | "adventure_ready"
+    "invitation" | "ranking" | "rankings_submitted" | "match_found" | "story_setup" | "generating" | "adventure_ready" | "session_ended"
   >("invitation");
   const [simPartnerRatings, setSimPartnerRatings] = useState<Record<string, number>>({});
   const [simRatingError, setSimRatingError] = useState<string | null>(null);
@@ -142,6 +142,9 @@ export default function DateNightPrototypeFlow({
   // Shared audio player state for adventure_ready
   const [simAudioPlaying, setSimAudioPlaying] = useState(false);
   const [simAudioProgress, setSimAudioProgress] = useState(0); // seconds elapsed
+  // Local volume controls (independent per user)
+  const [simHostVolume, setSimHostVolume] = useState(80);
+  const [simPartnerVolume, setSimPartnerVolume] = useState(80);
 
   const persist = useCallback((next: DateNightSession | null) => {
     setSession(next);
@@ -464,16 +467,52 @@ export default function DateNightPrototypeFlow({
       const sim = simPartnerState;
       const activeSession = session;
 
-      // ── Shared adventure player (both panels render this when adventure_ready) ──
-      function renderAdventurePlayer() {
-        const totalSec = STORY_DURATION_SEC;
-        const remaining = Math.max(0, totalSec - simAudioProgress);
-        const pct = Math.min(100, (simAudioProgress / totalSec) * 100);
-        const fmt = (s: number) => {
-          const m = Math.floor(s / 60);
-          const sec = Math.floor(s % 60);
-          return `${m}:${sec.toString().padStart(2, "0")}`;
-        };
+      // ── Shared helpers ────────────────────────────────────────────
+      const totalSec = STORY_DURATION_SEC;
+      const remaining = Math.max(0, totalSec - simAudioProgress);
+      const pct = Math.min(100, (simAudioProgress / totalSec) * 100);
+      const fmt = (s: number) => {
+        const m = Math.floor(s / 60);
+        const sec = Math.floor(s % 60);
+        return `${m}:${sec.toString().padStart(2, "0")}`;
+      };
+
+      function renderProgressBlock() {
+        return (
+          <div className="dn-sim-player">
+            <div className="dn-sim-waveform" role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
+              <div className="dn-sim-waveform-fill" style={{ width: `${pct}%` }} />
+            </div>
+            <div className="dn-sim-time-row">
+              <span className="dn-sim-time">{fmt(simAudioProgress)}</span>
+              <span className="dn-sim-time dn-sim-time-remain">−{fmt(remaining)}</span>
+            </div>
+          </div>
+        );
+      }
+
+      function renderVolumeControl(volume: number, onChange: (v: number) => void) {
+        return (
+          <div className="dn-sim-volume-row">
+            <svg className="dn-sim-vol-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden>
+              <path d="M9 4L5 7H2v6h3l4 3V4zm4.5 1.5a7 7 0 0 1 0 9M12 7a4 4 0 0 1 0 6" stroke="currentColor" strokeWidth="1" fill="none" strokeLinecap="round"/>
+            </svg>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={volume}
+              onChange={(e) => onChange(Number(e.target.value))}
+              className="dn-sim-volume-slider"
+              aria-label="Volume"
+            />
+            <span className="dn-sim-vol-value">{volume}%</span>
+          </div>
+        );
+      }
+
+      // ── Host adventure player (left / YOU panel) ──────────────────
+      function renderHostAdventure() {
         return (
           <div className="dn-duo-panel-body dn-sim-adventure">
             <span className="dn-duo-status dn-duo-status-accepted">
@@ -499,66 +538,100 @@ export default function DateNightPrototypeFlow({
               </div>
             </div>
 
-            <div className="dn-sim-player">
-              {/* Waveform / progress bar */}
-              <div
-                className="dn-sim-waveform"
-                role="progressbar"
-                aria-valuenow={Math.round(pct)}
-                aria-valuemin={0}
-                aria-valuemax={100}
+            {renderProgressBlock()}
+
+            {/* Host transport controls */}
+            <div className="dn-sim-controls">
+              <button
+                type="button"
+                className="dn-sim-ctrl-btn"
+                title="Rewind 15s"
+                onClick={() => setSimAudioProgress((p) => Math.max(0, p - 15))}
               >
-                <div className="dn-sim-waveform-fill" style={{ width: `${pct}%` }} />
-              </div>
+                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden>
+                  <path d="M10 3a7 7 0 1 0 7 7h-2a5 5 0 1 1-1.1-3.14L11 9h5V4l-1.76 1.76A7 7 0 0 0 10 3z" />
+                  <text x="6.5" y="12.5" fontSize="5" textAnchor="middle" fill="currentColor">15</text>
+                </svg>
+              </button>
 
-              <div className="dn-sim-time-row">
-                <span className="dn-sim-time">{fmt(simAudioProgress)}</span>
-                <span className="dn-sim-time dn-sim-time-remain">−{fmt(remaining)}</span>
-              </div>
-
-              <div className="dn-sim-controls">
-                <button
-                  type="button"
-                  className="dn-sim-ctrl-btn"
-                  title="Rewind 15s"
-                  onClick={() => setSimAudioProgress((p) => Math.max(0, p - 15))}
-                >
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden>
-                    <path d="M10 3a7 7 0 1 0 7 7h-2a5 5 0 1 1-1.1-3.14L11 9h5V4l-1.76 1.76A7 7 0 0 0 10 3z" />
-                    <text x="6.5" y="12.5" fontSize="5" textAnchor="middle" fill="currentColor">15</text>
+              <button
+                type="button"
+                className="dn-sim-ctrl-play"
+                onClick={() => setSimAudioPlaying((p) => !p)}
+                aria-label={simAudioPlaying ? "Pause" : "Play"}
+              >
+                {simAudioPlaying ? (
+                  <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden>
+                    <rect x="5" y="4" width="3" height="12" rx="1" />
+                    <rect x="12" y="4" width="3" height="12" rx="1" />
                   </svg>
-                </button>
-
-                <button
-                  type="button"
-                  className="dn-sim-ctrl-play"
-                  onClick={() => setSimAudioPlaying((p) => !p)}
-                  aria-label={simAudioPlaying ? "Pause" : "Play"}
-                >
-                  {simAudioPlaying ? (
-                    <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden>
-                      <rect x="5" y="4" width="3" height="12" rx="1" />
-                      <rect x="12" y="4" width="3" height="12" rx="1" />
-                    </svg>
-                  ) : (
-                    <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden>
-                      <path d="M6 4l12 6-12 6V4z" />
-                    </svg>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  className="dn-sim-ctrl-btn"
-                  title="Stop"
-                  onClick={() => { setSimAudioPlaying(false); setSimAudioProgress(0); }}
-                >
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden>
-                    <rect x="4" y="4" width="12" height="12" rx="1.5" />
+                ) : (
+                  <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden>
+                    <path d="M6 4l12 6-12 6V4z" />
                   </svg>
-                </button>
+                )}
+              </button>
+
+              <button
+                type="button"
+                className="dn-sim-ctrl-btn dn-sim-ctrl-end"
+                title="End Session"
+                onClick={() => { setSimAudioPlaying(false); setSimPartnerState("session_ended"); }}
+              >
+                <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden>
+                  <rect x="4" y="4" width="12" height="12" rx="1.5" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="dn-sim-ctrl-labels">
+              <span>−15s</span>
+              <span>{simAudioPlaying ? "Pause" : "Play"}</span>
+              <span>End</span>
+            </div>
+
+            {renderVolumeControl(simHostVolume, setSimHostVolume)}
+          </div>
+        );
+      }
+
+      // ── Listener adventure player (right / PARTNER panel) ─────────
+      function renderListenerAdventure() {
+        return (
+          <div className="dn-duo-panel-body dn-sim-adventure">
+            <span className="dn-duo-status dn-duo-status-accepted">
+              <svg viewBox="0 0 16 16" fill="none" width="11" height="11" aria-hidden>
+                <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.2" />
+                <path d="M5 8.5l2 2 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Adventure Ready
+            </span>
+
+            <div className="dn-sim-adv-meta">
+              <div className="dn-sim-adv-row">
+                <span className="dn-sim-adv-label">Story</span>
+                <span className="dn-sim-adv-value">{simStoryName || "Untitled Adventure"}</span>
+              </div>
+              <div className="dn-sim-adv-row">
+                <span className="dn-sim-adv-label">Scenario</span>
+                <span className="dn-sim-adv-value">{simMatchedScenario?.title}</span>
               </div>
             </div>
+
+            {/* Listener status — no transport controls */}
+            <div className="dn-sim-listener-status">
+              <svg viewBox="0 0 20 20" fill="none" width="18" height="18" aria-hidden>
+                <path d="M10 2a8 8 0 1 0 0 16A8 8 0 0 0 10 2zm-1 5l5 3-5 3V7z" fill="currentColor" opacity=".5" />
+              </svg>
+              <span className="dn-sim-listener-label">
+                Listening with <strong className="dn-duo-name">@{creatorUsername}</strong>
+              </span>
+            </div>
+            <p className="dn-duo-hint" style={{ textAlign: "center" }}>Playback controlled by host</p>
+
+            {renderProgressBlock()}
+
+            {renderVolumeControl(simPartnerVolume, setSimPartnerVolume)}
           </div>
         );
       }
@@ -668,7 +741,16 @@ export default function DateNightPrototypeFlow({
           );
         }
         if (sim === "adventure_ready") {
-          return renderAdventurePlayer();
+          return renderHostAdventure();
+        }
+        if (sim === "session_ended") {
+          return (
+            <div className="dn-duo-panel-body dn-sim-calculating">
+              <h2 className="dn-sim-calc-title">Session Ended</h2>
+              <p className="dn-sim-calc-hint">{simStoryName || simMatchedScenario?.title}</p>
+              <p className="dn-duo-hint">Your adventure has been saved.</p>
+            </div>
+          );
         }
         // generating
         return (
@@ -776,7 +858,16 @@ export default function DateNightPrototypeFlow({
           );
         }
         if (sim === "adventure_ready") {
-          return renderAdventurePlayer();
+          return renderListenerAdventure();
+        }
+        if (sim === "session_ended") {
+          return (
+            <div className="dn-duo-panel-body dn-sim-calculating">
+              <h2 className="dn-sim-calc-title">Session Ended</h2>
+              <p className="dn-sim-calc-hint">{simStoryName || simMatchedScenario?.title}</p>
+              <p className="dn-duo-hint">Host ended the adventure.</p>
+            </div>
+          );
         }
         // generating
         return (
