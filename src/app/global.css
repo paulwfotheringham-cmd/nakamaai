@@ -1855,6 +1855,239 @@
   padding: 1rem 0 2rem;
 }
 
+/* ── Post-Connect waiting layout ──────────────────────────── */
+.dn-connect-waiting-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 3rem 0 4rem;
+}
+
+/* Premium centered waiting card */
+.dn-connect-waiting-card {
+  width: 100%;
+  max-width: 30rem;
+  padding: 2.5rem 2.5rem 2rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: linear-gradient(170deg, rgba(212, 175, 55, 0.07) 0%, rgba(0, 0, 0, 0.35) 100%);
+  box-shadow:
+    0 0 48px rgba(212, 175, 55, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+/* Gold animated pulse ring */
+.dn-connect-pulse-ring {
+  position: relative;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: 0.5rem;
+  flex-shrink: 0;
+}
+
+.dn-connect-pulse-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(212, 175, 55, 0.55);
+  animation: dn-pulse-ring-inner 2s ease-in-out infinite;
+}
+
+.dn-connect-pulse-ring::after {
+  content: "";
+  position: absolute;
+  inset: -0.45rem;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  animation: dn-pulse-ring-outer 2s ease-in-out infinite;
+}
+
+@keyframes dn-pulse-ring-inner {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+
+@keyframes dn-pulse-ring-outer {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.12); opacity: 0.55; }
+}
+
+.dn-connect-waiting-heading {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.95);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.dn-connect-waiting-sub {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.dn-connect-partner-name {
+  color: rgba(212, 175, 55, 0.9);
+  font-weight: 500;
+}
+
+.dn-connect-waiting-hint {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.28);
+  font-style: italic;
+  margin-top: 0.1rem;
+}
+
+/* Two-panel split */
+.dn-connect-split {
+  width: 100%;
+  max-width: 44rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: linear-gradient(170deg, rgba(255, 255, 255, 0.025), rgba(0, 0, 0, 0.3));
+  overflow: hidden;
+}
+
+.dn-connect-split-divider {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  align-self: stretch;
+}
+
+.dn-connect-user-panel {
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.dn-connect-panel-role {
+  font-size: 0.625rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.28);
+  margin-bottom: 0.25rem;
+}
+
+.dn-connect-panel-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.22), rgba(212, 175, 55, 0.06));
+  border: 1.5px solid rgba(212, 175, 55, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: rgba(212, 175, 55, 0.9);
+  margin-bottom: 0.25rem;
+}
+
+.dn-connect-panel-avatar-dim {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.dn-connect-panel-username {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 500;
+}
+
+.dn-connect-panel-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+}
+
+.dn-connect-panel-status-sent {
+  background: rgba(212, 175, 55, 0.1);
+  color: rgba(212, 175, 55, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+}
+
+.dn-connect-panel-status-waiting {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dn-connect-status-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.85);
+  display: inline-block;
+  flex-shrink: 0;
+  animation: dn-dot-pulse 2s ease-in-out infinite;
+}
+
+.dn-connect-status-dot-dim {
+  background: rgba(255, 255, 255, 0.22);
+  animation: none;
+}
+
+@keyframes dn-dot-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.dn-connect-panel-time {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.22);
+}
+
+.dn-connect-panel-progress {
+  width: 80%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 1px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.dn-connect-panel-progress-bar {
+  height: 100%;
+  width: 45%;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.5), rgba(212, 175, 55, 0.9));
+  border-radius: 1px;
+  animation: dn-progress-sweep 2.4s ease-in-out infinite;
+}
+
+@keyframes dn-progress-sweep {
+  0% { opacity: 0.4; transform: translateX(-10%); }
+  50% { opacity: 1; transform: translateX(10%); }
+  100% { opacity: 0.4; transform: translateX(-10%); }
+}
+
+.dn-connect-panel-placeholder {
+  margin-top: 0.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.13);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.15);
+}
+
 .dn-connect-panel,
 .dn-waiting-panel,
 .dn-step-panel {
