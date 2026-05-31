@@ -14,11 +14,11 @@ const SCENARIO_IMAGES: Record<string, string> = {
   "Midnight Rooftop": "/tiles/tile6.jpg",
   "Winter Chalet": "/tiles/slowburn.jpg",
   "The Art Collector": "/tiles/tile2.jpg",
-  "Harbor at Dusk": "/tiles/boat.jpg",
+  "Harbor at Dusk": "/tiles/space.jpg",
   "Garden of Echoes": "/tiles/tile4.jpg",
   "The Jazz Lounge": "/tiles/tile5.jpg",
   "Castle by the Lake": "/tiles/dragon.jpg",
-  "Neon Afterglow": "/tiles/tile3.jpg",
+  "Neon Afterglow": "/tiles/anime.jpg",
 };
 
 export function getScenarioImage(title: string): string {

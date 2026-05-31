@@ -1,45 +1,51 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { PROTOTYPE_PARTNER_USERNAME } from "@/lib/date-night-prototype/constants";
-import {
-  matchCompatibility,
-  partnerStatusLabel,
-  partnerStepLabel,
-} from "@/lib/date-night-prototype/journey";
+import { partnerStatusLabel, partnerStepLabel } from "@/lib/date-night-prototype/journey";
 import { getScenarioImage } from "@/lib/date-night-prototype/scenario-images";
 import type { DateNightScenarioConcept, DateNightSession } from "@/lib/date-night-prototype/types";
 import DateNightPlayer from "./DateNightPlayer";
-import DateNightRatingPicker from "./DateNightRatingPicker";
+import DateNightRatingPicker, { RatingLegendCompact } from "./DateNightRatingPicker";
 
-function PartnerScenarioCards({
+function PartnerScenarioList({
   scenarios,
   ratings,
   onChange,
+  onSubmit,
+  complete,
 }: {
   scenarios: DateNightScenarioConcept[];
   ratings: Record<string, number>;
   onChange: (id: string, value: number) => void;
+  onSubmit: () => void;
+  complete: boolean;
 }) {
   return (
-    <ul className="dn-partner-scenario-grid">
-      {scenarios.map((s) => (
-        <li key={s.id} className="dn-partner-scenario-card">
-          <div
-            className="dn-partner-scenario-thumb"
-            style={{ backgroundImage: `url(${getScenarioImage(s.title)})` }}
-          />
-          <div className="dn-partner-scenario-copy">
-            <p className="dn-partner-scenario-title">{s.title}</p>
-            <DateNightRatingPicker
-              compact
-              value={ratings[s.id]}
-              onChange={(v) => onChange(s.id, v)}
+    <div className="dn-partner-rank-wrap">
+      <RatingLegendCompact />
+      <ul className="dn-partner-scenario-grid">
+        {scenarios.map((s) => (
+          <li key={s.id} className="dn-partner-scenario-card">
+            <div
+              className="dn-partner-scenario-thumb"
+              style={{ backgroundImage: `url(${getScenarioImage(s.title)})` }}
             />
-          </div>
-        </li>
-      ))}
-    </ul>
+            <div className="dn-partner-scenario-copy">
+              <p className="dn-partner-scenario-title">{s.title}</p>
+              <DateNightRatingPicker
+                compact
+                value={ratings[s.id]}
+                onChange={(v) => onChange(s.id, v)}
+              />
+            </div>
+          </li>
+        ))}
+      </ul>
+      <button type="button" className="dn-btn-gold w-full" disabled={!complete} onClick={onSubmit}>
+        Submit rankings
+      </button>
+    </div>
   );
 }
 
@@ -73,7 +79,83 @@ export default function PartnerSimulationPanel({
   const status = partnerStatusLabel(session);
   const step = partnerStepLabel(session);
   const match = session.matchedScenario;
-  const compatibility = matchCompatibility(session);
+  const showMatch = match && ["match-reveal", "story-config", "story-generated", "story-starting", "player"].includes(session.step);
+  const showStory = ["story-generated", "story-starting", "player"].includes(session.step);
+
+  let body: ReactNode = (
+    <p className="dn-partner-muted">Waiting for activity…</p>
+  );
+
+  if (session.inviteStatus === "pending") {
+    body = (
+      <div className="dn-partner-invite-card">
+        <p className="dn-partner-invite-text">
+          <strong>{creatorUsername}</strong> would like to start Date Night with you.
+        </p>
+        <div className="dn-partner-invite-actions">
+          <button type="button" className="dn-btn-gold" onClick={onAcceptInvite}>
+            Accept
+          </button>
+          <button type="button" className="dn-btn-ghost-ivory" onClick={onRejectInvite}>
+            Decline
+          </button>
+        </div>
+      </div>
+    );
+  } else if (session.inviteStatus === "rejected") {
+    body = <p className="dn-partner-muted">You declined the invitation.</p>;
+  } else if (session.inviteStatus === "accepted" && session.step === "partner-ratings") {
+    body = (
+      <PartnerScenarioList
+        scenarios={session.scenarios}
+        ratings={localRatings}
+        onChange={(id, v) => setLocalRatings((r) => ({ ...r, [id]: v }))}
+        onSubmit={() => onPartnerRatingsSubmit(localRatings)}
+        complete={ratingsComplete}
+      />
+    );
+  } else if (session.step === "match-loading") {
+    body = (
+      <div className="dn-partner-waiting">
+        <div className="dn-spinner dn-spinner-gold" aria-hidden />
+        <p>Finding tonight&apos;s match…</p>
+      </div>
+    );
+  } else if (showMatch && session.step === "match-reveal") {
+    body = (
+      <div className="dn-partner-match-mini">
+        <p className="dn-partner-match-label">✨ Tonight&apos;s match</p>
+        <div
+          className="dn-partner-match-art"
+          style={{ backgroundImage: `url(${getScenarioImage(match!.title)})` }}
+        />
+        <p className="dn-partner-match-title">{match!.title}</p>
+      </div>
+    );
+  } else if (session.step === "story-config") {
+    body = <p className="dn-partner-muted">Waiting for story setup…</p>;
+  } else if (session.step === "story-generated") {
+    body = (
+      <div className="dn-partner-waiting">
+        <div className="dn-spinner dn-spinner-gold" aria-hidden />
+        <p>Generating your adventure…</p>
+      </div>
+    );
+  } else if (session.step === "story-starting") {
+    body = <p className="dn-partner-ready">Your story is ready.</p>;
+  } else if (session.step === "player" && match) {
+    body = (
+      <DateNightPlayer
+        compact
+        showSave={false}
+        session={session}
+        partnerName={creatorUsername}
+        onUpdate={onUpdate}
+      />
+    );
+  } else if (session.step === "ratings" || session.step === "connect") {
+    body = <p className="dn-partner-muted">Waiting for invitation…</p>;
+  }
 
   return (
     <aside className="dn-partner-phone">
@@ -93,131 +175,22 @@ export default function PartnerSimulationPanel({
             <dt>Current step</dt>
             <dd>{step}</dd>
           </div>
-          <div>
-            <dt>Match</dt>
-            <dd>{match?.title ?? "—"}</dd>
-          </div>
-          <div>
-            <dt>Story</dt>
-            <dd>
-              {session.step === "player"
-                ? "Playing"
-                : session.step === "story-generated" || session.step === "story-starting"
-                  ? "Ready"
-                  : session.storyGenerated
-                    ? "Generated"
-                    : "Pending"}
-            </dd>
-          </div>
+          {showMatch ? (
+            <div>
+              <dt>Match</dt>
+              <dd>{match?.title ?? "—"}</dd>
+            </div>
+          ) : null}
+          {showStory ? (
+            <div>
+              <dt>Story</dt>
+              <dd>{session.step === "player" ? "Playing" : "Ready"}</dd>
+            </div>
+          ) : null}
         </dl>
 
-        <div className="dn-partner-phone-body">
-          {session.inviteStatus === "pending" ? (
-            <div className="dn-partner-invite-card">
-              <p className="dn-partner-invite-text">
-                <strong>{creatorUsername}</strong> would like to start Date Night with you.
-              </p>
-              <div className="dn-partner-invite-actions">
-                <button type="button" className="dn-btn-gold" onClick={onAcceptInvite}>
-                  Accept
-                </button>
-                <button type="button" className="dn-btn-ghost-ivory" onClick={onRejectInvite}>
-                  Decline
-                </button>
-              </div>
-            </div>
-          ) : null}
-
-          {session.inviteStatus === "rejected" ? (
-            <p className="dn-partner-muted">You declined the invitation.</p>
-          ) : null}
-
-          {session.inviteStatus === "accepted" && session.step === "partner-ratings" ? (
-            <div className="dn-partner-rank-wrap">
-              <p className="dn-partner-section-title">Rank tonight&apos;s adventures</p>
-              <PartnerScenarioCards
-                scenarios={session.scenarios}
-                ratings={localRatings}
-                onChange={(id, v) => setLocalRatings((r) => ({ ...r, [id]: v }))}
-              />
-              <button
-                type="button"
-                className="dn-btn-gold w-full"
-                disabled={!ratingsComplete}
-                onClick={() => onPartnerRatingsSubmit(localRatings)}
-              >
-                Submit rankings
-              </button>
-            </div>
-          ) : null}
-
-          {session.inviteStatus === "accepted" && session.step === "match-loading" ? (
-            <div className="dn-partner-waiting">
-              <div className="dn-spinner dn-spinner-gold" aria-hidden />
-              <p>Finding tonight&apos;s match…</p>
-            </div>
-          ) : null}
-
-          {match &&
-          ["match-reveal", "story-config", "story-generated", "story-starting"].includes(
-            session.step,
-          ) ? (
-            <div className="dn-partner-match-mini">
-              <p className="dn-partner-match-label">✨ Tonight&apos;s match</p>
-              <div
-                className="dn-partner-match-art"
-                style={{ backgroundImage: `url(${getScenarioImage(match.title)})` }}
-              />
-              <p className="dn-partner-match-title">{match.title}</p>
-              {session.friendlyName ? <p className="dn-partner-match-sub">{session.friendlyName}</p> : null}
-              {compatibility > 0 ? (
-                <p className="dn-partner-match-score">{compatibility}% compatibility</p>
-              ) : null}
-              {session.step === "story-config" ? (
-                <p className="dn-partner-muted">Waiting for story setup…</p>
-              ) : null}
-              {session.step === "story-generated" ? (
-                <div className="dn-partner-waiting">
-                  <div className="dn-spinner dn-spinner-gold" aria-hidden />
-                  <p>Generating your adventure…</p>
-                </div>
-              ) : null}
-              {session.step === "story-starting" ? (
-                <p className="dn-partner-ready">Your story is ready.</p>
-              ) : null}
-            </div>
-          ) : null}
-
-          {session.step === "player" && match ? (
-            <DateNightPlayer
-              compact
-              showSave={false}
-              session={session}
-              partnerName={creatorUsername}
-              onUpdate={onUpdate}
-            />
-          ) : null}
-
-          {session.inviteStatus === "idle" || (session.step === "ratings" && session.inviteStatus !== "pending") ? (
-            <p className="dn-partner-muted">Waiting for your partner to connect…</p>
-          ) : null}
-        </div>
+        <div className="dn-partner-phone-body">{body}</div>
       </div>
     </aside>
-  );
-}
-
-export function RatingLegend() {
-  return (
-    <div className="dn-rating-legend">
-      <p className="dn-rating-legend-title">Rate tonight&apos;s possibilities</p>
-      <p className="dn-rating-legend-scale">
-        <span>10 = I&apos;d love this</span>
-        <span>1 = Not for me</span>
-      </p>
-      <p className="dn-rating-legend-note">
-        There are no right answers. Your rankings are private. We&apos;ll only reveal your best shared match.
-      </p>
-    </div>
   );
 }

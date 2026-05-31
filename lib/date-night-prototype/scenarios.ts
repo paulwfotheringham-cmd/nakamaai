@@ -89,7 +89,7 @@ function slug(title: string, index: number): string {
   return `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${index}-${Date.now()}`;
 }
 
-export function generateScenarioSet(count = 10): DateNightScenarioConcept[] {
+export function generateScenarioSet(count = 12): DateNightScenarioConcept[] {
   const items: DateNightScenarioConcept[] = [];
   for (let i = 0; i < count; i++) {
     const src = SCENARIO_POOL[(poolOffset + i) % SCENARIO_POOL.length];
@@ -104,5 +104,5 @@ export function generateScenarioSet(count = 10): DateNightScenarioConcept[] {
 }
 
 export function freshScenarioSet(): DateNightScenarioConcept[] {
-  return generateScenarioSet(10);
+  return generateScenarioSet(12);
 }
