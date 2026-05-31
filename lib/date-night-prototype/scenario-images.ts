@@ -1,30 +1,31 @@
-// picsum.photos/seed/{seed}/480/260 — free, no API key, consistent per seed
-const picsumSrc = (seed: string) =>
-  `https://picsum.photos/seed/${encodeURIComponent(seed)}/480/260`;
+// All images served from /public — local assets, no external dependency.
+// /couples/ = dedicated Date Night photography
+// /scenes/  = story scene art from the home page slider
+// /tiles/   = genre tile art from the home page
 
 const SCENARIO_IMAGES: Record<string, string> = {
-  "Robin Hood & Maid Marian":  picsumSrc("dn-forest-midnight"),
-  "Venice After Midnight":     picsumSrc("dn-venice-canal"),
-  "Secret Society":            picsumSrc("dn-masquerade-ballroom"),
-  "The Last Letter":           picsumSrc("dn-candlelight-letter"),
-  "Moonlit Train":             picsumSrc("dn-sleeper-train"),
-  "Hidden Kingdom":            picsumSrc("dn-castle-dusk"),
-  "Runaway Royalty":           picsumSrc("dn-cobblestone-royal"),
-  "Lost in Paris":             picsumSrc("dn-paris-night"),
-  "Desert Oasis":              picsumSrc("dn-desert-stars"),
-  "Forbidden Masquerade":      picsumSrc("dn-carnival-mask"),
-  "Storm on the Coast":        picsumSrc("dn-stormy-ocean"),
-  "The Private Library":       picsumSrc("dn-dark-library"),
-  "Midnight Rooftop":          picsumSrc("dn-rooftop-skyline"),
-  "Winter Chalet":             picsumSrc("dn-winter-chalet"),
-  "The Art Collector":         picsumSrc("dn-art-gallery"),
-  "Harbor at Dusk":            picsumSrc("dn-harbor-dusk"),
-  "Garden of Echoes":          picsumSrc("dn-garden-twilight"),
-  "The Jazz Lounge":           picsumSrc("dn-jazz-lounge"),
-  "Castle by the Lake":        picsumSrc("dn-castle-lake"),
-  "Neon Afterglow":            picsumSrc("dn-neon-city"),
+  "Robin Hood & Maid Marian":  "/scenes/moor.jpg",
+  "Venice After Midnight":     "/tiles/boat.jpg",
+  "Secret Society":            "/tiles/vampire.jpg",
+  "The Last Letter":           "/tiles/slowburn.jpg",
+  "Moonlit Train":             "/couples/reconnection.jpg",
+  "Hidden Kingdom":            "/tiles/dragon.jpg",
+  "Runaway Royalty":           "/scenes/rome.jpg",
+  "Lost in Paris":             "/tiles/lover.jpg",
+  "Desert Oasis":              "/tiles/space.jpg",
+  "Forbidden Masquerade":      "/tiles/taboo.jpg",
+  "Storm on the Coast":        "/scenes/pirate.jpg",
+  "The Private Library":       "/tiles/tile6.jpg",
+  "Midnight Rooftop":          "/couples/date-night-hero.jpg",
+  "Winter Chalet":             "/couples/surprise-adventure.jpg",
+  "The Art Collector":         "/tiles/tile1.jpg",
+  "Harbor at Dusk":            "/tiles/tile2.jpg",
+  "Garden of Echoes":          "/scenes/werewolf.jpg",
+  "The Jazz Lounge":           "/tiles/powerplay.jpg",
+  "Castle by the Lake":        "/tiles/tile4.jpg",
+  "Neon Afterglow":            "/scenes/alien.jpg",
 };
 
 export function getScenarioImage(title: string): string {
-  return SCENARIO_IMAGES[title] ?? picsumSrc("dn-romantic-default");
+  return SCENARIO_IMAGES[title] ?? "/couples/date-night.jpg";
 }
