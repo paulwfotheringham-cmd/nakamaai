@@ -8,8 +8,6 @@ import {
 } from "@/lib/guides/preferences";
 import CouplesGuideConcierge from "./CouplesGuideConcierge";
 
-const REIGNITE_HOW_IT_WORKS_KEY = "nakama_reignite_how_it_works_dismissed";
-
 const COUPLES_EXPERIENCES = [
   {
     id: "date-night",
@@ -83,15 +81,7 @@ function CouplesExperienceCard({
   );
 }
 
-function HowItWorksModal({
-  dontShowAgain,
-  onDontShowAgainChange,
-  onClose,
-}: {
-  dontShowAgain: boolean;
-  onDontShowAgainChange: (value: boolean) => void;
-  onClose: () => void;
-}) {
+function HowItWorksModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="couples-modal-backdrop" role="presentation" onClick={onClose}>
       <div
@@ -133,15 +123,6 @@ function HowItWorksModal({
             <li>Reveal the adventure as it unfolds.</li>
           </ul>
         </section>
-
-        <label className="couples-modal-dismiss">
-          <input
-            type="checkbox"
-            checked={dontShowAgain}
-            onChange={(e) => onDontShowAgainChange(e.target.checked)}
-          />
-          <span>Don&apos;t show again</span>
-        </label>
       </div>
     </div>
   );
@@ -176,7 +157,6 @@ export default function LiveTestCouplesProgram({
   const [inviteEmailSent, setInviteEmailSent] = useState(false);
   const [invitedPartnerEmail, setInvitedPartnerEmail] = useState("");
   const [showHowItWorks, setShowHowItWorks] = useState(false);
-  const [dontShowHowItWorks, setDontShowHowItWorks] = useState(false);
 
   useEffect(() => {
     const prefs = readGuidePreferences();
@@ -189,9 +169,6 @@ export default function LiveTestCouplesProgram({
   }
 
   function closeHowItWorks() {
-    if (dontShowHowItWorks && typeof window !== "undefined") {
-      localStorage.setItem(REIGNITE_HOW_IT_WORKS_KEY, "1");
-    }
     setShowHowItWorks(false);
   }
 
@@ -251,13 +228,16 @@ export default function LiveTestCouplesProgram({
       <div className="couples-atmosphere pointer-events-none absolute inset-0" aria-hidden />
       <div className="couples-hero-glow-top pointer-events-none absolute inset-x-0 top-0 h-48" aria-hidden />
 
-      <header className="couples-hero relative z-10 shrink-0 px-6 pb-4 pt-7 sm:px-10 sm:pt-8">
-        <div className="couples-hero-top flex items-start justify-between gap-5">
-          <div className="min-w-0 flex-1">
+      <header className="couples-hero relative z-10 shrink-0 px-6 pb-4 pt-5 sm:px-10 sm:pt-6">
+        <div className="couples-hero-top flex items-center justify-between gap-4">
+          <div className="couples-hero-nav flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
             <p className="type-label text-amber-500/60">Reignite · Couples</p>
+            <button type="button" className="couples-how-link" onClick={openHowItWorks}>
+              How it works
+            </button>
           </div>
 
-          <div className="flex shrink-0 flex-col items-end gap-2.5">
+          <div className="flex shrink-0 flex-col items-end gap-2">
             {onToggleGuide ? (
               <CouplesGuideConcierge guideHidden={guideRailHidden} onToggle={onToggleGuide} />
             ) : null}
@@ -295,17 +275,11 @@ export default function LiveTestCouplesProgram({
           </div>
         </div>
 
-        <div className="couples-hero-body mt-3">
-          <div className="couples-hero-heading-row flex flex-wrap items-end gap-x-4 gap-y-2">
-            <h1 className="couples-greeting type-hero">
-              Good evening,{" "}
-              <span className="text-luxury-primary">{firstName}</span>
-            </h1>
-            <button type="button" className="couples-how-link" onClick={openHowItWorks}>
-              How it works
-            </button>
-          </div>
-          <p className="couples-hero-magic">Choose how tonight unfolds.</p>
+        <div className="couples-hero-body mt-2">
+          <h1 className="couples-greeting type-hero">
+            Good evening,{" "}
+            <span className="text-luxury-primary">{firstName}</span>
+          </h1>
           <p className="couples-header-subtitle type-body mt-2">
             A private space for long-term partners — choose your experience and let the evening unfold.
           </p>
@@ -352,13 +326,7 @@ export default function LiveTestCouplesProgram({
         ))}
       </div>
 
-      {showHowItWorks ? (
-        <HowItWorksModal
-          dontShowAgain={dontShowHowItWorks}
-          onDontShowAgainChange={setDontShowHowItWorks}
-          onClose={closeHowItWorks}
-        />
-      ) : null}
+      {showHowItWorks ? <HowItWorksModal onClose={closeHowItWorks} /> : null}
     </div>
   );
 }

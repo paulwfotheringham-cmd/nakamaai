@@ -4726,18 +4726,27 @@ button.nav-concept-context-back:hover {
   background: radial-gradient(ellipse 80% 100% at 50% 0%, rgba(198, 164, 106, 0.1), transparent 70%);
 }
 
-.couples-hero-magic {
-  margin-top: 0.5rem;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(1.0625rem, 1.6vw, 1.25rem);
-  font-weight: 400;
-  font-style: italic;
-  color: rgba(212, 175, 55, 0.72);
-  letter-spacing: 0.01em;
+.couples-hero {
+  padding-top: 1.15rem;
 }
 
-.couples-hero-heading-row {
-  align-items: baseline;
+@media (min-width: 640px) {
+  .couples-hero {
+    padding-top: 1.35rem;
+  }
+}
+
+.couples-hero-nav {
+  align-items: center;
+}
+
+.couples-hero-body {
+  max-width: 42rem;
+}
+
+.couples-hero-body .type-hero {
+  margin-top: 0;
+  line-height: 1.08;
 }
 
 .couples-greeting {
@@ -4757,23 +4766,44 @@ button.nav-concept-context-back:hover {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.45rem 0.85rem 0.45rem 0.55rem;
+  gap: 0.6rem;
+  padding: 0.4rem 0.9rem 0.4rem 0.45rem;
   border-radius: 9999px;
-  border: 1px solid rgba(212, 175, 55, 0.18);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.35));
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(12, 10, 8, 0.55));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
 .couples-concierge:hover {
-  border-color: rgba(212, 175, 55, 0.35);
-  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.35), 0 0 24px rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.28);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(12, 10, 8, 0.6));
 }
 
-.couples-concierge-open {
-  border-color: rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.04);
+.couples-concierge-active {
+  border-color: rgba(212, 175, 55, 0.42);
+  background: linear-gradient(145deg, rgba(212, 175, 55, 0.14), rgba(12, 10, 8, 0.65));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 0 1px rgba(212, 175, 55, 0.12);
+}
+
+.couples-concierge-active .couples-concierge-icon {
+  color: rgba(255, 248, 235, 0.95);
+  background: rgba(212, 175, 55, 0.28);
+}
+
+.couples-concierge-active .couples-concierge-label {
+  color: rgba(255, 252, 245, 0.95);
+}
+
+.couples-concierge-active .couples-concierge-sub {
+  color: rgba(212, 175, 55, 0.72);
+}
+
+.couples-concierge-active .couples-concierge-glow {
+  opacity: 1;
+  background: radial-gradient(circle at 30% 50%, rgba(212, 175, 55, 0.18), transparent 60%);
 }
 
 .couples-concierge-glow {
@@ -4867,21 +4897,19 @@ button.nav-concept-context-back:hover {
 }
 
 .couples-how-link {
-  padding: 0 0 0.15rem;
-  font-size: 0.6875rem;
-  letter-spacing: 0.1em;
+  padding: 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.38);
+  color: rgba(255, 255, 255, 0.34);
   background: none;
   border: none;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.22);
   cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .couples-how-link:hover {
-  color: rgba(212, 175, 55, 0.88);
-  border-color: rgba(212, 175, 55, 0.45);
+  color: rgba(212, 175, 55, 0.82);
 }
 
 .couples-card-scrim {
@@ -4936,9 +4964,9 @@ button.nav-concept-context-back:hover {
 }
 
 .couples-card-tagline {
-  margin-top: 0.55rem;
-  font-size: 0.6875rem;
-  letter-spacing: 0.16em;
+  margin-top: 0.65rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   font-weight: 500;
 }
@@ -4970,20 +4998,20 @@ button.nav-concept-context-back:hover {
 }
 
 .couples-card-desc {
-  margin-top: 0.85rem;
+  margin-top: 0.75rem;
   max-width: 24rem;
-  line-height: 1.6;
-  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.65);
+  line-height: 1.58;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.7);
 }
 
 .couples-card-desc--warm {
-  font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .couples-card-desc--playful {
-  font-size: 0.9375rem;
-  color: rgba(240, 232, 255, 0.72);
+  font-size: 0.875rem;
+  color: rgba(235, 225, 255, 0.62);
 }
 
 .couples-experience-card--warm {
@@ -5251,28 +5279,37 @@ button.nav-concept-context-back:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 140px;
-  padding: 14px 32px;
-  border: none;
+  min-width: 148px;
+  padding: 0.9rem 2.1rem;
+  border: 1px solid rgba(255, 235, 180, 0.35);
   border-radius: 999px;
-  background: linear-gradient(180deg, #fde68a 0%, #d97706 100%);
-  color: #1c1917;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  background: linear-gradient(180deg, #fef3c7 0%, #fbbf24 42%, #d97706 100%);
+  color: #1a1208;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   cursor: pointer;
   box-shadow:
-    0 4px 24px rgba(198, 164, 106, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
+    0 6px 28px rgba(198, 164, 106, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(120, 70, 20, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
 }
 
 .couples-cta-primary:hover {
-  transform: translateY(-2px) scale(1.02);
+  transform: translateY(-1px);
+  filter: brightness(1.04);
   box-shadow:
-    0 8px 36px rgba(198, 164, 106, 0.45),
-    0 0 32px rgba(198, 164, 106, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    0 10px 36px rgba(198, 164, 106, 0.48),
+    0 0 28px rgba(198, 164, 106, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(120, 70, 20, 0.2);
+}
+
+.couples-cta-primary:active {
+  transform: translateY(0);
+  filter: brightness(0.98);
 }
 
 .couples-cta-secondary {
