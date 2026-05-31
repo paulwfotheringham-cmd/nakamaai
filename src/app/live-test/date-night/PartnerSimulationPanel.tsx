@@ -8,6 +8,15 @@ import type { DateNightScenarioConcept, DateNightSession } from "@/lib/date-nigh
 import DateNightPlayer from "./DateNightPlayer";
 import DateNightRatingPicker, { RatingLegendCompact } from "./DateNightRatingPicker";
 
+const POST_MATCH_STEPS: DateNightSession["step"][] = [
+  "match-reveal",
+  "story-name",
+  "story-voices",
+  "story-mood",
+  "story-generated",
+  "player",
+];
+
 function PartnerScenarioList({
   scenarios,
   ratings,
@@ -79,8 +88,8 @@ export default function PartnerSimulationPanel({
   const status = partnerStatusLabel(session);
   const step = partnerStepLabel(session);
   const match = session.matchedScenario;
-  const showMatch = match && ["match-reveal", "story-config", "story-generated", "story-starting", "player"].includes(session.step);
-  const showStory = ["story-generated", "story-starting", "player"].includes(session.step);
+  const showMatch = match && POST_MATCH_STEPS.includes(session.step);
+  const showStory = session.step === "story-generated" || session.step === "player";
 
   let body: ReactNode = (
     <p className="dn-partner-muted">Waiting for activity…</p>
@@ -124,7 +133,7 @@ export default function PartnerSimulationPanel({
   } else if (showMatch && session.step === "match-reveal") {
     body = (
       <div className="dn-partner-match-mini">
-        <p className="dn-partner-match-label">✨ Tonight&apos;s match</p>
+        <p className="dn-partner-match-label">✨ Match found</p>
         <div
           className="dn-partner-match-art"
           style={{ backgroundImage: `url(${getScenarioImage(match!.title)})` }}
@@ -132,7 +141,11 @@ export default function PartnerSimulationPanel({
         <p className="dn-partner-match-title">{match!.title}</p>
       </div>
     );
-  } else if (session.step === "story-config") {
+  } else if (
+    session.step === "story-name" ||
+    session.step === "story-voices" ||
+    session.step === "story-mood"
+  ) {
     body = <p className="dn-partner-muted">Waiting for story setup…</p>;
   } else if (session.step === "story-generated") {
     body = (
@@ -141,8 +154,6 @@ export default function PartnerSimulationPanel({
         <p>Generating your adventure…</p>
       </div>
     );
-  } else if (session.step === "story-starting") {
-    body = <p className="dn-partner-ready">Your story is ready.</p>;
   } else if (session.step === "player" && match) {
     body = (
       <DateNightPlayer
@@ -184,7 +195,7 @@ export default function PartnerSimulationPanel({
           {showStory ? (
             <div>
               <dt>Story</dt>
-              <dd>{session.step === "player" ? "Playing" : "Ready"}</dd>
+              <dd>{session.step === "player" ? "Playing" : "Generating"}</dd>
             </div>
           ) : null}
         </dl>

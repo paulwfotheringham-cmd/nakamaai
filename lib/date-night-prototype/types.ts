@@ -18,15 +18,16 @@ export type DateNightMood =
 export type PartnerInviteStatus = "idle" | "pending" | "accepted" | "rejected";
 
 export type DateNightFlowStep =
-  | "home"
+  | "tutorial"
   | "ratings"
   | "connect"
   | "partner-ratings"
   | "match-loading"
   | "match-reveal"
-  | "story-config"
+  | "story-name"
+  | "story-voices"
+  | "story-mood"
   | "story-generated"
-  | "story-starting"
   | "player";
 
 export type DateNightSession = {

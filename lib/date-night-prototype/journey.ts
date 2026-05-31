@@ -1,14 +1,16 @@
 import type { DateNightFlowStep, DateNightSession } from "./types";
 
 const STEP_ORDER: DateNightFlowStep[] = [
+  "tutorial",
   "ratings",
   "connect",
   "partner-ratings",
   "match-loading",
   "match-reveal",
-  "story-config",
+  "story-name",
+  "story-voices",
+  "story-mood",
   "story-generated",
-  "story-starting",
   "player",
 ];
 
@@ -31,8 +33,10 @@ export function matchCompatibility(session: DateNightSession): number {
 export function partnerStatusLabel(session: DateNightSession): string {
   if (session.inviteStatus === "rejected") return "Declined";
   if (session.step === "player") return "Listening";
-  if (session.step === "story-starting" || session.step === "story-generated") return "Story ready";
-  if (session.step === "story-config") return "Waiting for setup";
+  if (session.step === "story-generated") return "Generating";
+  if (session.step === "story-mood" || session.step === "story-voices" || session.step === "story-name") {
+    return "Setting up";
+  }
   if (session.step === "match-reveal" || session.step === "match-loading") return "Matched";
   if (session.step === "partner-ratings") return "Ranking";
   if (session.inviteStatus === "accepted") return "Accepted";
@@ -42,6 +46,8 @@ export function partnerStatusLabel(session: DateNightSession): string {
 
 export function partnerStepLabel(session: DateNightSession): string {
   switch (session.step) {
+    case "tutorial":
+      return "Not started";
     case "ratings":
       return "Awaiting invite";
     case "connect":
@@ -51,15 +57,46 @@ export function partnerStepLabel(session: DateNightSession): string {
     case "match-loading":
       return "Finding match";
     case "match-reveal":
-      return "Match revealed";
-    case "story-config":
-      return "Partner configuring";
+      return "Match found";
+    case "story-name":
+      return "Story name";
+    case "story-voices":
+      return "Choosing voices";
+    case "story-mood":
+      return "Choosing mood";
     case "story-generated":
       return "Generating story";
-    case "story-starting":
-      return "Story starting";
     case "player":
-      return "In progress";
+      return "Audio experience";
+    default:
+      return "—";
+  }
+}
+
+export function creatorStepLabel(step: DateNightFlowStep): string {
+  switch (step) {
+    case "tutorial":
+      return "Tutorial";
+    case "ratings":
+      return "Scenario matching";
+    case "connect":
+      return "Invite partner";
+    case "partner-ratings":
+      return "Partner rates scenarios";
+    case "match-loading":
+      return "Finding match";
+    case "match-reveal":
+      return "Match found";
+    case "story-name":
+      return "Story name";
+    case "story-voices":
+      return "Voices";
+    case "story-mood":
+      return "Mood";
+    case "story-generated":
+      return "Generate story";
+    case "player":
+      return "Audio experience";
     default:
       return "—";
   }

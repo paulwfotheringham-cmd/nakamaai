@@ -21,7 +21,7 @@ import {
   upsertSharedStory,
   writeActiveSession,
 } from "@/lib/date-night-prototype/storage";
-import type { DateNightSession, SharedDateNightStory } from "@/lib/date-night-prototype/types";
+import type { DateNightMood, DateNightSession, SharedDateNightStory } from "@/lib/date-night-prototype/types";
 import { readGuidePreferences, DEFAULT_USER_NAME } from "@/lib/guides/preferences";
 import DateNightPlayer from "./DateNightPlayer";
 import DateNightRatingPicker, { RatingLegendCompact } from "./DateNightRatingPicker";
@@ -33,6 +33,40 @@ type DateNightPrototypeFlowProps = {
   guideRailHidden?: boolean;
   onToggleGuide?: () => void;
 };
+
+function StepPanel({
+  title,
+  description,
+  children,
+  actionLabel,
+  onAction,
+  actionDisabled,
+}: {
+  title: string;
+  description?: string;
+  children?: React.ReactNode;
+  actionLabel: string;
+  onAction: () => void;
+  actionDisabled?: boolean;
+}) {
+  return (
+    <section className="dn-step">
+      <div className="dn-step-panel">
+        <h2 className="dn-step-panel-title">{title}</h2>
+        {description ? <p className="dn-step-panel-desc">{description}</p> : null}
+        {children}
+        <button
+          type="button"
+          className="dn-btn-gold dn-btn-gold-lg"
+          disabled={actionDisabled}
+          onClick={onAction}
+        >
+          {actionLabel}
+        </button>
+      </div>
+    </section>
+  );
+}
 
 function SharedStoriesModal({
   stories,
@@ -86,13 +120,12 @@ export default function DateNightPrototypeFlow({
   guideRailHidden = true,
   onToggleGuide,
 }: DateNightPrototypeFlowProps) {
-  const [showTutorial, setShowTutorial] = useState(true);
-  const [dontShowAgain, setDontShowAgain] = useState(false);
   const [session, setSession] = useState<DateNightSession | null>(null);
   const [sharedStories, setSharedStories] = useState<SharedDateNightStory[]>([]);
   const [showSharedModal, setShowSharedModal] = useState(false);
   const [creatorUsername, setCreatorUsername] = useState(DEFAULT_USER_NAME);
   const [partnerUsername, setPartnerUsername] = useState(PROTOTYPE_PARTNER_USERNAME);
+  const [dontShowTutorialAgain, setDontShowTutorialAgain] = useState(false);
 
   const persist = useCallback((next: DateNightSession | null) => {
     setSession(next);
@@ -111,9 +144,7 @@ export default function DateNightPrototypeFlow({
   useEffect(() => {
     setCreatorUsername(readGuidePreferences().userName || DEFAULT_USER_NAME);
     setSharedStories(readSharedStories());
-    const existing = readActiveSession();
-    if (existing) setSession(existing);
-    setShowTutorial(!isTutorialDismissed());
+    setSession(readActiveSession());
   }, []);
 
   useEffect(() => {
@@ -132,18 +163,12 @@ export default function DateNightPrototypeFlow({
 
   useEffect(() => {
     if (session?.step !== "story-generated") return;
-    const t = setTimeout(() => updateSession({ step: "story-starting" }), 3000);
-    return () => clearTimeout(t);
-  }, [session?.step, updateSession]);
-
-  useEffect(() => {
-    if (session?.step !== "story-starting") return;
     const t = setTimeout(() => {
       updateSession({
         step: "player",
         playback: { playing: false, timeRemainingSec: STORY_DURATION_SEC },
       });
-    }, 2000);
+    }, 3000);
     return () => clearTimeout(t);
   }, [session?.step, updateSession]);
 
@@ -164,13 +189,15 @@ export default function DateNightPrototypeFlow({
     return () => clearInterval(iv);
   }, [session?.playback.playing, session?.step]);
 
-  function dismissTutorialBanner() {
-    if (dontShowAgain) dismissTutorial(true);
-    setShowTutorial(false);
+  function startCreateNew() {
+    const next = createNewSession();
+    next.step = isTutorialDismissed() ? "ratings" : "tutorial";
+    persist(next);
   }
 
-  function startCreateNew() {
-    persist(createNewSession());
+  function finishTutorial() {
+    if (dontShowTutorialAgain) dismissTutorial(true);
+    updateSession({ step: "ratings" });
   }
 
   function continueExisting(story: SharedDateNightStory) {
@@ -208,10 +235,6 @@ export default function DateNightPrototypeFlow({
     updateSession({ partnerRatings: ratings, step: "match-loading" });
   }
 
-  function beginStoryConfig() {
-    updateSession({ step: "story-config" });
-  }
-
   function generateStory() {
     updateSession({ storyGenerated: true, step: "story-generated" });
   }
@@ -243,9 +266,37 @@ export default function DateNightPrototypeFlow({
 
   const partner = session?.partnerUsername || PROTOTYPE_PARTNER_USERNAME;
   const compatibility = session ? matchCompatibility(session) : 0;
+  const storyNameReady = (session?.friendlyName.trim().length ?? 0) > 0;
 
   function renderMainStep() {
     if (!session) return null;
+
+    if (session.step === "tutorial") {
+      return (
+        <StepPanel
+          title="How Date Night works"
+          description="A 30-minute narrated adventure designed for you and your partner."
+          actionLabel="Begin matching"
+          onAction={finishTutorial}
+        >
+          <ul className="dn-tutorial-checklist dn-tutorial-checklist-panel">
+            <li>Rank twelve curated scenarios</li>
+            <li>Connect with your partner</li>
+            <li>Discover tonight&apos;s shared match</li>
+            <li>Choose a name, voices, and mood</li>
+            <li>Begin your audio experience</li>
+          </ul>
+          <label className="dn-tutorial-dismiss">
+            <input
+              type="checkbox"
+              checked={dontShowTutorialAgain}
+              onChange={(e) => setDontShowTutorialAgain(e.target.checked)}
+            />
+            <span>Don&apos;t show again</span>
+          </label>
+        </StepPanel>
+      );
+    }
 
     if (session.step === "ratings") {
       return (
@@ -294,33 +345,26 @@ export default function DateNightPrototypeFlow({
 
     if (session.step === "connect" && session.inviteStatus === "idle") {
       return (
-        <section className="dn-step dn-step-connect">
-          <div className="dn-connect-panel">
-            <h2 className="dn-connect-title">Invite your partner</h2>
-            <p className="dn-connect-desc">
-              Enter your partner&apos;s Nakama username. Usernames can be found in the Profile section.
-            </p>
-            <label className="dn-lux-field">
-              <span>Partner username</span>
-              <input
-                className="dn-lux-input"
-                value={partnerUsername}
-                onChange={(e) => setPartnerUsername(e.target.value)}
-                placeholder={PROTOTYPE_PARTNER_USERNAME}
-              />
-            </label>
-            <button type="button" className="dn-btn-gold dn-btn-gold-lg" onClick={connectPartner}>
-              Connect
-            </button>
-          </div>
-        </section>
+        <StepPanel
+          title="Invite your partner"
+          description="Enter your partner's Nakama username. Usernames can be found in the Profile section."
+          actionLabel="Connect"
+          onAction={connectPartner}
+        >
+          <label className="dn-lux-field">
+            <span>Partner username</span>
+            <input
+              className="dn-lux-input"
+              value={partnerUsername}
+              onChange={(e) => setPartnerUsername(e.target.value)}
+              placeholder={PROTOTYPE_PARTNER_USERNAME}
+            />
+          </label>
+        </StepPanel>
       );
     }
 
-    if (
-      session.step === "connect" &&
-      (session.inviteStatus === "pending" || session.inviteStatus === "accepted")
-    ) {
+    if (session.step === "connect" && session.inviteStatus === "pending") {
       return (
         <section className="dn-step dn-step-waiting">
           <div className="dn-waiting-panel">
@@ -354,7 +398,7 @@ export default function DateNightPrototypeFlow({
         <section className="dn-step dn-step-waiting">
           <div className="dn-waiting-panel">
             <div className="dn-spinner dn-spinner-gold" aria-hidden />
-            <h2 className="dn-waiting-title">Waiting for partner</h2>
+            <h2 className="dn-waiting-title">Partner rates scenarios</h2>
             <p className="dn-waiting-text">
               <strong>@{partner}</strong> is ranking tonight&apos;s adventures.
             </p>
@@ -379,7 +423,7 @@ export default function DateNightPrototypeFlow({
       return (
         <section className="dn-step">
           <div className="dn-match-reveal-card">
-            <p className="dn-match-reveal-label">✨ Tonight&apos;s match</p>
+            <p className="dn-match-reveal-label">✨ Match found</p>
             <div
               className="dn-match-reveal-art"
               style={{ backgroundImage: `url(${getScenarioImage(session.matchedScenario.title)})` }}
@@ -389,7 +433,7 @@ export default function DateNightPrototypeFlow({
             {compatibility > 0 ? (
               <p className="dn-match-reveal-score">Matched compatibility: {compatibility}%</p>
             ) : null}
-            <button type="button" className="dn-btn-gold" onClick={beginStoryConfig}>
+            <button type="button" className="dn-btn-gold" onClick={() => updateSession({ step: "story-name" })}>
               Continue
             </button>
           </div>
@@ -397,66 +441,91 @@ export default function DateNightPrototypeFlow({
       );
     }
 
-    if (session.step === "story-config") {
+    if (session.step === "story-name") {
       return (
-        <section className="dn-step">
-          <div className="dn-config-grid">
-            <label className="dn-config-card">
-              <span className="dn-config-card-label">Friendly story name</span>
-              <input
-                className="dn-lux-input"
-                value={session.friendlyName}
-                onChange={(e) => updateSession({ friendlyName: e.target.value })}
-                placeholder="Our evening adventure"
-              />
-            </label>
-            <label className="dn-config-card">
-              <span className="dn-config-card-label">Male voice</span>
-              <select
-                className="dn-lux-select"
-                value={session.maleVoice}
-                onChange={(e) => updateSession({ maleVoice: e.target.value })}
+        <StepPanel
+          title="Story name"
+          description="Give tonight's adventure a name you'll both remember."
+          actionLabel="Continue"
+          actionDisabled={!storyNameReady}
+          onAction={() => updateSession({ step: "story-voices" })}
+        >
+          <label className="dn-lux-field">
+            <span>Friendly story name</span>
+            <input
+              className="dn-lux-input"
+              value={session.friendlyName}
+              onChange={(e) => updateSession({ friendlyName: e.target.value })}
+              placeholder="Our evening adventure"
+            />
+          </label>
+        </StepPanel>
+      );
+    }
+
+    if (session.step === "story-voices") {
+      return (
+        <StepPanel
+          title="Voices"
+          description="Choose the narrators for your story."
+          actionLabel="Continue"
+          onAction={() => updateSession({ step: "story-mood" })}
+        >
+          <label className="dn-lux-field">
+            <span>Male voice</span>
+            <select
+              className="dn-lux-select"
+              value={session.maleVoice}
+              onChange={(e) => updateSession({ maleVoice: e.target.value })}
+            >
+              {MOCK_MALE_VOICES.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="dn-lux-field">
+            <span>Female voice</span>
+            <select
+              className="dn-lux-select"
+              value={session.femaleVoice}
+              onChange={(e) => updateSession({ femaleVoice: e.target.value })}
+            >
+              {MOCK_FEMALE_VOICES.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </label>
+        </StepPanel>
+      );
+    }
+
+    if (session.step === "story-mood") {
+      return (
+        <StepPanel
+          title="Mood"
+          description="Set the tone for tonight's narrative."
+          actionLabel="Generate story"
+          onAction={generateStory}
+        >
+          <div className="dn-mood-grid" role="listbox" aria-label="Story mood">
+            {DATE_NIGHT_MOODS.map((m) => (
+              <button
+                key={m}
+                type="button"
+                role="option"
+                aria-selected={session.mood === m}
+                className={`dn-mood-pill${session.mood === m ? " dn-mood-pill-active" : ""}`}
+                onClick={() => updateSession({ mood: m as DateNightMood })}
               >
-                {MOCK_MALE_VOICES.map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="dn-config-card">
-              <span className="dn-config-card-label">Female voice</span>
-              <select
-                className="dn-lux-select"
-                value={session.femaleVoice}
-                onChange={(e) => updateSession({ femaleVoice: e.target.value })}
-              >
-                {MOCK_FEMALE_VOICES.map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="dn-config-card">
-              <span className="dn-config-card-label">Mood</span>
-              <select
-                className="dn-lux-select"
-                value={session.mood}
-                onChange={(e) => updateSession({ mood: e.target.value as DateNightSession["mood"] })}
-              >
-                {DATE_NIGHT_MOODS.map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
-              </select>
-            </label>
+                {m}
+              </button>
+            ))}
           </div>
-          <button type="button" className="dn-btn-gold dn-config-generate" onClick={generateStory}>
-            Generate story
-          </button>
-        </section>
+        </StepPanel>
       );
     }
 
@@ -467,17 +536,6 @@ export default function DateNightPrototypeFlow({
             <div className="dn-spinner dn-spinner-gold" aria-hidden />
             <p className="dn-generating-title">Generating your adventure…</p>
             <p className="dn-generating-sub">Crafting voices, mood, and tonight&apos;s narrative.</p>
-          </div>
-        </section>
-      );
-    }
-
-    if (session.step === "story-starting") {
-      return (
-        <section className="dn-step">
-          <div className="dn-ready-banner">
-            <p className="dn-ready-banner-title">Your story is ready.</p>
-            <p className="dn-ready-banner-sub">Press play when you&apos;re both settled in.</p>
           </div>
         </section>
       );
@@ -526,44 +584,16 @@ export default function DateNightPrototypeFlow({
             </div>
           </header>
 
-          {showTutorial ? (
-            <section className="dn-tutorial-banner">
-              <div className="dn-tutorial-banner-copy">
-                <p className="dn-tutorial-banner-label">How Date Night works</p>
-                <p className="dn-tutorial-banner-desc">
-                  A 30-minute narrated adventure designed for couples.
-                </p>
-                <ul className="dn-tutorial-checklist">
-                  <li>Connect with your partner</li>
-                  <li>Discover tonight&apos;s shared match</li>
-                  <li>Choose voices and mood</li>
-                  <li>Begin your story</li>
-                </ul>
-                <label className="dn-tutorial-dismiss">
-                  <input
-                    type="checkbox"
-                    checked={dontShowAgain}
-                    onChange={(e) => setDontShowAgain(e.target.checked)}
-                  />
-                  <span>Don&apos;t show again</span>
-                </label>
-              </div>
-              <button type="button" className="dn-tutorial-close" onClick={dismissTutorialBanner} aria-label="Dismiss">
-                ×
-              </button>
-            </section>
-          ) : null}
-
           {!session ? (
             <section className="dn-hero-start">
               <div className="dn-hero-start-card">
-                <p className="dn-hero-start-eyebrow">Ready when you are</p>
-                <h2 className="dn-hero-start-title">Rank tonight&apos;s adventures</h2>
+                <p className="dn-hero-start-eyebrow">Date Night</p>
+                <h2 className="dn-hero-start-title">Tonight&apos;s adventure awaits</h2>
                 <p className="dn-hero-start-desc">
-                  Rate twelve curated scenarios, connect with your partner, and discover the story you both want tonight.
+                  Rank scenarios with your partner, discover your shared match, and begin a guided audio experience together.
                 </p>
                 <button type="button" className="dn-btn-gold" onClick={startCreateNew}>
-                  Begin matching
+                  Start Date Night
                 </button>
               </div>
             </section>
@@ -573,7 +603,7 @@ export default function DateNightPrototypeFlow({
         </div>
       </div>
 
-      {session ? (
+      {session && session.step !== "tutorial" ? (
         <PartnerSimulationPanel
           session={session}
           creatorUsername={creatorUsername}
@@ -589,7 +619,7 @@ export default function DateNightPrototypeFlow({
               <p className="dn-partner-phone-label">Partner View</p>
               <p className="dn-partner-phone-user">@{PROTOTYPE_PARTNER_USERNAME}</p>
             </header>
-            <p className="dn-partner-muted">Start matching to preview your partner&apos;s experience.</p>
+            <p className="dn-partner-muted">Your partner&apos;s experience appears here once matching begins.</p>
           </div>
         </aside>
       )}

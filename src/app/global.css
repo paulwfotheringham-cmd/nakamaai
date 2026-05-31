@@ -1698,7 +1698,8 @@
 }
 
 .dn-connect-panel,
-.dn-waiting-panel {
+.dn-waiting-panel,
+.dn-step-panel {
   width: 100%;
   max-width: 28rem;
   padding: 2rem 2.25rem;
@@ -1708,6 +1709,11 @@
   text-align: center;
 }
 
+.dn-step-panel {
+  margin: 0 auto;
+}
+
+.dn-step-panel-title,
 .dn-connect-title,
 .dn-waiting-title {
   font-family: var(--font-display), Georgia, serif;
@@ -1716,11 +1722,65 @@
   color: rgba(255, 255, 255, 0.94);
 }
 
+.dn-step-panel-desc,
 .dn-connect-desc {
   margin-top: 0.65rem;
   font-size: 0.875rem;
   line-height: 1.55;
   color: rgba(255, 255, 255, 0.48);
+}
+
+.dn-step-panel .dn-lux-field {
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.dn-step-panel .dn-btn-gold-lg {
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.dn-tutorial-checklist-panel {
+  margin-top: 1.25rem;
+  text-align: left;
+}
+
+.dn-tutorial-checklist-panel li {
+  font-size: 0.875rem;
+}
+
+.dn-step-panel .dn-tutorial-dismiss {
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.dn-mood-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
+.dn-mood-pill {
+  padding: 0.45rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.dn-mood-pill:hover {
+  border-color: rgba(212, 175, 55, 0.35);
+  color: rgba(212, 175, 55, 0.9);
+}
+
+.dn-mood-pill-active {
+  color: rgba(18, 14, 6, 0.95);
+  border-color: rgba(212, 175, 55, 0.55);
+  background: linear-gradient(180deg, rgba(212, 175, 55, 0.95), rgba(175, 140, 40, 0.92));
 }
 
 .dn-connect-panel .dn-lux-field {

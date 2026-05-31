@@ -7,7 +7,18 @@ import {
   STORY_DURATION_SEC,
 } from "./constants";
 import { freshScenarioSet } from "./scenarios";
-import type { DateNightSession, SharedDateNightStory } from "./types";
+import type { DateNightFlowStep, DateNightSession, SharedDateNightStory } from "./types";
+
+const LEGACY_STEP_MAP: Record<string, DateNightFlowStep> = {
+  "story-config": "story-name",
+  "story-starting": "player",
+  home: "tutorial",
+};
+
+function migrateSession(session: DateNightSession): DateNightSession {
+  const step = LEGACY_STEP_MAP[session.step as string] ?? session.step;
+  return step === session.step ? session : { ...session, step };
+}
 
 export function isTutorialDismissed(): boolean {
   if (typeof window === "undefined") return false;
@@ -24,7 +35,7 @@ export function readActiveSession(): DateNightSession | null {
   try {
     const raw = localStorage.getItem(DATE_NIGHT_SESSION_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as DateNightSession;
+    return migrateSession(JSON.parse(raw) as DateNightSession);
   } catch {
     return null;
   }
