@@ -2275,23 +2275,23 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 20%;  /* focus on horizon — cinematic crop */
-  opacity: 0.38;
-  filter: saturate(0.2) brightness(0.5);
+  object-position: center 25%;
+  opacity: 0.55;                  /* stronger — the image needs to be felt */
+  filter: saturate(0.4) brightness(0.6);  /* some colour visible, not grey mud */
 }
 
-/* Gradient veil: bright at top so logo feels atmospheric,
-   progressively darker toward bottom for nav legibility */
+/* Veil: image is almost bare at top (logo lives here),
+   fades to near-black at bottom (nav legibility) */
 .pro-sidebar-bg-veil {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(3, 2, 1, 0.08) 0%,    /* almost transparent — image breathes */
-    rgba(3, 2, 1, 0.28) 28%,
-    rgba(3, 2, 1, 0.55) 52%,
-    rgba(3, 2, 1, 0.82) 72%,
-    rgba(3, 2, 1, 0.96) 100%
+    rgba(3, 2, 1, 0.0)  0%,     /* fully transparent — raw image at top */
+    rgba(3, 2, 1, 0.18) 22%,
+    rgba(3, 2, 1, 0.50) 48%,
+    rgba(3, 2, 1, 0.82) 70%,
+    rgba(3, 2, 1, 0.97) 100%
   );
 }
 
@@ -2314,7 +2314,7 @@
 ──────────────────────────────────────────────────────────────── */
 .pro-sidebar-brand {
   flex-shrink: 0;
-  padding: 2.5rem 2.25rem 0;
+  padding: 2.75rem 2.25rem 0;
 }
 
 .pro-sidebar-logo-link {
@@ -2325,10 +2325,10 @@
 
 .pro-sidebar-logo-img {
   display: block;
-  height: 3rem;    /* 48px — crisp; the IMAGE is the hero, not just the logo */
+  height: 4.5rem;  /* 72px — logo needs to command, not merely identify */
   width: auto;
   opacity: 1;
-  filter: drop-shadow(0 1px 12px rgba(0,0,0,0.9));
+  filter: drop-shadow(0 2px 20px rgba(0,0,0,1));
 }
 
 .pro-sidebar-brand-statement {
