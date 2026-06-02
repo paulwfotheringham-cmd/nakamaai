@@ -160,20 +160,23 @@ export default function LiveTestProSidebar({
         </div>
 
         <div className="pro-sidebar-inner">
+
+          {/* ── Brand zone — dominates the top ── */}
           <header className="pro-sidebar-brand">
             <Link href="/" className="pro-sidebar-logo-link" onClick={onMobileClose}>
               <Image
                 src="/Nakama-AI-July25-White.png"
                 alt="Nakama Nights"
-                width={220}
-                height={60}
+                width={260}
+                height={72}
                 className="pro-sidebar-logo-img"
+                priority
               />
             </Link>
-            <div className="pro-sidebar-brand-rule" aria-hidden />
-            <p className="pro-sidebar-brand-tag">Members Universe</p>
+            <p className="pro-sidebar-brand-tag">Private Members Universe</p>
           </header>
 
+          {/* ── Navigation — subordinate to the brand ── */}
           <nav className="pro-sidebar-nav">
             {NAV_SECTIONS.map((section) => {
               const isOpen = openSections[section.id] ?? true;
@@ -194,7 +197,7 @@ export default function LiveTestProSidebar({
                       className={`pro-sidebar-chevron${isOpen ? " is-open" : ""}`}
                       aria-hidden
                     >
-                      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+                      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                     </svg>
                   </button>
 
@@ -223,11 +226,11 @@ export default function LiveTestProSidebar({
             })}
           </nav>
 
+          {/* ── Footer ── */}
           <footer className="pro-sidebar-footer">
-            <div className="pro-sidebar-footer-rule" aria-hidden />
-            <p className="pro-sidebar-footer-text">Nakama Nights</p>
-            <p className="pro-sidebar-footer-sub">Private Members · Live</p>
+            <p className="pro-sidebar-footer-text">© Nakama Nights</p>
           </footer>
+
         </div>
       </aside>
     </>
