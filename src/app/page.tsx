@@ -405,6 +405,17 @@ export default function Page() {
           </div>
         </section>
 
+        <section id="fantasy-services" className="mt-14 scroll-mt-28 rounded-2xl bg-zinc-950/80 p-6">
+          <h2 className="font-serif text-2xl leading-tight text-luxury-primary sm:text-3xl">
+            Nakama Nights Universe
+          </h2>
+          <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+            {browseServices.map((s) => (
+              <ServiceHoverVideoCard key={s.title} {...s} />
+            ))}
+          </div>
+        </section>
+
         <section className="mt-14 pt-6">
           <p className="type-section-heading">
             Nakama Nights favourite fantasies
@@ -505,17 +516,6 @@ export default function Page() {
                 );
               })}
             </div>
-          </div>
-        </section>
-
-        <section id="fantasy-services" className="mt-8 scroll-mt-28 rounded-2xl bg-zinc-950/80 p-6">
-          <h2 className="font-serif text-2xl leading-tight text-luxury-primary sm:text-3xl">
-            Nakama Nights Universe
-          </h2>
-          <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-            {browseServices.map((s) => (
-              <ServiceHoverVideoCard key={s.title} {...s} />
-            ))}
           </div>
         </section>
 
