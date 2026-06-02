@@ -543,7 +543,7 @@ export default function SurpriseModePage({ onBack }: { onBack?: () => void }) {
         <div className="min-w-0">
           <p className="surp-eyebrow">Surprise Mode</p>
           <h1 className="surp-headline">
-            {inviteSent ? "Shared Adventure — Live Simulation" : "Curate their evening."}
+            {inviteSent ? "Shared Adventure — Live Simulation" : "Curate your evening."}
           </h1>
           {!inviteSent && (
             <p className="surp-subline">
