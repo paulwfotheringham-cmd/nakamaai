@@ -1194,11 +1194,6 @@ export default function DateNightPrototypeFlow({
         <div className="dn-workspace-scroll">
           <header className="dn-page-header">
             <div className="dn-page-header-row">
-              <div className="dn-page-header-left">
-                <button type="button" className="dn-back-link" onClick={onBack}>
-                  ← Reignite
-                </button>
-              </div>
               <div className="dn-page-header-right">
                 <button type="button" className="dn-saved-stories-btn" onClick={() => setShowSharedModal(true)}>
                   <span className="dn-saved-stories-btn-glow" aria-hidden />

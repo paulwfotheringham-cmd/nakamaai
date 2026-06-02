@@ -540,20 +540,31 @@ export default function SurpriseModePage({ onBack }: { onBack?: () => void }) {
 
       {/* ── Header ── */}
       <header className="surp-header">
-        <div className="min-w-0">
-          <p className="surp-eyebrow">Surprise Mode</p>
-          <h1 className="surp-headline">
-            {inviteSent ? "Shared Adventure — Live Simulation" : "Curate your evening."}
-          </h1>
-          {!inviteSent && (
+        {!inviteSent && (
+          <div className="surp-header-row">
+            <div className="surp-header-right">
+              <button type="button" className="dn-btn-gold dn-btn-sm" onClick={() => setShowTutorial(true)}>
+                How it works
+              </button>
+            </div>
+          </div>
+        )}
+        <p className="surp-eyebrow">Surprise Mode</p>
+        {inviteSent ? (
+          <h1 className="surp-headline">Shared Adventure — Live Simulation</h1>
+        ) : (
+          <>
+            <div className="surp-title-row">
+              <h1 className="surp-headline">Curate Your Evening</h1>
+              <button type="button" className="dn-btn-gold dn-btn-sm" onClick={refreshCurated}>
+                Give me different scenarios
+              </button>
+            </div>
             <p className="surp-subline">
               Choose an adventure to gift your partner — they&apos;ll discover it when they join.
             </p>
-          )}
-        </div>
-        {onBack ? (
-          <button type="button" className="surp-back-btn" onClick={onBack}>← Back</button>
-        ) : null}
+          </>
+        )}
       </header>
 
       {/* ── Split-screen simulation ── */}
@@ -596,30 +607,6 @@ export default function SurpriseModePage({ onBack }: { onBack?: () => void }) {
         </div>
       ) : (
         <>
-          {/* ── Toolbar ── */}
-          <div className="surp-toolbar">
-            <span className="surp-toolbar-label">
-              {selected ? `Selected: ${selected.title}` : `${CURATED_COUNT} curated for you`}
-            </span>
-            <div className="surp-toolbar-actions">
-              <button type="button" className="surp-tutorial-btn" onClick={() => setShowTutorial(true)}>
-                <svg viewBox="0 0 16 16" fill="none" className="h-3.5 w-3.5 shrink-0" aria-hidden>
-                  <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.3" />
-                  <path d="M8 7.25v4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-                  <circle cx="8" cy="5" r="0.75" fill="currentColor" />
-                </svg>
-                How it works
-              </button>
-              <button type="button" className="surp-refresh-btn" onClick={refreshCurated}>
-                <svg viewBox="0 0 16 16" fill="none" className="h-3.5 w-3.5 shrink-0" aria-hidden>
-                  <path d="M2.5 8A5.5 5.5 0 1 0 4 4.5L2.5 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-                  <path d="M2.5 3v3h3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Give me different scenarios
-              </button>
-            </div>
-          </div>
-
           {/* ── Scenario grid ── */}
           <div className="surp-body">
             <AnimatePresence mode="wait">
