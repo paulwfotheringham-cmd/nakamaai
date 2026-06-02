@@ -27,12 +27,8 @@ import { readGuidePreferences, DEFAULT_USER_NAME } from "@/lib/guides/preference
 import DateNightPlayer from "./DateNightPlayer";
 import DateNightRatingPicker, { RatingLegend } from "./DateNightRatingPicker";
 import PartnerSimulationPanel from "./PartnerSimulationPanel";
-import CouplesGuideConcierge from "../CouplesGuideConcierge";
-
 type DateNightPrototypeFlowProps = {
   onBack: () => void;
-  guideRailHidden?: boolean;
-  onToggleGuide?: () => void;
 };
 
 function StepPanel({
@@ -118,8 +114,6 @@ function SharedStoriesModal({
 
 export default function DateNightPrototypeFlow({
   onBack,
-  guideRailHidden = true,
-  onToggleGuide,
 }: DateNightPrototypeFlowProps) {
   const [session, setSession] = useState<DateNightSession | null>(null);
   const [sharedStories, setSharedStories] = useState<SharedDateNightStory[]>([]);
@@ -1218,9 +1212,6 @@ export default function DateNightPrototypeFlow({
                     <span className="dn-saved-stories-btn-sub">Your adventures</span>
                   </span>
                 </button>
-                {onToggleGuide ? (
-                  <CouplesGuideConcierge guideHidden={guideRailHidden} onToggle={onToggleGuide} />
-                ) : null}
               </div>
             </div>
             {isRatingsStep && (

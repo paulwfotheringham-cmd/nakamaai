@@ -9,7 +9,6 @@ import {
 import DateNightPrototypeFlow from "./date-night/DateNightPrototypeFlow";
 import SurpriseModePage from "./SurpriseModePage";
 import LiveTestCouplesProgram from "./LiveTestCouplesProgram";
-import CouplesGuideConcierge from "./CouplesGuideConcierge";
 import LiveTestDashboardHome from "./LiveTestDashboardHome";
 import LiveTestCreateAudioFrame from "./LiveTestCreateAudioFrame";
 import LiveTestFantasyAudioFrame from "./LiveTestFantasyAudioFrame";
@@ -106,28 +105,18 @@ export default function LiveTestShell() {
                 <>
                   {couplesView === "menu" && (
                     <LiveTestCouplesProgram
-                      guideRailHidden={guideRailHidden}
-                      onToggleGuide={toggleGuideRail}
                       onStartDateNight={() => setCouplesView("date-night")}
                       onStartSurprise={() => setCouplesView("surprise")}
                     />
                   )}
                   {couplesView === "surprise" && (
                     <div className="couples-subflow-wrap">
-                      <div className="couples-subflow-toolbar">
-                        <CouplesGuideConcierge
-                          guideHidden={guideRailHidden}
-                          onToggle={toggleGuideRail}
-                        />
-                      </div>
                       <SurpriseModePage onBack={() => setCouplesView("menu")} />
                     </div>
                   )}
                   {couplesView === "date-night" && (
                     <div className="couples-subflow-wrap couples-subflow-wrap--flush">
                       <DateNightPrototypeFlow
-                        guideRailHidden={guideRailHidden}
-                        onToggleGuide={toggleGuideRail}
                         onBack={() => setCouplesView("menu")}
                       />
                     </div>

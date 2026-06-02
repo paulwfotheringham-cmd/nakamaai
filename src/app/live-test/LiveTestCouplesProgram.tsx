@@ -6,8 +6,6 @@ import {
   DEFAULT_USER_NAME,
   readGuidePreferences,
 } from "@/lib/guides/preferences";
-import CouplesGuideConcierge from "./CouplesGuideConcierge";
-
 const COUPLES_EXPERIENCES = [
   {
     id: "date-night",
@@ -137,13 +135,9 @@ function isTrialPlan(): boolean {
 export default function LiveTestCouplesProgram({
   onStartDateNight,
   onStartSurprise,
-  guideRailHidden = true,
-  onToggleGuide,
 }: {
   onStartDateNight?: () => void;
   onStartSurprise?: () => void;
-  guideRailHidden?: boolean;
-  onToggleGuide?: () => void;
 }) {
   const [firstName, setFirstName] = useState(DEFAULT_USER_NAME);
   const [showTrialTools, setShowTrialTools] = useState(false);
@@ -238,9 +232,6 @@ export default function LiveTestCouplesProgram({
           </div>
 
           <div className="flex shrink-0 flex-col items-end gap-2">
-            {onToggleGuide ? (
-              <CouplesGuideConcierge guideHidden={guideRailHidden} onToggle={onToggleGuide} />
-            ) : null}
             {showTrialTools ? (
               <>
                 {!showPartnerForm ? (
