@@ -3,75 +3,108 @@
 import { useEffect, useState } from "react";
 import { readGuidePreferences, type GuidePreferences } from "@/lib/guides/preferences";
 
-const HERO = {
-  genre: "GOTHIC ROMANCE",
-  title: "The Moor at Midnight",
-  hook: "A stranger appears at the edge of the known world. Some desires refuse to be contained.",
-  moods: ["Gothic", "Slow burn", "Desire"],
-  experience: "Audiobooks",
-  meta: "Listening · 3 days ago",
+const TONIGHT_REC = {
+  label: "The Moor at Midnight",
+  context: "Audiobooks",
   image: "/scenes/moor.jpg",
   imagePosition: "78% center",
 } as const;
 
-const COLLECTIONS = [
+const EXPERIENCES = [
   {
-    id: "tonight",
-    label: "Most Desired Tonight",
-    caption: "Curated for this hour",
-    items: [
-      {
-        genre: "FORBIDDEN",
-        title: "Private Desires",
-        hook: "Say what cannot be said aloud.",
-        image: "/tiles/tile4.jpg",
-        experience: "Forbidden Chat",
-      },
-      {
-        genre: "SLOW BURN",
-        title: "Late Hours",
-        hook: "The line between professional and dangerous.",
-        image: "/scenes/office.jpg",
-        imagePosition: "32% center",
-        experience: "Build Adventure",
-      },
-      {
-        genre: "CHAPTER 2",
-        title: "Choice at the Door",
-        hook: "Every decision rewrites what comes next.",
-        image: "/tiles/tile3.jpg",
-        imagePosition: "52% 38%",
-        experience: "Interactive",
-      },
-    ],
+    id: "audiobooks",
+    label: "Audiobooks",
+    desc: "Narrated fantasy stories",
+    status: "In progress",
+    statusType: "active" as const,
+    image: "/scenes/moor.jpg",
+    imagePosition: "78% center",
+    action: "Resume",
   },
   {
-    id: "dark",
-    label: "Dark Romance",
-    caption: "Intensity. Consequence. No easy endings.",
-    items: [
-      {
-        genre: "REIGNITE",
-        title: "Date Night",
-        hook: "A shared evening that changes everything.",
-        image: "/tiles/tile5.jpg",
-        experience: "Couples",
-      },
-      {
-        genre: "MASQUERADE",
-        title: "The Ball",
-        hook: "Behind every mask, a truth you are not prepared for.",
-        image: "/tiles/tile6.jpg",
-        experience: "Audiobooks",
-      },
-      {
-        genre: "SUPERNATURAL",
-        title: "Moonlit Forests",
-        hook: "Dangerous attraction. A secret you cannot escape.",
-        image: "/tiles/tile1.jpg",
-        experience: "Build Adventure",
-      },
-    ],
+    id: "build-adventure",
+    label: "Build Adventure",
+    desc: "Craft your own story",
+    status: "Draft saved",
+    statusType: "draft" as const,
+    image: "/scenes/office.jpg",
+    imagePosition: "32% center",
+    action: "Continue",
+  },
+  {
+    id: "interactive-adventures",
+    label: "Interactive",
+    desc: "Choose your path",
+    status: "Chapter 2",
+    statusType: "active" as const,
+    image: "/tiles/tile3.jpg",
+    imagePosition: "52% 38%",
+    action: "Continue",
+  },
+  {
+    id: "forbidden-chat",
+    label: "Forbidden Chat",
+    desc: "Uncensored conversation",
+    status: "Active chat",
+    statusType: "active" as const,
+    image: "/tiles/tile4.jpg",
+    action: "Open",
+  },
+  {
+    id: "reignite-couples",
+    label: "Reignite",
+    desc: "Couples adventures",
+    status: "Date Night ready",
+    statusType: "couples" as const,
+    image: "/tiles/tile5.jpg",
+    action: "Enter",
+  },
+] as const;
+
+const CONTINUE_ITEMS = [
+  {
+    label: "The Moor at Midnight",
+    context: "Audiobooks · 3 days ago",
+    image: "/scenes/moor.jpg",
+    imagePosition: "78% center",
+  },
+  {
+    label: "Slow burn, office",
+    context: "Build Adventure · Draft saved",
+    image: "/scenes/office.jpg",
+    imagePosition: "32% center",
+  },
+  {
+    label: "Chapter 2 — choice at the door",
+    context: "Interactive · In progress",
+    image: "/tiles/tile3.jpg",
+    imagePosition: "52% 38%",
+  },
+  {
+    label: "Date Night · Reconnection",
+    context: "Reignite · 2 days ago",
+    image: "/tiles/tile5.jpg",
+  },
+] as const;
+
+const RECOMMENDED = [
+  {
+    genre: "PARANORMAL",
+    title: "The Masquerade Ball",
+    hook: "Behind every mask, a truth you are not prepared for.",
+    image: "/tiles/tile6.jpg",
+  },
+  {
+    genre: "SUPERNATURAL",
+    title: "Moonlit Forests",
+    hook: "Dangerous attraction. A secret you cannot escape.",
+    image: "/tiles/tile1.jpg",
+  },
+  {
+    genre: "FORBIDDEN",
+    title: "Private Desires",
+    hook: "Say what cannot be said aloud.",
+    image: "/tiles/tile4.jpg",
   },
 ] as const;
 
@@ -85,86 +118,129 @@ export default function LiveTestDashboardHome() {
   const userName = prefs?.userName ?? "Jane";
 
   return (
-    <div className="dash-home animate-panel-in">
-      <div className="dash-scroll">
+    <div className="mdb-home animate-panel-in">
 
-        {/* ── Cinematic Hero ──────────────────────────── */}
-        <section className="dash-hero">
-          <div className="dash-hero-scene">
+      {/* ── Greeting / Tonight's Rec ── */}
+      <header className="mdb-header">
+        <div className="mdb-greeting-block">
+          <p className="mdb-eyebrow">Dashboard</p>
+          <h1 className="mdb-greeting">
+            Good evening, <span>{userName}</span>
+          </h1>
+        </div>
+
+        <div className="mdb-tonight-rec">
+          <div className="mdb-tonight-thumb">
             <img
-              src={HERO.image}
+              src={TONIGHT_REC.image}
               alt=""
-              className="dash-hero-img"
-              style={{ objectPosition: HERO.imagePosition }}
+              style={{ objectPosition: TONIGHT_REC.imagePosition }}
             />
-            <div className="dash-hero-veil" aria-hidden />
           </div>
-
-          <div className="dash-hero-body">
-            <div className="dash-hero-top">
-              <span className="dash-hero-welcome">Good evening, {userName}</span>
-            </div>
-
-            <div className="dash-hero-story">
-              <p className="dash-hero-genre">{HERO.genre}</p>
-              <h1 className="dash-hero-title">{HERO.title}</h1>
-              <p className="dash-hero-hook">{HERO.hook}</p>
-
-              <ul className="dash-hero-moods" aria-label="Mood">
-                {HERO.moods.map((m) => (
-                  <li key={m} className="dash-hero-mood">{m}</li>
-                ))}
-              </ul>
-
-              <div className="dash-hero-actions">
-                <button type="button" className="dash-hero-cta">
-                  <svg viewBox="0 0 12 12" fill="currentColor" className="h-2.5 w-2.5 shrink-0" aria-hidden>
-                    <polygon points="3,2 10,6 3,10" />
-                  </svg>
-                  Continue listening
-                </button>
-                <span className="dash-hero-meta">{HERO.meta}</span>
-              </div>
-            </div>
+          <div className="mdb-tonight-copy">
+            <p className="mdb-tonight-label">Tonight&apos;s recommendation</p>
+            <p className="mdb-tonight-title">Continue &ldquo;{TONIGHT_REC.label}&rdquo;</p>
+            <p className="mdb-tonight-context">{TONIGHT_REC.context}</p>
           </div>
-        </section>
+          <button type="button" className="mdb-tonight-btn">
+            <svg viewBox="0 0 12 12" fill="currentColor" className="h-2.5 w-2.5 shrink-0" aria-hidden>
+              <polygon points="3,2 10,6 3,10" />
+            </svg>
+            Continue
+          </button>
+        </div>
+      </header>
 
-        {/* ── Curated Collections ─────────────────────── */}
-        {COLLECTIONS.map((col) => (
-          <section key={col.id} className="dash-collection">
-            <header className="dash-col-header">
-              <h2 className="dash-col-label">{col.label}</h2>
-              <p className="dash-col-caption">{col.caption}</p>
-            </header>
+      {/* ── Body ── */}
+      <div className="mdb-body">
 
-            <ul className="dash-col-grid">
-              {col.items.map((item) => (
-                <li key={item.title} className="dash-card group">
-                  <div className="dash-card-visual">
+        {/* ── Main column ── */}
+        <div className="mdb-main">
+
+          {/* Five Experiences */}
+          <section className="mdb-section">
+            <h2 className="mdb-section-label">Your Experiences</h2>
+            <ul className="mdb-exp-row">
+              {EXPERIENCES.map((exp) => (
+                <li key={exp.id} className="mdb-exp-card group">
+                  <div className="mdb-exp-thumb">
                     <img
-                      src={item.image}
+                      src={exp.image}
                       alt=""
-                      className="dash-card-img"
-                      style={"imagePosition" in item ? { objectPosition: item.imagePosition } : undefined}
+                      style={"imagePosition" in exp ? { objectPosition: exp.imagePosition } : undefined}
                     />
-                    <div className="dash-card-veil" aria-hidden />
-                    <p className="dash-card-genre">{item.genre}</p>
+                    <div className="mdb-exp-thumb-veil" aria-hidden />
                   </div>
-                  <div className="dash-card-body">
-                    <h3 className="dash-card-title">{item.title}</h3>
-                    <p className="dash-card-hook">{item.hook}</p>
-                    <button type="button" className="dash-card-enter">
-                      Enter
-                      <svg viewBox="0 0 12 12" fill="none" className="h-2.5 w-2.5 shrink-0" aria-hidden>
-                        <path d="M3 6h7M7 3.5 9.5 6 7 8.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </button>
+                  <div className="mdb-exp-body">
+                    <p className="mdb-exp-title">{exp.label}</p>
+                    <p className="mdb-exp-desc">{exp.desc}</p>
+                    <div className="mdb-exp-footer">
+                      <span className={`mdb-exp-status mdb-exp-status--${exp.statusType}`}>
+                        {exp.status}
+                      </span>
+                      <button type="button" className="mdb-exp-btn">{exp.action}</button>
+                    </div>
                   </div>
                 </li>
               ))}
             </ul>
           </section>
-        ))}
+
+          {/* Continue Journey */}
+          <section className="mdb-section mdb-section--grow">
+            <h2 className="mdb-section-label">Continue your journey</h2>
+            <ul className="mdb-continue-list">
+              {CONTINUE_ITEMS.map((item) => (
+                <li key={item.label} className="mdb-continue-item group">
+                  <div className="mdb-continue-thumb">
+                    <img
+                      src={item.image}
+                      alt=""
+                      style={"imagePosition" in item ? { objectPosition: item.imagePosition } : undefined}
+                    />
+                  </div>
+                  <div className="mdb-continue-info">
+                    <p className="mdb-continue-title">{item.label}</p>
+                    <p className="mdb-continue-context">{item.context}</p>
+                  </div>
+                  <button type="button" className="mdb-continue-btn">
+                    Resume
+                    <svg viewBox="0 0 12 12" fill="none" className="h-2.5 w-2.5 shrink-0" aria-hidden>
+                      <path d="M3 6h7M7 3.5 9.5 6 7 8.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+        </div>
+
+        {/* ── Aside: Recommended Tonight ── */}
+        <aside className="mdb-aside">
+          <h2 className="mdb-section-label">Recommended tonight</h2>
+          <ul className="mdb-rec-list">
+            {RECOMMENDED.map((rec) => (
+              <li key={rec.title} className="mdb-rec-card group">
+                <div className="mdb-rec-thumb">
+                  <img src={rec.image} alt="" />
+                  <div className="mdb-rec-veil" aria-hidden />
+                  <p className="mdb-rec-genre">{rec.genre}</p>
+                </div>
+                <div className="mdb-rec-body">
+                  <p className="mdb-rec-title">{rec.title}</p>
+                  <p className="mdb-rec-hook">{rec.hook}</p>
+                  <button type="button" className="mdb-rec-btn">
+                    Enter
+                    <svg viewBox="0 0 12 12" fill="none" className="h-2.5 w-2.5 shrink-0" aria-hidden>
+                      <path d="M3 6h7M7 3.5 9.5 6 7 8.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </aside>
 
       </div>
     </div>

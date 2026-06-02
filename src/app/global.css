@@ -712,6 +712,505 @@
    Surprise Mode — Premium Redesign
 ───────────────────────────────────────────────────────── */
 
+/* ─────────────────────────────────────────────────────────
+   MEMBER DASHBOARD — above-the-fold, concierge layout
+   ───────────────────────────────────────────────────────── */
+
+.mdb-home {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: #060606;
+}
+
+/* ── Header: greeting + tonight's rec ──────────────────── */
+.mdb-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.875rem 1.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mdb-greeting-block {
+  flex-shrink: 0;
+  min-width: 11rem;
+}
+
+.mdb-eyebrow {
+  font-size: 0.5625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.45);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.mdb-greeting {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.0625rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.mdb-greeting span {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.mdb-tonight-rec {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(212, 175, 55, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.13);
+  border-radius: 0.625rem;
+  padding: 0.5rem 0.875rem 0.5rem 0.5rem;
+  min-width: 0;
+}
+
+.mdb-tonight-thumb {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.3rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.mdb-tonight-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mdb-tonight-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.mdb-tonight-label {
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.55);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.mdb-tonight-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.88);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.mdb-tonight-context {
+  font-size: 0.5625rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 0.1rem;
+}
+
+.mdb-tonight-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 1.75rem;
+  padding: 0 0.875rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  background: rgba(212, 175, 55, 0.12);
+  color: rgba(212, 175, 55, 0.95);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.mdb-tonight-btn:hover {
+  background: rgba(212, 175, 55, 0.22);
+  border-color: rgba(212, 175, 55, 0.55);
+}
+
+/* ── Body: main + aside ─────────────────────────────────── */
+.mdb-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 17rem;
+  overflow: hidden;
+}
+
+/* ── Main column ────────────────────────────────────────── */
+.mdb-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding: 1.125rem 1.75rem;
+  gap: 1.125rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.mdb-section { flex-shrink: 0; }
+
+.mdb-section--grow {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mdb-section-label {
+  font-size: 0.5rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.2);
+  font-family: var(--font-body), system-ui, sans-serif;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Five experience cards ──────────────────────────────── */
+.mdb-exp-row {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.mdb-exp-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  cursor: pointer;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.mdb-exp-card:hover {
+  border-color: rgba(212, 175, 55, 0.22);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mdb-exp-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.mdb-exp-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 500ms ease;
+}
+
+.mdb-exp-card:hover .mdb-exp-thumb img {
+  transform: scale(1.07);
+}
+
+.mdb-exp-thumb-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(6, 6, 6, 0.55) 0%, transparent 65%);
+}
+
+.mdb-exp-body {
+  padding: 0.5rem 0.625rem 0.625rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.mdb-exp-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.2;
+}
+
+.mdb-exp-desc {
+  font-size: 0.5625rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 0.15rem;
+  line-height: 1.4;
+}
+
+.mdb-exp-footer {
+  margin-top: auto;
+  padding-top: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+}
+
+.mdb-exp-status {
+  font-size: 0.4375rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: var(--font-body), system-ui, sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mdb-exp-status--active  { color: rgba(212, 175, 55, 0.65); }
+.mdb-exp-status--draft   { color: rgba(255, 255, 255, 0.28); }
+.mdb-exp-status--couples { color: rgba(220, 130, 100, 0.7); }
+
+.mdb-exp-btn {
+  flex-shrink: 0;
+  font-size: 0.4375rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.5);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.mdb-exp-card:hover .mdb-exp-btn { color: rgba(212, 175, 55, 0.95); }
+
+/* ── Continue journey list ──────────────────────────────── */
+.mdb-continue-list {
+  flex: 1;
+  min-height: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow: hidden;
+}
+
+.mdb-continue-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.mdb-continue-item:hover { background: rgba(255, 255, 255, 0.035); }
+
+.mdb-continue-thumb {
+  flex-shrink: 0;
+  width: 2.625rem;
+  height: 2.625rem;
+  border-radius: 0.3rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.mdb-continue-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mdb-continue-info { flex: 1; min-width: 0; }
+
+.mdb-continue-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.82);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mdb-continue-context {
+  font-size: 0.5625rem;
+  color: rgba(255, 255, 255, 0.28);
+  margin-top: 0.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mdb-continue-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.mdb-continue-item:hover .mdb-continue-btn {
+  opacity: 1;
+  color: rgba(212, 175, 55, 0.88);
+}
+
+/* ── Aside: Recommended Tonight ─────────────────────────── */
+.mdb-aside {
+  padding: 1.125rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mdb-rec-list {
+  flex: 1;
+  min-height: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  overflow: hidden;
+}
+
+.mdb-rec-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.mdb-rec-card:hover {
+  border-color: rgba(212, 175, 55, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mdb-rec-thumb {
+  position: relative;
+  aspect-ratio: 16 / 7;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.mdb-rec-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 500ms ease;
+}
+
+.mdb-rec-card:hover .mdb-rec-thumb img { transform: scale(1.06); }
+
+.mdb-rec-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(6, 6, 6, 0.75) 0%, transparent 60%);
+}
+
+.mdb-rec-genre {
+  position: absolute;
+  bottom: 0.375rem;
+  left: 0.5rem;
+  font-size: 0.4375rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.8);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.mdb-rec-body {
+  padding: 0.5rem 0.625rem 0.625rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.mdb-rec-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.25;
+}
+
+.mdb-rec-hook {
+  font-style: italic;
+  font-size: 0.625rem;
+  color: rgba(255, 255, 255, 0.33);
+  margin-top: 0.2rem;
+  line-height: 1.45;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mdb-rec-btn {
+  margin-top: 0.375rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.4375rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.mdb-rec-card:hover .mdb-rec-btn {
+  opacity: 1;
+  transform: translateY(0);
+  color: rgba(212, 175, 55, 0.9);
+}
+
+/* ─────────────────────────────────────────────────────────
+   Surprise Mode — Premium Redesign
+───────────────────────────────────────────────────────── */
+
 .surp-page {
   display: flex;
   height: 100%;
