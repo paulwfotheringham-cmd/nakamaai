@@ -1760,6 +1760,262 @@
   margin-top: 0.5rem;
 }
 
+/* ─────────────────────────────────────────────────────────
+   Surprise Mode — Toolbar actions group
+───────────────────────────────────────────────────────── */
+
+.surp-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.surp-tutorial-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 1.875rem;
+  padding: 0 0.875rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(212, 175, 55, 0.75);
+  background: rgba(212, 175, 55, 0.07);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.surp-tutorial-btn:hover {
+  background: rgba(212, 175, 55, 0.13);
+  color: rgba(212, 175, 55, 0.95);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+
+/* ─────────────────────────────────────────────────────────
+   Surprise Mode — Tutorial modal
+───────────────────────────────────────────────────────── */
+
+.surp-tut-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.surp-tut {
+  position: relative;
+  width: 100%;
+  max-width: 52rem;
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  background: rgba(14, 11, 8, 0.97);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 1.25rem;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(212, 175, 55, 0.06);
+  padding: 2rem 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* ── Header ── */
+.surp-tut-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.surp-tut-eyebrow {
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.55);
+  margin-bottom: 0.375rem;
+}
+
+.surp-tut-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.375rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.surp-tut-close {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  margin-top: 0.25rem;
+}
+
+.surp-tut-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ── Steps grid ── */
+.surp-tut-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  position: relative;
+}
+
+@media (max-width: 640px) {
+  .surp-tut-steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 400px) {
+  .surp-tut-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+.surp-tut-step {
+  position: relative;
+  padding: 1rem 0.875rem 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.surp-tut-step-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  background: rgba(212, 175, 55, 0.07);
+  color: rgba(212, 175, 55, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.375rem;
+}
+
+.surp-tut-step-num {
+  font-size: 0.5625rem;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.45);
+}
+
+.surp-tut-step-label {
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.surp-tut-step-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.3;
+  margin-top: 0.1rem;
+}
+
+.surp-tut-step-desc {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.38);
+  line-height: 1.5;
+}
+
+/* Arrow connector — positioned absolutely between steps */
+.surp-tut-arrow {
+  position: absolute;
+  right: -0.25rem;
+  top: 1.375rem;
+  color: rgba(212, 175, 55, 0.3);
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .surp-tut-arrow { display: none; }
+}
+
+/* ── Mystery section ── */
+.surp-tut-mystery {
+  background: rgba(212, 175, 55, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  border-radius: 0.75rem;
+  padding: 1rem 1.125rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.surp-tut-mystery-q {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(212, 175, 55, 0.7);
+  letter-spacing: 0.02em;
+}
+
+.surp-tut-mystery-a {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.42);
+  line-height: 1.55;
+}
+
+.surp-tut-mystery-emphasis {
+  color: rgba(212, 175, 55, 0.55);
+  font-style: italic;
+}
+
+/* ── Footer CTA ── */
+.surp-tut-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.surp-tut-cta {
+  display: inline-flex;
+  align-items: center;
+  height: 2.375rem;
+  padding: 0 1.375rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.9), rgba(175, 140, 38, 0.85));
+  color: rgba(18, 12, 0, 0.97);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  cursor: pointer;
+  transition: opacity 0.2s ease, box-shadow 0.2s ease;
+}
+
+.surp-tut-cta:hover {
+  opacity: 0.9;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);
+}
+
 /* ── Experience dock ── */
 .experience-dock-wrap {
   background: linear-gradient(to top, rgba(5, 5, 5, 0.85) 0%, transparent 100%);

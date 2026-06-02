@@ -8,6 +8,74 @@ import { DATE_NIGHT_SCENARIOS, type DateNightScenario } from "./date-night-scena
 
 // ── Constants ──────────────────────────────────────────────────────
 const CURATED_COUNT = 12;
+const TUTORIAL_SEEN_KEY = "surp-tutorial-seen";
+
+const TUTORIAL_STEPS = [
+  {
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5" aria-hidden>
+        <rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" strokeWidth="1.3" />
+        <path d="M7 10h6M10 7v6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+      </svg>
+    ),
+    label: "Choose",
+    title: "Pick tonight's adventure",
+    desc: "Browse curated scenarios and select the perfect experience for your partner.",
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5" aria-hidden>
+        <path d="M3 5h14v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z" stroke="currentColor" strokeWidth="1.3" />
+        <path d="M3 5l7 7 7-7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    label: "Invite",
+    title: "Send a surprise invitation",
+    desc: "Enter your partner's username. They receive a mysterious invite — no details revealed yet.",
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5" aria-hidden>
+        <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.3" />
+        <path d="M7 10.5l2.5 2.5L14 8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    label: "Accept",
+    title: "Partner accepts",
+    desc: "Your partner can accept or decline. If accepted, the adventure begins.",
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5" aria-hidden>
+        <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.3" />
+        <path d="M10 7v3.5l2.5 1.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    label: "Configure",
+    title: "You set the stage",
+    desc: "Choose voice, mood, tone, and story style. Your partner waits in anticipation.",
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5" aria-hidden>
+        <path d="M10 3l1.5 4.5H16l-3.75 2.75 1.5 4.5L10 12 6.25 14.75l1.5-4.5L4 7.5h4.5L10 3Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+      </svg>
+    ),
+    label: "Generate",
+    title: "AI crafts your story",
+    desc: "A custom adventure is generated — narrated, scored, and personalised for tonight.",
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5" aria-hidden>
+        <polygon points="5,3 17,10 5,17" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+      </svg>
+    ),
+    label: "Play",
+    title: "Experience it together",
+    desc: "You control playback as host. Your partner follows along in perfect sync.",
+  },
+] as const;
 const SIM_AUDIO_DURATION = 420; // 7-minute simulation
 
 const SIM_VOICES = ["Cameron", "Sophia", "Ava", "Donny", "Will"];
@@ -103,7 +171,21 @@ export default function SurpriseModePage({ onBack }: { onBack?: () => void }) {
   // Partner wait message cycling
   const [partnerMsgIdx, setPartnerMsgIdx] = useState(0);
 
+  // Tutorial
+  const [showTutorial, setShowTutorial] = useState(false);
+
   // ── Effects ──────────────────────────────────────────────────────
+
+  // Auto-show tutorial on first visit
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem(TUTORIAL_SEEN_KEY)) {
+        setShowTutorial(true);
+        localStorage.setItem(TUTORIAL_SEEN_KEY, "1");
+      }
+    } catch { /* localStorage unavailable */ }
+  }, []);
+
   useEffect(() => {
     if (simStep !== "setup" && simStep !== "generating") return;
     const id = setInterval(
@@ -519,13 +601,23 @@ export default function SurpriseModePage({ onBack }: { onBack?: () => void }) {
             <span className="surp-toolbar-label">
               {selected ? `Selected: ${selected.title}` : `${CURATED_COUNT} curated for you`}
             </span>
-            <button type="button" className="surp-refresh-btn" onClick={refreshCurated}>
-              <svg viewBox="0 0 16 16" fill="none" className="h-3.5 w-3.5 shrink-0" aria-hidden>
-                <path d="M2.5 8A5.5 5.5 0 1 0 4 4.5L2.5 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-                <path d="M2.5 3v3h3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              Give me different scenarios
-            </button>
+            <div className="surp-toolbar-actions">
+              <button type="button" className="surp-tutorial-btn" onClick={() => setShowTutorial(true)}>
+                <svg viewBox="0 0 16 16" fill="none" className="h-3.5 w-3.5 shrink-0" aria-hidden>
+                  <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.3" />
+                  <path d="M8 7.25v4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                  <circle cx="8" cy="5" r="0.75" fill="currentColor" />
+                </svg>
+                How it works
+              </button>
+              <button type="button" className="surp-refresh-btn" onClick={refreshCurated}>
+                <svg viewBox="0 0 16 16" fill="none" className="h-3.5 w-3.5 shrink-0" aria-hidden>
+                  <path d="M2.5 8A5.5 5.5 0 1 0 4 4.5L2.5 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                  <path d="M2.5 3v3h3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Give me different scenarios
+              </button>
+            </div>
           </div>
 
           {/* ── Scenario grid ── */}
@@ -591,6 +683,80 @@ export default function SurpriseModePage({ onBack }: { onBack?: () => void }) {
           </footer>
         </>
       )}
+
+      {/* ── Tutorial modal ── */}
+      <AnimatePresence>
+        {showTutorial ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="surp-tut-backdrop"
+            role="dialog"
+            aria-modal
+            aria-labelledby="surp-tut-title"
+            onClick={() => setShowTutorial(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.97 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="surp-tut"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="surp-tut-header">
+                <div>
+                  <p className="surp-tut-eyebrow">Surprise Adventure</p>
+                  <h2 id="surp-tut-title" className="surp-tut-title">How it works</h2>
+                </div>
+                <button type="button" className="surp-tut-close" onClick={() => setShowTutorial(false)} aria-label="Close tutorial">
+                  <svg viewBox="0 0 16 16" fill="none" className="h-4 w-4" aria-hidden>
+                    <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Steps */}
+              <div className="surp-tut-steps">
+                {TUTORIAL_STEPS.map((step, i) => (
+                  <div key={step.label} className="surp-tut-step">
+                    <div className="surp-tut-step-icon">{step.icon}</div>
+                    <div className="surp-tut-step-num">{i + 1}</div>
+                    <p className="surp-tut-step-label">{step.label}</p>
+                    <p className="surp-tut-step-title">{step.title}</p>
+                    <p className="surp-tut-step-desc">{step.desc}</p>
+                    {i < TUTORIAL_STEPS.length - 1 && (
+                      <div className="surp-tut-arrow" aria-hidden>
+                        <svg viewBox="0 0 12 12" fill="none" className="h-3 w-3">
+                          <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Partner mystery section */}
+              <div className="surp-tut-mystery">
+                <p className="surp-tut-mystery-q">What does my partner see?</p>
+                <p className="surp-tut-mystery-a">
+                  Your partner receives a surprise invitation — no scenario details until the adventure begins.
+                  <span className="surp-tut-mystery-emphasis"> The mystery is part of the experience.</span>
+                </p>
+              </div>
+
+              {/* CTA */}
+              <div className="surp-tut-footer">
+                <button type="button" className="surp-tut-cta" onClick={() => setShowTutorial(false)}>
+                  Got it — let me choose an adventure
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       {/* ── Invite modal ── */}
       <AnimatePresence>
