@@ -165,12 +165,13 @@ export default function LiveTestProSidebar({
               <Image
                 src="/Nakama-AI-July25-White.png"
                 alt="Nakama Nights"
-                width={120}
-                height={32}
-                className="h-6 w-auto opacity-90"
+                width={220}
+                height={60}
+                className="pro-sidebar-logo-img"
               />
             </Link>
-            <p className="pro-sidebar-brand-tag">Universe</p>
+            <div className="pro-sidebar-brand-rule" aria-hidden />
+            <p className="pro-sidebar-brand-tag">Members Universe</p>
           </header>
 
           <nav className="pro-sidebar-nav">
@@ -223,7 +224,9 @@ export default function LiveTestProSidebar({
           </nav>
 
           <footer className="pro-sidebar-footer">
-            <p className="pro-sidebar-footer-text">Nakama Nights · Live</p>
+            <div className="pro-sidebar-footer-rule" aria-hidden />
+            <p className="pro-sidebar-footer-text">Nakama Nights</p>
+            <p className="pro-sidebar-footer-sub">Private Members · Live</p>
           </footer>
         </div>
       </aside>

@@ -2196,7 +2196,7 @@
 
 @media (min-width: 768px) {
   .pro-shell {
-    grid-template-columns: 19rem minmax(0, 1fr);
+    grid-template-columns: 21rem minmax(0, 1fr);
   }
 }
 
@@ -2210,12 +2210,18 @@
     radial-gradient(ellipse 60% 40% at 100% 50%, rgba(120, 80, 30, 0.06), transparent 55%);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   PRO SIDEBAR — Luxury redesign
+   Reference: Soho House · Aman · Four Seasons · Centurion
+═══════════════════════════════════════════════════════════ */
+
 .pro-sidebar-backdrop {
   position: fixed;
   inset: 0;
   z-index: 40;
   border: none;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
   cursor: pointer;
 }
 
@@ -2232,12 +2238,12 @@
   z-index: 50;
   display: flex;
   flex-direction: column;
-  width: 19rem;
-  min-width: 19rem;
-  max-width: 19rem;
+  width: 21rem;
+  min-width: 21rem;
+  max-width: 21rem;
   height: 100%;
   transform: translateX(-100%);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .pro-sidebar.pro-sidebar-open {
@@ -2250,15 +2256,16 @@
     grid-column: 1;
     grid-row: 1;
     z-index: 20;
-    width: 19rem;
-    min-width: 19rem;
-    max-width: 19rem;
+    width: 21rem;
+    min-width: 21rem;
+    max-width: 21rem;
     transform: none;
     box-shadow: none;
-    border-right: 1px solid rgba(255, 255, 255, 0.04);
+    border-right: 1px solid rgba(212, 175, 55, 0.07);
   }
 }
 
+/* ── Background ── */
 .pro-sidebar-bg {
   position: absolute;
   inset: 0;
@@ -2269,8 +2276,9 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
-  opacity: 0.18;
+  object-position: center top;
+  opacity: 0.12;
+  filter: saturate(0.6);
 }
 
 .pro-sidebar-bg-overlay {
@@ -2278,12 +2286,25 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(5, 5, 5, 0.92) 0%,
-    rgba(5, 5, 5, 0.97) 55%,
-    rgba(3, 3, 3, 0.99) 100%
+    rgba(4, 3, 2, 0.88) 0%,
+    rgba(4, 3, 2, 0.95) 40%,
+    rgba(3, 2, 1, 0.99) 100%
   );
 }
 
+/* subtle ambient glow at the top right — luxury warmth */
+.pro-sidebar-bg::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 14rem;
+  background: radial-gradient(ellipse 80% 60% at 80% 0%, rgba(212, 175, 55, 0.06), transparent 70%);
+}
+
+/* ── Inner layout ── */
 .pro-sidebar-inner {
   position: relative;
   z-index: 1;
@@ -2292,56 +2313,79 @@
   width: 100%;
   height: 100%;
   min-height: 0;
-  min-width: 19rem;
+  min-width: 21rem;
 }
 
+/* ══════════════════════════════════════════
+   BRAND HEADER — The logo commands attention
+══════════════════════════════════════════ */
 .pro-sidebar-brand {
   flex-shrink: 0;
-  padding: 2.25rem 1.75rem 1.75rem;
-  border-bottom: none;
+  padding: 2.75rem 2rem 2.25rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.09);
 }
 
 .pro-sidebar-logo-link {
   display: block;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease;
 }
 
 .pro-sidebar-logo-link:hover {
+  opacity: 0.88;
+}
+
+/* Logo image — dramatically larger */
+.pro-sidebar-logo-img {
+  height: 3rem;       /* 48px — 100 % larger than previous 24px */
+  width: auto;
+  opacity: 0.94;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+.pro-sidebar-logo-link:hover .pro-sidebar-logo-img {
   opacity: 1;
 }
 
-.pro-sidebar-brand-tag {
-  margin-top: 0.75rem;
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 0.625rem;
-  font-weight: 400;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(245, 242, 235, 0.32);
+/* Gold rule beneath logo — luxury accent */
+.pro-sidebar-brand-rule {
+  width: 2rem;
+  height: 1px;
+  margin: 1.375rem 0 1rem;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.55), rgba(212, 175, 55, 0));
 }
 
+.pro-sidebar-brand-tag {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.5625rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.38);
+}
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
 .pro-sidebar-nav {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 0.5rem 0 2rem;
+  padding: 1rem 0 2.5rem;
+  scrollbar-width: none;
 }
 
 .pro-sidebar-nav::-webkit-scrollbar {
-  width: 3px;
+  display: none;
 }
 
-.pro-sidebar-nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
-}
-
+/* Section ── */
 .pro-sidebar-section {
-  padding-top: 2rem;
+  padding-top: 2.25rem;
 }
 
 .pro-sidebar-section:first-child {
-  padding-top: 0.25rem;
+  padding-top: 0.5rem;
 }
 
 .pro-sidebar-section-toggle {
@@ -2349,30 +2393,33 @@
   width: 100%;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.75rem 0.625rem;
+  padding: 0 2rem 0.75rem;
   font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 0.625rem;
-  font-weight: 400;
-  letter-spacing: 0.14em;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(245, 242, 235, 0.32);
-  transition: color 0.2s ease;
+  color: rgba(212, 175, 55, 0.32);
+  transition: color 0.25s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .pro-sidebar-section-toggle:hover,
 .pro-sidebar-section-toggle.has-active {
-  color: rgba(245, 242, 235, 0.45);
+  color: rgba(212, 175, 55, 0.55);
 }
 
 .pro-sidebar-chevron {
-  width: 0.875rem;
-  height: 0.875rem;
-  opacity: 0.35;
-  transition: transform 0.25s ease, opacity 0.2s ease;
+  width: 0.75rem;
+  height: 0.75rem;
+  opacity: 0.4;
+  transition: transform 0.3s ease, opacity 0.2s ease;
 }
 
 .pro-sidebar-section-toggle:hover .pro-sidebar-chevron {
-  opacity: 0.55;
+  opacity: 0.6;
 }
 
 .pro-sidebar-chevron.is-open {
@@ -2385,66 +2432,87 @@
   padding: 0;
 }
 
+/* ── Nav item ── */
 .pro-sidebar-item {
   position: relative;
   display: flex;
   width: 100%;
   align-items: center;
   gap: 1rem;
-  padding: 0.8125rem 1.75rem 0.8125rem 1.875rem;
+  padding: 0.875rem 2rem 0.875rem 2.125rem;
   font-family: var(--font-body), system-ui, sans-serif;
-  font-size: var(--type-nav);
+  font-size: 0.875rem;
   font-weight: 400;
-  line-height: 1.45;
-  color: rgba(245, 242, 235, 0.52);
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  color: rgba(245, 242, 235, 0.45);
   border: none;
   border-radius: 0;
   background: transparent;
   text-align: left;
   white-space: nowrap;
-  transition: color 0.2s ease;
+  cursor: pointer;
+  transition: color 0.22s ease, background 0.22s ease;
 }
 
+/* Left accent bar */
 .pro-sidebar-item::before {
   content: "";
   position: absolute;
   left: 0;
-  top: 0.625rem;
-  bottom: 0.625rem;
-  width: 1px;
-  background: transparent;
-  transition: background 0.2s ease;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 0;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    rgba(212, 175, 55, 0.0),
+    rgba(212, 175, 55, 0.85),
+    rgba(212, 175, 55, 0.0)
+  );
+  border-radius: 999px;
+  transition: height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  opacity: 0;
 }
 
+/* Hover ── */
 .pro-sidebar-item:hover {
-  color: rgba(245, 242, 235, 0.78);
-  background: transparent;
+  color: rgba(245, 242, 235, 0.75);
+  background: rgba(255, 255, 255, 0.028);
 }
 
+/* Active ── luxury gold treatment */
 .pro-sidebar-item.is-active {
-  color: rgba(245, 242, 235, 0.92);
-  background: transparent;
+  color: rgba(245, 242, 235, 0.96);
+  background: linear-gradient(
+    90deg,
+    rgba(212, 175, 55, 0.1) 0%,
+    rgba(212, 175, 55, 0.03) 60%,
+    transparent 100%
+  );
 }
 
 .pro-sidebar-item.is-active::before {
-  background: rgba(198, 164, 106, 0.75);
+  height: 1.5rem;
+  opacity: 1;
 }
 
+/* ── Icon ── */
 .pro-sidebar-icon {
   flex-shrink: 0;
-  width: 1.125rem;
-  height: 1.125rem;
-  opacity: 0.42;
-  transition: opacity 0.2s ease;
+  width: 1.25rem;
+  height: 1.25rem;
+  opacity: 0.36;
+  transition: opacity 0.22s ease, color 0.22s ease;
 }
 
 .pro-sidebar-item:hover .pro-sidebar-icon {
-  opacity: 0.62;
+  opacity: 0.58;
 }
 
 .pro-sidebar-item.is-active .pro-sidebar-icon {
-  opacity: 0.88;
-  color: inherit;
+  opacity: 1;
+  color: rgba(212, 175, 55, 0.8);
 }
 
 .pro-sidebar-item-label {
@@ -2458,27 +2526,45 @@
   flex-shrink: 0;
   padding: 0;
   font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 0.625rem;
+  font-size: 0.5625rem;
   font-weight: 400;
-  letter-spacing: 0.08em;
-  text-transform: none;
-  color: rgba(198, 164, 106, 0.55);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.45);
   background: none;
   border-radius: 0;
 }
 
+/* ══════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════ */
 .pro-sidebar-footer {
   flex-shrink: 0;
-  padding: 1.75rem 1.75rem 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 1.5rem 2rem 2rem;
+}
+
+.pro-sidebar-footer-rule {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.1), transparent 70%);
+  margin-bottom: 1.25rem;
 }
 
 .pro-sidebar-footer-text {
   font-size: 0.625rem;
-  font-weight: 400;
-  letter-spacing: 0.1em;
+  font-weight: 500;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(245, 242, 235, 0.28);
+  color: rgba(245, 242, 235, 0.32);
+  margin-bottom: 0.3rem;
+}
+
+.pro-sidebar-footer-sub {
+  font-size: 0.5625rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.28);
 }
 
 .pro-main-wrap {
