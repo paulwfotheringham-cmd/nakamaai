@@ -2210,12 +2210,14 @@
     radial-gradient(ellipse 60% 40% at 100% 50%, rgba(120, 80, 30, 0.06), transparent 55%);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   PRO SIDEBAR — Architectural redesign.
-   Concept: Atmospheric Masthead + Typography Directory.
-   Brand zone ≈ 40% of sidebar. Navigation is editorial. No icon dependency.
-   Reference: MasterClass · Aman · Saint Laurent · Apple TV+ · Soho House
-═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   PRO SIDEBAR — CONCEPT A: CINEMATIC FULL-BLEED
+   The sidebar IS the brand. Not navigation with a logo.
+   Atmospheric image covers the full height.
+   Logo floats at top. Navigation text sits at bottom.
+   No boxes. No containers. No chrome.
+   Reference: Aman · Soho House · Apple TV+ · MasterClass
+═══════════════════════════════════════════════════════════════════ */
 
 .pro-sidebar-backdrop {
   position: fixed;
@@ -2227,7 +2229,7 @@
 }
 @media (min-width: 768px) { .pro-sidebar-backdrop { display: none; } }
 
-/* ── Shell ── */
+/* ── Sidebar shell ── */
 .pro-sidebar {
   position: fixed;
   top: 0; left: 0;
@@ -2238,9 +2240,10 @@
   min-width: 22.5rem;
   max-width: 22.5rem;
   height: 100%;
-  background: #060403;
+  background: #050302;
   transform: translateX(-100%);
   transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
 }
 .pro-sidebar.pro-sidebar-open { transform: translateX(0); }
 
@@ -2251,198 +2254,197 @@
     z-index: 20;
     width: 22.5rem; min-width: 22.5rem; max-width: 22.5rem;
     transform: none;
-    border-right: 1px solid rgba(255,255,255,0.05);
+    border-right: 1px solid rgba(255, 255, 255, 0.045);
   }
 }
 
-.pro-sidebar-inner {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  width: 100%; height: 100%;
-  min-height: 0; min-width: 22.5rem;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   BRAND MASTHEAD
-   The cinematic top third.
-   Atmospheric image + large logo anchored to bottom.
-   Logo feels like a luxury hotel signage plaque.
-   Min-height ~260px at standard viewports.
-═══════════════════════════════════════════════════════════════ */
-.pro-sidebar-brand {
-  position: relative;
-  flex-shrink: 0;
-  min-height: 16rem;         /* 256px — guaranteed minimum brand zone */
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end; /* logo anchors to the bottom of the zone */
-  overflow: hidden;
-}
-
-/* Atmospheric image — fills the brand zone only */
-.pro-sidebar-brand-atmosphere {
+/* ── Full-sidebar atmospheric image ─────────────────────────────
+   The landscape photograph fills the entire sidebar.
+   This is NOT a banner. It IS the sidebar.
+   Text floats on top of it like typography on a luxury poster.
+──────────────────────────────────────────────────────────────── */
+.pro-sidebar-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.pro-sidebar-atm-img {
+.pro-sidebar-bg-img {
   position: absolute;
   inset: 0;
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  object-position: center 30%;
-  opacity: 0.28;
-  filter: saturate(0.3) brightness(0.55);
+  object-position: center 20%;  /* focus on horizon — cinematic crop */
+  opacity: 0.38;
+  filter: saturate(0.2) brightness(0.5);
 }
 
-/* Gradient veil — darkens bottom so logo is legible */
-.pro-sidebar-atm-veil {
+/* Gradient veil: bright at top so logo feels atmospheric,
+   progressively darker toward bottom for nav legibility */
+.pro-sidebar-bg-veil {
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    170deg,
-    rgba(6, 4, 3, 0.15) 0%,
-    rgba(6, 4, 3, 0.55) 45%,
-    rgba(6, 4, 3, 0.92) 75%,
-    rgba(6, 4, 3, 1) 100%
+    to bottom,
+    rgba(3, 2, 1, 0.08) 0%,    /* almost transparent — image breathes */
+    rgba(3, 2, 1, 0.28) 28%,
+    rgba(3, 2, 1, 0.55) 52%,
+    rgba(3, 2, 1, 0.82) 72%,
+    rgba(3, 2, 1, 0.96) 100%
   );
 }
 
-/* Brand content — above the veil */
-.pro-sidebar-brand-content {
+/* ── Inner scaffold ── */
+.pro-sidebar-inner {
   position: relative;
   z-index: 1;
-  padding: 0 2.25rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  min-width: 22.5rem;
+}
+
+/* ── Brand zone ─────────────────────────────────────────────────
+   Logo floats on the atmospheric image.
+   No background. No border. No container.
+   Just typography on a cinematic frame.
+──────────────────────────────────────────────────────────────── */
+.pro-sidebar-brand {
+  flex-shrink: 0;
+  padding: 2.5rem 2.25rem 0;
 }
 
 .pro-sidebar-logo-link {
   display: block;
   transition: opacity 0.3s ease;
 }
-.pro-sidebar-logo-link:hover { opacity: 0.8; }
+.pro-sidebar-logo-link:hover { opacity: 0.78; }
 
-/* Logo — hero scale. Full white. No dimming. */
 .pro-sidebar-logo-img {
   display: block;
-  height: 5.5rem;   /* 88px — 3.7× the original 24px */
+  height: 3rem;    /* 48px — crisp; the IMAGE is the hero, not just the logo */
   width: auto;
   opacity: 1;
-  filter: drop-shadow(0 2px 24px rgba(0, 0, 0, 0.8));
+  filter: drop-shadow(0 1px 12px rgba(0,0,0,0.9));
 }
 
-/* Brand statement */
 .pro-sidebar-brand-statement {
-  margin-top: 1rem;
+  margin-top: 0.875rem;
   font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 0.5625rem;
+  font-size: 0.5rem;
   font-weight: 500;
-  letter-spacing: 0.26em;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: rgba(212, 175, 55, 0.65);
+  color: rgba(212, 175, 55, 0.55);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.8);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   EDITORIAL NAVIGATION DIRECTORY
-   Typography carries the navigation. Icons are secondary.
-   Section headers = editorial chapter titles.
-   Items = plain, confident, readable.
-═══════════════════════════════════════════════════════════════ */
+/* ── Navigation ──────────────────────────────────────────────────
+   Pure text on the darkening atmosphere.
+   No boxes. No borders. No icon slots.
+   Sections separated by spacing alone.
+   Feels like editorial text over a luxury print.
+──────────────────────────────────────────────────────────────── */
 .pro-sidebar-nav {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 1.5rem 0 2.5rem;
+  /* Navigation starts at ~55% down so logo zone breathes */
+  padding: 0 0 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;  /* items anchor to the bottom half */
   scrollbar-width: none;
 }
 .pro-sidebar-nav::-webkit-scrollbar { display: none; }
 
-/* ── Chapter heading — editorial, not software accordion ── */
 .pro-sidebar-section {
-  padding-top: 2rem;
+  padding-top: 1.75rem;
 }
-.pro-sidebar-section:first-child { padding-top: 0.25rem; }
+.pro-sidebar-section:first-child { padding-top: 0; }
 
-.pro-sidebar-chapter {
-  display: flex;
+/* Section label — editorial marker, not dashboard accordion header */
+.pro-sidebar-section-label {
+  display: block;
   width: 100%;
-  align-items: center;
-  padding: 0 2.25rem 0.625rem;
+  padding: 0 2.25rem 0.5rem;
   font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 0.5625rem;
+  font-size: 0.5rem;
   font-weight: 600;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: rgba(212, 175, 55, 0.5);
+  color: rgba(212, 175, 55, 0.45);
   background: none;
   border: none;
+  text-align: left;
   cursor: pointer;
   transition: color 0.2s ease;
 }
-.pro-sidebar-chapter:hover { color: rgba(212, 175, 55, 0.8); }
-.pro-sidebar-chapter.has-active { color: rgba(212, 175, 55, 0.72); }
+.pro-sidebar-section-label:hover { color: rgba(212, 175, 55, 0.7); }
+.pro-sidebar-section-label.has-active { color: rgba(212, 175, 55, 0.65); }
 
 .pro-sidebar-items {
   list-style: none;
   margin: 0; padding: 0;
 }
 
-/* ── Nav item — typography-led, no icon dependence ── */
+/* ── Nav item ── */
 .pro-sidebar-item {
   position: relative;
   display: flex;
   width: 100%;
   align-items: center;
-  padding: 0.75rem 2.25rem 0.75rem 2.375rem;
+  /* Left padding accounts for the 2px active rail */
+  padding: 0.625rem 2.25rem 0.625rem 2.375rem;
   font-family: var(--font-body), system-ui, sans-serif;
   font-size: 0.9375rem;    /* 15px */
   font-weight: 400;
   letter-spacing: 0.01em;
   line-height: 1.4;
-  color: rgba(245, 242, 235, 0.72);
+  color: rgba(245, 242, 235, 0.78);
   border: none;
   background: none;
   text-align: left;
   white-space: nowrap;
   cursor: pointer;
   transition: color 0.2s ease;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.6);
 }
 
-/* 2px gold left rail — the only structural indicator */
+/* Active rail */
 .pro-sidebar-item::before {
   content: "";
   position: absolute;
-  left: 0; top: 0; bottom: 0;
+  left: 0; top: 25%; bottom: 25%;
   width: 2px;
-  background: transparent;
   border-radius: 0 1px 1px 0;
-  transition: background 0.2s ease;
+  background: transparent;
+  transition: background 0.22s ease, top 0.22s ease, bottom 0.22s ease;
 }
 
-.pro-sidebar-item:hover { color: rgba(245, 242, 235, 0.95); }
+.pro-sidebar-item:hover { color: rgba(245, 242, 235, 1); }
 
-/* Active — gold text + gold rail. Clean. Unmistakable. */
+/* Active — gold. The only signal needed. */
 .pro-sidebar-item.is-active {
   color: rgba(212, 175, 55, 1);
   font-weight: 500;
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.3), 0 1px 8px rgba(0,0,0,0.6);
 }
 .pro-sidebar-item.is-active::before {
   background: linear-gradient(
     180deg,
-    rgba(212, 175, 55, 0.2) 0%,
-    rgba(212, 175, 55, 1) 50%,
-    rgba(212, 175, 55, 0.2) 100%
+    rgba(212, 175, 55, 0.15) 0%,
+    rgba(212, 175, 55, 0.95) 50%,
+    rgba(212, 175, 55, 0.15) 100%
   );
 }
 
-/* Icons: present in DOM, visually suppressed — text carries the nav */
-.pro-sidebar-icon-wrap {
-  display: none;
-}
-/* Keep legacy .pro-sidebar-icon class working if referenced anywhere */
+/* Icons: not rendered — text carries the full navigation */
 .pro-sidebar-icon { display: none; }
+.pro-sidebar-icon-wrap { display: none; }
 
 .pro-sidebar-item-label {
   flex: 1;
@@ -2453,27 +2455,25 @@
 
 .pro-sidebar-badge {
   flex-shrink: 0;
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 0.5rem;
+  font-size: 0.4375rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(212, 175, 55, 0.6);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   FOOTER — minimal marque
-═══════════════════════════════════════════════════════════════ */
+/* ── Footer ── */
 .pro-sidebar-footer {
   flex-shrink: 0;
-  padding: 1.25rem 2.25rem 1.75rem;
+  padding: 1rem 2.25rem 1.5rem;
 }
 .pro-sidebar-footer-text {
-  font-size: 0.5rem;
+  font-size: 0.4375rem;
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(245, 242, 235, 0.2);
+  color: rgba(245, 242, 235, 0.22);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.8);
 }
 
 .pro-main-wrap {
