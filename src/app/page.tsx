@@ -302,20 +302,19 @@ export default function Page() {
           <div className="ml-auto flex flex-wrap items-center justify-end gap-3 sm:gap-4">
             <a
               href="#fantasy-services"
-              className="inline-flex rounded-full border border-amber-400/35 bg-gradient-to-b from-[#e4efd9] via-[#dce8c8] to-[#d0ddb8] px-6 py-2.5 type-label text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:border-amber-300/50 hover:from-[#ecf4e4] hover:via-[#e6efd6] hover:to-[#dae6c8]"
+              className="inline-flex rounded-full bg-[linear-gradient(180deg,#E6C45A_0%,#D4AF37_100%)] px-6 py-2.5 type-label font-medium text-[#111111] shadow-[0_4px_20px_rgba(212,175,55,0.3)] transition hover:brightness-110"
             >
               Fantasy services
             </a>
             <Link
               href="/signup-trial"
-              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2 type-label text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
+              className="inline-flex rounded-full bg-[linear-gradient(180deg,#E6C45A_0%,#D4AF37_100%)] px-5 py-2 type-label font-medium text-[#111111] shadow-[0_4px_20px_rgba(212,175,55,0.3)] transition hover:brightness-110"
             >
               10 Day Free Trial
             </Link>
-
             <Link
               href="/login"
-              className="inline-flex rounded-full border border-amber-200/50 bg-amber-100/90 px-6 py-2.5 type-label text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100"
+              className="inline-flex rounded-full bg-[linear-gradient(180deg,#E6C45A_0%,#D4AF37_100%)] px-6 py-2.5 type-label font-medium text-[#111111] shadow-[0_4px_20px_rgba(212,175,55,0.3)] transition hover:brightness-110"
             >
               Login
             </Link>
@@ -371,7 +370,7 @@ export default function Page() {
 
             <Link
               href="/select-plan"
-              className="mt-12 inline-flex w-full max-w-[280px] items-center justify-center rounded-full border border-amber-200/50 bg-amber-100/90 px-5 py-2.5 type-label text-stone-700 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:bg-amber-100 md:px-7 md:py-3 md:text-[11px] lg:text-xs"
+              className="mt-12 inline-flex w-full max-w-[280px] items-center justify-center rounded-full bg-[linear-gradient(180deg,#E6C45A_0%,#D4AF37_100%)] px-5 py-2.5 type-label font-medium text-[#111111] shadow-[0_4px_24px_rgba(212,175,55,0.35)] transition hover:brightness-110 md:px-7 md:py-3"
             >
               JOIN NAKAMA NOW
             </Link>
@@ -385,7 +384,7 @@ export default function Page() {
                 </p>
                 <Link
                   href="/signup-trial"
-                  className="inline-flex w-full max-w-full items-center justify-center rounded-full border border-emerald-200/55 bg-gradient-to-r from-amber-200/95 via-lime-200/90 to-emerald-300/95 px-5 py-2.5 type-label text-stone-800 shadow-[0_10px_28px_rgba(0,0,0,0.25)] transition hover:from-amber-100 hover:via-lime-100 hover:to-emerald-200 md:w-fit md:px-7 md:py-3 md:pl-8 md:pr-7 md:text-[11px] lg:text-xs"
+                  className="inline-flex w-full max-w-full items-center justify-center rounded-full bg-[linear-gradient(180deg,#E6C45A_0%,#D4AF37_100%)] px-5 py-2.5 type-label font-medium text-[#111111] shadow-[0_4px_24px_rgba(212,175,55,0.35)] transition hover:brightness-110 md:w-fit md:px-7 md:py-3"
                 >
                   TRY YOUR FIRST EXPERIENCE
                 </Link>
@@ -554,7 +553,7 @@ export default function Page() {
 
               <button
                 type="submit"
-                className="w-full rounded-full bg-stone-300 py-3 type-section-heading text-black transition hover:bg-stone-400"
+                className="w-full rounded-full bg-[linear-gradient(180deg,#E6C45A_0%,#D4AF37_100%)] py-3 type-section-heading font-medium text-[#111111] shadow-[0_4px_20px_rgba(212,175,55,0.3)] transition hover:brightness-110"
               >
                 Create account
               </button>
@@ -566,9 +565,9 @@ export default function Page() {
             <div className="mt-6 border-t border-stone-800 pt-5">
               <Link
                 href="/login"
-                className="inline-flex rounded-full border border-amber-300/40 bg-amber-300/10 px-4 py-1.5 text-sm font-medium text-amber-200 transition hover:border-amber-200/70 hover:bg-amber-300/20 hover:text-amber-100"
+                className="inline-flex rounded-full border border-[#D4AF37]/50 px-4 py-1.5 text-sm font-medium text-[#D4AF37] transition hover:border-[#D4AF37]/90 hover:text-[#E6C45A]"
               >
-                Existing members - click here to login
+                Existing members — login here
               </Link>
             </div>
 
@@ -606,7 +605,7 @@ export default function Page() {
               />
               <button
                 type="submit"
-                className="w-full rounded-full border border-amber-200/50 bg-amber-100/90 py-3 type-label text-stone-700 transition hover:bg-amber-100"
+                className="w-full rounded-full bg-[linear-gradient(180deg,#E6C45A_0%,#D4AF37_100%)] py-3 type-label font-medium text-[#111111] shadow-[0_4px_20px_rgba(212,175,55,0.3)] transition hover:brightness-110"
               >
                 Send message
               </button>
