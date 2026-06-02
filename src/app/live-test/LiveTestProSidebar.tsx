@@ -154,51 +154,51 @@ export default function LiveTestProSidebar({
         className={`pro-sidebar${mobileOpen ? " pro-sidebar-open" : ""}`}
         aria-label="Main navigation"
       >
-        <div className="pro-sidebar-bg" aria-hidden>
-          <img src="/scenes/moor.jpg" alt="" className="pro-sidebar-bg-image" />
-          <div className="pro-sidebar-bg-overlay" />
-        </div>
-
         <div className="pro-sidebar-inner">
 
-          {/* ── Brand zone — dominates the top ── */}
+          {/* ══ BRAND MASTHEAD ══
+              Atmospheric image zone. Logo anchors to bottom.
+              ~40% of sidebar height. Cinematic. Prestigious. */}
           <header className="pro-sidebar-brand">
-            <Link href="/" className="pro-sidebar-logo-link" onClick={onMobileClose}>
-              <Image
-                src="/Nakama-AI-July25-White.png"
-                alt="Nakama Nights"
-                width={300}
-                height={84}
-                className="pro-sidebar-logo-img"
-                priority
-              />
-            </Link>
-            <p className="pro-sidebar-brand-tag">Private Members Universe</p>
+            {/* Atmospheric texture — brand zone only */}
+            <div className="pro-sidebar-brand-atmosphere" aria-hidden>
+              <img src="/scenes/moor.jpg" alt="" className="pro-sidebar-atm-img" />
+              <div className="pro-sidebar-atm-veil" />
+            </div>
+
+            {/* Brand content — anchored to bottom of zone */}
+            <div className="pro-sidebar-brand-content">
+              <Link href="/" className="pro-sidebar-logo-link" onClick={onMobileClose}>
+                <Image
+                  src="/Nakama-AI-July25-White.png"
+                  alt="Nakama Nights"
+                  width={300}
+                  height={96}
+                  className="pro-sidebar-logo-img"
+                  priority
+                />
+              </Link>
+              <p className="pro-sidebar-brand-statement">Private Members Universe</p>
+            </div>
           </header>
 
-          {/* ── Navigation — subordinate to the brand ── */}
-          <nav className="pro-sidebar-nav">
+          {/* ══ EDITORIAL NAVIGATION ══
+              Typography-led. No icons. Chapter-style sections. */}
+          <nav className="pro-sidebar-nav" aria-label="Main navigation">
             {NAV_SECTIONS.map((section) => {
               const isOpen = openSections[section.id] ?? true;
               const hasActive = section.items.some((item) => isActive(activeId, item.id));
 
               return (
                 <div key={section.id} className="pro-sidebar-section">
+                  {/* Chapter heading — still toggleable, styled as editorial title */}
                   <button
                     type="button"
-                    className={`pro-sidebar-section-toggle${hasActive ? " has-active" : ""}`}
+                    className={`pro-sidebar-chapter${hasActive ? " has-active" : ""}`}
                     onClick={() => toggleSection(section.id)}
                     aria-expanded={isOpen}
                   >
-                    <span className="pro-sidebar-section-label">{section.label}</span>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      className={`pro-sidebar-chevron${isOpen ? " is-open" : ""}`}
-                      aria-hidden
-                    >
-                      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                    </svg>
+                    <span>{section.label}</span>
                   </button>
 
                   {isOpen ? (
@@ -211,7 +211,8 @@ export default function LiveTestProSidebar({
                             className={`pro-sidebar-item${isActive(activeId, item.id) ? " is-active" : ""}`}
                             aria-current={isActive(activeId, item.id) ? "page" : undefined}
                           >
-                            {item.icon}
+                            {/* Icon retained for accessibility / future use — visually hidden */}
+                            <span className="pro-sidebar-icon-wrap" aria-hidden>{item.icon}</span>
                             <span className="pro-sidebar-item-label">{item.label}</span>
                             {item.badge ? (
                               <span className="pro-sidebar-badge">{item.badge}</span>
@@ -226,9 +227,9 @@ export default function LiveTestProSidebar({
             })}
           </nav>
 
-          {/* ── Footer ── */}
+          {/* ══ FOOTER ══ */}
           <footer className="pro-sidebar-footer">
-            <p className="pro-sidebar-footer-text">© Nakama Nights</p>
+            <p className="pro-sidebar-footer-text">Nakama Nights</p>
           </footer>
 
         </div>
