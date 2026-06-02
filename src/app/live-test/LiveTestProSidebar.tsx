@@ -167,8 +167,8 @@ export default function LiveTestProSidebar({
               <Image
                 src="/Nakama-AI-July25-White.png"
                 alt="Nakama Nights"
-                width={260}
-                height={72}
+                width={300}
+                height={84}
                 className="pro-sidebar-logo-img"
                 priority
               />
