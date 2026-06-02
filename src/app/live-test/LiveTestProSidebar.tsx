@@ -84,7 +84,6 @@ const NAV_SECTIONS: NavSection[] = [
       { id: "build-adventure", label: "Build adventure", icon: ICON.build },
       { id: "interactive-adventures", label: "Interactive adventures", icon: ICON.adventure },
       { id: "forbidden-chat", label: "Forbidden chat", icon: ICON.chat },
-      { id: "character-voices", label: "Characters & voices", icon: ICON.character },
     ],
     defaultOpen: true,
   },
@@ -98,8 +97,11 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     id: "account",
-    label: "Account",
-    items: [{ id: "profile", label: "Profile", icon: ICON.profile }],
+    label: "Account & Personalisation",
+    items: [
+      { id: "character-voices", label: "Characters & voices", icon: ICON.character },
+      { id: "profile", label: "Profile", icon: ICON.profile },
+    ],
     defaultOpen: true,
   },
 ];
