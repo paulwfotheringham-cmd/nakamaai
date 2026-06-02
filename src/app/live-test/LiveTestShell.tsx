@@ -27,14 +27,13 @@ export default function LiveTestShell() {
   const searchParams = useSearchParams();
   const [activeNav, setActiveNav] = useState<LiveTestNavId | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [guideRailHidden, setGuideRailHidden] = useState(false);
+  const [guideRailHidden, setGuideRailHidden] = useState(true); // hidden by default on all pages
   const centerPanel = getLiveTestCenterPanel(activeNav);
   const [couplesView, setCouplesView] = useState<CouplesCenterView>("menu");
 
   const inCouplesExperience = centerPanel === "couples-program";
   const inDateNightFlow = inCouplesExperience && couplesView === "date-night";
-  const hideGuideRail = inCouplesExperience && guideRailHidden;
-  const showGuideRail = inCouplesExperience ? !guideRailHidden : centerPanel !== null;
+  const showGuideRail = centerPanel !== null && !guideRailHidden;
 
   useEffect(() => {
     const nav = searchParams.get("nav");
@@ -46,15 +45,8 @@ export default function LiveTestShell() {
   useEffect(() => {
     if (centerPanel !== "couples-program") {
       setCouplesView("menu");
-      setGuideRailHidden(false);
     }
   }, [centerPanel]);
-
-  useEffect(() => {
-    if (inCouplesExperience) {
-      setGuideRailHidden(true);
-    }
-  }, [inCouplesExperience, couplesView]);
 
   function toggleGuideRail() {
     setGuideRailHidden((hidden) => !hidden);
@@ -85,11 +77,26 @@ export default function LiveTestShell() {
                 <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </button>
+
+            {centerPanel !== null && (
+              <button
+                type="button"
+                className={`pro-companion-toggle${guideRailHidden ? "" : " is-open"}`}
+                aria-label={guideRailHidden ? "Show companion" : "Hide companion"}
+                onClick={toggleGuideRail}
+              >
+                <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4 shrink-0" aria-hidden>
+                  <circle cx="10" cy="7" r="3" stroke="currentColor" strokeWidth="1.25" />
+                  <path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+                </svg>
+                <span>{guideRailHidden ? "Companion" : "Hide"}</span>
+              </button>
+            )}
           </header>
 
           <div
             className={`pro-main-body${
-              hideGuideRail ? " pro-main-body-guide-hidden" : ""
+              guideRailHidden ? " pro-main-body-guide-hidden" : ""
             }`}
           >
             <section className={`pro-content${inDateNightFlow ? " pro-content-dn" : ""}`}>
@@ -155,7 +162,7 @@ export default function LiveTestShell() {
                 <div className="pro-guide-inner">
                   <LiveTestGuideRail
                     onNavigate={setActiveNav}
-                    onHide={inCouplesExperience ? toggleGuideRail : undefined}
+                    onHide={toggleGuideRail}
                   />
                 </div>
               </aside>
