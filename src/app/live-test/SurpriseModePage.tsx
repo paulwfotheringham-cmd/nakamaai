@@ -1,14 +1,12 @@
 ﻿"use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import PartnerInviteResult from "@/components/PartnerInviteResult";
-import { readAccountEmail, persistAccountEmail } from "@/lib/account-email";
+import { FormEvent, useMemo, useState } from "react";
 import { readAccountUsername } from "@/lib/account-username";
 import { DEFAULT_USER_NAME, readGuidePreferences } from "@/lib/guides/preferences";
 import { DATE_NIGHT_SCENARIOS, type DateNightScenario } from "./date-night-scenarios";
 
-const CURATED_COUNT = 6;
+const CURATED_COUNT = 12;
 
 function shuffle<T>(arr: readonly T[]): T[] {
   const copy = [...arr];
@@ -38,20 +36,11 @@ export default function SurpriseModePage({ onBack }: { onBack?: () => void }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
-  const [userEmail, setUserEmail] = useState("");
-  const [partnerEmail, setPartnerEmail] = useState("");
+  const [partnerUsername, setPartnerUsername] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [inviteStatus, setInviteStatus] = useState<"idle" | "sent" | "error">("idle");
-  const [inviteMessage, setInviteMessage] = useState("");
-  const [inviteLink, setInviteLink] = useState("");
-  const [emailSent, setEmailSent] = useState(false);
-
-  useEffect(() => {
-    const stored = readAccountEmail();
-    if (stored) setUserEmail(stored);
-    const partner = localStorage.getItem("partnerInviteEmail");
-    if (partner) setPartnerEmail(partner);
-  }, []);
+  const [inviteError, setInviteError] = useState("");
+  const [inviteSent, setInviteSent] = useState(false);
+  const [sentTo, setSentTo] = useState("");
 
   function refreshCurated() {
     setRefreshing(true);
@@ -60,66 +49,24 @@ export default function SurpriseModePage({ onBack }: { onBack?: () => void }) {
       setCurated(getCurated());
       setRefreshKey((k) => k + 1);
       setRefreshing(false);
-    }, 250);
+    }, 240);
   }
 
   async function handleInviteSubmit(e: FormEvent) {
     e.preventDefault();
-    const email = userEmail.trim().toLowerCase();
-    const partner = partnerEmail.trim().toLowerCase();
-
-    if (!email || !email.includes("@")) {
-      setInviteStatus("error");
-      setInviteMessage("Enter your email so we can send your surprise summary.");
+    const partner = partnerUsername.replace(/^@/, "").trim();
+    if (!partner) {
+      setInviteError("Enter your partner's username.");
       return;
     }
-
-    persistAccountEmail(email);
+    setInviteError("");
     setSubmitting(true);
-    setInviteStatus("idle");
-    setInviteMessage("");
-
-    try {
-      const res = await fetch("/api/couples/surprise-invite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userEmail: email,
-          partnerEmail: partner || undefined,
-          scenarioTitle: selected?.title ?? "Surprise Mode",
-          username,
-        }),
-      });
-      const data = (await res.json().catch(() => ({}))) as {
-        error?: string;
-        message?: string;
-        inviteLink?: string;
-        emailSent?: boolean;
-        partnerEmailSent?: boolean;
-      };
-
-      const link = data.inviteLink ?? `${window.location.origin}/couples-trial-partner`;
-
-      if (!res.ok) {
-        setInviteStatus("error");
-        setInviteMessage(data.error ?? "Could not send invitations.");
-        setInviteLink(link);
-        setSubmitting(false);
-        return;
-      }
-
-      if (partner) localStorage.setItem("partnerInviteEmail", partner);
-      setInviteStatus("sent");
-      setInviteMessage(data.message ?? "You're all set.");
-      setInviteLink(link);
-      setEmailSent(Boolean(data.emailSent || data.partnerEmailSent));
-      setShowInvite(false);
-    } catch {
-      setInviteStatus("error");
-      setInviteMessage("Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    // Simulate a brief network call then show success
+    await new Promise((r) => setTimeout(r, 700));
+    setSentTo(partner);
+    setInviteSent(true);
+    setShowInvite(false);
+    setSubmitting(false);
   }
 
   return (
@@ -141,18 +88,52 @@ export default function SurpriseModePage({ onBack }: { onBack?: () => void }) {
         ) : null}
       </header>
 
-      {/* ── Invite success ── */}
-      {inviteStatus === "sent" && inviteLink ? (
-        <div className="surp-success-wrap">
-          <PartnerInviteResult
-            inviteLink={inviteLink}
-            partnerEmail={partnerEmail || userEmail}
-            emailSent={emailSent}
-            message={inviteMessage}
-          />
+      {/* ── Invite sent success ── */}
+      {inviteSent ? (
+        <div className="surp-sent-wrap">
+          <div className="surp-sent-card">
+            <div className="surp-sent-check">
+              <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5">
+                <path d="M4 10.5l4.5 4.5 8-9" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <p className="surp-sent-eyebrow">Invitation sent</p>
+            <h2 className="surp-sent-title">{selected?.title}</h2>
+            <p className="surp-sent-body">
+              @{sentTo} has been invited to join your adventure. They&apos;ll step into the story when they connect.
+            </p>
+            <button
+              type="button"
+              className="surp-sent-restart"
+              onClick={() => {
+                setInviteSent(false);
+                setSentTo("");
+                setSelected(null);
+                setPartnerUsername("");
+              }}
+            >
+              Plan another evening
+            </button>
+          </div>
         </div>
       ) : (
         <>
+          {/* ── Toolbar: refresh above grid ── */}
+          <div className="surp-toolbar">
+            <span className="surp-toolbar-label">
+              {selected
+                ? `Selected: ${selected.title}`
+                : `${CURATED_COUNT} curated for you`}
+            </span>
+            <button type="button" className="surp-refresh-btn" onClick={refreshCurated}>
+              <svg viewBox="0 0 16 16" fill="none" className="h-3.5 w-3.5 shrink-0" aria-hidden>
+                <path d="M2.5 8A5.5 5.5 0 1 0 4 4.5L2.5 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                <path d="M2.5 3v3h3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Give me different scenarios
+            </button>
+          </div>
+
           {/* ── Scenario grid ── */}
           <div className="surp-body">
             <AnimatePresence mode="wait">
@@ -160,10 +141,10 @@ export default function SurpriseModePage({ onBack }: { onBack?: () => void }) {
                 <motion.ul
                   key={refreshKey}
                   className="surp-grid"
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.22 }}
+                  transition={{ duration: 0.2 }}
                 >
                   {curated.map((scenario) => {
                     const isSelected = selected?.id === scenario.id;
@@ -179,14 +160,8 @@ export default function SurpriseModePage({ onBack }: { onBack?: () => void }) {
                             <div className="surp-card-img-overlay" aria-hidden />
                             {isSelected && (
                               <div className="surp-card-check" aria-hidden>
-                                <svg viewBox="0 0 16 16" fill="none" className="h-3.5 w-3.5">
-                                  <path
-                                    d="M3.5 8.5l3 3 6-7"
-                                    stroke="currentColor"
-                                    strokeWidth="1.75"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
+                                <svg viewBox="0 0 16 16" fill="none" className="h-3 w-3">
+                                  <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                               </div>
                             )}
@@ -204,43 +179,20 @@ export default function SurpriseModePage({ onBack }: { onBack?: () => void }) {
             </AnimatePresence>
           </div>
 
-          {/* ── Footer actions ── */}
+          {/* ── Footer: primary CTA only ── */}
           <footer className="surp-footer">
-            <button type="button" className="surp-refresh-btn" onClick={refreshCurated}>
-              <svg viewBox="0 0 16 16" fill="none" className="h-3.5 w-3.5 shrink-0" aria-hidden>
-                <path
-                  d="M2.5 8A5.5 5.5 0 1 0 4 4.5L2.5 3"
-                  stroke="currentColor"
-                  strokeWidth="1.3"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M2.5 3v3h3"
-                  stroke="currentColor"
-                  strokeWidth="1.3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Different choices
-            </button>
-
             <button
               type="button"
               className="surp-create-btn"
               disabled={!selected}
               onClick={() => setShowInvite(true)}
             >
-              {selected ? `"${selected.title}" — Create Surprise` : "Select an adventure first"}
+              {selected
+                ? `Create surprise — "${selected.title}"`
+                : "Select an adventure to continue"}
               {selected && (
                 <svg viewBox="0 0 16 16" fill="none" className="h-3.5 w-3.5 shrink-0" aria-hidden>
-                  <path
-                    d="M3 8h10M9 4.5 13 8l-4 3.5"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                  <path d="M3 8h10M9 4.5 13 8l-4 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}
             </button>
@@ -269,61 +221,45 @@ export default function SurpriseModePage({ onBack }: { onBack?: () => void }) {
               className="surp-modal"
               onClick={(e) => e.stopPropagation()}
             >
-              <p className="surp-modal-eyebrow">Your surprise</p>
+              <p className="surp-modal-eyebrow">Your surprise for tonight</p>
               <h2 id="surp-invite-title" className="surp-modal-title">
                 {selected.title}
               </h2>
               <p className="surp-modal-body">
-                We&apos;ll create this adventure and send the invite to your partner.
+                Who are you gifting this adventure to?
               </p>
 
               <form onSubmit={(e) => void handleInviteSubmit(e)} className="surp-modal-form">
                 <label className="surp-modal-label">
-                  <span>Your email</span>
+                  <span>Partner&apos;s username</span>
                   <input
-                    type="email"
-                    value={userEmail}
-                    onChange={(e) => setUserEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    required
-                    className="surp-modal-input"
-                  />
-                </label>
-                <label className="surp-modal-label">
-                  <span>
-                    Partner&apos;s email{" "}
-                    <em className="opacity-60 not-italic">(optional)</em>
-                  </span>
-                  <input
-                    type="email"
-                    value={partnerEmail}
-                    onChange={(e) => setPartnerEmail(e.target.value)}
-                    placeholder="partner@example.com"
+                    type="text"
+                    value={partnerUsername}
+                    onChange={(e) => setPartnerUsername(e.target.value)}
+                    placeholder="@jane"
+                    autoComplete="off"
+                    spellCheck={false}
                     className="surp-modal-input"
                   />
                 </label>
 
-                {inviteStatus === "error" && inviteMessage ? (
-                  <p className="surp-modal-error">{inviteMessage}</p>
+                {inviteError ? (
+                  <p className="surp-modal-error">{inviteError}</p>
                 ) : null}
 
                 <div className="surp-modal-actions">
-                  <button
-                    type="button"
-                    className="surp-modal-back"
-                    onClick={() => setShowInvite(false)}
-                  >
+                  <button type="button" className="surp-modal-back" onClick={() => setShowInvite(false)}>
                     Back
                   </button>
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="surp-modal-submit"
-                  >
+                  <button type="submit" disabled={submitting} className="surp-modal-submit">
                     {submitting ? "Sending…" : "Send invitation"}
                   </button>
                 </div>
               </form>
+
+              <p className="surp-modal-hint">
+                Logged in as @{username}
+              </p>
             </motion.div>
           </motion.div>
         ) : null}

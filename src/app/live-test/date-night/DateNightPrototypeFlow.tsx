@@ -1,7 +1,7 @@
 // v2026-05-31 — audio-only player, no synopsis text
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   DATE_NIGHT_MOODS,
   MOCK_FEMALE_VOICES,
@@ -143,10 +143,22 @@ export default function DateNightPrototypeFlow({
   // Shared audio player state for adventure_ready
   const [simAudioPlaying, setSimAudioPlaying] = useState(false);
   const [simAudioProgress, setSimAudioProgress] = useState(0); // seconds elapsed
-  // Local volume controls (independent per user)
-  const [simHostVolume, setSimHostVolume] = useState(80);
-  const [simPartnerVolume, setSimPartnerVolume] = useState(80);
+  const [simAudioDuration, setSimAudioDuration] = useState(STORY_DURATION_SEC);
+  const [simAudioUrl, setSimAudioUrl] = useState<string | null>(null);
+  const [simAudioError, setSimAudioError] = useState<string | null>(null);
+  const simAudioRef = useRef<HTMLAudioElement | null>(null);
   const [simSaved, setSimSaved] = useState(false);
+
+  // Map display voice names → UnrealSpeech voice IDs
+  const VOICE_MAP: Record<string, string> = {
+    "Donny — Steady Presence": "Dan",
+    "Clint — Rugged Actor": "Will",
+    "Damon — Commanding Narrator": "Will",
+    "Cameron — Chill Companion": "Dan",
+    "Sienna — Warm Guide": "Amy",
+    "Elena — Velvet Tone": "Scarlett",
+    "Mara — Intimate Narrator": "Amy",
+  };
 
   const persist = useCallback((next: DateNightSession | null) => {
     setSession(next);
@@ -229,17 +241,13 @@ export default function DateNightPrototypeFlow({
     return () => clearTimeout(t);
   }, [session?.step, updateSession]);
 
-  // Shared audio tick — advances simAudioProgress when playing in the duo simulator
+  // Sync simAudioPlaying state → actual audio element play/pause
   useEffect(() => {
-    if (!simAudioPlaying || simPartnerState !== "adventure_ready") return;
-    const id = setInterval(() => {
-      setSimAudioProgress((prev) => {
-        if (prev >= STORY_DURATION_SEC) { setSimAudioPlaying(false); return STORY_DURATION_SEC; }
-        return prev + 1;
-      });
-    }, 1000);
-    return () => clearInterval(id);
-  }, [simAudioPlaying, simPartnerState]);
+    const audio = simAudioRef.current;
+    if (!audio || !simAudioUrl) return;
+    if (simAudioPlaying) { audio.play().catch(() => setSimAudioPlaying(false)); }
+    else { audio.pause(); }
+  }, [simAudioPlaying, simAudioUrl]);
 
   useEffect(() => {
     if (!session?.playback.playing || session.step !== "player") return;
@@ -283,17 +291,58 @@ export default function DateNightPrototypeFlow({
     updateSession({ step: "connect" });
   }
 
-  function generateSimAdventure() {
+  async function generateSimAdventure() {
     if (!simStoryName.trim()) { setSimSetupError("Please enter a story name."); return; }
     if (!simMood) { setSimSetupError("Please choose a mood."); return; }
     setSimSetupError(null);
+    setSimAudioError(null);
     setSimPartnerState("generating");
-    // Stay in the duo-layout; advance to adventure_ready after a brief generation delay
-    setTimeout(() => {
+
+    try {
+      // 1. Generate story text via Groq
+      const scenarioTitle = simMatchedScenario?.title ?? "romantic adventure";
+      const storyRes = await fetch("/api/story", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category: "romance",
+          setting: scenarioTitle,
+          mood: simMood,
+          buildUp: "slow and sensual",
+          maleRole: "mysterious lover",
+          femaleRole: "captivating partner",
+          storyType: "immersive couples experience",
+        }),
+      });
+      const { story: storyText } = await storyRes.json() as { story: string };
+
+      // 2. Clean text and convert to speech via UnrealSpeech
+      const cleanText = storyText
+        .split("\n")
+        .map((l) => l.replace(/^(NARRATOR:|MALE:|FEMALE:)\s*/i, "").trim())
+        .filter(Boolean)
+        .join(" ")
+        .slice(0, 2800);
+
+      const voiceId = VOICE_MAP[simMaleVoice] ?? "Will";
+      const ttsRes = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: cleanText, voiceId }),
+      });
+      const { outputUri, error: ttsError } = await ttsRes.json() as { outputUri?: string; error?: string };
+
+      if (!outputUri) throw new Error(ttsError ?? "TTS failed");
+
+      setSimAudioUrl(outputUri);
       setSimAudioProgress(0);
       setSimAudioPlaying(false);
       setSimPartnerState("adventure_ready");
-    }, 2500);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Generation failed";
+      setSimAudioError(msg);
+      setSimPartnerState("story_setup"); // revert so user can retry
+    }
   }
 
   function submitSimPartnerRankings() {
@@ -447,21 +496,37 @@ export default function DateNightPrototypeFlow({
 
     if (session.step === "connect" && session.inviteStatus === "idle") {
       return (
-        <StepPanel
-          title="Invite your partner"
-          actionLabel="Connect"
-          onAction={connectPartner}
-        >
-          <label className="dn-lux-field">
-            <span>Partner username</span>
-            <input
-              className="dn-lux-input"
-              value={partnerUsername}
-              onChange={(e) => setPartnerUsername(e.target.value)}
-              placeholder={PROTOTYPE_PARTNER_USERNAME}
-            />
-          </label>
-        </StepPanel>
+        <section className="dn-step">
+          <div className="surp-modal dn-invite-card">
+            <p className="surp-modal-eyebrow">Date Night</p>
+            <h2 className="surp-modal-title">Invite your partner</h2>
+            <p className="surp-modal-body">
+              Enter your partner&apos;s username. They&apos;ll rank scenarios separately — your shared match will be revealed when both of you submit.
+            </p>
+            <div className="surp-modal-form">
+              <label className="surp-modal-label">
+                <span>Partner&apos;s username</span>
+                <input
+                  type="text"
+                  className="surp-modal-input"
+                  value={partnerUsername}
+                  onChange={(e) => setPartnerUsername(e.target.value)}
+                  placeholder={`@${PROTOTYPE_PARTNER_USERNAME}`}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+              </label>
+              <div className="surp-modal-actions">
+                <button type="button" className="surp-modal-back" onClick={() => persist(null)}>
+                  Cancel
+                </button>
+                <button type="button" className="surp-modal-submit" onClick={connectPartner}>
+                  Send invite
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
       );
     }
 
@@ -470,7 +535,7 @@ export default function DateNightPrototypeFlow({
       const activeSession = session;
 
       // ── Shared helpers ────────────────────────────────────────────
-      const totalSec = STORY_DURATION_SEC;
+      const totalSec = simAudioDuration > 0 ? simAudioDuration : STORY_DURATION_SEC;
       const remaining = Math.max(0, totalSec - simAudioProgress);
       const pct = Math.min(100, (simAudioProgress / totalSec) * 100);
       const fmt = (s: number) => {
@@ -558,7 +623,12 @@ export default function DateNightPrototypeFlow({
                   type="button"
                   className="dn-sim-ctrl-btn"
                   title="Replay 15s"
-                  onClick={() => setSimAudioProgress((p) => Math.max(0, p - 15))}
+                  onClick={() => {
+                    const audio = simAudioRef.current;
+                    const t = Math.max(0, simAudioProgress - 15);
+                    setSimAudioProgress(t);
+                    if (audio) audio.currentTime = t;
+                  }}
                 >
                   <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15" aria-hidden>
                     <path d="M10 3a7 7 0 1 0 6.32 3.97l1.64-1.64A9 9 0 1 1 10 1v2z" />
@@ -575,6 +645,7 @@ export default function DateNightPrototypeFlow({
                   type="button"
                   className="dn-sim-ctrl-play"
                   onClick={() => setSimAudioPlaying((p) => !p)}
+                  disabled={!simAudioUrl}
                   aria-label={simAudioPlaying ? "Pause" : "Play"}
                 >
                   {simAudioPlaying ? (
@@ -619,7 +690,13 @@ export default function DateNightPrototypeFlow({
                   type="button"
                   className="dn-sim-ctrl-btn dn-sim-ctrl-end"
                   title="End Session"
-                  onClick={() => { setSimAudioPlaying(false); setSimPartnerState("session_ended"); }}
+                  onClick={() => {
+                    const audio = simAudioRef.current;
+                    if (audio) { audio.pause(); audio.currentTime = 0; }
+                    setSimAudioPlaying(false);
+                    setSimAudioProgress(0);
+                    setSimPartnerState("session_ended");
+                  }}
                 >
                   <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden>
                     <rect x="4" y="4" width="12" height="12" rx="1.5" />
@@ -754,6 +831,7 @@ export default function DateNightPrototypeFlow({
               </div>
 
               {simSetupError && <p className="dn-sim-rating-error">{simSetupError}</p>}
+              {simAudioError && <p className="dn-sim-rating-error">Generation error: {simAudioError}. Please try again.</p>}
 
               <button type="button" className="dn-btn-gold dn-btn-gold-lg" onClick={generateSimAdventure}>
                 Generate Adventure
@@ -1107,6 +1185,17 @@ export default function DateNightPrototypeFlow({
 
   return (
     <div className="dn-workspace dn-workspace-solo">
+      {/* Hidden audio element — driven by simAudioUrl and controlled by play/pause state */}
+      {simAudioUrl && (
+        <audio
+          ref={simAudioRef}
+          src={simAudioUrl}
+          preload="auto"
+          onTimeUpdate={() => setSimAudioProgress(simAudioRef.current?.currentTime ?? 0)}
+          onDurationChange={() => setSimAudioDuration(simAudioRef.current?.duration ?? STORY_DURATION_SEC)}
+          onEnded={() => { setSimAudioPlaying(false); setSimAudioProgress(simAudioDuration); }}
+        />
+      )}
       <div className="dn-workspace-center dn-workspace-center-full">
         <div className="dn-workspace-scroll">
           <header className="dn-page-header">
