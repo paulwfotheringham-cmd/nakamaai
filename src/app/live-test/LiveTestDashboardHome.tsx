@@ -3,80 +3,42 @@
 import { useEffect, useState } from "react";
 import { readGuidePreferences, type GuidePreferences } from "@/lib/guides/preferences";
 
-const PICK_UP_ITEMS = [
-  {
-    section: "Audiobooks",
-    lastActivity: "Gothic · windswept moor",
-    when: "Last played 3 days ago",
-    image: "/scenes/moor.jpg",
-    imagePosition: "78% center",
-  },
+const FEATURED_ITEM = {
+  section: "Audiobooks",
+  title: "Gothic · windswept moor",
+  meta: "Last played 3 days ago",
+  image: "/scenes/moor.jpg",
+  imagePosition: "78% center",
+} as const;
+
+const CONTINUE_ITEMS = [
   {
     section: "Build Adventure",
-    lastActivity: "Your draft — slow burn, office",
-    when: "Saved, not finished",
+    title: "Slow burn, office",
+    meta: "Saved — not finished",
     image: "/scenes/office.jpg",
     imagePosition: "32% center",
   },
   {
     section: "Interactive Adventures",
-    lastActivity: "Chapter 2 — choice at the door",
-    when: "In progress",
+    title: "Chapter 2 — choice at the door",
+    meta: "In progress",
     image: "/tiles/tile3.jpg",
     imagePosition: "52% 38%",
   },
   {
     section: "Forbidden Chat",
-    lastActivity: "Private desires",
-    when: "Pick up the conversation",
+    title: "Private desires",
+    meta: "Pick up the conversation",
     image: "/tiles/tile4.jpg",
   },
   {
-    section: "Reignite for Couples",
-    lastActivity: "Date Night · Reconnection",
-    when: "Last here 2 days ago",
+    section: "Reignite",
+    title: "Date Night · Reconnection",
+    meta: "Last here 2 days ago",
     image: "/tiles/tile5.jpg",
   },
 ] as const;
-
-function PickUpCard({
-  item,
-  featured = false,
-}: {
-  item: (typeof PICK_UP_ITEMS)[number];
-  featured?: boolean;
-}) {
-  return (
-    <li className={`group dash-story-card ${featured ? "dash-story-card-featured" : ""}`}>
-      <img
-        src={item.image}
-        alt=""
-        className="dash-story-card-image"
-        style={
-          "imagePosition" in item ? { objectPosition: item.imagePosition } : undefined
-        }
-      />
-      <div className="dash-story-card-overlay" aria-hidden />
-
-      <div className={`dash-story-card-content ${featured ? "is-featured" : ""}`}>
-        <p className="type-label text-luxury-muted">{item.section}</p>
-        <h3 className={`dash-story-card-title ${featured ? "is-featured" : ""}`}>
-          {item.lastActivity}
-        </h3>
-        <p className="dash-story-card-meta">{item.when}</p>
-
-        <div className="dash-story-card-actions">
-          <button type="button" className="btn-primary">
-            Continue
-          </button>
-          <button type="button" className="btn-ghost">
-            Later
-          </button>
-        </div>
-      </div>
-    </li>
-  );
-}
 
 export default function LiveTestDashboardHome() {
   const [prefs, setPrefs] = useState<GuidePreferences | null>(null);
@@ -86,35 +48,72 @@ export default function LiveTestDashboardHome() {
   }, []);
 
   const userName = prefs?.userName ?? "Jane";
-  const guideName = prefs?.guideName ?? "your guide";
-
-  const [featured, ...secondary] = PICK_UP_ITEMS;
 
   return (
     <div className="dash-home animate-panel-in">
-      <header className="dash-home-header">
-        <p className="type-label text-amber-500/50">Dashboard</p>
-        <h1 className="dash-welcome-heading mt-2">
-          Welcome back, <span className="text-luxury-primary">{userName}</span>
+
+      {/* ── Compact header ── */}
+      <header className="dash-header">
+        <span className="dash-eyebrow">Dashboard</span>
+        <h1 className="dash-greeting">
+          Welcome back,{" "}
+          <em>{userName}</em>
         </h1>
-        <p className="type-small mt-2 max-w-md text-stone-400">
-          Pick up where you left off. {guideName} is ready when you are.
-        </p>
       </header>
 
-      <section className="dash-home-stories">
-        <div className="dash-home-stories-intro">
-          <h2 className="type-section-heading">Continue your adventure</h2>
-          <p className="type-small mt-2">Where do you want to go tonight?</p>
+      {/* ── Featured card ── */}
+      <section className="dash-featured">
+        <div className="dash-featured-card group">
+          <img
+            src={FEATURED_ITEM.image}
+            alt=""
+            className="dash-featured-img"
+            style={{ objectPosition: FEATURED_ITEM.imagePosition }}
+          />
+          <div className="dash-featured-gradient" aria-hidden />
+          <div className="dash-featured-content">
+            <span className="dash-featured-eyebrow">{FEATURED_ITEM.section}</span>
+            <h2 className="dash-featured-title">{FEATURED_ITEM.title}</h2>
+            <p className="dash-featured-meta">{FEATURED_ITEM.meta}</p>
+            <button type="button" className="dash-featured-btn">
+              <svg viewBox="0 0 12 12" fill="currentColor" className="h-2.5 w-2.5 shrink-0" aria-hidden>
+                <polygon points="3,2 10,6 3,10" />
+              </svg>
+              Continue
+            </button>
+          </div>
         </div>
+      </section>
 
-        <ul className="dash-home-grid">
-          <PickUpCard item={featured} featured />
-          {secondary.map((item) => (
-            <PickUpCard key={item.section} item={item} />
+      {/* ── Continue section ── */}
+      <section className="dash-continue">
+        <h2 className="dash-section-label">Continue your adventure</h2>
+        <ul className="dash-continue-grid">
+          {CONTINUE_ITEMS.map((item) => (
+            <li key={item.section} className="dash-continue-card group">
+              <div className="dash-continue-thumb">
+                <img
+                  src={item.image}
+                  alt=""
+                  style={"imagePosition" in item ? { objectPosition: item.imagePosition } : undefined}
+                />
+              </div>
+              <div className="dash-continue-body">
+                <span className="dash-continue-eyebrow">{item.section}</span>
+                <h3 className="dash-continue-title">{item.title}</h3>
+                <p className="dash-continue-meta">{item.meta}</p>
+                <button type="button" className="dash-continue-btn">
+                  Continue
+                  <svg viewBox="0 0 12 12" fill="none" className="h-2.5 w-2.5 shrink-0" aria-hidden>
+                    <path d="M3 6h7M7 3.5 9.5 6 7 8.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </div>
+            </li>
           ))}
         </ul>
       </section>
+
     </div>
   );
 }
