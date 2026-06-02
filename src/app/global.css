@@ -2666,10 +2666,10 @@
 
 .pro-sidebar-logo-img {
   display: block;
-  height: 5.375rem; /* ~86px — 20% larger than 72px */
+  height: 5.375rem; /* ~86px */
   width: auto;
   opacity: 1;
-  filter: drop-shadow(0 2px 24px rgba(0,0,0,0.9));
+  /* No filter — logo floats directly on the atmosphere, no box */
 }
 
 /* ── Navigation ──────────────────────────────────────────────────
@@ -2692,29 +2692,29 @@
 .pro-sidebar-nav::-webkit-scrollbar { display: none; }
 
 .pro-sidebar-section {
-  padding-top: 1.75rem;
+  padding-top: 2.5rem;
 }
 .pro-sidebar-section:first-child { padding-top: 0; }
 
-/* Section label — editorial marker, not dashboard accordion header */
+/* Section label — chapter marker, not dashboard header */
 .pro-sidebar-section-label {
   display: block;
   width: 100%;
-  padding: 0 2.25rem 0.5rem;
+  padding: 0 2.25rem 0.375rem;
   font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 0.5rem;
-  font-weight: 600;
-  letter-spacing: 0.25em;
+  font-size: 0.4375rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(212, 175, 55, 0.45);
+  color: rgba(255, 255, 255, 0.18);
   background: none;
   border: none;
   text-align: left;
   cursor: pointer;
   transition: color 0.2s ease;
 }
-.pro-sidebar-section-label:hover { color: rgba(212, 175, 55, 0.7); }
-.pro-sidebar-section-label.has-active { color: rgba(212, 175, 55, 0.65); }
+.pro-sidebar-section-label:hover { color: rgba(255, 255, 255, 0.32); }
+.pro-sidebar-section-label.has-active { color: rgba(255, 255, 255, 0.26); }
 
 .pro-sidebar-items {
   list-style: none;
@@ -2734,14 +2734,14 @@
   font-weight: 400;
   letter-spacing: 0.01em;
   line-height: 1.4;
-  color: rgba(245, 242, 235, 0.78);
+  color: rgba(245, 242, 235, 0.62);
   border: none;
   background: none;
   text-align: left;
   white-space: nowrap;
   cursor: pointer;
   transition: color 0.2s ease;
-  text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.75);
 }
 
 /* Active rail */
@@ -2755,20 +2755,20 @@
   transition: background 0.22s ease, top 0.22s ease, bottom 0.22s ease;
 }
 
-.pro-sidebar-item:hover { color: rgba(245, 242, 235, 1); }
+.pro-sidebar-item:hover { color: rgba(245, 242, 235, 0.92); }
 
-/* Active — gold. The only signal needed. */
+/* Active — white. The gold rail is the only accent needed. */
 .pro-sidebar-item.is-active {
-  color: rgba(212, 175, 55, 1);
-  font-weight: 500;
-  text-shadow: 0 0 20px rgba(212, 175, 55, 0.3), 0 1px 8px rgba(0,0,0,0.6);
+  color: rgba(255, 255, 255, 0.97);
+  font-weight: 400;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
 }
 .pro-sidebar-item.is-active::before {
   background: linear-gradient(
     180deg,
-    rgba(212, 175, 55, 0.15) 0%,
-    rgba(212, 175, 55, 0.95) 50%,
-    rgba(212, 175, 55, 0.15) 100%
+    rgba(212, 175, 55, 0.1) 0%,
+    rgba(212, 175, 55, 0.85) 50%,
+    rgba(212, 175, 55, 0.1) 100%
   );
 }
 
