@@ -2696,18 +2696,21 @@
   width: 100%;
   padding: 0 2.25rem 0.625rem;
   font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 0.625rem;       /* 10px — readable, not dominant */
+  font-size: 0.625rem;
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(212, 175, 55, 0.5);
   background: none;
   border: none;
+  outline: none;
+  box-shadow: none;
   text-align: left;
   cursor: pointer;
   transition: color 0.2s ease;
 }
 .pro-sidebar-section-label:hover { color: rgba(212, 175, 55, 0.75); }
+.pro-sidebar-section-label:focus { outline: none; box-shadow: none; }
 .pro-sidebar-section-label.has-active { color: rgba(212, 175, 55, 0.7); }
 
 .pro-sidebar-items {
@@ -2723,21 +2726,27 @@
   align-items: center;
   padding: 0.7rem 2.25rem 0.7rem 2.5rem;
   font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 1.0625rem;      /* 17px — confident, readable */
+  font-size: 1.0625rem;
   font-weight: 400;
   letter-spacing: 0.005em;
   line-height: 1.35;
   color: rgba(245, 242, 235, 0.78);
   border: none;
+  outline: none;
+  box-shadow: none;
   background: none;
   text-align: left;
   white-space: nowrap;
   cursor: pointer;
   transition: color 0.2s ease;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+  -webkit-tap-highlight-color: transparent;
 }
+.pro-sidebar-item:focus { outline: none; box-shadow: none; }
+.pro-sidebar-item:focus-visible { outline: none; box-shadow: none; }
+.pro-sidebar-item:active { background: none; outline: none; }
 
-/* Active rail */
+/* Gold left rail — the only active signal */
 .pro-sidebar-item::before {
   content: "";
   position: absolute;
@@ -2750,18 +2759,21 @@
 
 .pro-sidebar-item:hover { color: rgba(245, 242, 235, 1); }
 
-/* Active — full white + strong weight. The gold rail confirms the selection. */
+/* Active: white text, heavier weight, gold rail. No box. No background. */
 .pro-sidebar-item.is-active {
   color: rgba(255, 255, 255, 1);
   font-weight: 600;
+  background: none;
+  outline: none;
+  box-shadow: none;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
 }
 .pro-sidebar-item.is-active::before {
   background: linear-gradient(
     180deg,
-    rgba(212, 175, 55, 0.1) 0%,
-    rgba(212, 175, 55, 0.9) 50%,
-    rgba(212, 175, 55, 0.1) 100%
+    rgba(212, 175, 55, 0.08) 0%,
+    rgba(212, 175, 55, 0.9)  50%,
+    rgba(212, 175, 55, 0.08) 100%
   );
 }
 
