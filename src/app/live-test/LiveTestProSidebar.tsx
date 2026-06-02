@@ -168,13 +168,12 @@ export default function LiveTestProSidebar({
               <Image
                 src="/Nakama-AI-July25-White.png"
                 alt="Nakama Nights"
-                width={240}
-                height={64}
+                width={288}
+                height={77}
                 className="pro-sidebar-logo-img"
                 priority
               />
             </Link>
-            <p className="pro-sidebar-brand-statement">Private Members Universe</p>
           </header>
 
           {/* ══ NAVIGATION — typography on atmosphere ══ */}

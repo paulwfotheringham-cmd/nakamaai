@@ -2314,7 +2314,7 @@
 ──────────────────────────────────────────────────────────────── */
 .pro-sidebar-brand {
   flex-shrink: 0;
-  padding: 2.75rem 2.25rem 0;
+  padding: 3.25rem 2.25rem 0;
 }
 
 .pro-sidebar-logo-link {
@@ -2325,21 +2325,10 @@
 
 .pro-sidebar-logo-img {
   display: block;
-  height: 4.5rem;  /* 72px — logo needs to command, not merely identify */
+  height: 5.375rem; /* ~86px — 20% larger than 72px */
   width: auto;
   opacity: 1;
-  filter: drop-shadow(0 2px 20px rgba(0,0,0,1));
-}
-
-.pro-sidebar-brand-statement {
-  margin-top: 0.875rem;
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 0.5rem;
-  font-weight: 500;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: rgba(212, 175, 55, 0.55);
-  text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+  filter: drop-shadow(0 2px 24px rgba(0,0,0,0.9));
 }
 
 /* ── Navigation ──────────────────────────────────────────────────
