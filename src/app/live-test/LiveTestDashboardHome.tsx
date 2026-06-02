@@ -87,27 +87,24 @@ export default function LiveTestDashboardHome() {
 
   const userName = prefs?.userName ?? "Jane";
   const guideName = prefs?.guideName ?? "your guide";
-  const voiceLabel = prefs?.voiceName?.split("—")[0]?.trim() ?? "your voice";
-  const tone = prefs?.tone ?? "Relaxed";
 
   const [featured, ...secondary] = PICK_UP_ITEMS;
 
   return (
     <div className="dash-home animate-panel-in">
       <header className="dash-home-header">
-        <p className="type-label">Dashboard</p>
-        <h1 className="type-hero mt-4">
-          Welcome back, {userName}
+        <p className="type-label text-amber-500/50">Dashboard</p>
+        <h1 className="dash-welcome-heading mt-2">
+          Welcome back, <span className="text-luxury-primary">{userName}</span>
         </h1>
-        <p className="type-body mt-5 max-w-lg">
-          Pick up where you left off. {guideName} ({voiceLabel}, {tone} tone) is ready when you
-          are.
+        <p className="type-small mt-2 max-w-md text-stone-400">
+          Pick up where you left off. {guideName} is ready when you are.
         </p>
       </header>
 
       <section className="dash-home-stories">
         <div className="dash-home-stories-intro">
-          <h2 className="type-section-heading">Continue your story</h2>
+          <h2 className="type-section-heading">Continue your adventure</h2>
           <p className="type-small mt-2">Where do you want to go tonight?</p>
         </div>
 

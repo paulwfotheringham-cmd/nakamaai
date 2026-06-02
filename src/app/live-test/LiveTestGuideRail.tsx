@@ -115,7 +115,7 @@ export default function LiveTestGuideRail({ onNavigate, onHide }: LiveTestGuideR
           </button>
         ) : null}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-6 bg-gradient-to-t from-black/30 to-transparent" />
-        <div className="aspect-[3/4] max-h-[min(52vh,22rem)] min-h-[11rem] w-full sm:min-h-[12rem] md:max-h-[min(54vh,24rem)]">
+        <div className="aspect-[3/4] max-h-[min(36vh,15rem)] min-h-[9rem] w-full sm:min-h-[10rem] md:max-h-[min(38vh,16rem)]">
           {mounted ? (
             <SimliAvatar
               key={prefs.guideId}

@@ -92,7 +92,7 @@ const NAV_SECTIONS: NavSection[] = [
     id: "couples",
     label: "For couples",
     items: [
-      { id: "reignite-couples", label: "Reignite", icon: ICON.couples, badge: "Date Night" },
+      { id: "reignite-couples", label: "Reignite", icon: ICON.couples },
     ],
     defaultOpen: true,
   },
