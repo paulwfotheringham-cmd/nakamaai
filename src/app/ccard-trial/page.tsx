@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import CouplesPartnerInvitePanel from "@/components/CouplesPartnerInvitePanel";
 import { persistAccountEmail } from "@/lib/account-email";
 
 export default function CcardTrialPage() {
@@ -59,7 +58,7 @@ export default function CcardTrialPage() {
           </p>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.85fr_0.85fr]">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
           <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
             <h2 className="text-2xl font-semibold">Billing details</h2>
 
@@ -174,7 +173,6 @@ export default function CcardTrialPage() {
             </p>
           </div>
 
-          <CouplesPartnerInvitePanel />
         </div>
       </section>
     </main>
