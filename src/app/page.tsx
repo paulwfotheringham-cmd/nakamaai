@@ -519,12 +519,11 @@ export default function Page() {
           </div>
         </section>
 
-        <section className="mt-16 grid gap-6 sm:mt-20 lg:mt-24 lg:grid-cols-2">
+        <section className="mt-16 sm:mt-20 lg:mt-24">
           <div
             id="signup"
-            className="w-full scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-8 shadow-xl"
+            className="mx-auto w-full max-w-md scroll-mt-28 rounded-2xl border border-stone-800 bg-zinc-950/80 p-8 shadow-xl"
           >
-
             <h2 className="font-serif text-3xl text-luxury-primary">
               Begin your fantasy
             </h2>
@@ -541,7 +540,6 @@ export default function Page() {
                 required
                 className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-luxury-primary placeholder:text-stone-600"
               />
-
               <input
                 placeholder="Your email address"
                 type="email"
@@ -550,7 +548,6 @@ export default function Page() {
                 required
                 className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-luxury-primary placeholder:text-stone-600"
               />
-
               <button
                 type="submit"
                 className="w-full rounded-full bg-[linear-gradient(180deg,#E6C45A_0%,#D4AF37_100%)] py-3 type-section-heading font-medium text-[#111111] shadow-[0_4px_20px_rgba(212,175,55,0.3)] transition hover:brightness-110"
@@ -558,6 +555,7 @@ export default function Page() {
                 Create account
               </button>
             </form>
+
             <p className="mt-3 text-center text-xs uppercase tracking-wide text-stone-400">
               10 days free trial
             </p>
@@ -570,46 +568,6 @@ export default function Page() {
                 Existing members — login here
               </Link>
             </div>
-
-          </div>
-
-          <div className="w-full rounded-2xl border border-stone-800 bg-zinc-950/80 p-8 shadow-xl">
-            <h2 className="font-serif text-3xl text-luxury-primary">Contact us</h2>
-            <p className="mt-2 text-sm text-stone-400">
-              Ask us anything about Nakama Nights.
-            </p>
-
-            <form onSubmit={handleContactSubmit} className="mt-6 space-y-3">
-              <input
-                placeholder="Name"
-                value={contactName}
-                onChange={(e) => setContactName(e.target.value)}
-                required
-                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-luxury-primary placeholder:text-stone-600"
-              />
-              <input
-                placeholder="Email"
-                type="email"
-                value={contactEmail}
-                onChange={(e) => setContactEmail(e.target.value)}
-                required
-                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-luxury-primary placeholder:text-stone-600"
-              />
-              <textarea
-                placeholder="Message"
-                value={contactMessage}
-                onChange={(e) => setContactMessage(e.target.value)}
-                required
-                rows={5}
-                className="w-full rounded-xl border border-stone-800 bg-black px-3 py-2.5 text-luxury-primary placeholder:text-stone-600"
-              />
-              <button
-                type="submit"
-                className="w-full rounded-full bg-[linear-gradient(180deg,#E6C45A_0%,#D4AF37_100%)] py-3 type-label font-medium text-[#111111] shadow-[0_4px_20px_rgba(212,175,55,0.3)] transition hover:brightness-110"
-              >
-                Send message
-              </button>
-            </form>
           </div>
         </section>
 
