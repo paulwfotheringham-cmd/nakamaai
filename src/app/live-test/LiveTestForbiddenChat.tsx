@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  readForbiddenChatSetup,
-  writeForbiddenChatSetup,
-} from "@/lib/guides/chat-setup";
+import { writeForbiddenChatSetup } from "@/lib/guides/chat-setup";
 import {
   readGuidePreferences,
   writeGuidePreferences,
@@ -28,11 +25,7 @@ export default function LiveTestForbiddenChat() {
   const [setupComplete, setSetupComplete] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (readForbiddenChatSetup()?.mode) {
-      setSetupComplete(true);
-    }
-  }, []);
+  // Always show setup on entry — do not auto-resume from saved prefs
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
