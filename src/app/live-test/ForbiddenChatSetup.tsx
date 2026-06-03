@@ -4,11 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { GUIDE_VOICES } from "@/lib/guides/catalog";
 import {
   buildGuidedStartMessage,
-  CHARACTER_OPTIONS,
-  CHAT_MOOD_OPTIONS,
-  EXPERIENCE_LENGTH_OPTIONS,
-  INTERACTION_STYLE_OPTIONS,
-  SCENARIO_OPTIONS,
   type ChatSetupPreferences,
 } from "@/lib/guides/chat-setup";
 import { readGuidePreferences } from "@/lib/guides/preferences";
@@ -24,65 +19,71 @@ type ForbiddenChatSetupProps = {
   disabled?: boolean;
 };
 
-type ExperienceMode = "unfettered" | "guided";
+const MOOD_OPTIONS = [
+  "Playful", "Dominant", "Forbidden", "Dangerous", "Slow Burn", "Obsessive",
+] as const;
 
-function SelectChevron() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="fc-select-chevron" aria-hidden>
-      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-    </svg>
-  );
+const SCENARIO_OPTIONS = [
+  "Office Tension", "Stranger", "Bodyguard", "CEO", "Rival", "Professor",
+] as const;
+
+const CHARACTER_OPTIONS = [
+  "Older Stranger", "Protective Alpha", "Mysterious Billionaire", "Best Friend", "Enemy",
+] as const;
+
+const STYLE_OPTIONS = [
+  "Flirty", "Explicit", "Slow Burn", "Emotional", "Teasing",
+] as const;
+
+const SCENE_OPENERS: Record<string, string> = {
+  "Office Tension": "The office is almost empty when he finally speaks.",
+  "Stranger": "You weren't expecting him to sit there.",
+  "Bodyguard": "He never looks directly at you. But he always knows exactly where you are.",
+  "CEO": "His office is on the top floor. You've never been invited before tonight.",
+  "Rival": "You've always known it would end like this between you.",
+  "Professor": "The lecture hall is empty. Only you stayed behind.",
+};
+
+function buildPreview(mood: string, scenario: string, character: string, style: string): string {
+  if (!mood && !scenario && !character && !style) return "";
+  let s = "";
+  if (scenario) s += scenario;
+  if (mood && scenario) s += ` — ${mood.toLowerCase()}`;
+  else if (mood) s += mood;
+  if (character) s += `. A ${character.toLowerCase()}`;
+  if (style) s += `. ${style}`;
+  return s ? s + "." : "";
 }
 
-function PremiumSelect({
-  id,
+function Chip({
   label,
-  value,
-  onChange,
-  options,
+  selected,
+  onClick,
   disabled,
 }: {
-  id: string;
   label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: readonly string[];
+  selected: boolean;
+  onClick: () => void;
   disabled?: boolean;
 }) {
   return (
-    <label htmlFor={id} className="fc-field">
-      <span className="fc-field-label">{label}</span>
-      <span className="fc-select-wrap">
-        <select
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
-          className="fc-select"
-        >
-          <option value="">Select…</option>
-          {options.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
-          ))}
-        </select>
-        <SelectChevron />
-      </span>
-    </label>
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`fc-chip${selected ? " fc-chip-selected" : ""}`}
+    >
+      {label}
+    </button>
   );
 }
 
 export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenChatSetupProps) {
-  const [mode, setMode] = useState<ExperienceMode>("guided");
-  const [experienceLength, setExperienceLength] = useState("");
   const [mood, setMood] = useState("");
   const [scenario, setScenario] = useState("");
-  const [customScenario, setCustomScenario] = useState("");
   const [character, setCharacter] = useState("");
-  const [interactionStyle, setInteractionStyle] = useState("");
+  const [style, setStyle] = useState("");
   const [voiceId, setVoiceId] = useState("");
-  const [setupError, setSetupError] = useState<string | null>(null);
   const [previewingVoice, setPreviewingVoice] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -90,19 +91,13 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
     const savedVoice = readGuidePreferences().voiceId;
     if (savedVoice && GUIDE_VOICES.some((v) => v.id === savedVoice)) {
       setVoiceId(savedVoice);
+    } else if (GUIDE_VOICES.length > 0) {
+      setVoiceId(GUIDE_VOICES[0]!.id);
     }
   }, []);
 
-  const selectedVoice = GUIDE_VOICES.find((v) => v.id === voiceId);
-
-  const guidedReady =
-    experienceLength &&
-    mood &&
-    scenario &&
-    character &&
-    interactionStyle &&
-    voiceId &&
-    (scenario !== "Create your own" || customScenario.trim());
+  const preview = buildPreview(mood, scenario, character, style);
+  const canStart = !!(mood && scenario && character && style);
 
   const playVoicePreview = useCallback(async (id: string, name: string) => {
     setPreviewingVoice(id);
@@ -110,17 +105,12 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
       const res = await fetch("/api/preview-voice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          voice: name,
-          text: "Come closer. I've been waiting for you.",
-        }),
+        body: JSON.stringify({ voice: name, text: "Come closer. I've been waiting for you." }),
       });
       if (!res.ok) return;
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      if (!audioRef.current) {
-        audioRef.current = new Audio();
-      }
+      if (!audioRef.current) audioRef.current = new Audio();
       audioRef.current.pause();
       audioRef.current.src = url;
       await audioRef.current.play();
@@ -132,215 +122,143 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
   }, []);
 
   const handleStart = () => {
-    if (disabled) return;
-    setSetupError(null);
-
-    if (mode === "unfettered") {
-      onComplete({
-        prefs: {
-          mode: "unfettered",
-          voiceId: selectedVoice?.id ?? readGuidePreferences().voiceId,
-          voiceName: selectedVoice?.name,
-        },
-        assistantNote:
-          "You've got an open canvas — no rules, no script. Say anything and we'll go wherever you want.",
-      });
-      return;
-    }
-
-    if (!guidedReady) {
-      setSetupError("Complete each field to begin your guided experience.");
-      return;
-    }
-    if (scenario === "Create your own" && !customScenario.trim()) {
-      setSetupError("Describe your custom scenario.");
-      return;
-    }
-
+    if (disabled || !canStart) return;
+    const voice = GUIDE_VOICES.find((v) => v.id === voiceId) ?? GUIDE_VOICES[0];
     const prefs: ChatSetupPreferences = {
       mode: "guided",
-      experienceLength,
+      experienceLength: "Ongoing Affair",
       mood,
       scenario,
-      customScenario: scenario === "Create your own" ? customScenario.trim() : undefined,
       character,
-      interactionStyle,
-      voiceId: selectedVoice!.id,
-      voiceName: selectedVoice!.name,
+      interactionStyle: style,
+      voiceId: voice?.id,
+      voiceName: voice?.name,
     };
-
-    const scenarioLabel =
-      scenario === "Create your own" ? customScenario.trim() : scenario;
-
+    const opener = SCENE_OPENERS[scenario] ?? "The scene opens. You already feel it.";
     onComplete({
       prefs,
       userMessage: buildGuidedStartMessage(prefs),
-      assistantNote: `Perfect — ${experienceLength}, ${mood.toLowerCase()} mood, ${scenarioLabel}. Tell me how you'd like to begin.`,
+      assistantNote: opener,
     });
   };
 
-  const startDisabled = disabled || (mode === "guided" && !guidedReady);
-
   return (
-    <div className="launcher-panel fc-setup">
-      <div className="fc-setup-glow" aria-hidden />
+    <div className="fc-setup">
 
-      <header className="launcher-panel-header fc-setup-header">
-        <p className="launcher-eyebrow">Forbidden chat</p>
-        <h1 className="launcher-title">Private desires</h1>
-        <p className="launcher-subtitle">
-          Craft a personalized experience through mood, scenario, character and interaction style.
+      {/* Hero header */}
+      <div className="fc-setup-hero">
+        <p className="fc-setup-eyebrow">Forbidden Chat</p>
+        <h1 className="fc-setup-headline">Private Desires</h1>
+        <p className="fc-setup-tagline">
+          Create a conversation that should never have happened.
         </p>
-      </header>
+      </div>
 
-      <div className="fc-setup-body">
-        <div className="fc-mode-switch" role="tablist" aria-label="Experience mode">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === "unfettered"}
-            disabled={disabled}
-            onClick={() => {
-              setMode("unfettered");
-              setSetupError(null);
-            }}
-            className={`fc-mode-option${mode === "unfettered" ? " is-active" : ""}`}
-          >
-            <span className="fc-mode-title">Unfiltered chat</span>
-            <span className="fc-mode-desc">Open canvas — no preset scene</span>
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === "guided"}
-            disabled={disabled}
-            onClick={() => {
-              setMode("guided");
-              setSetupError(null);
-            }}
-            className={`fc-mode-option${mode === "guided" ? " is-active" : ""}`}
-          >
-            <span className="fc-mode-title">Guided experience</span>
-            <span className="fc-mode-desc">Shape mood, scene, and voice</span>
-          </button>
+      {/* Live fantasy preview */}
+      {preview ? (
+        <div className="fc-preview-card">
+          <p className="fc-preview-label">Your story</p>
+          <p className="fc-preview-text">{preview}</p>
+        </div>
+      ) : (
+        <div className="fc-preview-placeholder">
+          <p className="fc-preview-placeholder-text">Your fantasy is taking shape…</p>
+        </div>
+      )}
+
+      {/* Preference chips */}
+      <div className="fc-prefs">
+
+        <div className="fc-pref-group">
+          <p className="fc-pref-label">Mood</p>
+          <div className="fc-chips">
+            {MOOD_OPTIONS.map((opt) => (
+              <Chip
+                key={opt} label={opt} selected={mood === opt}
+                onClick={() => setMood(mood === opt ? "" : opt)} disabled={disabled}
+              />
+            ))}
+          </div>
         </div>
 
-        {mode === "guided" ? (
-          <div className="fc-form-card">
-            <p className="launcher-section-label">Your preferences</p>
+        <div className="fc-pref-group">
+          <p className="fc-pref-label">Scenario</p>
+          <div className="fc-chips">
+            {SCENARIO_OPTIONS.map((opt) => (
+              <Chip
+                key={opt} label={opt} selected={scenario === opt}
+                onClick={() => setScenario(scenario === opt ? "" : opt)} disabled={disabled}
+              />
+            ))}
+          </div>
+        </div>
 
-            <div className="fc-form-grid">
-              <PremiumSelect
-                id="fc-experience-length"
-                label="Experience length"
-                value={experienceLength}
-                onChange={setExperienceLength}
-                options={EXPERIENCE_LENGTH_OPTIONS}
-                disabled={disabled}
+        <div className="fc-pref-group">
+          <p className="fc-pref-label">Character</p>
+          <div className="fc-chips">
+            {CHARACTER_OPTIONS.map((opt) => (
+              <Chip
+                key={opt} label={opt} selected={character === opt}
+                onClick={() => setCharacter(character === opt ? "" : opt)} disabled={disabled}
               />
-              <PremiumSelect
-                id="fc-mood"
-                label="Mood"
-                value={mood}
-                onChange={setMood}
-                options={CHAT_MOOD_OPTIONS}
-                disabled={disabled}
+            ))}
+          </div>
+        </div>
+
+        <div className="fc-pref-group">
+          <p className="fc-pref-label">Interaction Style</p>
+          <div className="fc-chips">
+            {STYLE_OPTIONS.map((opt) => (
+              <Chip
+                key={opt} label={opt} selected={style === opt}
+                onClick={() => setStyle(style === opt ? "" : opt)} disabled={disabled}
               />
-              <PremiumSelect
-                id="fc-scenario"
-                label="Scenario"
-                value={scenario}
-                onChange={setScenario}
-                options={SCENARIO_OPTIONS}
-                disabled={disabled}
-              />
-              {scenario === "Create your own" ? (
-                <label htmlFor="fc-custom-scenario" className="fc-field fc-field-full">
-                  <span className="fc-field-label">Your scenario</span>
-                  <input
-                    id="fc-custom-scenario"
-                    type="text"
-                    value={customScenario}
-                    onChange={(e) => setCustomScenario(e.target.value)}
-                    placeholder="Describe your scene…"
-                    disabled={disabled}
-                    className="fc-input"
+            ))}
+          </div>
+        </div>
+
+        {GUIDE_VOICES.length > 0 && (
+          <div className="fc-pref-group">
+            <p className="fc-pref-label">Voice</p>
+            <div className="fc-chips">
+              {GUIDE_VOICES.map((v) => (
+                <div key={v.id} className="fc-voice-chip-row">
+                  <Chip
+                    label={v.name} selected={voiceId === v.id}
+                    onClick={() => setVoiceId(v.id)} disabled={disabled}
                   />
-                </label>
-              ) : null}
-              <PremiumSelect
-                id="fc-character"
-                label="Character"
-                value={character}
-                onChange={setCharacter}
-                options={CHARACTER_OPTIONS}
-                disabled={disabled}
-              />
-              <PremiumSelect
-                id="fc-interaction-style"
-                label="Interaction style"
-                value={interactionStyle}
-                onChange={setInteractionStyle}
-                options={INTERACTION_STYLE_OPTIONS}
-                disabled={disabled}
-              />
-              <div className="fc-field">
-                <span className="fc-field-label">Voice</span>
-                <div className="fc-voice-row">
-                  <span className="fc-select-wrap fc-select-wrap-grow">
-                    <select
-                      id="fc-voice"
-                      value={voiceId}
-                      onChange={(e) => setVoiceId(e.target.value)}
-                      disabled={disabled}
-                      className="fc-select"
-                    >
-                      <option value="">Select…</option>
-                      {GUIDE_VOICES.map((v) => (
-                        <option key={v.id} value={v.id}>
-                          {v.name}
-                        </option>
-                      ))}
-                    </select>
-                    <SelectChevron />
-                  </span>
                   <button
                     type="button"
-                    disabled={disabled || !voiceId || previewingVoice !== null}
-                    onClick={() => {
-                      const v = GUIDE_VOICES.find((x) => x.id === voiceId);
-                      if (v) void playVoicePreview(v.id, v.name);
-                    }}
-                    className="fc-voice-preview"
-                    title="Preview voice"
+                    disabled={disabled || previewingVoice !== null}
+                    onClick={() => void playVoicePreview(v.id, v.name)}
+                    className="fc-voice-play-btn"
+                    aria-label={`Preview ${v.name}`}
                   >
-                    {previewingVoice ? "…" : "▶"}
+                    {previewingVoice === v.id ? "…" : "▶"}
                   </button>
                 </div>
-              </div>
+              ))}
             </div>
-          </div>
-        ) : (
-          <div className="fc-unfiltered-card">
-            <p className="fc-unfiltered-title">Begin without boundaries</p>
-            <p className="fc-unfiltered-copy">
-              Jump straight into conversation — no mood, scene, or character preset. Your companion
-              adapts as you go.
-            </p>
           </div>
         )}
 
-        {setupError ? <p className="fc-setup-error">{setupError}</p> : null}
+      </div>
 
+      {/* CTA */}
+      <div className="fc-cta-area">
         <button
           type="button"
-          disabled={startDisabled}
+          disabled={disabled || !canStart}
           onClick={handleStart}
           className="fc-start-btn"
         >
-          Start your experience
+          Start This Conversation
         </button>
+        {!canStart && (
+          <p className="fc-cta-hint">Choose a mood, scenario, character and style to begin.</p>
+        )}
       </div>
+
     </div>
   );
 }
