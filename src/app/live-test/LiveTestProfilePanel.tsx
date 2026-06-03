@@ -80,7 +80,7 @@ function AccountDetails({ userName }: { userName: string }) {
   }
 
   return (
-    <section className="prf-section">
+    <section className="prf-section prf-section-first">
       <h2 className="prf-section-title">Account Details</h2>
 
       <form onSubmit={handleSave} className="prf-form">
@@ -252,44 +252,40 @@ export default function LiveTestProfilePanel({ onNavigate }: { onNavigate?: (vie
         <div className="profile-panel-atmosphere absolute inset-0" />
       </div>
 
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto">
+      <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden">
 
-        {/* Header */}
-        <header className="shrink-0 px-6 pb-5 pt-7 sm:px-8 sm:pt-8">
-          <p className="launcher-eyebrow">Profile</p>
-          <div className="mt-5 flex min-w-0 items-center gap-4">
-            <div className="profile-avatar" aria-hidden>{initials}</div>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <h1 className="type-card-title leading-snug tracking-tight text-luxury-primary sm:text-2xl">
-                  {userName}
-                </h1>
-                <span className="profile-badge profile-badge-tier">{tier}</span>
-                <span className="profile-badge profile-badge-active">Active</span>
+        {/* ── Left identity column ── */}
+        <div className="prf-identity-col">
+          <div className="prf-identity-inner">
+            <p className="launcher-eyebrow mb-5">Profile</p>
+
+            <div className="prf-avatar-block">
+              <div className="profile-avatar" aria-hidden>{initials}</div>
+              <div>
+                <h1 className="prf-identity-name">{userName}</h1>
+                <p className="prf-identity-sub">Member · Nakama Nights</p>
               </div>
-              <p className="mt-1.5 text-sm text-stone-400/80">Member · Nakama Nights</p>
             </div>
-          </div>
-        </header>
 
-        {/* Content */}
-        <div className="px-6 pb-12 sm:px-8">
-
-          {/* Membership card */}
-          <div className="profile-membership-card">
-            <div>
-              <p className="profile-membership-label">Premium Membership</p>
-              <p className="profile-membership-tier">{tier}</p>
-              <p className="profile-membership-billing">{billingLabel(billing)}</p>
+            <div className="prf-identity-badges">
+              <span className="profile-badge profile-badge-tier">{tier}</span>
+              <span className="profile-badge profile-badge-active">Active</span>
             </div>
-            <div className="profile-membership-stats">
+
+            <div className="prf-identity-divider" />
+
+            <div className="prf-identity-stats">
+              <div>
+                <p className="profile-membership-stat-label">Plan</p>
+                <p className="profile-membership-stat-value">{tier}</p>
+              </div>
+              <div>
+                <p className="profile-membership-stat-label">Billing</p>
+                <p className="profile-membership-stat-value">{billingLabel(billing)}</p>
+              </div>
               <div>
                 <p className="profile-membership-stat-label">Status</p>
                 <p className="profile-membership-stat-value profile-membership-stat-active">Active</p>
-              </div>
-              <div>
-                <p className="profile-membership-stat-label">Renewal</p>
-                <p className="profile-membership-stat-value">{billing === "yearly" ? "Annual" : "Monthly"}</p>
               </div>
               {isTrial && (
                 <div>
@@ -298,31 +294,39 @@ export default function LiveTestProfilePanel({ onNavigate }: { onNavigate?: (vie
                 </div>
               )}
             </div>
-            <button type="button" className="profile-membership-manage">
+
+            <button type="button" className="profile-membership-manage mt-4">
               Manage Membership
             </button>
           </div>
-
-          {/* Account Details */}
-          <AccountDetails userName={userName} />
-
-          {/* Secondary cards */}
-          <section className="prf-section mt-8">
-            <h2 className="prf-section-title">Settings</h2>
-            <div className="prf-settings-list">
-              {SECONDARY_CARDS.map((c) => (
-                <SettingCard
-                  key={c.id}
-                  icon={c.icon}
-                  title={c.title}
-                  desc={c.desc}
-                  onClick={() => onNavigate?.(c.id)}
-                />
-              ))}
-            </div>
-          </section>
-
         </div>
+
+        {/* ── Right controls column ── */}
+        <div className="prf-controls-col overflow-y-auto">
+          <div className="prf-controls-inner">
+
+            {/* Account Details */}
+            <AccountDetails userName={userName} />
+
+            {/* Settings */}
+            <section className="prf-section">
+              <h2 className="prf-section-title">Settings</h2>
+              <div className="prf-settings-list">
+                {SECONDARY_CARDS.map((c) => (
+                  <SettingCard
+                    key={c.id}
+                    icon={c.icon}
+                    title={c.title}
+                    desc={c.desc}
+                    onClick={() => onNavigate?.(c.id)}
+                  />
+                ))}
+              </div>
+            </section>
+
+          </div>
+        </div>
+
       </div>
     </div>
   );

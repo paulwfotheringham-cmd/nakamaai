@@ -8748,8 +8748,77 @@ button.nav-concept-context-back:hover {
 }
 
 /* ── Account Details form ── */
+/* ── Profile two-column layout ── */
+.prf-identity-col {
+  width: 15rem;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.18);
+  overflow-y: auto;
+}
+.prf-identity-inner {
+  padding: 1.75rem 1.5rem 2rem;
+}
+.prf-avatar-block {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin-bottom: 0.875rem;
+}
+.prf-identity-name {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.0625rem;
+  font-weight: 400;
+  color: rgba(245, 242, 235, 0.95);
+  line-height: 1.2;
+}
+.prf-identity-sub {
+  margin-top: 0.2rem;
+  font-size: 0.6875rem;
+  color: rgba(168, 162, 158, 0.6);
+}
+.prf-identity-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 0.125rem;
+}
+.prf-identity-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  margin: 1.25rem 0;
+}
+.prf-identity-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.prf-controls-col {
+  flex: 1;
+  min-width: 0;
+}
+.prf-controls-inner {
+  padding: 1.75rem 2rem 3rem;
+  max-width: 36rem;
+}
+
+@media (max-width: 640px) {
+  .prf-identity-col {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .prf-controls-col {
+    width: 100%;
+  }
+}
+
 .prf-section {
   margin-top: 2rem;
+}
+.prf-section-first {
+  margin-top: 0;
 }
 .prf-section-title {
   font-size: 0.5rem;
