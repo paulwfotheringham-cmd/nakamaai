@@ -197,15 +197,15 @@ function AccountDetails({ userName }: { userName: string }) {
 
 /* ── Secondary setting cards ───────────────────────────── */
 
-const SECONDARY_CARDS = [
+const SECONDARY_CARDS: { id: ProfileSubView; icon: string; title: string; desc: string }[] = [
   { id: "privacy",       icon: "shield", title: "Privacy Controls", desc: "Manage what we store, your history, and data preferences." },
   { id: "notifications", icon: "bell",   title: "Notifications",    desc: "Choose your email and in-app alert preferences." },
   { id: "billing",       icon: "card",   title: "Billing",           desc: "View your plan, payment method, and invoices." },
-] as const;
+];
 
-function SettingCard({ icon, title, desc }: { icon: string; title: string; desc: string }) {
+function SettingCard({ icon, title, desc, onClick }: { icon: string; title: string; desc: string; onClick?: () => void }) {
   return (
-    <button type="button" className="prf-setting-card group">
+    <button type="button" onClick={onClick} className="prf-setting-card group">
       <div className="prf-setting-card-icon">
         <Icon name={icon} />
       </div>
@@ -222,7 +222,9 @@ function SettingCard({ icon, title, desc }: { icon: string; title: string; desc:
 
 /* ── Main component ────────────────────────────────────── */
 
-export default function LiveTestProfilePanel() {
+type ProfileSubView = "main" | "privacy" | "notifications" | "billing";
+
+export default function LiveTestProfilePanel({ onNavigate }: { onNavigate?: (view: ProfileSubView) => void }) {
   const [userName, setUserName] = useState(DEFAULT_USER_NAME);
   const [plan, setPlan] = useState<string | null>(null);
   const [billing, setBilling] = useState<string | null>(null);
@@ -309,7 +311,13 @@ export default function LiveTestProfilePanel() {
             <h2 className="prf-section-title">Settings</h2>
             <div className="prf-settings-list">
               {SECONDARY_CARDS.map((c) => (
-                <SettingCard key={c.id} icon={c.icon} title={c.title} desc={c.desc} />
+                <SettingCard
+                  key={c.id}
+                  icon={c.icon}
+                  title={c.title}
+                  desc={c.desc}
+                  onClick={() => onNavigate?.(c.id)}
+                />
               ))}
             </div>
           </section>

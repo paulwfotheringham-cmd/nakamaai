@@ -17,10 +17,14 @@ import LiveTestGuideRail from "./LiveTestGuideRail";
 import LiveTestInfoPanel from "./LiveTestInfoPanel";
 import LiveTestProSidebar from "./LiveTestProSidebar";
 import LiveTestProfilePanel from "./LiveTestProfilePanel";
+import SettingsPrivacyPanel from "./SettingsPrivacyPanel";
+import SettingsNotificationsPanel from "./SettingsNotificationsPanel";
+import SettingsBillingPanel from "./SettingsBillingPanel";
 
 export type { LiveTestNavId };
 
 type CouplesCenterView = "menu" | "date-night" | "surprise";
+type ProfileSubView = "main" | "privacy" | "notifications" | "billing";
 
 export default function LiveTestShell() {
   const searchParams = useSearchParams();
@@ -29,6 +33,7 @@ export default function LiveTestShell() {
   const [guideRailHidden, setGuideRailHidden] = useState(true); // hidden by default on all pages
   const centerPanel = getLiveTestCenterPanel(activeNav);
   const [couplesView, setCouplesView] = useState<CouplesCenterView>("menu");
+  const [profileSubView, setProfileSubView] = useState<ProfileSubView>("main");
 
   const inCouplesExperience = centerPanel === "couples-program";
   const inDateNightFlow = inCouplesExperience && couplesView === "date-night";
@@ -44,6 +49,12 @@ export default function LiveTestShell() {
   useEffect(() => {
     if (centerPanel !== "couples-program") {
       setCouplesView("menu");
+    }
+  }, [centerPanel]);
+
+  useEffect(() => {
+    if (centerPanel !== "profile") {
+      setProfileSubView("main");
     }
   }, [centerPanel]);
 
@@ -142,7 +153,22 @@ export default function LiveTestShell() {
                 />
               )}
               {centerPanel === "forbidden-chat" && <LiveTestForbiddenChat />}
-              {centerPanel === "profile" && <LiveTestProfilePanel />}
+              {centerPanel === "profile" && (
+                <>
+                  {profileSubView === "main" && (
+                    <LiveTestProfilePanel onNavigate={setProfileSubView} />
+                  )}
+                  {profileSubView === "privacy" && (
+                    <SettingsPrivacyPanel onBack={() => setProfileSubView("main")} />
+                  )}
+                  {profileSubView === "notifications" && (
+                    <SettingsNotificationsPanel onBack={() => setProfileSubView("main")} />
+                  )}
+                  {profileSubView === "billing" && (
+                    <SettingsBillingPanel onBack={() => setProfileSubView("main")} />
+                  )}
+                </>
+              )}
               {centerPanel === "dashboard" && <LiveTestDashboardHome />}
             </section>
 
