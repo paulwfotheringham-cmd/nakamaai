@@ -61,7 +61,7 @@ export default function SettingsBillingPanel({ onBack }: { onBack: () => void })
               <div>
                 <p className="stg-membership-plan-name">{tier}</p>
                 <p className="stg-membership-plan-price">
-                  {isTrial ? "Free trial" : billing === "yearly" ? "£89.99 / year" : "£9.99 / month"}
+                  {isTrial ? "Free trial" : billing === "yearly" ? "$149.99 / year" : "$14.99 / month"}
                 </p>
               </div>
               <StatusPill variant={isTrial ? "trial" : "active"}>
