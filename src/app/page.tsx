@@ -330,50 +330,56 @@ export default function Page() {
             alt="Moor scene placeholder"
             className="absolute inset-0 h-full w-full object-cover object-center opacity-90"
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/88 via-black/58 to-black/22" />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/72 via-black/26 to-black/36" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/92 via-black/60 to-black/10" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/65" />
 
-          <div className="relative z-10 max-w-3xl p-6 sm:p-8 lg:p-10">
-            <p className="type-hero text-luxury-primary drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
-              Nakama Nights
-            </p>
-            <p className="mt-3 text-xs font-medium uppercase tracking-[0.22em] text-stone-500 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
-              For women who want more than ordinary.
-            </p>
+          <div className="relative z-10 flex min-h-[520px] max-w-2xl flex-col justify-between p-8 sm:min-h-[560px] sm:p-10 lg:min-h-[600px] lg:p-12">
 
-            <div className="mt-14 flex flex-col gap-14 sm:gap-16">
-              <div>
-                <p className="font-serif text-6xl font-light leading-none tracking-tight text-stone-100 drop-shadow-[0_2px_16px_rgba(0,0,0,0.7)] sm:text-7xl lg:text-8xl">
-                  Fantasy
-                </p>
-                <p className="mt-3 font-serif text-base italic leading-relaxed text-stone-400 sm:text-lg">
-                  Step somewhere you've kept private.
-                </p>
-              </div>
-              <div>
-                <p className="font-serif text-6xl font-light leading-none tracking-tight text-stone-300 drop-shadow-[0_2px_16px_rgba(0,0,0,0.7)] sm:text-7xl lg:text-8xl">
-                  Escape
-                </p>
-                <p className="mt-3 font-serif text-base italic leading-relaxed text-stone-500 sm:text-lg">
-                  The real world ends here.
-                </p>
-              </div>
-              <div>
-                <p className="font-serif text-6xl font-light leading-none tracking-tight text-stone-100 drop-shadow-[0_2px_16px_rgba(0,0,0,0.7)] sm:text-7xl lg:text-8xl">
-                  Pleasure
-                </p>
-                <p className="mt-3 font-serif text-base italic leading-relaxed text-stone-400 sm:text-lg">
-                  Made to be felt. Not explained.
-                </p>
-              </div>
+            {/* Brand anchor — top left */}
+            <div>
+              <p className="text-[10px] font-medium uppercase tracking-[0.35em] text-stone-400 drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)]">
+                Nakama Nights
+              </p>
+              <p className="mt-2 font-serif text-sm italic text-stone-500 drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)]">
+                Private fantasy experiences for women.
+              </p>
             </div>
 
-            <Link
-              href="/select-plan"
-              className="mt-16 inline-flex w-full max-w-[260px] items-center justify-center rounded-full bg-[linear-gradient(180deg,#E6C45A_0%,#D4AF37_100%)] px-7 py-3 text-xs font-medium tracking-[0.18em] text-[#111111] shadow-[0_4px_24px_rgba(212,175,55,0.35)] transition hover:brightness-110"
-            >
-              JOIN NAKAMA NOW
-            </Link>
+            {/* Three pillars — dominant visual */}
+            <div className="py-2">
+              <p
+                className="font-serif font-light leading-[0.88] tracking-tight text-stone-100 drop-shadow-[0_2px_24px_rgba(0,0,0,0.8)]"
+                style={{ fontSize: "clamp(3.5rem, 6.5vw, 6.5rem)" }}
+              >
+                Fantasy
+              </p>
+              <p
+                className="ml-[5%] font-serif font-light leading-[0.88] tracking-tight text-stone-100/70 drop-shadow-[0_2px_24px_rgba(0,0,0,0.8)]"
+                style={{ fontSize: "clamp(3.5rem, 6.5vw, 6.5rem)" }}
+              >
+                Escape
+              </p>
+              <p
+                className="ml-[10%] font-serif font-light leading-[0.88] tracking-tight text-stone-100 drop-shadow-[0_2px_24px_rgba(0,0,0,0.8)]"
+                style={{ fontSize: "clamp(3.5rem, 6.5vw, 6.5rem)" }}
+              >
+                Pleasure
+              </p>
+            </div>
+
+            {/* CTA — the natural next step */}
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+              <Link
+                href="/select-plan"
+                className="inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#E6C45A_0%,#D4AF37_100%)] px-7 py-3 text-xs font-medium tracking-[0.18em] text-[#111111] shadow-[0_4px_24px_rgba(212,175,55,0.4)] transition hover:brightness-110"
+              >
+                JOIN NAKAMA NOW
+              </Link>
+              <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-stone-500">
+                10 days free · No charge today
+              </p>
+            </div>
+
           </div>
 
           <div className="relative z-10 mt-10 w-full border-t border-amber-200/25 bg-black/90 px-6 sm:px-8 lg:px-10">
