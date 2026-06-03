@@ -67,8 +67,8 @@ const EXPERIENCES = [
     progress: "Date Night & Surprise Mode",
     action: "Enter",
     statusType: "couples" as const,
-    image: "/couples/date-night.jpg",
-    imagePosition: "50% 30%",
+    image: "/couples/shared-session.jpg",
+    imagePosition: "center center",
   },
 ] as const;
 
