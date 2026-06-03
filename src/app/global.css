@@ -8740,83 +8740,192 @@ button.nav-concept-context-back:hover {
   color: rgba(212, 175, 55, 1);
 }
 
-/* ── Settings card grid ── */
-.profile-card-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
+/* ── Account Details form ── */
+.prf-section {
+  margin-top: 2rem;
 }
-@media (min-width: 580px) {
-  .profile-card-grid { grid-template-columns: repeat(2, 1fr); }
+.prf-section-title {
+  font-size: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.6);
+  margin-bottom: 1.5rem;
 }
-@media (min-width: 900px) {
-  .profile-card-grid { grid-template-columns: repeat(3, 1fr); }
-}
-
-.profile-card {
+.prf-form {
   display: flex;
   flex-direction: column;
-  gap: 1.125rem;
-  padding: 1.25rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 0;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.875rem;
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+}
+.prf-field {
+  padding: 1.125rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.prf-field:last-of-type { border-bottom: none; }
+.prf-label {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(168, 162, 158, 0.55);
+  margin-bottom: 0.5rem;
+}
+.prf-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: rgba(245, 242, 235, 0.88);
+  padding: 0;
+  transition: color 0.15s ease;
+}
+.prf-input::placeholder { color: rgba(168, 162, 158, 0.3); }
+.prf-input:focus { color: rgba(245, 242, 235, 1); }
+.prf-input-pw-display {
+  cursor: default;
+  color: rgba(168, 162, 158, 0.35);
+  letter-spacing: 0.1em;
+  flex: 1;
+}
+.prf-pw-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.prf-change-pw-btn {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: rgba(212, 175, 55, 0.7);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+  outline: none;
+  white-space: nowrap;
+}
+.prf-change-pw-btn:hover { color: rgba(212, 175, 55, 1); }
+.prf-pw-expand {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 1rem;
+}
+.prf-pw-expand .prf-input {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
   background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
+}
+.prf-pw-expand .prf-input:focus {
+  border-color: rgba(212, 175, 55, 0.3);
+}
+.prf-field-error {
+  font-size: 0.75rem;
+  color: rgba(239, 68, 68, 0.8);
+}
+.prf-form-footer {
+  padding: 1.125rem 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.015);
+}
+.prf-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #E6C45A 0%, #D4AF37 100%);
+  color: #111111;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.28);
+  transition: filter 0.2s ease;
+  outline: none;
+}
+.prf-save-btn:hover:not(:disabled) { filter: brightness(1.08); }
+.prf-save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Settings cards (privacy / notifications / billing) ── */
+.prf-settings-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.875rem;
+  overflow: hidden;
+}
+.prf-setting-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.125rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.02);
   text-align: left;
   cursor: pointer;
   outline: none;
-  box-shadow: none;
-  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  border-top: none;
+  border-left: none;
+  border-right: none;
   -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease;
 }
-.profile-card:hover {
-  background: rgba(198, 164, 106, 0.06);
-  border-color: rgba(198, 164, 106, 0.2);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28), 0 0 16px rgba(198, 164, 106, 0.06);
-}
-.profile-card:focus { outline: none; box-shadow: none; }
-
-.profile-card-top {
+.prf-setting-card:last-child { border-bottom: none; }
+.prf-setting-card:hover { background: rgba(198, 164, 106, 0.05); }
+.prf-setting-card:focus { outline: none; }
+.prf-setting-card-icon {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.profile-card-icon-wrap {
-  display: flex;
-  width: 2.5rem;
-  height: 2.5rem;
   align-items: center;
   justify-content: center;
-  border-radius: 0.75rem;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: background 0.2s ease;
-}
-.profile-card:hover .profile-card-icon-wrap {
-  background: rgba(198, 164, 106, 0.12);
-}
-.profile-card-chevron {
-  width: 1rem;
-  height: 1rem;
-  color: rgba(168, 162, 158, 0.3);
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-.profile-card:hover .profile-card-chevron {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.625rem;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   color: rgba(212, 175, 55, 0.65);
-  transform: translateX(2px);
+  flex-shrink: 0;
+  transition: background 0.15s ease;
 }
-.profile-card-title {
-  font-size: 0.9375rem;
+.prf-setting-card:hover .prf-setting-card-icon {
+  background: rgba(212, 175, 55, 0.1);
+}
+.prf-setting-card-body { flex: 1; min-width: 0; }
+.prf-setting-card-title {
+  font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(245, 242, 235, 0.9);
-  transition: color 0.2s ease;
+  color: rgba(245, 242, 235, 0.88);
+  transition: color 0.15s ease;
 }
-.profile-card:hover .profile-card-title { color: rgba(245, 242, 235, 1); }
-.profile-card-desc {
-  margin-top: 0.3rem;
+.prf-setting-card:hover .prf-setting-card-title { color: rgba(245, 242, 235, 1); }
+.prf-setting-card-desc {
   font-size: 0.75rem;
-  line-height: 1.5;
-  color: rgba(168, 162, 158, 0.65);
+  line-height: 1.45;
+  color: rgba(168, 162, 158, 0.5);
+  margin-top: 0.2rem;
+}
+.prf-setting-card-arrow {
+  color: rgba(168, 162, 158, 0.25);
+  flex-shrink: 0;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.prf-setting-card:hover .prf-setting-card-arrow {
+  color: rgba(212, 175, 55, 0.5);
+  transform: translateX(2px);
 }
 
 /* ═══════════════════════════════════════════════════════════

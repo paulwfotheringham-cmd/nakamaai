@@ -6,6 +6,8 @@ import {
   readGuidePreferences,
 } from "@/lib/guides/preferences";
 
+/* ── Constants ─────────────────────────────────────────── */
+
 const PLAN_LABELS: Record<string, string> = {
   free: "Free Trial",
   paid: "Premium",
@@ -13,145 +15,212 @@ const PLAN_LABELS: Record<string, string> = {
   "couples-partner": "Couples Partner",
 };
 
-const SETTING_CARDS = [
-  {
-    id: "display-name",
-    icon: "user",
-    title: "Display Name",
-    description: "How your name appears to your guide and across Nakama Nights.",
-  },
-  {
-    id: "email",
-    icon: "mail",
-    title: "Email Address",
-    description: "Used to sign in and receive important account updates.",
-  },
-  {
-    id: "password",
-    icon: "lock",
-    title: "Password",
-    description: "Update your password to keep your account secure.",
-  },
-  {
-    id: "privacy",
-    icon: "shield",
-    title: "Privacy Controls",
-    description: "Manage what we store, your history, and data preferences.",
-  },
-  {
-    id: "notifications",
-    icon: "bell",
-    title: "Notifications",
-    description: "Choose your email and in-app alert preferences.",
-  },
-  {
-    id: "billing",
-    icon: "card",
-    title: "Billing",
-    description: "View your plan, payment method, and invoices.",
-  },
-] as const;
+function planLabel(plan: string | null) {
+  return plan ? (PLAN_LABELS[plan] ?? "Member") : "Member";
+}
+function billingLabel(billing: string | null) {
+  if (billing === "yearly") return "Annual billing";
+  if (billing === "monthly") return "Monthly billing";
+  return "Monthly billing";
+}
+function initialsFromName(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "N";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+}
 
-function SettingIcon({ name }: { name: string }) {
-  const cls = "h-5 w-5 shrink-0 text-amber-400/75";
+/* ── Icons ─────────────────────────────────────────────── */
+
+function Icon({ name }: { name: string }) {
+  const cls = "h-4 w-4 shrink-0";
   switch (name) {
-    case "user":
-      return (
-        <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M20 21a8 8 0 0 0-16 0" />
-          <circle cx="12" cy="8" r="4" />
-        </svg>
-      );
-    case "mail":
-      return (
-        <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
-          <rect x="3" y="5" width="18" height="14" rx="2" />
-          <path strokeLinecap="round" d="m3 7 9 6 9-6" />
-        </svg>
-      );
-    case "lock":
-      return (
-        <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
-          <rect x="5" y="11" width="14" height="10" rx="2" />
-          <path strokeLinecap="round" d="M8 11V8a4 4 0 1 1 8 0v3" />
-        </svg>
-      );
     case "shield":
-      return (
-        <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 3 19 6v6c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V6l7-3Z" />
-        </svg>
-      );
+      return <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" d="M12 3 19 6v6c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V6l7-3Z" /></svg>;
     case "bell":
-      return (
-        <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 17H9m10-2.5A6.5 6.5 0 0 0 7 8.5V7a5 5 0 0 1 10 0v1.5" />
-          <path strokeLinecap="round" d="M10 17a2 2 0 0 0 4 0" />
-        </svg>
-      );
+      return <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" d="M15 17H9m10-2.5A6.5 6.5 0 0 0 7 8.5V7a5 5 0 0 1 10 0v1.5" /><path strokeLinecap="round" d="M10 17a2 2 0 0 0 4 0" /></svg>;
     case "card":
-      return (
-        <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
-          <rect x="3" y="6" width="18" height="12" rx="2" />
-          <path strokeLinecap="round" d="M3 10h18" />
-        </svg>
-      );
+      return <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden><rect x="3" y="6" width="18" height="12" rx="2" /><path strokeLinecap="round" d="M3 10h18" /></svg>;
+    case "chevron":
+      return <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" d="m9 6 6 6-6 6" /></svg>;
+    case "check":
+      return <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>;
     default:
       return null;
   }
 }
 
-function ProfileCard({
-  icon,
-  title,
-  description,
-}: {
-  icon: string;
-  title: string;
-  description: string;
-}) {
+/* ── Account Details section ───────────────────────────── */
+
+function AccountDetails({ userName }: { userName: string }) {
+  const [displayName, setDisplayName] = useState(userName);
+  const [username, setUsername] = useState("@" + userName.toLowerCase().replace(/\s+/g, ""));
+  const [emailAddr, setEmailAddr] = useState("member@nakamanights.com");
+  const [saved, setSaved] = useState(false);
+  const [showPw, setShowPw] = useState(false);
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [pwSaved, setPwSaved] = useState(false);
+
+  function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  }
+
+  function handlePwUpdate(e: React.FormEvent) {
+    e.preventDefault();
+    if (!currentPw || !newPw || newPw !== confirmPw) return;
+    setPwSaved(true);
+    setCurrentPw("");
+    setNewPw("");
+    setConfirmPw("");
+    setTimeout(() => { setPwSaved(false); setShowPw(false); }, 2500);
+  }
+
   return (
-    <button type="button" className="profile-card group">
-      <div className="profile-card-top">
-        <div className="profile-card-icon-wrap">
-          <SettingIcon name={icon} />
+    <section className="prf-section">
+      <h2 className="prf-section-title">Account Details</h2>
+
+      <form onSubmit={handleSave} className="prf-form">
+        {/* Display Name */}
+        <div className="prf-field">
+          <label htmlFor="prf-display-name" className="prf-label">Display Name</label>
+          <input
+            id="prf-display-name"
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            className="prf-input"
+            placeholder="Your name"
+          />
         </div>
-        <svg
-          className="profile-card-chevron"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          aria-hidden
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="m9 6 6 6-6 6" />
-        </svg>
+
+        {/* Username */}
+        <div className="prf-field">
+          <label htmlFor="prf-username" className="prf-label">Username</label>
+          <input
+            id="prf-username"
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="prf-input"
+            placeholder="@username"
+          />
+        </div>
+
+        {/* Email */}
+        <div className="prf-field">
+          <label htmlFor="prf-email" className="prf-label">Email Address</label>
+          <input
+            id="prf-email"
+            type="email"
+            value={emailAddr}
+            onChange={(e) => setEmailAddr(e.target.value)}
+            className="prf-input"
+            placeholder="your@email.com"
+          />
+        </div>
+
+        {/* Password row */}
+        <div className="prf-field">
+          <label className="prf-label">Password</label>
+          <div className="prf-pw-row">
+            <input
+              type="password"
+              value="••••••••••"
+              readOnly
+              className="prf-input prf-input-pw-display"
+              aria-label="Current password placeholder"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPw((p) => !p)}
+              className="prf-change-pw-btn"
+            >
+              {showPw ? "Cancel" : "Change Password"}
+            </button>
+          </div>
+
+          {/* Inline password change */}
+          {showPw && (
+            <form onSubmit={handlePwUpdate} className="prf-pw-expand">
+              <input
+                type="password"
+                value={currentPw}
+                onChange={(e) => setCurrentPw(e.target.value)}
+                placeholder="Current password"
+                required
+                className="prf-input"
+              />
+              <input
+                type="password"
+                value={newPw}
+                onChange={(e) => setNewPw(e.target.value)}
+                placeholder="New password"
+                required
+                className="prf-input"
+              />
+              <input
+                type="password"
+                value={confirmPw}
+                onChange={(e) => setConfirmPw(e.target.value)}
+                placeholder="Confirm new password"
+                required
+                className="prf-input"
+              />
+              {newPw && confirmPw && newPw !== confirmPw && (
+                <p className="prf-field-error">Passwords do not match.</p>
+              )}
+              <button
+                type="submit"
+                disabled={!currentPw || !newPw || newPw !== confirmPw}
+                className="prf-save-btn"
+              >
+                {pwSaved ? <><Icon name="check" /> Password updated</> : "Update Password"}
+              </button>
+            </form>
+          )}
+        </div>
+
+        {/* Save */}
+        <div className="prf-form-footer">
+          <button type="submit" className="prf-save-btn">
+            {saved ? <><Icon name="check" /> Changes saved</> : "Save Changes"}
+          </button>
+        </div>
+      </form>
+    </section>
+  );
+}
+
+/* ── Secondary setting cards ───────────────────────────── */
+
+const SECONDARY_CARDS = [
+  { id: "privacy",       icon: "shield", title: "Privacy Controls", desc: "Manage what we store, your history, and data preferences." },
+  { id: "notifications", icon: "bell",   title: "Notifications",    desc: "Choose your email and in-app alert preferences." },
+  { id: "billing",       icon: "card",   title: "Billing",           desc: "View your plan, payment method, and invoices." },
+] as const;
+
+function SettingCard({ icon, title, desc }: { icon: string; title: string; desc: string }) {
+  return (
+    <button type="button" className="prf-setting-card group">
+      <div className="prf-setting-card-icon">
+        <Icon name={icon} />
       </div>
-      <div>
-        <p className="profile-card-title">{title}</p>
-        <p className="profile-card-desc">{description}</p>
+      <div className="prf-setting-card-body">
+        <p className="prf-setting-card-title">{title}</p>
+        <p className="prf-setting-card-desc">{desc}</p>
+      </div>
+      <div className="prf-setting-card-arrow">
+        <Icon name="chevron" />
       </div>
     </button>
   );
 }
 
-function initialsFromName(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return "N";
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
-}
-
-function planLabel(plan: string | null): string {
-  if (!plan) return "Member";
-  return PLAN_LABELS[plan] ?? "Member";
-}
-
-function billingLabel(billing: string | null): string {
-  if (billing === "yearly") return "Annual billing";
-  if (billing === "monthly") return "Monthly billing";
-  return "Monthly billing";
-}
+/* ── Main component ────────────────────────────────────── */
 
 export default function LiveTestProfilePanel() {
   const [userName, setUserName] = useState(DEFAULT_USER_NAME);
@@ -170,6 +239,8 @@ export default function LiveTestProfilePanel() {
 
   return (
     <div className="profile-panel animate-panel-in relative flex h-full min-h-0 flex-col overflow-hidden">
+
+      {/* Backdrop */}
       <div className="profile-panel-backdrop pointer-events-none absolute inset-0" aria-hidden>
         <img
           src="/profile/profile-panel.jpg"
@@ -200,7 +271,7 @@ export default function LiveTestProfilePanel() {
         </header>
 
         {/* Content */}
-        <div className="px-6 pb-10 sm:px-8">
+        <div className="px-6 pb-12 sm:px-8">
 
           {/* Membership card */}
           <div className="profile-membership-card">
@@ -216,9 +287,7 @@ export default function LiveTestProfilePanel() {
               </div>
               <div>
                 <p className="profile-membership-stat-label">Renewal</p>
-                <p className="profile-membership-stat-value">
-                  {billing === "yearly" ? "Annual" : "Monthly"}
-                </p>
+                <p className="profile-membership-stat-value">{billing === "yearly" ? "Annual" : "Monthly"}</p>
               </div>
               {isTrial && (
                 <div>
@@ -232,12 +301,18 @@ export default function LiveTestProfilePanel() {
             </button>
           </div>
 
-          {/* Settings card grid */}
-          <div className="profile-card-grid">
-            {SETTING_CARDS.map((card) => (
-              <ProfileCard key={card.id} icon={card.icon} title={card.title} description={card.description} />
-            ))}
-          </div>
+          {/* Account Details */}
+          <AccountDetails userName={userName} />
+
+          {/* Secondary cards */}
+          <section className="prf-section mt-8">
+            <h2 className="prf-section-title">Settings</h2>
+            <div className="prf-settings-list">
+              {SECONDARY_CARDS.map((c) => (
+                <SettingCard key={c.id} icon={c.icon} title={c.title} desc={c.desc} />
+              ))}
+            </div>
+          </section>
 
         </div>
       </div>
