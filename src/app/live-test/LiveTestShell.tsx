@@ -30,7 +30,7 @@ export default function LiveTestShell() {
   const searchParams = useSearchParams();
   const [activeNav, setActiveNav] = useState<LiveTestNavId | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [guideRailHidden, setGuideRailHidden] = useState(true); // hidden by default on all pages
+  const [guideRailHidden, setGuideRailHidden] = useState(false); // visible by default on dashboard
   const centerPanel = getLiveTestCenterPanel(activeNav);
   const [couplesView, setCouplesView] = useState<CouplesCenterView>("menu");
   const [profileSubView, setProfileSubView] = useState<ProfileSubView>("main");
