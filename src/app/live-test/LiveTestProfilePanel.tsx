@@ -6,75 +6,6 @@ import {
   readGuidePreferences,
 } from "@/lib/guides/preferences";
 
-const PROFILE_SECTIONS = [
-  {
-    id: "account",
-    title: "Account",
-    items: [
-      {
-        id: "display-name",
-        label: "Display Name",
-        description:
-          "How your name appears across Nakama Nights and to your guide.",
-        icon: "user",
-      },
-      {
-        id: "email",
-        label: "Email address",
-        description:
-          "Used to sign in, recover your account, and receive important updates.",
-        icon: "mail",
-      },
-      {
-        id: "password",
-        label: "Change password",
-        description:
-          "Update your password anytime to keep your account secure.",
-        icon: "lock",
-      },
-    ],
-  },
-  {
-    id: "privacy",
-    title: "Privacy & Security",
-    items: [
-      {
-        id: "privacy",
-        label: "Privacy controls",
-        description:
-          "Manage what we store, playback history, and how your activity is used.",
-        icon: "shield",
-      },
-    ],
-  },
-  {
-    id: "notifications",
-    title: "Notifications",
-    items: [
-      {
-        id: "notifications",
-        label: "Notification options",
-        description:
-          "Choose email and in-app alerts for new stories, couples modes, and offers.",
-        icon: "bell",
-      },
-    ],
-  },
-  {
-    id: "membership",
-    title: "Membership",
-    items: [
-      {
-        id: "billing",
-        label: "Billing",
-        description:
-          "View your plan, payment method, invoices, and membership status.",
-        icon: "card",
-      },
-    ],
-  },
-] as const;
-
 const PLAN_LABELS: Record<string, string> = {
   free: "Free Trial",
   paid: "Premium",
@@ -82,47 +13,85 @@ const PLAN_LABELS: Record<string, string> = {
   "couples-partner": "Couples Partner",
 };
 
-function SettingIcon({ name }: { name: string }) {
-  const className = "h-[18px] w-[18px] shrink-0 text-amber-400/75";
+const SETTING_CARDS = [
+  {
+    id: "display-name",
+    icon: "user",
+    title: "Display Name",
+    description: "How your name appears to your guide and across Nakama Nights.",
+  },
+  {
+    id: "email",
+    icon: "mail",
+    title: "Email Address",
+    description: "Used to sign in and receive important account updates.",
+  },
+  {
+    id: "password",
+    icon: "lock",
+    title: "Password",
+    description: "Update your password to keep your account secure.",
+  },
+  {
+    id: "privacy",
+    icon: "shield",
+    title: "Privacy Controls",
+    description: "Manage what we store, your history, and data preferences.",
+  },
+  {
+    id: "notifications",
+    icon: "bell",
+    title: "Notifications",
+    description: "Choose your email and in-app alert preferences.",
+  },
+  {
+    id: "billing",
+    icon: "card",
+    title: "Billing",
+    description: "View your plan, payment method, and invoices.",
+  },
+] as const;
 
+function SettingIcon({ name }: { name: string }) {
+  const cls = "h-5 w-5 shrink-0 text-amber-400/75";
   switch (name) {
     case "user":
       return (
-        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+        <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" d="M20 21a8 8 0 0 0-16 0" />
           <circle cx="12" cy="8" r="4" />
         </svg>
       );
     case "mail":
       return (
-        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+        <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
           <rect x="3" y="5" width="18" height="14" rx="2" />
           <path strokeLinecap="round" d="m3 7 9 6 9-6" />
         </svg>
       );
     case "lock":
       return (
-        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+        <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
           <rect x="5" y="11" width="14" height="10" rx="2" />
           <path strokeLinecap="round" d="M8 11V8a4 4 0 1 1 8 0v3" />
         </svg>
       );
     case "shield":
       return (
-        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+        <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 3 19 6v6c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V6l7-3Z" />
         </svg>
       );
     case "bell":
       return (
-        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+        <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 17H9m10-2.5A6.5 6.5 0 0 0 7 8.5V7a5 5 0 0 1 10 0v1.5" />
           <path strokeLinecap="round" d="M10 17a2 2 0 0 0 4 0" />
         </svg>
       );
     case "card":
       return (
-        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+        <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
           <rect x="3" y="6" width="18" height="12" rx="2" />
           <path strokeLinecap="round" d="M3 10h18" />
         </svg>
@@ -132,41 +101,37 @@ function SettingIcon({ name }: { name: string }) {
   }
 }
 
-function ProfileSettingRow({
-  label,
-  description,
+function ProfileCard({
   icon,
+  title,
+  description,
 }: {
-  label: string;
-  description: string;
   icon: string;
+  title: string;
+  description: string;
 }) {
   return (
-    <li>
-      <button type="button" className="profile-settings-row group w-full text-left">
-        <span className="profile-settings-row-icon" aria-hidden>
+    <button type="button" className="profile-card group">
+      <div className="profile-card-top">
+        <div className="profile-card-icon-wrap">
           <SettingIcon name={icon} />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block type-section-heading text-stone-100 transition-colors group-hover:text-luxury-primary">
-            {label}
-          </span>
-          <span className="mt-0.5 block text-xs leading-relaxed text-stone-400/90">
-            {description}
-          </span>
-        </span>
+        </div>
         <svg
-          className="h-4 w-4 shrink-0 text-stone-500 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-amber-300/80"
+          className="profile-card-chevron"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.75"
           aria-hidden
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="m9 6 6 6-6 6" />
         </svg>
-      </button>
-    </li>
+      </div>
+      <div>
+        <p className="profile-card-title">{title}</p>
+        <p className="profile-card-desc">{description}</p>
+      </div>
+    </button>
   );
 }
 
@@ -185,7 +150,7 @@ function planLabel(plan: string | null): string {
 function billingLabel(billing: string | null): string {
   if (billing === "yearly") return "Annual billing";
   if (billing === "monthly") return "Monthly billing";
-  return "Billing cycle not set";
+  return "Monthly billing";
 }
 
 export default function LiveTestProfilePanel() {
@@ -215,82 +180,65 @@ export default function LiveTestProfilePanel() {
       </div>
 
       <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto">
-        <header className="profile-header shrink-0 px-6 pb-6 pt-7 sm:px-8 sm:pt-8">
-          <p className="launcher-eyebrow">Profile</p>
 
-          <div className="mt-5 flex min-w-0 items-start gap-4">
-            <div className="profile-avatar" aria-hidden>
-              {initials}
-            </div>
+        {/* Header */}
+        <header className="shrink-0 px-6 pb-5 pt-7 sm:px-8 sm:pt-8">
+          <p className="launcher-eyebrow">Profile</p>
+          <div className="mt-5 flex min-w-0 items-center gap-4">
+            <div className="profile-avatar" aria-hidden>{initials}</div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2.5">
-                <h1 className="type-card-title leading-snug tracking-tight text-luxury-primary sm:text-3xl">
+                <h1 className="type-card-title leading-snug tracking-tight text-luxury-primary sm:text-2xl">
                   {userName}
                 </h1>
                 <span className="profile-badge profile-badge-tier">{tier}</span>
                 <span className="profile-badge profile-badge-active">Active</span>
               </div>
-              <p className="mt-2 text-sm text-stone-400/90">Member · Nakama Nights</p>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-stone-300/85 sm:text-[15px]">
-                Your account, preferences, and membership — everything you need in
-                one private place.
-              </p>
+              <p className="mt-1.5 text-sm text-stone-400/80">Member · Nakama Nights</p>
             </div>
           </div>
         </header>
 
-        <div className="flex flex-col gap-8 px-6 pb-10 sm:px-8">
-          <section className="profile-status-card" aria-label="Membership">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="type-label text-amber-500/65">
-                  Your membership
-                </p>
-                <p className="mt-2 type-card-title text-luxury-primary">{tier}</p>
-                <p className="mt-1 text-sm text-stone-400/90">{billingLabel(billing)}</p>
-              </div>
-              <div className="flex flex-wrap gap-6 sm:gap-8">
-                <div>
-                  <p className="text-[10px] font-medium uppercase tracking-micro text-stone-500">
-                    Status
-                  </p>
-                  <p className="mt-1 text-sm font-medium text-emerald-300/90">Active</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-medium uppercase tracking-micro text-stone-500">
-                    Renewal
-                  </p>
-                  <p className="mt-1 text-sm font-medium text-stone-200">
-                    {billing === "yearly" ? "Renews annually" : "Renews monthly"}
-                  </p>
-                </div>
-                {isTrial ? (
-                  <div>
-                    <p className="text-[10px] font-medium uppercase tracking-micro text-stone-500">
-                      Trial
-                    </p>
-                    <p className="mt-1 text-sm font-medium text-amber-200/90">In progress</p>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-          </section>
+        {/* Content */}
+        <div className="px-6 pb-10 sm:px-8">
 
-          {PROFILE_SECTIONS.map((section) => (
-            <section key={section.id} className="profile-settings-section">
-              <h2 className="profile-section-title">{section.title}</h2>
-              <ul className="profile-settings-list">
-                {section.items.map((item) => (
-                  <ProfileSettingRow
-                    key={item.id}
-                    label={item.label}
-                    description={item.description}
-                    icon={item.icon}
-                  />
-                ))}
-              </ul>
-            </section>
-          ))}
+          {/* Membership card */}
+          <div className="profile-membership-card">
+            <div>
+              <p className="profile-membership-label">Premium Membership</p>
+              <p className="profile-membership-tier">{tier}</p>
+              <p className="profile-membership-billing">{billingLabel(billing)}</p>
+            </div>
+            <div className="profile-membership-stats">
+              <div>
+                <p className="profile-membership-stat-label">Status</p>
+                <p className="profile-membership-stat-value profile-membership-stat-active">Active</p>
+              </div>
+              <div>
+                <p className="profile-membership-stat-label">Renewal</p>
+                <p className="profile-membership-stat-value">
+                  {billing === "yearly" ? "Annual" : "Monthly"}
+                </p>
+              </div>
+              {isTrial && (
+                <div>
+                  <p className="profile-membership-stat-label">Trial</p>
+                  <p className="profile-membership-stat-value profile-membership-stat-trial">In progress</p>
+                </div>
+              )}
+            </div>
+            <button type="button" className="profile-membership-manage">
+              Manage Membership
+            </button>
+          </div>
+
+          {/* Settings card grid */}
+          <div className="profile-card-grid">
+            {SETTING_CARDS.map((card) => (
+              <ProfileCard key={card.id} icon={card.icon} title={card.title} description={card.description} />
+            ))}
+          </div>
+
         </div>
       </div>
     </div>
