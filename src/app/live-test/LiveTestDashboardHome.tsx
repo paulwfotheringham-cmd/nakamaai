@@ -60,14 +60,15 @@ const EXPERIENCES = [
   },
   {
     id: "reignite-couples",
-    category: "Reignite",
-    title: "Date Night",
-    desc: "Couples adventures designed for connection.",
+    category: "Couples Experiences",
+    title: "Couples Experiences",
+    desc: "Shared adventures designed for connection.",
     status: "Ready",
-    progress: "Date Night available",
+    progress: "Date Night & Surprise Mode",
     action: "Enter",
     statusType: "couples" as const,
-    image: "/tiles/tile5.jpg",
+    image: "/couples/date-night.jpg",
+    imagePosition: "50% 30%",
   },
 ] as const;
 
