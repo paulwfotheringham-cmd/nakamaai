@@ -833,11 +833,12 @@
   min-height: 0;
   list-style: none;
   margin: 0;
-  padding: 1rem 1.25rem 1.25rem;
+  padding: 0.75rem 1.25rem 1.25rem;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.75rem;
-  overflow: hidden;
+  /* Cap card height so images don't stretch too tall */
+  align-items: start;
 }
 
 .mdb-dest {
@@ -846,6 +847,9 @@
   overflow: hidden;
   cursor: pointer;
   background: #0c0c0c;
+  /* Fixed aspect ratio so all cards are the same height and not excessively tall */
+  aspect-ratio: 2 / 3;
+  max-height: 72vh;
 }
 
 .mdb-dest-img {
@@ -858,18 +862,18 @@
 }
 
 .mdb-dest:hover .mdb-dest-img {
-  transform: scale(1.06);
+  transform: scale(1.05);
 }
 
-/* Two-layer veil: rich dark at bottom, subtle at top */
+/* Gradient: strong at bottom for text, lighter at top to show image */
 .mdb-dest-veil {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to top,
     rgba(6, 6, 6, 0.97) 0%,
-    rgba(6, 6, 6, 0.55) 38%,
-    rgba(6, 6, 6, 0.1) 65%,
+    rgba(6, 6, 6, 0.72) 35%,
+    rgba(6, 6, 6, 0.2) 60%,
     rgba(6, 6, 6, 0.25) 100%
   );
   transition: background 0.4s ease;
@@ -879,75 +883,67 @@
   background: linear-gradient(
     to top,
     rgba(6, 6, 6, 0.98) 0%,
-    rgba(6, 6, 6, 0.65) 42%,
-    rgba(6, 6, 6, 0.18) 70%,
+    rgba(6, 6, 6, 0.78) 40%,
+    rgba(6, 6, 6, 0.25) 65%,
     rgba(6, 6, 6, 0.28) 100%
   );
 }
 
-/* Content anchored to the bottom */
+/* Content sits in the lower 55% of the card */
 .mdb-dest-content {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 1.25rem 1rem 1rem;
+  padding: 1.5rem 1.125rem 1.125rem;
 }
 
 .mdb-dest-category {
-  font-size: 0.5rem;
-  letter-spacing: 0.22em;
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(212, 175, 55, 0.75);
+  color: rgba(212, 175, 55, 0.8);
   font-family: var(--font-body), system-ui, sans-serif;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.5rem;
 }
 
 .mdb-dest-title {
   font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(0.875rem, 1.2vw, 1.125rem);
+  font-size: clamp(1.0625rem, 1.4vw, 1.375rem);
   font-weight: 400;
-  line-height: 1.2;
+  line-height: 1.15;
   letter-spacing: -0.01em;
-  color: rgba(255, 255, 255, 0.95);
-  margin-bottom: 0.35rem;
+  color: rgba(255, 255, 255, 0.97);
+  margin-bottom: 0.5rem;
 }
 
-/* Description hidden by default, revealed on hover */
+/* Description visible by default (not hidden) */
 .mdb-dest-desc {
-  font-size: 0.625rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 0.625rem;
+  color: rgba(255, 255, 255, 0.52);
+  margin-bottom: 0.875rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  transition: max-height 0.35s ease, opacity 0.3s ease, margin 0.3s ease;
-}
-
-.mdb-dest:hover .mdb-dest-desc {
-  max-height: 3rem;
-  opacity: 1;
 }
 
 .mdb-dest-meta {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.875rem;
   flex-wrap: wrap;
 }
 
 .mdb-dest-status {
-  font-size: 0.4375rem;
-  letter-spacing: 0.12em;
+  font-size: 0.5625rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   font-family: var(--font-body), system-ui, sans-serif;
-  padding: 0.2rem 0.5rem;
+  padding: 0.25rem 0.625rem;
   border-radius: 999px;
   border: 1px solid currentColor;
 }
@@ -957,19 +953,19 @@
 .mdb-dest-status--couples { color: rgba(220, 130, 100, 0.85); background: rgba(220, 130, 100, 0.08); }
 
 .mdb-dest-progress {
-  font-size: 0.5rem;
-  color: rgba(255, 255, 255, 0.28);
-  letter-spacing: 0.03em;
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.32);
+  letter-spacing: 0.02em;
 }
 
 .mdb-dest-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  height: 2rem;
-  padding: 0 1rem;
+  height: 2.25rem;
+  padding: 0 1.125rem;
   border-radius: 999px;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.04em;
   background: rgba(212, 175, 55, 0.14);
