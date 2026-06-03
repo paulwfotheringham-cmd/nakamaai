@@ -196,6 +196,7 @@ function FantasyAudioContent() {
   const [duration, setDuration] = useState(0);
   const [audioDurations, setAudioDurations] = useState<{ [key: string]: number }>({});
   const [audiobookLength, setAudiobookLength] = useState<AudiobookLength | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [savedItems, setSavedItems] = useState<Set<string>>(() => new Set());
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -351,6 +352,13 @@ function FantasyAudioContent() {
     });
   }, [positions, tileVisibleCount]);
 
+  const filteredRowIndices = useMemo(() => {
+    return rows
+      .map((row, i) => ({ row, i }))
+      .filter(({ row }) => !selectedCategory || row.title === selectedCategory)
+      .map(({ i }) => i);
+  }, [selectedCategory]);
+
   const featuredItem =
     currentlyPlaying ??
     ("Werewolf" in audioFiles ? "Werewolf" : Object.keys(audioFiles)[0] ?? rows[0].items[0]);
@@ -415,6 +423,32 @@ function FantasyAudioContent() {
           </div>
         </section>
 
+        {/* Category selector */}
+        <section className="fantasy-categories" aria-label="Category filter">
+          <div className="fantasy-categories-inner">
+            <button
+              type="button"
+              aria-pressed={selectedCategory === null}
+              onClick={() => setSelectedCategory(null)}
+              className={`fantasy-cat-chip${selectedCategory === null ? " fantasy-cat-chip-active" : ""}`}
+            >
+              All
+            </button>
+            {rows.map((row) => (
+              <button
+                key={row.title}
+                type="button"
+                aria-pressed={selectedCategory === row.title}
+                onClick={() => setSelectedCategory(row.title)}
+                className={`fantasy-cat-chip${selectedCategory === row.title ? " fantasy-cat-chip-active" : ""}`}
+              >
+                {row.title}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Duration filters */}
         <section className="fantasy-filters" aria-label="Duration filters">
           <div className="fantasy-filters-inner">
             {LENGTH_FILTERS.map(({ value, label }) => {
@@ -435,7 +469,9 @@ function FantasyAudioContent() {
         </section>
 
         <section className="fantasy-shelves">
-          {rows.map((row, rowIndex) => (
+          {filteredRowIndices.map((rowIndex) => {
+            const row = rows[rowIndex];
+            return (
             <div
               key={row.title}
               className="fantasy-shelf"
@@ -495,7 +531,8 @@ function FantasyAudioContent() {
                 <ArrowButton direction="right" onClick={() => goNext(rowIndex)} />
               </div>
             </div>
-          ))}
+            );
+          })}
         </section>
 
         {!embed && (
@@ -765,10 +802,49 @@ function FantasyAudioContent() {
           color: #fde68a;
         }
 
+        /* ── Category selector ── */
+        .fantasy-categories {
+          flex-shrink: 0;
+          padding: 20px clamp(16px, 4vw, 40px) 0;
+        }
+        .fantasy-categories-inner {
+          display: flex;
+          gap: 8px;
+          overflow-x: auto;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          padding-bottom: 2px;
+        }
+        .fantasy-categories-inner::-webkit-scrollbar { display: none; }
+        .fantasy-cat-chip {
+          flex-shrink: 0;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.04);
+          color: rgba(245, 242, 235, 0.55);
+          font-size: 0.8125rem;
+          font-weight: 500;
+          padding: 0.5rem 1.125rem;
+          cursor: pointer;
+          white-space: nowrap;
+          transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+          outline: none;
+        }
+        .fantasy-cat-chip:hover {
+          border-color: rgba(212, 175, 55, 0.35);
+          color: rgba(245, 242, 235, 0.9);
+          background: rgba(212, 175, 55, 0.06);
+        }
+        .fantasy-cat-chip-active {
+          border-color: rgba(212, 175, 55, 0.65);
+          background: rgba(212, 175, 55, 0.12);
+          color: rgba(212, 175, 55, 0.95);
+        }
+
         /* ── Filters ── */
         .fantasy-filters {
           flex-shrink: 0;
-          padding: 20px clamp(16px, 4vw, 40px) 8px;
+          padding: 12px clamp(16px, 4vw, 40px) 8px;
         }
 
         .fantasy-filters-inner {
