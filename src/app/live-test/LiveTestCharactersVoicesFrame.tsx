@@ -1,15 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  NARRATOR_VOICES,
-  narratorFromGuideVoiceId,
-  type NarratorVoice,
-} from "@/lib/guides/narrator-voices";
-import {
-  readGuidePreferences,
-  writeGuidePreferences,
-} from "@/lib/guides/preferences";
+import { useCallback, useEffect, useState } from "react";
 import {
   createCharacterId,
   DEFAULT_USER_CHARACTERS,
@@ -90,15 +81,8 @@ export default function LiveTestCharactersVoicesFrame() {
   const [form, setForm] = useState<CharacterForm>(EMPTY_FORM);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const [selectedNarratorId, setSelectedNarratorId] = useState(NARRATOR_VOICES[0].id);
-  const [previewingVoice, setPreviewingVoice] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
   useEffect(() => {
     setCharacters(readUserCharacters());
-    const prefs = readGuidePreferences();
-    const match = narratorFromGuideVoiceId(prefs.voiceId);
-    if (match) setSelectedNarratorId(match.id);
   }, []);
 
   const persistCharacters = useCallback((next: UserCharacter[]) => {
@@ -176,41 +160,6 @@ export default function LiveTestCharactersVoicesFrame() {
     setDeleteId(null);
   }
 
-  const playVoicePreview = useCallback(async (voice: NarratorVoice) => {
-    setPreviewingVoice(voice.id);
-    try {
-      const res = await fetch("/api/preview-voice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          voice: voice.previewName,
-          text: "Come closer. I've been waiting for you.",
-        }),
-      });
-      if (!res.ok) return;
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      if (!audioRef.current) audioRef.current = new Audio();
-      audioRef.current.pause();
-      audioRef.current.src = url;
-      await audioRef.current.play();
-    } catch {
-      /* ignore */
-    } finally {
-      setPreviewingVoice(null);
-    }
-  }, []);
-
-  function selectNarrator(voice: NarratorVoice) {
-    setSelectedNarratorId(voice.id);
-    const prefs = readGuidePreferences();
-    writeGuidePreferences({
-      ...prefs,
-      voiceId: voice.guideVoiceId,
-      voiceName: voice.guideVoiceName,
-    });
-  }
-
   return (
     <div className="cv-root animate-panel-in">
       <div className="cv-atmosphere" aria-hidden>
@@ -226,7 +175,7 @@ export default function LiveTestCharactersVoicesFrame() {
               <p className="cv-hero-eyebrow">Your personal cast</p>
               <h1 className="cv-hero-title">Characters & Voices</h1>
               <p className="cv-hero-subtitle">
-                Build your personal cast across adventures, audiobooks and chat.
+                A gallery of the companions who travel with you through every story.
               </p>
             </div>
             <button type="button" className="cv-cta" onClick={openCreate}>
@@ -235,7 +184,7 @@ export default function LiveTestCharactersVoicesFrame() {
           </div>
         </header>
 
-        <section className="cv-block" aria-labelledby="cv-cast-heading">
+        <section className="cv-block cv-block--gallery" aria-labelledby="cv-cast-heading">
           <div className="cv-block-head">
             <h2 id="cv-cast-heading" className="cv-block-title">
               Character Gallery
@@ -246,7 +195,7 @@ export default function LiveTestCharactersVoicesFrame() {
           </div>
           <div className="cv-roster-grid">
             {characters.map((c) => (
-              <article key={c.id} className="cv-roster-card group">
+              <article key={c.id} className="cv-roster-card">
                 <CharacterPortrait character={c} />
                 <span className="cv-roster-archetype">{c.role}</span>
                 <div className="cv-roster-body">
@@ -255,7 +204,7 @@ export default function LiveTestCharactersVoicesFrame() {
                   <div className="cv-roster-usage">
                     <span className="cv-roster-usage-label">Used in</span>
                     <ul className="cv-roster-usage-list">
-                      {getCharacterUsage(c).slice(0, 2).map((place) => (
+                      {getCharacterUsage(c).map((place) => (
                         <li key={place}>{place}</li>
                       ))}
                     </ul>
@@ -279,56 +228,6 @@ export default function LiveTestCharactersVoicesFrame() {
                 </div>
               </article>
             ))}
-          </div>
-        </section>
-
-        <section className="cv-block" aria-labelledby="cv-voices-heading">
-          <div className="cv-block-head">
-            <h2 id="cv-voices-heading" className="cv-block-title">
-              Narrator Voices
-            </h2>
-            <p className="cv-block-desc">
-              The voice that narrates your world — intimate, commanding, unforgettable.
-            </p>
-          </div>
-          <div className="cv-narrator-grid">
-            {NARRATOR_VOICES.map((v) => {
-              const active = selectedNarratorId === v.id;
-              const previewing = previewingVoice === v.id;
-              return (
-                <article
-                  key={v.id}
-                  className={`cv-narrator-card${active ? " is-selected" : ""}`}
-                >
-                  {active && <span className="cv-narrator-badge">Your narrator</span>}
-                  <div className="cv-narrator-portrait">
-                    <img src={v.image} alt="" className="cv-narrator-img" />
-                    <div className="cv-narrator-portrait-veil" aria-hidden />
-                  </div>
-                  <div className="cv-narrator-copy">
-                    <h3 className="cv-narrator-name">{v.name}</h3>
-                    <p className="cv-narrator-tagline">{v.tagline}</p>
-                  </div>
-                  <div className="cv-narrator-actions">
-                    <button
-                      type="button"
-                      className={`cv-narrator-preview${previewing ? " is-playing" : ""}`}
-                      aria-label={`Preview ${v.name}`}
-                      onClick={() => playVoicePreview(v)}
-                    >
-                      {previewing ? "Playing…" : "Preview"}
-                    </button>
-                    <button
-                      type="button"
-                      className={`cv-narrator-select${active ? " is-active" : ""}`}
-                      onClick={() => selectNarrator(v)}
-                    >
-                      {active ? "Selected" : "Select"}
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
           </div>
         </section>
 

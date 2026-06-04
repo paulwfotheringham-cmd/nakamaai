@@ -14,11 +14,16 @@ await mkdir(outDir, { recursive: true });
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 await page.goto(url, { waitUntil: "networkidle", timeout: 120000 });
-await page.waitForSelector(".cv-title", { timeout: 30000 });
+await page.waitForSelector(".cv-hero-title", { timeout: 60000 });
 await page.waitForTimeout(1500);
 
 await page.screenshot({
   path: path.join(outDir, "characters-voices.png"),
+  fullPage: true,
+});
+
+await page.screenshot({
+  path: path.join(outDir, "characters-voices-hero.png"),
   fullPage: false,
 });
 
