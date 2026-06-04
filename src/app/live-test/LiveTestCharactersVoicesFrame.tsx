@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   createCharacterId,
   DEFAULT_USER_CHARACTERS,
@@ -51,7 +51,7 @@ function formFromCharacter(c: UserCharacter): CharacterForm {
 function CastPortrait({ character }: { character: UserCharacter }) {
   const src = portraitSrc(character);
   return (
-    <div className="cv-cast-portrait">
+    <>
       {src ? (
         <img src={src} alt="" className="cv-cast-portrait-img" />
       ) : (
@@ -60,7 +60,80 @@ function CastPortrait({ character }: { character: UserCharacter }) {
         </div>
       )}
       <div className="cv-cast-portrait-shade" aria-hidden />
-    </div>
+    </>
+  );
+}
+
+function CharacterCastCard({
+  character,
+  menuOpen,
+  onToggleMenu,
+  onCloseMenu,
+  onEdit,
+  onRemove,
+}: {
+  character: UserCharacter;
+  menuOpen: boolean;
+  onToggleMenu: () => void;
+  onCloseMenu: () => void;
+  onEdit: () => void;
+  onRemove: () => void;
+}) {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handlePointer(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        onCloseMenu();
+      }
+    }
+    document.addEventListener("mousedown", handlePointer);
+    return () => document.removeEventListener("mousedown", handlePointer);
+  }, [menuOpen, onCloseMenu]);
+
+  return (
+    <article className="cv-cast-card">
+      <div className="cv-cast-portrait">
+        <CastPortrait character={character} />
+        <div className="cv-cast-portrait-overlay">
+          <span className="cv-cast-owned">Your companion</span>
+          <div className="cv-cast-menu" ref={menuRef}>
+            <button
+              type="button"
+              className="cv-cast-menu-trigger"
+              aria-label={`Options for ${character.name}`}
+              aria-expanded={menuOpen}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleMenu();
+              }}
+            >
+              <svg viewBox="0 0 20 20" fill="currentColor" className="cv-cast-menu-icon" aria-hidden>
+                <circle cx="10" cy="4" r="1.5" />
+                <circle cx="10" cy="10" r="1.5" />
+                <circle cx="10" cy="16" r="1.5" />
+              </svg>
+            </button>
+            {menuOpen && (
+              <div className="cv-cast-menu-panel" role="menu">
+                <button type="button" role="menuitem" onClick={onEdit}>
+                  Edit companion
+                </button>
+                <button type="button" role="menuitem" className="is-remove" onClick={onRemove}>
+                  Remove from cast
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="cv-cast-foot">
+        <h2 className="cv-cast-name">{character.name}</h2>
+        <span className="cv-cast-archetype">{character.role}</span>
+        <p className="cv-cast-desc">{character.summary}</p>
+      </div>
+    </article>
   );
 }
 
@@ -70,6 +143,7 @@ export default function LiveTestCharactersVoicesFrame() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<CharacterForm>(EMPTY_FORM);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   useEffect(() => {
     setCharacters(readUserCharacters());
@@ -81,12 +155,14 @@ export default function LiveTestCharactersVoicesFrame() {
   }, []);
 
   function openCreate() {
+    setOpenMenuId(null);
     setForm(EMPTY_FORM);
     setEditingId(null);
     setModalMode("create");
   }
 
   function openEdit(c: UserCharacter) {
+    setOpenMenuId(null);
     setForm(formFromCharacter(c));
     setEditingId(c.id);
     setModalMode("edit");
@@ -165,35 +241,36 @@ export default function LiveTestCharactersVoicesFrame() {
         <section className="cv-cast-gallery" aria-label="Your cast">
           <div className="cv-cast-grid">
             {characters.map((c) => (
-              <article key={c.id} className="cv-cast-card">
-                <CastPortrait character={c} />
-                <div className="cv-cast-foot">
-                  <h2 className="cv-cast-name">{c.name}</h2>
-                  <p className="cv-cast-archetype">{c.role}</p>
-                  <p className="cv-cast-desc">{c.summary}</p>
-                  <div className="cv-cast-actions">
-                    <button type="button" className="cv-cast-btn cv-cast-btn--edit" onClick={() => openEdit(c)}>
-                      Edit
-                    </button>
-                    <button type="button" className="cv-cast-btn cv-cast-btn--delete" onClick={() => setDeleteId(c.id)}>
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </article>
+              <CharacterCastCard
+                key={c.id}
+                character={c}
+                menuOpen={openMenuId === c.id}
+                onToggleMenu={() => setOpenMenuId((id) => (id === c.id ? null : c.id))}
+                onCloseMenu={() => setOpenMenuId(null)}
+                onEdit={() => openEdit(c)}
+                onRemove={() => {
+                  setOpenMenuId(null);
+                  setDeleteId(c.id);
+                }}
+              />
             ))}
-            <button type="button" className="cv-cast-card cv-cast-card--add" onClick={openCreate}>
-              <div className="cv-cast-add-body">
-                <span className="cv-cast-add-ring" aria-hidden>
-                  <span className="cv-cast-add-icon">+</span>
+            <button type="button" className="cv-cast-card cv-cast-card--invite" onClick={openCreate}>
+              <div className="cv-cast-invite-visual" aria-hidden>
+                <img src="/tiles/tile6.jpg" alt="" className="cv-cast-invite-img" />
+                <div className="cv-cast-invite-veil" />
+                <span className="cv-cast-invite-glow" />
+              </div>
+              <div className="cv-cast-invite-foot">
+                <span className="cv-cast-invite-icon" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25">
+                    <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+                  </svg>
                 </span>
-                <span className="cv-cast-add-label">Add to your cast</span>
+                <h2 className="cv-cast-invite-title">Create New Companion</h2>
+                <p className="cv-cast-invite-sub">Create your next character</p>
               </div>
             </button>
           </div>
-          <p className="cv-cast-footnote">
-            Companions you create here appear across adventures, audiobooks, and chat.
-          </p>
         </section>
       </div>
 
@@ -276,7 +353,7 @@ export default function LiveTestCharactersVoicesFrame() {
                 <button type="button" className="cv-cast-btn cv-cast-btn--ghost" onClick={closeModal}>
                   Cancel
                 </button>
-                <button type="submit" className="cv-cast-btn cv-cast-btn--edit">
+                <button type="submit" className="cv-cast-btn cv-cast-btn--gold">
                   Save
                 </button>
               </div>
@@ -294,13 +371,16 @@ export default function LiveTestCharactersVoicesFrame() {
             onClick={(e) => e.stopPropagation()}
           >
             <p className="cv-modal-title">Remove from your cast?</p>
-            <p className="cv-confirm-text">This companion will be removed. This cannot be undone.</p>
+            <p className="cv-confirm-text">
+              {characters.find((c) => c.id === deleteId)?.name ?? "This companion"} will leave your
+              collection. This cannot be undone.
+            </p>
             <div className="cv-modal-actions">
               <button type="button" className="cv-cast-btn cv-cast-btn--ghost" onClick={() => setDeleteId(null)}>
-                Cancel
+                Keep companion
               </button>
-              <button type="button" className="cv-cast-btn cv-cast-btn--delete" onClick={confirmDelete}>
-                Delete
+              <button type="button" className="cv-cast-btn cv-cast-btn--muted" onClick={confirmDelete}>
+                Remove
               </button>
             </div>
           </div>
