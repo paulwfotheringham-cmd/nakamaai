@@ -5,8 +5,19 @@ import { useEffect, useState } from "react";
 import {
   getLiveTestCenterPanel,
   LIVE_TEST_NAV_ITEMS,
+  type LiveTestCenterPanel,
   type LiveTestNavId,
 } from "@/lib/nakama-universe-services";
+
+/** Experience pages keep the companion minimized so the center panel stays primary. */
+const COMPANION_MINIMIZED_PANELS: ReadonlySet<LiveTestCenterPanel> = new Set([
+  "fantasy-audio",
+  "create-audio",
+  "build-adventure",
+  "forbidden-chat",
+  "character-voices",
+  "profile",
+]);
 
 const LIVE_TEST_NAV_IDS = new Set(LIVE_TEST_NAV_ITEMS.map((item) => item.id));
 import DateNightPrototypeFlow from "./date-night/DateNightPrototypeFlow";
@@ -68,6 +79,16 @@ export default function LiveTestShell() {
   useEffect(() => {
     if (centerPanel !== "profile") {
       setProfileSubView("main");
+    }
+  }, [centerPanel]);
+
+  useEffect(() => {
+    if (centerPanel === "dashboard") {
+      setGuideRailHidden(false);
+      return;
+    }
+    if (COMPANION_MINIMIZED_PANELS.has(centerPanel)) {
+      setGuideRailHidden(true);
     }
   }, [centerPanel]);
 
