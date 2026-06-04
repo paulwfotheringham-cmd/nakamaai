@@ -4,8 +4,11 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   getLiveTestCenterPanel,
+  LIVE_TEST_NAV_ITEMS,
   type LiveTestNavId,
 } from "@/lib/nakama-universe-services";
+
+const LIVE_TEST_NAV_IDS = new Set(LIVE_TEST_NAV_ITEMS.map((item) => item.id));
 import DateNightPrototypeFlow from "./date-night/DateNightPrototypeFlow";
 import SurpriseModePage from "./SurpriseModePage";
 import LiveTestCouplesProgram from "./LiveTestCouplesProgram";
@@ -44,6 +47,14 @@ export default function LiveTestShell() {
     const nav = searchParams.get("nav");
     if (nav === "reignite-couples" || nav === "couples") {
       setActiveNav("reignite-couples");
+      return;
+    }
+    if (nav === "home" || nav === "dashboard") {
+      setActiveNav(null);
+      return;
+    }
+    if (nav && LIVE_TEST_NAV_IDS.has(nav as LiveTestNavId)) {
+      setActiveNav(nav as LiveTestNavId);
     }
   }, [searchParams]);
 
