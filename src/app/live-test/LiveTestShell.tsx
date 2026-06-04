@@ -15,6 +15,7 @@ import LiveTestFantasyAudioFrame from "./LiveTestFantasyAudioFrame";
 import LiveTestForbiddenChat from "./LiveTestForbiddenChat";
 import LiveTestGuideRail from "./LiveTestGuideRail";
 import LiveTestInfoPanel from "./LiveTestInfoPanel";
+import LiveTestBuildAdventureFrame from "./LiveTestBuildAdventureFrame";
 import LiveTestProSidebar from "./LiveTestProSidebar";
 import LiveTestProfilePanel from "./LiveTestProfilePanel";
 import SettingsPrivacyPanel from "./SettingsPrivacyPanel";
@@ -134,15 +135,7 @@ export default function LiveTestShell() {
                   )}
                 </>
               )}
-              {centerPanel === "build-adventure" && (
-                <LiveTestInfoPanel
-                  eyebrow="Build adventure"
-                  title="Create your fantasy"
-                  description="Shape tone, setting, and heat on your terms."
-                  poster="/tiles/tile2.jpg"
-                  body="Build Adventure lets you craft custom audio stories step by step — choose characters, mood, pacing, and how far you want to go. Save drafts, revisit scenes, and publish when you're ready."
-                />
-              )}
+              {centerPanel === "build-adventure" && <LiveTestBuildAdventureFrame />}
               {centerPanel === "character-voices" && (
                 <LiveTestInfoPanel
                   eyebrow="Characters & voices"
