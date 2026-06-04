@@ -737,7 +737,7 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  padding: 0.75rem 1.25rem;
+  padding: 0.5rem 0.875rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -754,14 +754,17 @@
   color: rgba(255, 255, 255, 0.88);
 }
 
-/* ── Two-column body ── */
+/* ── Two-column body ──
+   Continue : Experience ≈ 48% : 34% of total (guide rail occupies remaining ~18%)
+   Within this content area that ratio is ~1.41 : 1
+*/
 .mdb-body {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(10rem, 16rem) minmax(0, 1fr);
-  gap: 0.625rem;
-  padding: 0.625rem;
+  grid-template-columns: 1.41fr 1fr;
+  gap: 0.375rem;
+  padding: 0.375rem;
   overflow: hidden;
 }
 
@@ -862,7 +865,7 @@
 .mdb-grid {
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: 0.375rem;
   min-height: 0;
   overflow: hidden;
 }
@@ -871,7 +874,7 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  gap: 0.625rem;
+  gap: 0.375rem;
 }
 
 .mdb-grid-row--2 {
@@ -933,70 +936,49 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 1rem 0.875rem 0.875rem;
+  padding: 0.75rem 0.75rem 0.75rem;
 }
 
 .mdb-card-category {
-  font-size: 0.5625rem;
+  font-size: 0.5rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(212, 175, 55, 0.75);
+  color: rgba(212, 175, 55, 0.7);
   font-family: var(--font-body), system-ui, sans-serif;
-  margin-bottom: 0.375rem;
+  margin-bottom: 0.3rem;
 }
 
 .mdb-card-title {
   font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(0.8125rem, 1.1vw, 1.125rem);
+  font-size: clamp(0.75rem, 1vw, 1rem);
   font-weight: 400;
   line-height: 1.2;
   letter-spacing: -0.01em;
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(255, 255, 255, 0.93);
   margin-bottom: 0.5rem;
 }
-
-.mdb-card-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.625rem;
-}
-
-.mdb-card-status {
-  font-size: 0.5rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-family: var(--font-body), system-ui, sans-serif;
-  padding: 0.2rem 0.5rem;
-  border-radius: 999px;
-  border: 1px solid currentColor;
-}
-
-.mdb-card-status--active  { color: rgba(212, 175, 55, 0.8);  background: rgba(212, 175, 55, 0.08); }
-.mdb-card-status--draft   { color: rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.04); }
-.mdb-card-status--couples { color: rgba(220, 130, 100, 0.85); background: rgba(220, 130, 100, 0.08); }
 
 .mdb-card-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  height: 1.875rem;
-  padding: 0 0.875rem;
+  gap: 0.3rem;
+  height: 1.625rem;
+  padding: 0 0.75rem;
   border-radius: 999px;
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
-  background: rgba(212, 175, 55, 0.12);
-  color: rgba(212, 175, 55, 0.95);
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  letter-spacing: 0.05em;
+  background: rgba(212, 175, 55, 0.1);
+  color: rgba(212, 175, 55, 0.9);
+  border: 1px solid rgba(212, 175, 55, 0.25);
   cursor: pointer;
   align-self: flex-start;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .mdb-card.group:hover .mdb-card-btn {
-  background: rgba(212, 175, 55, 0.22);
-  border-color: rgba(212, 175, 55, 0.58);
+  background: rgba(212, 175, 55, 0.2);
+  border-color: rgba(212, 175, 55, 0.5);
 }
 
 
@@ -2952,7 +2934,8 @@
 
 @media (min-width: 768px) {
   .pro-main-body {
-    grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+    /* Guide rail ~18% of viewport — narrower, supporting role only */
+    grid-template-columns: minmax(0, 1fr) minmax(11rem, 15rem);
     grid-template-rows: minmax(0, 1fr);
   }
 }
@@ -3016,7 +2999,7 @@
 .pro-guide-inner {
   height: 100%;
   min-height: 0;
-  padding: 1rem;
+  padding: 0.625rem;
   overflow: hidden;
 }
 
@@ -3027,7 +3010,7 @@
   }
 
   .pro-guide-inner {
-    padding: 1.25rem;
+    padding: 0.75rem;
   }
 }
 

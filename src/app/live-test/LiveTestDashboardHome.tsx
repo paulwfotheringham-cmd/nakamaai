@@ -103,11 +103,6 @@ function ExperienceCard({ exp }: { exp: Exp }) {
       <div className="mdb-card-content">
         <p className="mdb-card-category">{exp.category}</p>
         <h2 className="mdb-card-title">{exp.title}</h2>
-        <div className="mdb-card-meta">
-          <span className={`mdb-card-status mdb-card-status--${exp.statusType}`}>
-            {exp.status}
-          </span>
-        </div>
         <button type="button" className="mdb-card-btn">
           {exp.action}
           <svg viewBox="0 0 12 12" fill="none" className="h-2.5 w-2.5 shrink-0" aria-hidden>
