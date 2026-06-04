@@ -108,6 +108,8 @@ export default function LiveTestShell() {
           <div
             className={`pro-main-body${
               guideRailHidden ? " pro-main-body-guide-hidden" : ""
+            }${
+              centerPanel === "build-adventure" ? " pro-main-body--ba" : ""
             }`}
           >
             <section className={`pro-content${inDateNightFlow ? " pro-content-dn" : ""}`}>
