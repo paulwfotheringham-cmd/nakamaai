@@ -46,6 +46,19 @@ type RecentConversation = {
 
 const MOOD_PRESETS: MoodPreset[] = [
   {
+    id: "romantic-connection",
+    title: "Romantic Connection",
+    desc: "Emotional and intimate",
+    image: "/tiles/lover.jpg",
+    prefs: {
+      experienceLength: "Slow Burn",
+      mood: "Romantic",
+      scenario: "Vacation Fantasy",
+      character: "Best Friend",
+      interactionStyle: "Romantic Roleplay",
+    },
+  },
+  {
     id: "quick-escape",
     title: "Quick Escape",
     desc: "Short immersive experience",
@@ -59,16 +72,16 @@ const MOOD_PRESETS: MoodPreset[] = [
     },
   },
   {
-    id: "romantic-connection",
-    title: "Romantic Connection",
-    desc: "Emotional and intimate",
-    image: "/tiles/lover.jpg",
+    id: "surprise-me",
+    title: "Surprise Me",
+    desc: "Generate something unexpected",
+    image: "/tiles/tile3.jpg",
     prefs: {
-      experienceLength: "Slow Burn",
-      mood: "Romantic",
-      scenario: "Vacation Fantasy",
-      character: "Best Friend",
-      interactionStyle: "Romantic Roleplay",
+      experienceLength: "Quick Escape",
+      mood: "Teasing",
+      scenario: "Stranger Encounter",
+      character: "Confident Woman",
+      interactionStyle: "Flirty Conversation",
     },
   },
   {
@@ -97,20 +110,17 @@ const MOOD_PRESETS: MoodPreset[] = [
       interactionStyle: "Power Dynamic",
     },
   },
-  {
-    id: "surprise-me",
-    title: "Surprise Me",
-    desc: "Generate something unexpected",
-    image: "/tiles/tile3.jpg",
-    prefs: {
-      experienceLength: "Quick Escape",
-      mood: "Teasing",
-      scenario: "Stranger Encounter",
-      character: "Confident Woman",
-      interactionStyle: "Flirty Conversation",
-    },
-  },
 ];
+
+const HERO_MOOD_IDS = ["romantic-connection", "quick-escape", "surprise-me"] as const;
+const HERO_MOODS = HERO_MOOD_IDS.map(
+  (id) => MOOD_PRESETS.find((p) => p.id === id)!,
+);
+const SECONDARY_MOODS = MOOD_PRESETS.filter((p) =>
+  ["forbidden-tension", "dominant-energy"].includes(p.id),
+);
+
+const MAX_RECENT_STORIES = 3;
 
 const RECENT_CONVERSATIONS: RecentConversation[] = [
   {
@@ -244,8 +254,6 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
     if (typeof window === "undefined") return null;
     return readForbiddenChatSetup();
   }, []);
-
-  const continueCardImage = "/tiles/tile4.jpg";
 
   const guidedReady =
     experienceLength &&
@@ -443,64 +451,59 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
       <div className="fc-setup-glow" aria-hidden />
 
       <div className="fc-browse-scroll">
-        {/* SECTION 1 — Hero + mood cards */}
+        {/* SECTION 1 — Hero: 3 choices + quick actions */}
         <header className="fc-hero">
           <p className="fc-hero-eyebrow">Forbidden Chat</p>
           <h1 className="fc-hero-title">What are you in the mood for tonight?</h1>
-          <p className="fc-hero-sub">
-            Choose an experience or continue where you left off.
-          </p>
+          <p className="fc-hero-sub">Choose an experience or continue where you left off.</p>
 
-          <div className="fc-mood-grid">
-            {MOOD_PRESETS.map((card) => (
+          <div className="fc-hero-cards">
+            {HERO_MOODS.map((card) => (
               <button
                 key={card.id}
                 type="button"
                 disabled={disabled}
                 onClick={() => handleMoodCard(card)}
-                className="fc-mood-card group"
+                className="fc-hero-card"
               >
-                <span className="fc-mood-card-img-wrap">
-                  <img src={card.image} alt="" className="fc-mood-card-img" />
-                  <span className="fc-mood-card-overlay" aria-hidden />
-                </span>
-                <span className="fc-mood-card-body">
-                  <span className="fc-mood-card-title">{card.title}</span>
-                  <span className="fc-mood-card-desc">{card.desc}</span>
+                <img src={card.image} alt="" className="fc-hero-card-img" />
+                <span className="fc-hero-card-overlay" aria-hidden />
+                <span className="fc-hero-card-copy">
+                  <span className="fc-hero-card-title">{card.title}</span>
+                  <span className="fc-hero-card-desc">{card.desc}</span>
                 </span>
               </button>
             ))}
+          </div>
 
+          <div className="fc-action-chips" role="group" aria-label="More options">
             <button
               type="button"
               disabled={disabled}
               onClick={handleContinueLast}
-              className="fc-mood-card group"
+              className={`fc-action-chip${lastSession ? " fc-action-chip--highlight" : ""}`}
             >
-              <span className="fc-mood-card-img-wrap">
-                <img src={continueCardImage} alt="" className="fc-mood-card-img" />
-                <span className="fc-mood-card-overlay" aria-hidden />
-                {lastSession ? (
-                  <span className="fc-mood-card-badge">Resume</span>
-                ) : null}
-              </span>
-              <span className="fc-mood-card-body">
-                <span className="fc-mood-card-title">Continue Last Story</span>
-                <span className="fc-mood-card-desc">
-                  {lastSession
-                    ? "Resume your most recent experience"
-                    : "Resume your most recent experience"}
-                </span>
-              </span>
+              Continue last story
             </button>
+            {SECONDARY_MOODS.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                disabled={disabled}
+                onClick={() => handleMoodCard(preset)}
+                className="fc-action-chip"
+              >
+                {preset.title}
+              </button>
+            ))}
           </div>
         </header>
 
-        {/* SECTION 2 — Continue your stories */}
+        {/* SECTION 2 — Continue your stories (max 3) */}
         <section className="fc-stories-section">
           <h2 className="fc-section-title">Continue your stories</h2>
           <div className="fc-stories-grid">
-            {RECENT_CONVERSATIONS.map((conv) => (
+            {RECENT_CONVERSATIONS.slice(0, MAX_RECENT_STORIES).map((conv) => (
               <div key={conv.id} className="fc-story-card mdb-card group">
                 <img
                   src={conv.image}
@@ -538,8 +541,6 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
 
         {/* SECTION 3 — Customize (collapsed) */}
         <section className="fc-create-section">
-          <h2 className="fc-section-title">Create something new</h2>
-
           <div className={`fc-customize-panel${customizeOpen ? " is-open" : ""}`}>
             <button
               type="button"
