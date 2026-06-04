@@ -3,14 +3,15 @@
 import { useEffect, useState } from "react";
 import { readGuidePreferences, type GuidePreferences } from "@/lib/guides/preferences";
 
-const TONIGHT_REC = {
-  label: "The Moor at Midnight",
+const CONTINUE_CARD = {
+  label: "Continue Where You Left Off",
+  title: "The Moor at Midnight",
   context: "Audiobooks · Last played 3 days ago",
   image: "/scenes/moor.jpg",
   imagePosition: "78% center",
 } as const;
 
-const EXPERIENCES = [
+const TOP_EXPERIENCES = [
   {
     id: "audiobooks",
     category: "Audiobooks",
@@ -23,6 +24,21 @@ const EXPERIENCES = [
     image: "/scenes/moor.jpg",
     imagePosition: "78% center",
   },
+  {
+    id: "reignite-couples",
+    category: "Couples Experiences",
+    title: "Couples Experiences",
+    desc: "Shared adventures designed for connection.",
+    status: "Ready",
+    progress: "Date Night & Surprise Mode",
+    action: "Enter",
+    statusType: "couples" as const,
+    image: "/couples/shared-session.jpg",
+    imagePosition: "center center",
+  },
+] as const;
+
+const BOTTOM_EXPERIENCES = [
   {
     id: "build-adventure",
     category: "Build Adventure",
@@ -57,20 +73,51 @@ const EXPERIENCES = [
     action: "Open",
     statusType: "active" as const,
     image: "/tiles/tile4.jpg",
-  },
-  {
-    id: "reignite-couples",
-    category: "Couples Experiences",
-    title: "Couples Experiences",
-    desc: "Shared adventures designed for connection.",
-    status: "Ready",
-    progress: "Date Night & Surprise Mode",
-    action: "Enter",
-    statusType: "couples" as const,
-    image: "/couples/shared-session.jpg",
     imagePosition: "center center",
   },
 ] as const;
+
+type Exp = {
+  id: string;
+  category: string;
+  title: string;
+  desc: string;
+  status: string;
+  progress: string;
+  action: string;
+  statusType: "active" | "draft" | "couples";
+  image: string;
+  imagePosition?: string;
+};
+
+function ExperienceCard({ exp }: { exp: Exp }) {
+  return (
+    <div className="mdb-card group">
+      <img
+        src={exp.image}
+        alt=""
+        className="mdb-card-img"
+        style={exp.imagePosition ? { objectPosition: exp.imagePosition } : undefined}
+      />
+      <div className="mdb-card-veil" aria-hidden />
+      <div className="mdb-card-content">
+        <p className="mdb-card-category">{exp.category}</p>
+        <h2 className="mdb-card-title">{exp.title}</h2>
+        <div className="mdb-card-meta">
+          <span className={`mdb-card-status mdb-card-status--${exp.statusType}`}>
+            {exp.status}
+          </span>
+        </div>
+        <button type="button" className="mdb-card-btn">
+          {exp.action}
+          <svg viewBox="0 0 12 12" fill="none" className="h-2.5 w-2.5 shrink-0" aria-hidden>
+            <path d="M3 6h7M7 3.5 9.5 6 7 8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function LiveTestDashboardHome() {
   const [prefs, setPrefs] = useState<GuidePreferences | null>(null);
@@ -84,73 +131,58 @@ export default function LiveTestDashboardHome() {
   return (
     <div className="mdb-home animate-panel-in">
 
-      {/* ── Header ── */}
+      {/* ── Greeting bar ── */}
       <header className="mdb-header">
         <h1 className="mdb-greeting">
           Good evening, <span>{userName}</span>
         </h1>
-
-        <div className="mdb-tonight">
-          <div className="mdb-tonight-thumb">
-            <img
-              src={TONIGHT_REC.image}
-              alt=""
-              style={{ objectPosition: TONIGHT_REC.imagePosition }}
-            />
-          </div>
-          <div className="mdb-tonight-copy">
-            <p className="mdb-tonight-label">Continue where you left off</p>
-            <p className="mdb-tonight-title">{TONIGHT_REC.label}</p>
-            <p className="mdb-tonight-context">{TONIGHT_REC.context}</p>
-          </div>
-          <button type="button" className="mdb-tonight-btn">
-            <svg viewBox="0 0 12 12" fill="currentColor" className="h-2.5 w-2.5 shrink-0" aria-hidden>
-              <polygon points="3,2 10,6 3,10" />
-            </svg>
-            Resume
-          </button>
-        </div>
       </header>
 
-      {/* ── Five Experience Destinations ── */}
-      <ul className="mdb-deck">
-        {EXPERIENCES.map((exp) => (
-          <li key={exp.id} className="mdb-dest group">
-            {/* Full-bleed image */}
-            <img
-              src={exp.image}
-              alt=""
-              className="mdb-dest-img"
-              style={"imagePosition" in exp ? { objectPosition: exp.imagePosition } : undefined}
-            />
+      {/* ── Two-column body ── */}
+      <div className="mdb-body">
 
-            {/* Atmospheric gradient */}
-            <div className="mdb-dest-veil" aria-hidden />
+        {/* Column 1 — Continue card (full height) */}
+        <div className="mdb-continue group">
+          <img
+            src={CONTINUE_CARD.image}
+            alt=""
+            className="mdb-continue-img"
+            style={{ objectPosition: CONTINUE_CARD.imagePosition }}
+          />
+          <div className="mdb-continue-veil" aria-hidden />
+          <div className="mdb-continue-content">
+            <p className="mdb-continue-eyebrow">{CONTINUE_CARD.label}</p>
+            <h2 className="mdb-continue-title">{CONTINUE_CARD.title}</h2>
+            <p className="mdb-continue-context">{CONTINUE_CARD.context}</p>
+            <button type="button" className="mdb-continue-btn">
+              <svg viewBox="0 0 12 12" fill="currentColor" className="h-2.5 w-2.5 shrink-0" aria-hidden>
+                <polygon points="3,2 10,6 3,10" />
+              </svg>
+              Resume
+            </button>
+          </div>
+        </div>
 
-            {/* Content anchored at the bottom */}
-            <div className="mdb-dest-content">
-              <p className="mdb-dest-category">{exp.category}</p>
-              <h2 className="mdb-dest-title">{exp.title}</h2>
-              <p className="mdb-dest-desc">{exp.desc}</p>
+        {/* Column 2 — Experience grid */}
+        <div className="mdb-grid">
 
-              <div className="mdb-dest-meta">
-                <span className={`mdb-dest-status mdb-dest-status--${exp.statusType}`}>
-                  {exp.status}
-                </span>
-                <span className="mdb-dest-progress">{exp.progress}</span>
-              </div>
+          {/* Row 1: Audiobooks + Couples (2 cols) */}
+          <div className="mdb-grid-row mdb-grid-row--2">
+            {TOP_EXPERIENCES.map((exp) => (
+              <ExperienceCard key={exp.id} exp={exp} />
+            ))}
+          </div>
 
-              <button type="button" className="mdb-dest-btn">
-                {exp.action}
-                <svg viewBox="0 0 12 12" fill="none" className="h-2.5 w-2.5 shrink-0" aria-hidden>
-                  <path d="M3 6h7M7 3.5 9.5 6 7 8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+          {/* Row 2: Build + Interactive + Forbidden Chat (3 cols) */}
+          <div className="mdb-grid-row mdb-grid-row--3">
+            {BOTTOM_EXPERIENCES.map((exp) => (
+              <ExperienceCard key={exp.id} exp={exp} />
+            ))}
+          </div>
 
+        </div>
+
+      </div>
     </div>
   );
 }

@@ -716,6 +716,13 @@
    MEMBER DASHBOARD — five destinations, full viewport
    ───────────────────────────────────────────────────────── */
 
+/* ─────────────────────────────────────────────────────────
+   Dashboard — responsive 2-column layout
+   Col 1: Continue card (full height)
+   Col 2: 2-row experience grid (2 top + 3 bottom)
+   Col 3: Guide rail (shell-level, outside this component)
+───────────────────────────────────────────────────────── */
+
 .mdb-home {
   display: flex;
   flex-direction: column;
@@ -725,134 +732,51 @@
   background: #060606;
 }
 
-/* ── Header ─────────────────────────────────────────────── */
+/* ── Greeting bar ── */
 .mdb-header {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  padding: 0.875rem 1.75rem;
+  padding: 0.75rem 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .mdb-greeting {
-  flex-shrink: 0;
   font-family: var(--font-display), Georgia, serif;
-  font-size: 1.0625rem;
+  font-size: 0.9375rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(255, 255, 255, 0.38);
   line-height: 1.2;
   white-space: nowrap;
 }
 
 .mdb-greeting span {
-  color: rgba(255, 255, 255, 0.92);
-}
-
-.mdb-tonight {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: rgba(212, 175, 55, 0.05);
-  border: 1px solid rgba(212, 175, 55, 0.13);
-  border-radius: 0.625rem;
-  padding: 0.5rem 0.875rem 0.5rem 0.5rem;
-  min-width: 0;
-}
-
-.mdb-tonight-thumb {
-  flex-shrink: 0;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 0.3rem;
-  overflow: hidden;
-  position: relative;
-}
-
-.mdb-tonight-thumb img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.mdb-tonight-copy { flex: 1; min-width: 0; }
-
-.mdb-tonight-label {
-  font-size: 0.5rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(212, 175, 55, 0.55);
-  font-family: var(--font-body), system-ui, sans-serif;
-}
-
-.mdb-tonight-title {
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 0.875rem;
-  font-weight: 400;
   color: rgba(255, 255, 255, 0.88);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.3;
 }
 
-.mdb-tonight-context {
-  font-size: 0.5625rem;
-  color: rgba(255, 255, 255, 0.3);
-  margin-top: 0.1rem;
-}
-
-.mdb-tonight-btn {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  height: 1.75rem;
-  padding: 0 0.875rem;
-  border-radius: 999px;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  background: rgba(212, 175, 55, 0.12);
-  color: rgba(212, 175, 55, 0.95);
-  border: 1px solid rgba(212, 175, 55, 0.28);
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.mdb-tonight-btn:hover {
-  background: rgba(212, 175, 55, 0.22);
-  border-color: rgba(212, 175, 55, 0.55);
-}
-
-/* ── Five destination cards ─────────────────────────────── */
-.mdb-deck {
+/* ── Two-column body ── */
+.mdb-body {
   flex: 1;
   min-height: 0;
-  list-style: none;
-  margin: 0;
-  padding: 0.75rem 1.25rem 1.25rem;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.75rem;
-  /* Cap card height so images don't stretch too tall */
-  align-items: start;
-}
-
-.mdb-dest {
-  position: relative;
-  border-radius: 0.75rem;
+  grid-template-columns: minmax(10rem, 16rem) minmax(0, 1fr);
+  gap: 0.625rem;
+  padding: 0.625rem;
   overflow: hidden;
-  cursor: pointer;
-  background: #0c0c0c;
-  /* Fixed aspect ratio so all cards are the same height and not excessively tall */
-  aspect-ratio: 2 / 3;
-  max-height: 72vh;
 }
 
-.mdb-dest-img {
+/* ── Continue card (Column 1, full height) ── */
+.mdb-continue {
+  position: relative;
+  border-radius: 0.875rem;
+  overflow: hidden;
+  background: #0c0c0c;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.mdb-continue-img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -861,125 +785,218 @@
   transition: transform 700ms ease;
 }
 
-.mdb-dest:hover .mdb-dest-img {
-  transform: scale(1.05);
+.mdb-continue.group:hover .mdb-continue-img {
+  transform: scale(1.04);
 }
 
-/* Gradient: strong at bottom for text, lighter at top to show image */
-.mdb-dest-veil {
+.mdb-continue-veil {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(6, 6, 6, 0.97) 0%,
-    rgba(6, 6, 6, 0.72) 35%,
-    rgba(6, 6, 6, 0.2) 60%,
-    rgba(6, 6, 6, 0.25) 100%
-  );
-  transition: background 0.4s ease;
-}
-
-.mdb-dest:hover .mdb-dest-veil {
-  background: linear-gradient(
-    to top,
     rgba(6, 6, 6, 0.98) 0%,
-    rgba(6, 6, 6, 0.78) 40%,
-    rgba(6, 6, 6, 0.25) 65%,
-    rgba(6, 6, 6, 0.28) 100%
+    rgba(6, 6, 6, 0.7) 40%,
+    rgba(6, 6, 6, 0.25) 75%,
+    rgba(6, 6, 6, 0.35) 100%
   );
 }
 
-/* Content sits in the lower 55% of the card */
-.mdb-dest-content {
+.mdb-continue-content {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 1.5rem 1.125rem 1.125rem;
+  padding: 1.5rem 1.25rem 1.375rem;
 }
 
-.mdb-dest-category {
-  font-size: 0.625rem;
+.mdb-continue-eyebrow {
+  font-size: 0.5rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(212, 175, 55, 0.8);
+  color: rgba(212, 175, 55, 0.65);
   font-family: var(--font-body), system-ui, sans-serif;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.625rem;
 }
 
-.mdb-dest-title {
+.mdb-continue-title {
   font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(1.0625rem, 1.4vw, 1.375rem);
+  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
   font-weight: 400;
   line-height: 1.15;
   letter-spacing: -0.01em;
   color: rgba(255, 255, 255, 0.97);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.375rem;
 }
 
-/* Description visible by default (not hidden) */
-.mdb-dest-desc {
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.52);
-  margin-bottom: 0.875rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.mdb-dest-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.875rem;
-  flex-wrap: wrap;
-}
-
-.mdb-dest-status {
-  font-size: 0.5625rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-family: var(--font-body), system-ui, sans-serif;
-  padding: 0.25rem 0.625rem;
-  border-radius: 999px;
-  border: 1px solid currentColor;
-}
-
-.mdb-dest-status--active  { color: rgba(212, 175, 55, 0.8);  background: rgba(212, 175, 55, 0.08); }
-.mdb-dest-status--draft   { color: rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.04); }
-.mdb-dest-status--couples { color: rgba(220, 130, 100, 0.85); background: rgba(220, 130, 100, 0.08); }
-
-.mdb-dest-progress {
+.mdb-continue-context {
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.32);
-  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.38);
+  margin-bottom: 1.25rem;
 }
 
-.mdb-dest-btn {
+.mdb-continue-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  height: 2.25rem;
+  height: 2.125rem;
   padding: 0 1.125rem;
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   background: rgba(212, 175, 55, 0.14);
   color: rgba(212, 175, 55, 0.97);
   border: 1px solid rgba(212, 175, 55, 0.35);
   cursor: pointer;
   align-self: flex-start;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-.mdb-dest:hover .mdb-dest-btn {
-  background: rgba(212, 175, 55, 0.22);
+.mdb-continue.group:hover .mdb-continue-btn {
+  background: rgba(212, 175, 55, 0.24);
   border-color: rgba(212, 175, 55, 0.6);
-  transform: translateY(-1px);
+}
+
+/* ── Experience grid (Column 2) ── */
+.mdb-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.mdb-grid-row {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: 0.625rem;
+}
+
+.mdb-grid-row--2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.mdb-grid-row--3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* ── Individual experience card ── */
+.mdb-card {
+  position: relative;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #0c0c0c;
+  cursor: pointer;
+}
+
+.mdb-card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 700ms ease;
+}
+
+.mdb-card.group:hover .mdb-card-img {
+  transform: scale(1.05);
+}
+
+.mdb-card-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(6, 6, 6, 0.97) 0%,
+    rgba(6, 6, 6, 0.65) 35%,
+    rgba(6, 6, 6, 0.15) 65%,
+    rgba(6, 6, 6, 0.22) 100%
+  );
+  transition: background 0.3s ease;
+}
+
+.mdb-card.group:hover .mdb-card-veil {
+  background: linear-gradient(
+    to top,
+    rgba(6, 6, 6, 0.98) 0%,
+    rgba(6, 6, 6, 0.75) 40%,
+    rgba(6, 6, 6, 0.2) 65%,
+    rgba(6, 6, 6, 0.28) 100%
+  );
+}
+
+.mdb-card-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1rem 0.875rem 0.875rem;
+}
+
+.mdb-card-category {
+  font-size: 0.5625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.75);
+  font-family: var(--font-body), system-ui, sans-serif;
+  margin-bottom: 0.375rem;
+}
+
+.mdb-card-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(0.8125rem, 1.1vw, 1.125rem);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 0.5rem;
+}
+
+.mdb-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.625rem;
+}
+
+.mdb-card-status {
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: var(--font-body), system-ui, sans-serif;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+
+.mdb-card-status--active  { color: rgba(212, 175, 55, 0.8);  background: rgba(212, 175, 55, 0.08); }
+.mdb-card-status--draft   { color: rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.04); }
+.mdb-card-status--couples { color: rgba(220, 130, 100, 0.85); background: rgba(220, 130, 100, 0.08); }
+
+.mdb-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 1.875rem;
+  padding: 0 0.875rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  background: rgba(212, 175, 55, 0.12);
+  color: rgba(212, 175, 55, 0.95);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.mdb-card.group:hover .mdb-card-btn {
+  background: rgba(212, 175, 55, 0.22);
+  border-color: rgba(212, 175, 55, 0.58);
 }
 
 
@@ -2927,7 +2944,6 @@
   display: grid;
   flex: 1;
   min-height: 0;
-  position: relative;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) minmax(16rem, 32dvh);
   overflow: hidden;
@@ -2936,7 +2952,7 @@
 
 @media (min-width: 768px) {
   .pro-main-body {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
     grid-template-rows: minmax(0, 1fr);
   }
 }
@@ -2988,17 +3004,13 @@
 }
 
 .pro-guide {
-  position: absolute;
-  z-index: 10;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 32dvh;
-  min-height: 16rem;
+  position: relative;
+  z-index: 1;
+  min-height: 0;
   overflow: hidden;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(8, 8, 8, 0.88);
-  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(16px);
 }
 
 .pro-guide-inner {
@@ -3010,15 +3022,8 @@
 
 @media (min-width: 768px) {
   .pro-guide {
-    top: 0;
-    bottom: 0;
-    left: auto;
-    right: 0;
-    width: clamp(18rem, 22rem, 26rem);
-    height: 100%;
-    min-height: 0;
     border-top: none;
-    border-left: 1px solid rgba(255, 255, 255, 0.06);
+    border-left: 1px solid rgba(255, 255, 255, 0.04);
   }
 
   .pro-guide-inner {
@@ -3034,8 +3039,9 @@
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
 }
 
-.pro-main-body-guide-hidden .pro-guide {
-  display: none;
+.pro-main-body-guide-hidden {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
 }
 
 .pro-guide-hide-btn {
