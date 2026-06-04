@@ -172,7 +172,7 @@ export default function LiveTestBuildAdventureFrame() {
             <p className="ba-hero-sub">Create a story as unique as your desires.</p>
           </header>
 
-          <section className="ba-section">
+          <section className="ba-section ba-section--cast">
             <div className="ba-section-header">
               <SectionLabel>Characters in this story</SectionLabel>
               {!addingChar && (
@@ -194,7 +194,7 @@ export default function LiveTestBuildAdventureFrame() {
                   tabIndex={0}
                   onClick={() => setSelectedCharId(c.id)}
                   onKeyDown={(e) => e.key === "Enter" && setSelectedCharId(c.id)}
-                  className={`ba-cast-card${selectedCharId === c.id ? " is-selected" : ""}`}
+                  className={`ba-cast-card${!c.removable ? " ba-cast-card--core" : ""}${selectedCharId === c.id ? " is-selected" : ""}`}
                 >
                   <div className="ba-cast-avatar" style={{ background: c.gradient }}>
                     <span className="ba-cast-initial">{c.name[0]}</span>
@@ -296,7 +296,7 @@ export default function LiveTestBuildAdventureFrame() {
             </button>
           </section>
 
-          <section className="ba-card ba-generate-card">
+          <section className="ba-card ba-generate-card ba-section--generate">
             <div className="ba-generate-toggles">
               <div className="ba-toggle-row">
                 <div>
