@@ -12,7 +12,10 @@ import {
 } from "@/lib/guides/preferences";
 import {
   createCharacterId,
+  DEFAULT_USER_CHARACTERS,
+  getCharacterUsage,
   pickCharacterGradient,
+  pickCharacterPortrait,
   readUserCharacters,
   writeUserCharacters,
   type CharacterGender,
@@ -39,13 +42,6 @@ const EMPTY_FORM: CharacterForm = {
   boundaries: "",
 };
 
-function genderLabel(gender: CharacterGender): string | null {
-  if (gender === "male") return "Male";
-  if (gender === "female") return "Female";
-  if (gender === "nonbinary") return "Non-binary";
-  return null;
-}
-
 function formFromCharacter(c: UserCharacter): CharacterForm {
   return {
     name: c.name,
@@ -58,9 +54,37 @@ function formFromCharacter(c: UserCharacter): CharacterForm {
   };
 }
 
+function CharacterPortrait({
+  character,
+  className = "",
+}: {
+  character: UserCharacter;
+  className?: string;
+}) {
+  const src =
+    character.portrait ??
+    DEFAULT_USER_CHARACTERS.find((d) => d.id === character.id)?.portrait;
+  return (
+    <div className={`cv-roster-portrait ${className}`.trim()}>
+      {src ? (
+        <img src={src} alt="" className="cv-roster-portrait-img" />
+      ) : (
+        <div
+          className="cv-roster-portrait-fallback"
+          style={{ background: character.gradient }}
+          aria-hidden
+        >
+          <span>{character.name[0]?.toUpperCase() ?? "?"}</span>
+        </div>
+      )}
+      <div className="cv-roster-portrait-veil" aria-hidden />
+    </div>
+  );
+}
+
 export default function LiveTestCharactersVoicesFrame() {
   const [characters, setCharacters] = useState<UserCharacter[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [viewCharacter, setViewCharacter] = useState<UserCharacter | null>(null);
   const [modalMode, setModalMode] = useState<"create" | "edit" | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<CharacterForm>(EMPTY_FORM);
@@ -89,6 +113,7 @@ export default function LiveTestCharactersVoicesFrame() {
   }
 
   function openEdit(c: UserCharacter) {
+    setViewCharacter(null);
     setForm(formFromCharacter(c));
     setEditingId(c.id);
     setModalMode("edit");
@@ -134,6 +159,7 @@ export default function LiveTestCharactersVoicesFrame() {
         personality: form.personality.trim(),
         boundaries: form.boundaries.trim(),
         gradient: pickCharacterGradient(characters.length),
+        portrait: pickCharacterPortrait(characters.length),
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
@@ -146,7 +172,7 @@ export default function LiveTestCharactersVoicesFrame() {
     if (!deleteId) return;
     const next = characters.filter((c) => c.id !== deleteId);
     persistCharacters(next);
-    if (expandedId === deleteId) setExpandedId(null);
+    if (viewCharacter?.id === deleteId) setViewCharacter(null);
     setDeleteId(null);
   }
 
@@ -193,79 +219,111 @@ export default function LiveTestCharactersVoicesFrame() {
       </div>
 
       <div className="cv-scroll">
-        <header className="cv-header">
-          <div className="cv-header-copy">
-            <h1 className="cv-title">Characters & Voices</h1>
-            <p className="cv-subtitle">Your cast of characters across Nakama Nights.</p>
+        <header className="cv-hero">
+          <div className="cv-hero-glow" aria-hidden />
+          <div className="cv-hero-inner">
+            <div className="cv-hero-copy">
+              <p className="cv-hero-eyebrow">Your personal cast</p>
+              <h1 className="cv-hero-title">Characters & Voices</h1>
+              <p className="cv-hero-subtitle">
+                Build your personal cast across adventures, audiobooks and chat.
+              </p>
+            </div>
+            <button type="button" className="cv-cta" onClick={openCreate}>
+              + New Character
+            </button>
           </div>
-          <button type="button" className="cv-cta" onClick={openCreate}>
-            + New Character
-          </button>
         </header>
 
-        <section className="cv-section" aria-labelledby="cv-cast-heading">
-          <h2 id="cv-cast-heading" className="cv-section-label">
-            Your cast
-          </h2>
-          <div className="cv-grid">
-            {characters.map((c) => {
-              const expanded = expandedId === c.id;
-              const gLabel = genderLabel(c.gender);
-              return (
-                <article key={c.id} className={`cv-char-card${expanded ? " is-expanded" : ""}`}>
-                  <div
-                    className="cv-char-portrait"
-                    style={{ background: c.gradient }}
-                    aria-hidden
-                  >
-                    <span className="cv-char-initial">{c.name[0]?.toUpperCase() ?? "?"}</span>
+        <section className="cv-block" aria-labelledby="cv-cast-heading">
+          <div className="cv-block-head">
+            <h2 id="cv-cast-heading" className="cv-block-title">
+              Character Gallery
+            </h2>
+            <p className="cv-block-desc">
+              Portrait-first companions — the faces that follow you through every story.
+            </p>
+          </div>
+          <div className="cv-roster-grid">
+            {characters.map((c) => (
+              <article key={c.id} className="cv-roster-card group">
+                <CharacterPortrait character={c} />
+                <span className="cv-roster-archetype">{c.role}</span>
+                <div className="cv-roster-body">
+                  <h3 className="cv-roster-name">{c.name}</h3>
+                  <p className="cv-roster-summary">{c.summary}</p>
+                  <div className="cv-roster-usage">
+                    <span className="cv-roster-usage-label">Used in</span>
+                    <ul className="cv-roster-usage-list">
+                      {getCharacterUsage(c).slice(0, 2).map((place) => (
+                        <li key={place}>{place}</li>
+                      ))}
+                    </ul>
                   </div>
-                  <h3 className="cv-char-name">{c.name}</h3>
-                  <div className="cv-char-tags">
-                    {gLabel && <span className="cv-tag">{gLabel}</span>}
-                    <span className="cv-tag cv-tag--role">{c.role}</span>
-                  </div>
-                  <p className="cv-char-summary">{c.summary}</p>
-
-                  {expanded && (
-                    <div className="cv-char-details">
-                      {c.details && <p>{c.details}</p>}
-                      {c.personality && (
-                        <p>
-                          <strong>Personality:</strong> {c.personality}
-                        </p>
-                      )}
-                      {c.boundaries && (
-                        <p>
-                          <strong>Boundaries:</strong> {c.boundaries}
-                        </p>
-                      )}
-                      {!c.details && !c.personality && !c.boundaries && (
-                        <p className="cv-char-details-empty">
-                          Add more detail when editing this character.
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="cv-char-actions">
-                    <button type="button" className="cv-btn cv-btn--primary" onClick={() => openEdit(c)}>
+                  <div className="cv-roster-actions">
+                    <button
+                      type="button"
+                      className="cv-roster-btn cv-roster-btn--primary"
+                      onClick={() => openEdit(c)}
+                    >
                       Edit
                     </button>
                     <button
                       type="button"
-                      className="cv-btn cv-btn--danger"
-                      onClick={() => setDeleteId(c.id)}
+                      className="cv-roster-btn cv-roster-btn--secondary"
+                      onClick={() => setViewCharacter(c)}
                     >
-                      Delete
+                      View
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="cv-block" aria-labelledby="cv-voices-heading">
+          <div className="cv-block-head">
+            <h2 id="cv-voices-heading" className="cv-block-title">
+              Narrator Voices
+            </h2>
+            <p className="cv-block-desc">
+              The voice that narrates your world — intimate, commanding, unforgettable.
+            </p>
+          </div>
+          <div className="cv-narrator-grid">
+            {NARRATOR_VOICES.map((v) => {
+              const active = selectedNarratorId === v.id;
+              const previewing = previewingVoice === v.id;
+              return (
+                <article
+                  key={v.id}
+                  className={`cv-narrator-card${active ? " is-selected" : ""}`}
+                >
+                  {active && <span className="cv-narrator-badge">Your narrator</span>}
+                  <div className="cv-narrator-portrait">
+                    <img src={v.image} alt="" className="cv-narrator-img" />
+                    <div className="cv-narrator-portrait-veil" aria-hidden />
+                  </div>
+                  <div className="cv-narrator-copy">
+                    <h3 className="cv-narrator-name">{v.name}</h3>
+                    <p className="cv-narrator-tagline">{v.tagline}</p>
+                  </div>
+                  <div className="cv-narrator-actions">
+                    <button
+                      type="button"
+                      className={`cv-narrator-preview${previewing ? " is-playing" : ""}`}
+                      aria-label={`Preview ${v.name}`}
+                      onClick={() => playVoicePreview(v)}
+                    >
+                      {previewing ? "Playing…" : "Preview"}
                     </button>
                     <button
                       type="button"
-                      className="cv-btn cv-btn--link"
-                      onClick={() => setExpandedId(expanded ? null : c.id)}
-                      aria-expanded={expanded}
+                      className={`cv-narrator-select${active ? " is-active" : ""}`}
+                      onClick={() => selectNarrator(v)}
                     >
-                      {expanded ? "Collapse" : "Expand details"}
+                      {active ? "Selected" : "Select"}
                     </button>
                   </div>
                 </article>
@@ -274,52 +332,113 @@ export default function LiveTestCharactersVoicesFrame() {
           </div>
         </section>
 
-        <section className="cv-section cv-section--voices" aria-labelledby="cv-voices-heading">
-          <h2 id="cv-voices-heading" className="cv-section-label">
-            Narrator Voices
-          </h2>
-          <p className="cv-voices-hint">
-            Your narrator travels with you across adventures, chat, and audio.
-          </p>
-          <div className="cv-voice-row">
-            {NARRATOR_VOICES.map((v) => {
-              const active = selectedNarratorId === v.id;
-              const previewing = previewingVoice === v.id;
-              return (
-                <div
-                  key={v.id}
-                  className={`cv-voice-card${active ? " is-active" : ""}`}
-                >
-                  <div className="cv-voice-img-wrap">
-                    <img src={v.image} alt="" className="cv-voice-img" />
-                  </div>
-                  <div className="cv-voice-info">
-                    <p className="cv-voice-name">{v.name}</p>
-                    <p className="cv-voice-tagline">{v.tagline}</p>
-                  </div>
-                  <div className="cv-voice-actions">
-                    <button
-                      type="button"
-                      className={`cv-voice-preview${previewing ? " is-playing" : ""}`}
-                      aria-label={`Preview ${v.name}`}
-                      onClick={() => playVoicePreview(v)}
-                    >
-                      {previewing ? "…" : "Preview"}
-                    </button>
-                    <button
-                      type="button"
-                      className={`cv-voice-select${active ? " is-selected" : ""}`}
-                      onClick={() => selectNarrator(v)}
-                    >
-                      {active ? "Selected" : "Select"}
-                    </button>
-                  </div>
+        <section className="cv-block cv-block--activity" aria-labelledby="cv-activity-heading">
+          <div className="cv-block-head">
+            <h2 id="cv-activity-heading" className="cv-block-title">
+              Character Activity
+            </h2>
+            <p className="cv-block-desc">
+              Where your cast appears across Nakama Nights — connected to real experiences.
+            </p>
+          </div>
+          <div className="cv-activity-grid">
+            {characters.map((c) => (
+              <div key={c.id} className="cv-activity-card">
+                <div className="cv-activity-portrait">
+                  {c.portrait ? (
+                    <img src={c.portrait} alt="" />
+                  ) : (
+                    <div style={{ background: c.gradient }} aria-hidden>
+                      <span>{c.name[0]}</span>
+                    </div>
+                  )}
                 </div>
-              );
-            })}
+                <div className="cv-activity-copy">
+                  <h3 className="cv-activity-name">{c.name}</h3>
+                  <p className="cv-activity-label">Used in</p>
+                  <ul className="cv-activity-places">
+                    {getCharacterUsage(c).map((place) => (
+                      <li key={place}>{place}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       </div>
+
+      {viewCharacter && (
+        <div
+          className="cv-modal-backdrop"
+          role="presentation"
+          onClick={() => setViewCharacter(null)}
+        >
+          <div
+            className="cv-view-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cv-view-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CharacterPortrait character={viewCharacter} className="cv-view-portrait" />
+            <div className="cv-view-body">
+              <p className="cv-view-archetype">{viewCharacter.role}</p>
+              <h2 id="cv-view-title" className="cv-view-name">
+                {viewCharacter.name}
+              </h2>
+              <p className="cv-view-summary">{viewCharacter.summary}</p>
+              {viewCharacter.details && (
+                <p className="cv-view-detail">{viewCharacter.details}</p>
+              )}
+              {viewCharacter.personality && (
+                <p className="cv-view-meta">
+                  <strong>Personality</strong> — {viewCharacter.personality}
+                </p>
+              )}
+              {viewCharacter.boundaries && (
+                <p className="cv-view-meta">
+                  <strong>Boundaries</strong> — {viewCharacter.boundaries}
+                </p>
+              )}
+              <div className="cv-view-usage">
+                <p className="cv-view-usage-label">Used in</p>
+                <ul>
+                  {getCharacterUsage(viewCharacter).map((place) => (
+                    <li key={place}>{place}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="cv-view-actions">
+                <button
+                  type="button"
+                  className="cv-roster-btn cv-roster-btn--primary"
+                  onClick={() => openEdit(viewCharacter)}
+                >
+                  Edit character
+                </button>
+                <button
+                  type="button"
+                  className="cv-roster-btn cv-roster-btn--danger"
+                  onClick={() => {
+                    setDeleteId(viewCharacter.id);
+                    setViewCharacter(null);
+                  }}
+                >
+                  Remove from cast
+                </button>
+                <button
+                  type="button"
+                  className="cv-roster-btn cv-roster-btn--ghost"
+                  onClick={() => setViewCharacter(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {modalMode && (
         <div className="cv-modal-backdrop" role="presentation" onClick={closeModal}>
@@ -359,7 +478,7 @@ export default function LiveTestCharactersVoicesFrame() {
                   </select>
                 </label>
                 <label className="cv-field">
-                  <span>Role</span>
+                  <span>Archetype / role</span>
                   <input
                     value={form.role}
                     onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
@@ -368,7 +487,7 @@ export default function LiveTestCharactersVoicesFrame() {
                 </label>
               </div>
               <label className="cv-field">
-                <span>One-line summary</span>
+                <span>Short description</span>
                 <input
                   value={form.summary}
                   onChange={(e) => setForm((f) => ({ ...f, summary: e.target.value }))}
@@ -376,9 +495,9 @@ export default function LiveTestCharactersVoicesFrame() {
                 />
               </label>
               <label className="cv-field">
-                <span>Details (optional)</span>
+                <span>Story details (optional)</span>
                 <textarea
-                  rows={2}
+                  rows={3}
                   value={form.details}
                   onChange={(e) => setForm((f) => ({ ...f, details: e.target.value }))}
                 />
@@ -398,10 +517,10 @@ export default function LiveTestCharactersVoicesFrame() {
                 />
               </label>
               <div className="cv-modal-actions">
-                <button type="button" className="cv-btn cv-btn--ghost" onClick={closeModal}>
+                <button type="button" className="cv-roster-btn cv-roster-btn--ghost" onClick={closeModal}>
                   Cancel
                 </button>
-                <button type="submit" className="cv-btn cv-btn--primary">
+                <button type="submit" className="cv-roster-btn cv-roster-btn--primary">
                   Save character
                 </button>
               </div>
@@ -418,16 +537,16 @@ export default function LiveTestCharactersVoicesFrame() {
             aria-modal="true"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="cv-modal-title">Remove this character?</p>
+            <p className="cv-modal-title">Remove from your cast?</p>
             <p className="cv-confirm-text">
-              They will be removed from your cast. This cannot be undone.
+              This character will leave your gallery. This cannot be undone.
             </p>
             <div className="cv-modal-actions">
-              <button type="button" className="cv-btn cv-btn--ghost" onClick={() => setDeleteId(null)}>
+              <button type="button" className="cv-roster-btn cv-roster-btn--ghost" onClick={() => setDeleteId(null)}>
                 Cancel
               </button>
-              <button type="button" className="cv-btn cv-btn--danger" onClick={confirmDelete}>
-                Delete
+              <button type="button" className="cv-roster-btn cv-roster-btn--danger" onClick={confirmDelete}>
+                Remove
               </button>
             </div>
           </div>

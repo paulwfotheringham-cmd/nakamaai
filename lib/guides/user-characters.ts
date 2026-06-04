@@ -12,9 +12,30 @@ export type UserCharacter = {
   personality: string;
   boundaries: string;
   gradient: string;
+  /** Cinematic portrait for gallery cards */
+  portrait?: string;
+  /** Experiences where this character appears */
+  usedIn?: string[];
   createdAt: number;
   updatedAt: number;
 };
+
+const PORTRAIT_POOL = [
+  "/scenes/moor.jpg",
+  "/scenes/rome.jpg",
+  "/scenes/office.jpg",
+  "/scenes/werewolf.jpg",
+  "/scenes/pirate.jpg",
+  "/scenes/alien.jpg",
+];
+
+export function pickCharacterPortrait(index: number): string {
+  return PORTRAIT_POOL[index % PORTRAIT_POOL.length];
+}
+
+export function defaultCharacterUsage(name: string): string[] {
+  return [`Available in adventures featuring ${name}`];
+}
 
 const GRADIENT_POOL = [
   "linear-gradient(135deg, #7A5C2E 0%, #C9A227 100%)",
@@ -41,6 +62,8 @@ export const DEFAULT_USER_CHARACTERS: UserCharacter[] = [
     personality: "Playful, emotionally attuned, slow-burn romantic.",
     boundaries: "Consent-first; no humiliation or non-consent themes.",
     gradient: GRADIENT_POOL[4],
+    portrait: "/scenes/rome.jpg",
+    usedIn: ["Private Desires", "The Moor at Midnight"],
     createdAt: 0,
     updatedAt: 0,
   },
@@ -55,6 +78,8 @@ export const DEFAULT_USER_CHARACTERS: UserCharacter[] = [
     personality: "Direct, intense, protective when it matters.",
     boundaries: "Hard limits respected; safewords honored without question.",
     gradient: GRADIENT_POOL[1],
+    portrait: "/scenes/office.jpg",
+    usedIn: ["Build Adventure", "Forbidden Chat"],
     createdAt: 0,
     updatedAt: 0,
   },
@@ -69,6 +94,8 @@ export const DEFAULT_USER_CHARACTERS: UserCharacter[] = [
     personality: "Sharp humor, emotional honesty, voyeur-friendly energy.",
     boundaries: "Keeps intimacy between adults; avoids cruelty for shock value.",
     gradient: GRADIENT_POOL[5],
+    portrait: "/scenes/werewolf.jpg",
+    usedIn: ["Interactive Adventures"],
     createdAt: 0,
     updatedAt: 0,
   },
@@ -92,9 +119,20 @@ function normalizeCharacter(raw: Partial<UserCharacter>, index: number): UserCha
     personality: (raw.personality ?? "").trim(),
     boundaries: (raw.boundaries ?? "").trim(),
     gradient: raw.gradient?.trim() || pickCharacterGradient(index),
+    portrait: typeof raw.portrait === "string" ? raw.portrait.trim() : undefined,
+    usedIn: Array.isArray(raw.usedIn)
+      ? raw.usedIn.filter((x): x is string => typeof x === "string" && x.trim().length > 0)
+      : undefined,
     createdAt: typeof raw.createdAt === "number" ? raw.createdAt : Date.now(),
     updatedAt: typeof raw.updatedAt === "number" ? raw.updatedAt : Date.now(),
   };
+}
+
+export function getCharacterUsage(c: UserCharacter): string[] {
+  if (c.usedIn?.length) return c.usedIn;
+  const preset = DEFAULT_USER_CHARACTERS.find((d) => d.id === c.id)?.usedIn;
+  if (preset?.length) return preset;
+  return defaultCharacterUsage(c.name);
 }
 
 export function parseUserCharacters(raw: string | null): UserCharacter[] {
