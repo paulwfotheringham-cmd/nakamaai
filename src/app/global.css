@@ -1523,21 +1523,19 @@
 }
 @media (min-width: 1100px) {
   .cv-cast-grid {
-    grid-template-columns: repeat(4, minmax(17.5rem, 20rem));
-    gap: 1rem 1.125rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
   }
 }
 
-/* Card: ~300×380px, portrait ~60% */
+/* Card: ~280–320px wide × 360–420px tall, portrait ~60% */
 .cv-cast-card {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 20rem;
-  height: 23.75rem;
-  min-height: 22.5rem;
+  min-width: 0;
+  height: 26.25rem;
   max-height: 26.25rem;
-  margin: 0 auto;
   border-radius: 0.75rem;
   overflow: hidden;
   background: linear-gradient(180deg, rgba(22, 26, 32, 0.95) 0%, rgba(8, 10, 12, 0.98) 100%);
@@ -1713,6 +1711,14 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(212, 175, 55, 0.75);
+}
+.cv-cast-footnote {
+  flex-shrink: 0;
+  margin-top: 0.5rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.32);
+  text-align: center;
 }
 
 /* Tighter live-test panel padding when Characters is open */

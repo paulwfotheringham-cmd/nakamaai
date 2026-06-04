@@ -191,6 +191,9 @@ export default function LiveTestCharactersVoicesFrame() {
               </div>
             </button>
           </div>
+          <p className="cv-cast-footnote">
+            Companions you create here appear across adventures, audiobooks, and chat.
+          </p>
         </section>
       </div>
 
