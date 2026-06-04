@@ -49,7 +49,7 @@ const MOOD_PRESETS: MoodPreset[] = [
     id: "quick-escape",
     title: "Quick Escape",
     desc: "Short immersive experience",
-    image: "/tiles/tile7.jpg",
+    image: "/tiles/tile6.jpg",
     prefs: {
       experienceLength: "Quick Escape",
       mood: "Playful",
