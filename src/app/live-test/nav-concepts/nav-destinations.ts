@@ -16,7 +16,7 @@ export const NAV_DESTINATIONS: NavDestination[] = [
   { target: "interactive-adventures", label: "Interactive Adventures", shortLabel: "Adventure", poster: "/tiles/tile3.jpg" },
   { target: "forbidden-chat", label: "Forbidden Chat", shortLabel: "Chat", poster: "/tiles/tile4.jpg" },
   { target: "reignite-couples", label: "Reignite", shortLabel: "Couples", poster: "/tiles/tile5.jpg" },
-  { target: "character-voices", label: "Characters & Voices", shortLabel: "Characters", poster: "/tiles/tile6.jpg" },
+  { target: "character-voices", label: "Characters", shortLabel: "Characters", poster: "/tiles/tile6.jpg" },
   { target: "profile", label: "Profile", shortLabel: "Profile", poster: "/scenes/moor.jpg" },
 ];
 

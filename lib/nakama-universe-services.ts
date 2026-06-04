@@ -40,8 +40,8 @@ export const NAKAMA_UNIVERSE_SERVICES = [
   },
   {
     id: "character-voices",
-    title: "CHARACTER & VOICES",
-    overlayLabel: "Characters & Voices",
+    title: "CHARACTERS",
+    overlayLabel: "Characters",
     description:
       "Create your character that will always be with you. In the voice you most desire",
     poster: "/tiles/tile6.jpg",

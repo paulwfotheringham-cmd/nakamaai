@@ -99,7 +99,7 @@ const NAV_SECTIONS: NavSection[] = [
     id: "account",
     label: "Account & Personalisation",
     items: [
-      { id: "character-voices", label: "Characters & voices", icon: ICON.character },
+      { id: "character-voices", label: "Characters", icon: ICON.character },
       { id: "profile", label: "Profile", icon: ICON.profile },
     ],
     defaultOpen: true,

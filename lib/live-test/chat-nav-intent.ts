@@ -72,7 +72,7 @@ export function getNavSectionLabel(navId: LiveTestNavId): string {
     case "reignite-couples":
       return "Reignite for Couples";
     case "character-voices":
-      return "Characters & Voices";
+      return "Characters";
     case "profile":
       return "Profile";
     default:
