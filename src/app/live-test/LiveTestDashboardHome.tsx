@@ -21,8 +21,8 @@ const TOP_EXPERIENCES = [
     progress: "Last played 3 days ago",
     action: "Resume",
     statusType: "active" as const,
-    image: "/tiles/tile1.jpg",
-    imagePosition: "center 35%",
+    image: "/scenes/rome.jpg",
+    imagePosition: "center 40%",
   },
   {
     id: "reignite-couples",
