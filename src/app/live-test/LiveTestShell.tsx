@@ -19,6 +19,7 @@ import LiveTestForbiddenChat from "./LiveTestForbiddenChat";
 import LiveTestGuideRail from "./LiveTestGuideRail";
 import LiveTestInfoPanel from "./LiveTestInfoPanel";
 import LiveTestBuildAdventureFrame from "./LiveTestBuildAdventureFrame";
+import LiveTestCharactersVoicesFrame from "./LiveTestCharactersVoicesFrame";
 import LiveTestProSidebar from "./LiveTestProSidebar";
 import LiveTestProfilePanel from "./LiveTestProfilePanel";
 import SettingsPrivacyPanel from "./SettingsPrivacyPanel";
@@ -149,15 +150,7 @@ export default function LiveTestShell() {
                 </>
               )}
               {centerPanel === "build-adventure" && <LiveTestBuildAdventureFrame />}
-              {centerPanel === "character-voices" && (
-                <LiveTestInfoPanel
-                  eyebrow="Characters & voices"
-                  title="Your cast, your sound"
-                  description="Create a character that stays with you across experiences."
-                  poster="/tiles/tile6.jpg"
-                  body="Pick or clone the voice you want, define personality and boundaries, and reuse your character in adventures, audiobooks, and chat. Voices and personas travel with you across Nakama Nights."
-                />
-              )}
+              {centerPanel === "character-voices" && <LiveTestCharactersVoicesFrame />}
               {centerPanel === "forbidden-chat" && <LiveTestForbiddenChat />}
               {centerPanel === "profile" && (
                 <>
