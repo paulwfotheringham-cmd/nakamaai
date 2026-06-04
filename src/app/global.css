@@ -986,12 +986,12 @@
 
 
 /* ─────────────────────────────────────────────────────────
-   Build Adventure — Premium Redesign v2
+   Build Adventure — Premium Redesign
 ───────────────────────────────────────────────────────── */
 
-/* Narrower guide rail for Build Adventure */
+/* Slightly narrower companion rail on Build Adventure only */
 .pro-main-body--ba {
-  grid-template-columns: minmax(0, 1fr) minmax(9rem, 11.5rem);
+  grid-template-columns: minmax(0, 1fr) minmax(10rem, 13rem);
 }
 
 /* Root */
@@ -1005,7 +1005,7 @@
   background: #060606;
 }
 
-/* Atmospheric background — brighter */
+/* Atmospheric background */
 .ba-atmosphere {
   position: absolute;
   inset: 0;
@@ -1019,39 +1019,62 @@
   height: 100%;
   object-fit: cover;
   object-position: center 30%;
-  opacity: 0.22;
-  filter: saturate(0.75) brightness(0.85) contrast(1.1);
+  opacity: 0.18;
+  filter: saturate(0.7) brightness(0.8) contrast(1.05);
 }
 .ba-atmosphere-veil {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(6, 6, 6, 0.35) 0%,
-    rgba(6, 6, 6, 0.72) 35%,
-    rgba(6, 6, 6, 0.96) 75%
+    rgba(6, 6, 6, 0.4) 0%,
+    rgba(6, 6, 6, 0.78) 40%,
+    rgba(6, 6, 6, 0.97) 100%
   );
 }
 
-/* Single scrollable column */
-.ba-scroll {
+/* Two-column layout: story ~73%, settings rail ~27% */
+.ba-layout {
   position: relative;
   z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 2.65fr) minmax(0, 1fr);
+  gap: 0;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.ba-left {
   overflow-y: auto;
-  padding: 2.5rem 3rem 3rem;
-  max-width: 52rem;
+  padding: 2rem 2.25rem 2.5rem 2.5rem;
   display: flex;
   flex-direction: column;
-  gap: 2.25rem;
+  gap: 1.5rem;
+  min-width: 0;
   scrollbar-width: thin;
   scrollbar-color: rgba(212, 175, 55, 0.15) transparent;
 }
-.ba-scroll::-webkit-scrollbar { width: 4px; }
-.ba-scroll::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.15); border-radius: 2px; }
+.ba-left::-webkit-scrollbar { width: 4px; }
+.ba-left::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.15); border-radius: 2px; }
 
-/* ── 1. Hero ── */
+.ba-right {
+  overflow-y: auto;
+  padding: 2rem 1.5rem 2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.1) transparent;
+}
+.ba-right::-webkit-scrollbar { width: 3px; }
+.ba-right::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.1); border-radius: 2px; }
+
+/* ── Hero ── */
 .ba-hero { padding-bottom: 0.25rem; }
 .ba-eyebrow {
   font-size: 0.5625rem;
@@ -1080,7 +1103,7 @@
 .ba-section {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.875rem;
 }
 .ba-section-header {
   display: flex;
@@ -1095,11 +1118,11 @@
   font-family: var(--font-body), system-ui, sans-serif;
 }
 
-/* ── 2. Character cast grid ── */
+/* ── Character cast cards ── */
 .ba-cast-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.625rem;
   align-items: flex-start;
 }
 .ba-cast-card {
@@ -1107,12 +1130,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1.125rem 1.25rem 1rem;
-  border-radius: 1.125rem;
+  gap: 0.375rem;
+  padding: 0.875rem 1rem 0.75rem;
+  border-radius: 1rem;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  min-width: 7rem;
+  min-width: 6.25rem;
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
@@ -1127,8 +1150,8 @@
   background: rgba(255, 255, 255, 0.07);
 }
 .ba-cast-avatar {
-  width: 3.25rem;
-  height: 3.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1203,12 +1226,13 @@
 }
 .ba-char-input:focus { border-color: rgba(212, 175, 55, 0.4); }
 
-/* ── 3. Story textarea — dominant ── */
+/* ── Story textarea (dominant, fits viewport with rail) ── */
+.ba-story-section { flex-shrink: 0; }
 .ba-story-section .ba-section-label { margin-bottom: 0.125rem; }
 .ba-textarea {
   width: 100%;
-  min-height: 360px;
-  padding: 1.625rem 1.875rem;
+  min-height: 300px;
+  padding: 1.5rem 1.75rem;
   border-radius: 1.25rem;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.09);
@@ -1233,16 +1257,27 @@
   padding: 0 0.25rem;
 }
 
-/* ── 4. Tone pills ── */
+/* ── Right rail ── */
+.ba-rail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+.ba-rail-section--voices {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Tone pills */
 .ba-tone-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.375rem;
 }
 .ba-tone-pill {
-  padding: 0.45rem 1rem;
+  padding: 0.3rem 0.7rem;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.45);
   background: rgba(255, 255, 255, 0.04);
@@ -1262,140 +1297,145 @@
   border-color: rgba(255, 255, 255, 0.16);
 }
 
-/* ── 5. Perspective ── */
+/* Perspective */
 .ba-perspective-row {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 .ba-perspective-btn {
   flex: 1;
-  padding: 0.875rem 1.125rem;
-  border-radius: 1rem;
-  text-align: left;
-  color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-.ba-perspective-btn.is-active {
-  color: rgba(212, 175, 55, 0.95);
-  background: rgba(212, 175, 55, 0.08);
-  border-color: rgba(212, 175, 55, 0.38);
-  box-shadow: 0 0 16px rgba(212, 175, 55, 0.1);
-}
-.ba-perspective-btn:hover:not(.is-active) {
-  color: rgba(255, 255, 255, 0.68);
-  border-color: rgba(255, 255, 255, 0.14);
-}
-.ba-perspective-label {
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 0.9375rem;
+  height: 2.25rem;
+  border-radius: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 400;
-  line-height: 1.2;
-}
-.ba-perspective-desc {
-  font-size: 0.625rem;
-  opacity: 0.6;
-  line-height: 1.3;
-}
-
-/* ── 6. Narrator voice grid ── */
-.ba-voice-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-}
-.ba-voice-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  border-radius: 1.125rem;
+  color: rgba(255, 255, 255, 0.45);
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.07);
   cursor: pointer;
-  text-align: left;
-  overflow: hidden;
   transition: all 0.2s ease;
+}
+.ba-perspective-btn.is-active {
+  color: rgba(212, 175, 55, 0.95);
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.35);
+  box-shadow: 0 0 14px rgba(212, 175, 55, 0.12);
+}
+.ba-perspective-btn:hover:not(.is-active) {
+  color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Narrator voice cards (compact rail list) */
+.ba-voice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.ba-voice-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  min-height: 4.5rem;
+  border-radius: 0.875rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
   width: 100%;
 }
 .ba-voice-card.is-active {
-  border-color: rgba(212, 175, 55, 0.45);
-  background: rgba(212, 175, 55, 0.06);
-  box-shadow: 0 0 24px rgba(212, 175, 55, 0.14), inset 0 1px 0 rgba(212, 175, 55, 0.12);
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.38);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.14);
 }
 .ba-voice-card:hover:not(.is-active) {
-  background: rgba(255, 255, 255, 0.065);
-  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.055);
+  border-color: rgba(255, 255, 255, 0.1);
 }
-/* Portrait area */
 .ba-voice-img-wrap {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 3 / 2;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.5rem;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
 }
 .ba-voice-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center top;
-  transition: transform 500ms ease;
 }
-.ba-voice-card:hover .ba-voice-img { transform: scale(1.04); }
-
-/* Play button overlaid on portrait */
-.ba-voice-play-overlay {
-  position: absolute;
-  bottom: 0.625rem;
-  right: 0.625rem;
-  width: 2.125rem;
-  height: 2.125rem;
+.ba-voice-info {
+  flex: 1;
+  min-width: 0;
+}
+.ba-voice-name {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: rgba(245, 242, 235, 0.9);
+  line-height: 1.2;
+}
+.ba-voice-tagline {
+  font-size: 0.625rem;
+  color: rgba(255, 255, 255, 0.32);
+  line-height: 1.4;
+  margin-top: 0.15rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ba-voice-play {
+  flex-shrink: 0;
+  width: 1.875rem;
+  height: 1.875rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.55);
-  border: 1px solid rgba(212, 175, 55, 0.35);
-  color: rgba(212, 175, 55, 0.9);
-  backdrop-filter: blur(6px);
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  color: rgba(212, 175, 55, 0.8);
   cursor: pointer;
   transition: all 0.18s ease;
-  z-index: 2;
 }
-.ba-voice-play-overlay:hover, .ba-voice-play-overlay.is-playing {
+.ba-voice-play:hover, .ba-voice-play.is-playing {
   background: rgba(212, 175, 55, 0.2);
-  border-color: rgba(212, 175, 55, 0.7);
+  border-color: rgba(212, 175, 55, 0.5);
   color: rgba(212, 175, 55, 1);
 }
 
-/* Voice info below portrait */
-.ba-voice-body {
-  padding: 0.875rem 1rem 1rem;
+/* Auto story card */
+.ba-auto-story {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.25rem 1.5rem;
 }
-.ba-voice-name {
+.ba-auto-story-label {
+  font-size: 0.5625rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.5);
+  font-family: var(--font-body), system-ui, sans-serif;
+  margin-bottom: 0.375rem;
+}
+.ba-auto-story-desc {
+  font-size: 0.9375rem;
   font-family: var(--font-display), Georgia, serif;
-  font-size: 1rem;
-  font-weight: 400;
-  color: rgba(245, 242, 235, 0.92);
-  line-height: 1.2;
-  margin-bottom: 0.25rem;
+  color: rgba(245, 242, 235, 0.75);
+  line-height: 1.4;
 }
-.ba-voice-tagline {
-  font-size: 0.6875rem;
-  color: rgba(212, 175, 55, 0.6);
-  line-height: 1.35;
-  margin-bottom: 0.5rem;
-  font-style: italic;
-}
-.ba-voice-desc {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.32);
-  line-height: 1.55;
+.ba-gold-btn--auto {
+  font-size: 0.8125rem;
+  height: 2.5rem;
+  padding: 0 1.5rem;
+  flex-shrink: 0;
 }
 
 /* ── Buttons ── */
@@ -1441,10 +1481,10 @@
 .ba-gold-btn:hover:not(:disabled) { filter: brightness(1.1); }
 .ba-gold-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .ba-gold-btn--primary {
-  font-size: 1rem;
-  height: 3.25rem;
-  padding: 0 2.5rem;
-  box-shadow: 0 6px 28px rgba(212, 175, 55, 0.3);
+  font-size: 0.9375rem;
+  height: 3rem;
+  padding: 0 2.25rem;
+  box-shadow: 0 6px 24px rgba(212, 175, 55, 0.28);
 }
 .ba-generating { pointer-events: none; }
 
@@ -1452,7 +1492,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 3.25rem;
+  height: 3rem;
   padding: 0 2rem;
   border-radius: 999px;
   font-size: 0.875rem;
@@ -1466,15 +1506,15 @@
 }
 .ba-secondary-btn:hover { color: rgba(255, 255, 255, 0.72); border-color: rgba(255, 255, 255, 0.16); }
 
-/* ── 7+8. Generate card ── */
+/* Cards + generate */
 .ba-card {
-  border-radius: 1.375rem;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(255, 255, 255, 0.035);
-  backdrop-filter: blur(10px);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
 }
-.ba-generate-card { padding: 2rem; }
-.ba-generate-toggles { margin-bottom: 2rem; }
+.ba-generate-card { padding: 1.75rem; }
+.ba-generate-toggles { margin-bottom: 1.75rem; }
 .ba-toggle-row {
   display: flex;
   align-items: center;
@@ -1483,9 +1523,9 @@
   padding: 0.625rem 0;
 }
 .ba-toggle-label {
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-family: var(--font-display), Georgia, serif;
-  color: rgba(245, 242, 235, 0.82);
+  color: rgba(245, 242, 235, 0.85);
   margin-bottom: 0.2rem;
 }
 .ba-toggle-desc {
