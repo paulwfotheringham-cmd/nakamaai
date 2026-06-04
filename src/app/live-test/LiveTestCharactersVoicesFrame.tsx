@@ -6,6 +6,7 @@ import {
   DEFAULT_USER_CHARACTERS,
   pickCharacterGradient,
   pickCharacterPortrait,
+  getCharacterUsage,
   readUserCharacters,
   writeUserCharacters,
   type CharacterGender,
@@ -271,6 +272,32 @@ export default function LiveTestCharactersVoicesFrame() {
               </div>
             </button>
           </div>
+        </section>
+
+        <section className="cv-activity" aria-labelledby="cv-activity-title">
+          <div className="cv-activity-head">
+            <h2 id="cv-activity-title" className="cv-activity-title">
+              Character Activity
+            </h2>
+            <p className="cv-activity-lead">
+              Where your companions have recently appeared across Nakama Nights
+            </p>
+          </div>
+          <ul className="cv-activity-cast">
+            {characters.map((c) => {
+              const appearances = getCharacterUsage(c);
+              return (
+                <li key={c.id} className="cv-activity-entry">
+                  <span className="cv-activity-name">{c.name}</span>
+                  <ul className="cv-activity-stories">
+                    {appearances.map((story) => (
+                      <li key={story}>{story}</li>
+                    ))}
+                  </ul>
+                </li>
+              );
+            })}
+          </ul>
         </section>
       </div>
 

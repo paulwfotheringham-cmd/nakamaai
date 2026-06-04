@@ -33,8 +33,8 @@ export function pickCharacterPortrait(index: number): string {
   return PORTRAIT_POOL[index % PORTRAIT_POOL.length];
 }
 
-export function defaultCharacterUsage(name: string): string[] {
-  return [`Available in adventures featuring ${name}`];
+export function defaultCharacterUsage(_name: string): string[] {
+  return ["Awaiting their first appearance"];
 }
 
 const GRADIENT_POOL = [
@@ -79,7 +79,7 @@ export const DEFAULT_USER_CHARACTERS: UserCharacter[] = [
     boundaries: "Hard limits respected; safewords honored without question.",
     gradient: GRADIENT_POOL[1],
     portrait: "/scenes/office.jpg",
-    usedIn: ["Build Adventure", "Forbidden Chat"],
+    usedIn: ["Slow Burn, Office", "Forbidden Chat"],
     createdAt: 0,
     updatedAt: 0,
   },
@@ -95,7 +95,7 @@ export const DEFAULT_USER_CHARACTERS: UserCharacter[] = [
     boundaries: "Keeps intimacy between adults; avoids cruelty for shock value.",
     gradient: GRADIENT_POOL[5],
     portrait: "/scenes/werewolf.jpg",
-    usedIn: ["Interactive Adventures"],
+    usedIn: ["Reignite", "Choice at the Door"],
     createdAt: 0,
     updatedAt: 0,
   },
