@@ -8,11 +8,12 @@ import {
 } from "@/lib/guides/chat-setup";
 import {
   getMoodById,
+  MOOD_CARD_MOODS,
   pickNewAdventureMood,
   pickSurpriseMood,
   openingLinesForMood,
+  SURPRISE_MOOD,
   TEN_MINUTE_ESCAPE,
-  TONIGHT_MOODS,
   type ForbiddenMood,
   type ForbiddenMoodId,
 } from "@/lib/guides/forbidden-chat-moods";
@@ -36,11 +37,7 @@ type ForbiddenChatSetupProps = {
   disabled?: boolean;
 };
 
-const EXPLORE_SCENES = [
-  { title: "Private Desires", moodId: "comfort-attention" as ForbiddenMoodId },
-  { title: "Late Night Call", moodId: "slow-burn" as ForbiddenMoodId },
-  { title: "Hotel Encounter", moodId: "forbidden-tension" as ForbiddenMoodId },
-];
+const CONTINUE_HERO_IMAGE = "/tiles/tile4.jpg";
 
 function resolveVoice(): { voiceId: string; voiceName?: string } {
   const guideVoice = readGuidePreferences().voiceId;
@@ -85,14 +82,69 @@ function buildStart(
   };
 }
 
+function MoodCardButton({
+  mood,
+  disabled,
+  onSelect,
+}: {
+  mood: ForbiddenMood;
+  disabled?: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onSelect}
+      className="fc-mood-card group"
+    >
+      <img src={mood.image} alt="" className="fc-mood-card-img" />
+      <span className="fc-mood-card-veil" aria-hidden />
+      <span className="fc-mood-card-label">{mood.chipLabel}</span>
+    </button>
+  );
+}
+
+function HeroActionCard({
+  image,
+  eyebrow,
+  title,
+  meta,
+  disabled,
+  onClick,
+  variant,
+}: {
+  image: string;
+  eyebrow: string;
+  title: string;
+  meta: string;
+  disabled?: boolean;
+  onClick: () => void;
+  variant: "continue" | "surprise";
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={`fc-hero-card fc-hero-card--${variant} group`}
+    >
+      <img src={image} alt="" className="fc-hero-card-img" />
+      <span className="fc-hero-card-veil" aria-hidden />
+      <span className="fc-hero-card-body">
+        <span className="fc-hero-card-eyebrow">{eyebrow}</span>
+        <span className="fc-hero-card-title">{title}</span>
+        <span className="fc-hero-card-meta">{meta}</span>
+      </span>
+    </button>
+  );
+}
+
 export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenChatSetupProps) {
-  const [hasLast, setHasLast] = useState(false);
   const [lastTitle, setLastTitle] = useState("Private Desires");
 
   useEffect(() => {
-    const saved = hasSavedSession();
-    setHasLast(saved);
-    if (saved) {
+    if (hasSavedSession()) {
       setLastTitle(getContinueLastSession().title);
     }
   }, []);
@@ -108,8 +160,6 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
   const handleContinueLast = () => {
     if (disabled) return;
     const session = getContinueLastSession();
-    const mood =
-      getMoodById(session.moodId ?? "comfort-attention") ?? TONIGHT_MOODS[0];
     onComplete({
       prefs: session.prefs,
       title: session.title,
@@ -120,16 +170,20 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
     writeForbiddenChatSetup(session.prefs);
   };
 
+  const handleSurpriseMe = () => {
+    const picked = pickSurpriseMood();
+    startMood(
+      { ...picked, id: "surprise-me", label: "Surprise Me", chipLabel: "Surprise Me" },
+      false,
+      "Surprise Me",
+    );
+  };
+
   const handleTenMinuteEscape = () => {
     startMood(TEN_MINUTE_ESCAPE);
   };
 
   const handleMood = (id: ForbiddenMoodId) => {
-    if (id === "surprise-me") {
-      const picked = pickSurpriseMood();
-      startMood({ ...picked, id: "surprise-me", label: "Surprise Me", chipLabel: "Surprise Me" });
-      return;
-    }
     const mood = getMoodById(id);
     if (mood) startMood(mood);
   };
@@ -139,92 +193,84 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
     startMood(mood, true, "New Adventure");
   };
 
-  const handleExploreScene = (title: string, moodId: ForbiddenMoodId) => {
-    const mood = getMoodById(moodId);
-    if (mood) startMood(mood, false, title);
-  };
-
   return (
-    <div className="launcher-panel fc-setup fc-mood-landing">
+    <div className="launcher-panel fc-setup fc-emotional-landing">
       <div className="fc-setup-glow" aria-hidden />
+      <div className="fc-atmosphere" aria-hidden />
 
       <div className="fc-browse-scroll">
-        <div className="fc-compact-fold">
-          <header className="fc-landing-head">
-            <p className="fc-hero-eyebrow">Forbidden Chat</p>
-            <h1 className="fc-hero-title fc-hero-title--compact">What do you need tonight?</h1>
-          </header>
+        <header className="fc-hero">
+          <p className="fc-hero-eyebrow">Forbidden Chat</p>
+          <h1 className="fc-hero-title">What do you need tonight?</h1>
+          <p className="fc-hero-sub">
+            A little attention. A brief escape. Something familiar.
+          </p>
 
+          <div className="fc-hero-actions">
+            <HeroActionCard
+              variant="continue"
+              image={CONTINUE_HERO_IMAGE}
+              eyebrow="Pick up where you left off"
+              title="Continue Last Story"
+              meta={lastTitle}
+              disabled={disabled}
+              onClick={handleContinueLast}
+            />
+            <HeroActionCard
+              variant="surprise"
+              image={SURPRISE_MOOD.image}
+              eyebrow="Let tonight decide"
+              title="Surprise Me"
+              meta={SURPRISE_MOOD.tagline}
+              disabled={disabled}
+              onClick={handleSurpriseMe}
+            />
+          </div>
+        </header>
+
+        <section className="fc-mood-section" aria-labelledby="fc-mood-heading">
+          <h2 id="fc-mood-heading" className="fc-section-title">
+            Tonight&apos;s Mood
+          </h2>
+          <div className="fc-mood-cards">
+            {MOOD_CARD_MOODS.map((mood) => (
+              <MoodCardButton
+                key={mood.id}
+                mood={mood}
+                disabled={disabled}
+                onSelect={() => handleMood(mood.id)}
+              />
+            ))}
+          </div>
+        </section>
+
+        <section className="fc-shortcuts" aria-label="Quick entry">
           <button
             type="button"
             disabled={disabled}
-            onClick={handleContinueLast}
-            className="fc-continue-primary"
+            onClick={handleTenMinuteEscape}
+            className="fc-shortcut group"
           >
-            <span className="fc-continue-primary-label">Continue Last Story</span>
-            <span className="fc-continue-primary-meta">
-              {hasLast ? lastTitle : `${lastTitle} — one tap to resume`}
+            <img src={TEN_MINUTE_ESCAPE.image} alt="" className="fc-shortcut-img" />
+            <span className="fc-shortcut-veil" aria-hidden />
+            <span className="fc-shortcut-copy">
+              <span className="fc-shortcut-title">10 Minute Escape</span>
+              <span className="fc-shortcut-desc">A brief immersive moment</span>
             </span>
           </button>
-
-          <section className="fc-mood-section" aria-labelledby="fc-mood-heading">
-            <h2 id="fc-mood-heading" className="fc-section-title fc-section-title--compact">
-              Tonight&apos;s Mood
-            </h2>
-            <div className="fc-mood-chips" role="list">
-              {TONIGHT_MOODS.map((mood) => (
-                <button
-                  key={mood.id}
-                  type="button"
-                  role="listitem"
-                  disabled={disabled}
-                  onClick={() => handleMood(mood.id)}
-                  className="fc-mood-chip"
-                >
-                  {mood.chipLabel}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <div className="fc-quick-actions" role="group" aria-label="Quick starts">
-            <button
-              type="button"
-              disabled={disabled}
-              onClick={handleTenMinuteEscape}
-              className="fc-action-card"
-            >
-              <span className="fc-action-card-title">10 Minute Escape</span>
-              <span className="fc-action-card-desc">Short, immersive — no setup</span>
-            </button>
-            <button
-              type="button"
-              disabled={disabled}
-              onClick={handleNewAdventure}
-              className="fc-action-card"
-            >
-              <span className="fc-action-card-title">New Adventure</span>
-              <span className="fc-action-card-desc">Something fresh tonight</span>
-            </button>
-          </div>
-        </div>
-
-        <section className="fc-secondary" aria-label="More scenes">
-          <h3 className="fc-secondary-title">Explore scenes</h3>
-          <ul className="fc-secondary-list">
-            {EXPLORE_SCENES.map((scene) => (
-              <li key={scene.title}>
-                <button
-                  type="button"
-                  disabled={disabled}
-                  className="fc-secondary-link"
-                  onClick={() => handleExploreScene(scene.title, scene.moodId)}
-                >
-                  {scene.title}
-                </button>
-              </li>
-            ))}
-          </ul>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={handleNewAdventure}
+            className="fc-shortcut group"
+          >
+            <img src="/tiles/tile3.jpg" alt="" className="fc-shortcut-img" />
+            <span className="fc-shortcut-veil" aria-hidden />
+            <span className="fc-shortcut-copy">
+              <span className="fc-shortcut-title">New Adventure</span>
+              <span className="fc-shortcut-desc">Something fresh tonight</span>
+            </span>
+          </button>
         </section>
       </div>
     </div>

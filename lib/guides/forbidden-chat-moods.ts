@@ -193,7 +193,12 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
   },
 ];
 
-const SURPRISE_POOL = TONIGHT_MOODS.filter((m) => m.id !== "surprise-me");
+/** Six mood cards on the landing (Surprise Me is a hero action instead). */
+export const MOOD_CARD_MOODS = TONIGHT_MOODS.filter((m) => m.id !== "surprise-me");
+
+export const SURPRISE_MOOD = TONIGHT_MOODS.find((m) => m.id === "surprise-me")!;
+
+const SURPRISE_POOL = MOOD_CARD_MOODS;
 
 export function pickSurpriseMood(): ForbiddenMood {
   return SURPRISE_POOL[Math.floor(Math.random() * SURPRISE_POOL.length)];
