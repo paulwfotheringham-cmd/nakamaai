@@ -9,17 +9,19 @@ import {
 import {
   getMoodById,
   MOOD_CARD_MOODS,
-  pickNewAdventureMood,
   pickSurpriseMood,
   openingLinesForMood,
-  SURPRISE_MOOD,
-  TEN_MINUTE_ESCAPE,
   type ForbiddenMood,
   type ForbiddenMoodId,
 } from "@/lib/guides/forbidden-chat-moods";
 import {
+  QUICK_STARTS,
+  type QuickStart,
+} from "@/lib/guides/forbidden-chat-quick-starts";
+import {
   getContinueLastSession,
-  hasSavedSession,
+  messagesFromOpenings,
+  sceneReminderFromOpenings,
   type ForbiddenChatMessage,
 } from "@/lib/guides/forbidden-chat-session";
 import { readGuidePreferences } from "@/lib/guides/preferences";
@@ -28,6 +30,7 @@ export type ForbiddenChatSetupResult = {
   prefs: ChatSetupPreferences;
   title: string;
   moodId?: ForbiddenMoodId;
+  sceneReminder?: string;
   openingMessages: ForbiddenChatMessage[];
   resumeMessages?: ForbiddenChatMessage[];
 };
@@ -48,7 +51,13 @@ function resolveVoice(): { voiceId: string; voiceName?: string } {
 
 function buildStart(
   mood: ForbiddenMood,
-  options?: { fresh?: boolean; resume?: ForbiddenChatMessage[]; title?: string },
+  options?: {
+    fresh?: boolean;
+    resume?: ForbiddenChatMessage[];
+    title?: string;
+    openings?: string[];
+    sceneReminder?: string;
+  },
 ): ForbiddenChatSetupResult {
   const { voiceId, voiceName } = resolveVoice();
   const prefs: ChatSetupPreferences = {
@@ -64,22 +73,40 @@ function buildStart(
       prefs,
       title: options.title ?? mood.label,
       moodId: mood.id,
+      sceneReminder: options.sceneReminder,
       openingMessages: [],
       resumeMessages: options.resume,
     };
   }
 
-  const lines = openingLinesForMood(mood, options?.fresh);
+  const lines = options?.openings ?? openingLinesForMood(mood, options?.fresh);
+  const openingMessages = messagesFromOpenings(lines);
   return {
     prefs,
     title: options?.title ?? mood.label,
     moodId: mood.id,
-    openingMessages: lines.map((text, i) => ({
-      id: `open-${Date.now()}-${i}`,
-      role: "assistant" as const,
-      text,
-    })),
+    sceneReminder: options?.sceneReminder ?? sceneReminderFromOpenings(lines),
+    openingMessages,
   };
+}
+
+function buildFromQuickStart(quick: QuickStart): ForbiddenChatSetupResult {
+  const mood = getMoodById(quick.moodId);
+  if (!mood) {
+    return buildStart(
+      {
+        id: quick.moodId,
+        label: quick.label,
+        chipLabel: quick.label,
+        tagline: quick.label,
+        image: "/tiles/tile4.jpg",
+        prefs: quick.prefs,
+        openings: [quick.openings],
+      },
+      { title: quick.label, openings: quick.openings },
+    );
+  }
+  return buildStart(mood, { title: quick.label, openings: quick.openings });
 }
 
 function MoodCardButton({
@@ -105,47 +132,19 @@ function MoodCardButton({
   );
 }
 
-function HeroActionCard({
-  image,
-  eyebrow,
-  title,
-  meta,
-  disabled,
-  onClick,
-  variant,
-}: {
-  image: string;
-  eyebrow: string;
-  title: string;
-  meta: string;
-  disabled?: boolean;
-  onClick: () => void;
-  variant: "continue" | "surprise";
-}) {
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onClick}
-      className={`fc-hero-card fc-hero-card--${variant} group`}
-    >
-      <img src={image} alt="" className="fc-hero-card-img" />
-      <span className="fc-hero-card-veil" aria-hidden />
-      <span className="fc-hero-card-body">
-        <span className="fc-hero-card-eyebrow">{eyebrow}</span>
-        <span className="fc-hero-card-title">{title}</span>
-        <span className="fc-hero-card-meta">{meta}</span>
-      </span>
-    </button>
-  );
-}
-
 export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenChatSetupProps) {
-  const [lastTitle, setLastTitle] = useState("Private Desires");
+  const [continueTitle, setContinueTitle] = useState("Private Desires");
+  const [continueReminder, setContinueReminder] = useState(
+    "They had just asked what you wanted tonight — the message still glows on your screen, unanswered.",
+  );
 
   useEffect(() => {
-    if (hasSavedSession()) {
-      setLastTitle(getContinueLastSession().title);
+    const session = getContinueLastSession();
+    setContinueTitle(session.title);
+    const fallback = session.messages.find((m) => m.role === "assistant")?.text;
+    const reminder = session.sceneReminder ?? fallback?.split("\n")[0]?.trim();
+    if (reminder) {
+      setContinueReminder(reminder.length > 110 ? `${reminder.slice(0, 107)}…` : reminder);
     }
   }, []);
 
@@ -160,37 +159,41 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
   const handleContinueLast = () => {
     if (disabled) return;
     const session = getContinueLastSession();
+    const mood =
+      getMoodById(session.moodId ?? "comfort-attention") ?? MOOD_CARD_MOODS[0];
+    const bridge: ForbiddenChatMessage = {
+      id: `resume-bridge-${Date.now()}`,
+      role: "assistant",
+      text: "You're back. They're still here — pick up the thread whenever you're ready.",
+    };
     onComplete({
       prefs: session.prefs,
       title: session.title,
       moodId: session.moodId,
+      sceneReminder: session.sceneReminder,
       openingMessages: [],
-      resumeMessages: session.messages,
+      resumeMessages: [...session.messages, bridge],
     });
     writeForbiddenChatSetup(session.prefs);
   };
 
-  const handleSurpriseMe = () => {
-    const picked = pickSurpriseMood();
-    startMood(
-      { ...picked, id: "surprise-me", label: "Surprise Me", chipLabel: "Surprise Me" },
-      false,
-      "Surprise Me",
-    );
-  };
-
-  const handleTenMinuteEscape = () => {
-    startMood(TEN_MINUTE_ESCAPE);
-  };
-
   const handleMood = (id: ForbiddenMoodId) => {
+    if (id === "surprise-me") {
+      const picked = pickSurpriseMood();
+      startMood(
+        { ...picked, id: "surprise-me", label: "Surprise Me", chipLabel: "Surprise Me" },
+        false,
+        "Surprise Me",
+      );
+      return;
+    }
     const mood = getMoodById(id);
     if (mood) startMood(mood);
   };
 
-  const handleNewAdventure = () => {
-    const mood = pickNewAdventureMood();
-    startMood(mood, true, "New Adventure");
+  const handleQuickStart = (quick: QuickStart) => {
+    if (disabled) return;
+    onComplete(buildFromQuickStart(quick));
   };
 
   return (
@@ -206,26 +209,20 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
             A little attention. A brief escape. Something familiar.
           </p>
 
-          <div className="fc-hero-actions">
-            <HeroActionCard
-              variant="continue"
-              image={CONTINUE_HERO_IMAGE}
-              eyebrow="Pick up where you left off"
-              title="Continue Last Story"
-              meta={lastTitle}
-              disabled={disabled}
-              onClick={handleContinueLast}
-            />
-            <HeroActionCard
-              variant="surprise"
-              image={SURPRISE_MOOD.image}
-              eyebrow="Let tonight decide"
-              title="Surprise Me"
-              meta={SURPRISE_MOOD.tagline}
-              disabled={disabled}
-              onClick={handleSurpriseMe}
-            />
-          </div>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={handleContinueLast}
+            className="fc-continue-story group"
+          >
+            <img src={CONTINUE_HERO_IMAGE} alt="" className="fc-continue-story-img" />
+            <span className="fc-continue-story-veil" aria-hidden />
+            <span className="fc-continue-story-body">
+              <span className="fc-continue-story-eyebrow">Continue Last Story</span>
+              <span className="fc-continue-story-title">{continueTitle}</span>
+              <span className="fc-continue-story-reminder">{continueReminder}</span>
+            </span>
+          </button>
         </header>
 
         <section className="fc-mood-section" aria-labelledby="fc-mood-heading">
@@ -244,33 +241,25 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
           </div>
         </section>
 
-        <section className="fc-shortcuts" aria-label="Quick entry">
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={handleTenMinuteEscape}
-            className="fc-shortcut group"
-          >
-            <img src={TEN_MINUTE_ESCAPE.image} alt="" className="fc-shortcut-img" />
-            <span className="fc-shortcut-veil" aria-hidden />
-            <span className="fc-shortcut-copy">
-              <span className="fc-shortcut-title">10 Minute Escape</span>
-              <span className="fc-shortcut-desc">A brief immersive moment</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={handleNewAdventure}
-            className="fc-shortcut group"
-          >
-            <img src="/tiles/tile3.jpg" alt="" className="fc-shortcut-img" />
-            <span className="fc-shortcut-veil" aria-hidden />
-            <span className="fc-shortcut-copy">
-              <span className="fc-shortcut-title">New Adventure</span>
-              <span className="fc-shortcut-desc">Something fresh tonight</span>
-            </span>
-          </button>
+        <section className="fc-quick-starts" aria-labelledby="fc-quick-heading">
+          <h2 id="fc-quick-heading" className="fc-section-title">
+            Quick Starts
+          </h2>
+          <p className="fc-quick-starts-hint">Tap one — no typing required.</p>
+          <div className="fc-quick-starts-row" role="list">
+            {QUICK_STARTS.map((quick) => (
+              <button
+                key={quick.id}
+                type="button"
+                role="listitem"
+                disabled={disabled}
+                onClick={() => handleQuickStart(quick)}
+                className="fc-quick-start-btn"
+              >
+                {quick.label}
+              </button>
+            ))}
+          </div>
         </section>
       </div>
     </div>

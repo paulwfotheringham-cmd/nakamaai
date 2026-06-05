@@ -2,6 +2,7 @@
 
 import { writeForbiddenChatSetup } from "@/lib/guides/chat-setup";
 import {
+  deriveSceneReminder,
   writeForbiddenChatSession,
   type ForbiddenChatMessage,
 } from "@/lib/guides/forbidden-chat-session";
@@ -17,6 +18,8 @@ import ForbiddenChatSetup, {
 
 const PLACEHOLDER_REPLY =
   "Thanks for your message. Full Forbidden Chat is coming soon — for now, keep going and your companion will meet you there.";
+
+const TAP_REPLIES = ["I'm here", "Tell me more", "Don't stop"] as const;
 
 export default function LiveTestForbiddenChat() {
   const [messages, setMessages] = useState<ForbiddenChatMessage[]>([]);
@@ -38,6 +41,7 @@ export default function LiveTestForbiddenChat() {
       moodId: s.moodId,
       prefs: s.prefs,
       messages: nextMessages,
+      sceneReminder: deriveSceneReminder(nextMessages),
       updatedAt: Date.now(),
     });
   }, []);
@@ -86,7 +90,23 @@ export default function LiveTestForbiddenChat() {
       moodId: result.moodId,
       prefs: result.prefs,
       messages: initial,
+      sceneReminder: result.sceneReminder ?? deriveSceneReminder(initial),
       updatedAt: Date.now(),
+    });
+    scrollToBottom();
+  };
+
+  const sendUserLine = (text: string) => {
+    const userId = `user-${Date.now()}`;
+    const assistantId = `assistant-${Date.now()}`;
+    setMessages((prev) => {
+      const next = [
+        ...prev,
+        { id: userId, role: "user" as const, text },
+        { id: assistantId, role: "assistant" as const, text: PLACEHOLDER_REPLY },
+      ];
+      persistSession(next);
+      return next;
     });
     scrollToBottom();
   };
@@ -104,20 +124,7 @@ export default function LiveTestForbiddenChat() {
     if (!text || !inChat) return;
 
     setDraft("");
-    const userId = `user-${Date.now()}`;
-    const assistantId = `assistant-${Date.now()}`;
-
-    setMessages((prev) => {
-      const next = [
-        ...prev,
-        { id: userId, role: "user" as const, text },
-        { id: assistantId, role: "assistant" as const, text: PLACEHOLDER_REPLY },
-      ];
-      persistSession(next);
-      return next;
-    });
-
-    scrollToBottom();
+    sendUserLine(text);
   };
 
   if (!inChat) {
@@ -151,12 +158,25 @@ export default function LiveTestForbiddenChat() {
           ))}
         </div>
 
+        <div className="fc-tap-replies" role="group" aria-label="Quick replies">
+          {TAP_REPLIES.map((line) => (
+            <button
+              key={line}
+              type="button"
+              className="fc-tap-reply-btn"
+              onClick={() => sendUserLine(line)}
+            >
+              {line}
+            </button>
+          ))}
+        </div>
+
         <form onSubmit={handleSubmit} className="fc-composer">
           <input
             type="text"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="Type your message…"
+            placeholder="Or type your own reply…"
             className="launcher-chat-input"
           />
           <button type="submit" disabled={!draft.trim()} className="btn-primary shrink-0 px-5 py-2.5">

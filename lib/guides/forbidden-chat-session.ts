@@ -11,6 +11,8 @@ export type ForbiddenChatMessage = {
 
 export type ForbiddenChatSession = {
   title: string;
+  /** One-line reminder of where the scene left off */
+  sceneReminder?: string;
   moodId?: ForbiddenMoodId;
   prefs: ChatSetupPreferences;
   messages: ForbiddenChatMessage[];
@@ -19,6 +21,8 @@ export type ForbiddenChatSession = {
 
 const DEFAULT_RESUME: ForbiddenChatSession = {
   title: "Private Desires",
+  sceneReminder:
+    "They had just asked what you wanted tonight — the message still glows on your screen, unanswered.",
   moodId: "comfort-attention",
   prefs: {
     mode: "guided",
@@ -80,4 +84,17 @@ export function messagesFromOpenings(lines: string[]): ForbiddenChatMessage[] {
     role: "assistant" as const,
     text,
   }));
+}
+
+/** Short hook for Continue Last Story from the latest assistant line */
+export function deriveSceneReminder(messages: ForbiddenChatMessage[]): string | undefined {
+  const assistant = [...messages].reverse().find((m) => m.role === "assistant");
+  if (!assistant?.text.trim()) return undefined;
+  const line = assistant.text.split("\n").find((l) => l.trim())?.trim() ?? assistant.text.trim();
+  if (line.length <= 110) return line;
+  return `${line.slice(0, 107)}…`;
+}
+
+export function sceneReminderFromOpenings(lines: string[]): string {
+  return deriveSceneReminder(messagesFromOpenings(lines)) ?? lines[0] ?? "";
 }
