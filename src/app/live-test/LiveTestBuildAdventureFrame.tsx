@@ -4,11 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 type Perspective = "first" | "third";
 
-const TONES = [
+const MOODS = [
   "Seductive", "Romantic", "Explicit", "Sensual", "Voyeur",
   "Taboo", "Slow Burn", "Playful", "Dominant", "Submissive", "Neutral",
 ] as const;
-type Tone = (typeof TONES)[number];
+type Mood = (typeof MOODS)[number];
 
 type CharacterCard = {
   id: string;
@@ -74,9 +74,9 @@ const NARRATOR_VOICES: NarratorVoice[] = [
   },
 ];
 
-const STORY_MIN_LINES = 5;
-const STORY_MAX_LINES = 10;
-const STORY_LINE_PX = 22;
+const STORY_MIN_LINES = 4;
+const STORY_MAX_LINES = 8;
+const STORY_LINE_PX = 24;
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void }) {
   return (
@@ -111,7 +111,7 @@ export default function LiveTestBuildAdventureFrame() {
   const [generated, setGenerated] = useState(false);
 
   const [perspective, setPerspective] = useState<Perspective>("first");
-  const [tones, setTones] = useState<Tone[]>(["Romantic"]);
+  const [moods, setMoods] = useState<Mood[]>(["Romantic"]);
   const [selectedVoice, setSelectedVoice] = useState<NarratorVoice>(NARRATOR_VOICES[0]);
   const [previewPlaying, setPreviewPlaying] = useState<string | null>(null);
 
@@ -157,9 +157,9 @@ export default function LiveTestBuildAdventureFrame() {
     if (selectedCharId === id) setSelectedCharId("you");
   }
 
-  function toggleTone(tone: Tone) {
-    setTones((prev) =>
-      prev.includes(tone) ? prev.filter((t) => t !== tone) : [...prev, tone],
+  function toggleMood(mood: Mood) {
+    setMoods((prev) =>
+      prev.includes(mood) ? prev.filter((m) => m !== mood) : [...prev, mood],
     );
   }
 
@@ -176,35 +176,59 @@ export default function LiveTestBuildAdventureFrame() {
   }
 
   return (
-    <div className="ba-root ba-root--compact animate-panel-in">
+    <div className="ba-root ba-root--balanced animate-panel-in">
       <div className="ba-atmosphere" aria-hidden>
         <img src="/tiles/tile2.jpg" alt="" className="ba-atmosphere-img" />
         <div className="ba-atmosphere-veil" />
       </div>
 
-      <div className="ba-layout ba-layout--compact">
-        <div className="ba-workspace">
-          <header className="ba-hero ba-hero--compact">
-            <p className="ba-eyebrow">Build Adventure</p>
-            <h1 className="ba-hero-title">Build Your Adventure</h1>
-            <p className="ba-hero-sub">Create a story as unique as your desires.</p>
-          </header>
+      <div className="ba-page">
+        <header className="ba-header">
+          <p className="ba-eyebrow">Build Adventure</p>
+          <h1 className="ba-hero-title">Build Your Adventure</h1>
+          <p className="ba-hero-sub">
+            Sit with your storyteller — set the mood, choose your cast, and begin.
+          </p>
 
-          <section className="ba-section ba-section--cast">
-            <div className="ba-section-header">
-              <SectionLabel>Who&apos;s in your story</SectionLabel>
-              {!addingChar && (
-                <button
-                  type="button"
-                  className="ba-ghost-btn ba-ghost-btn--sm"
-                  onClick={() => setAddingChar(true)}
-                >
-                  + Add
-                </button>
-              )}
+          <div className="ba-mood-block">
+            <div className="ba-mood-head">
+              <SectionLabel>Set the mood</SectionLabel>
+              <div className="ba-perspective-row ba-perspective-row--header">
+                {(["first", "third"] as Perspective[]).map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPerspective(p)}
+                    className={`ba-perspective-btn${perspective === p ? " is-active" : ""}`}
+                  >
+                    {p === "first" ? "First person" : "Third person"}
+                  </button>
+                ))}
+              </div>
             </div>
+            <div className="ba-tone-grid ba-tone-grid--hero">
+              {MOODS.map((mood) => (
+                <button
+                  key={mood}
+                  type="button"
+                  onClick={() => toggleMood(mood)}
+                  className={`ba-tone-pill${moods.includes(mood) ? " is-active" : ""}`}
+                >
+                  {mood}
+                </button>
+              ))}
+            </div>
+          </div>
+        </header>
 
-            <div className="ba-cast-grid">
+        <div className="ba-stage">
+          <section className="ba-stage-panel ba-stage-panel--cast" aria-labelledby="ba-cast-heading">
+            <div className="ba-stage-panel-head">
+              <SectionLabel>
+                <span id="ba-cast-heading">Your characters</span>
+              </SectionLabel>
+            </div>
+            <div className="ba-cast-grid ba-cast-grid--prominent">
               {cast.map((c) => (
                 <div
                   key={c.id}
@@ -217,7 +241,8 @@ export default function LiveTestBuildAdventureFrame() {
                   <div className="ba-cast-avatar" style={{ background: c.gradient }}>
                     <span className="ba-cast-initial">{c.name[0]}</span>
                   </div>
-                  <span className="ba-cast-name">{c.name}</span>
+                  <p className="ba-cast-name">{c.name}</p>
+                  <p className="ba-cast-role">{c.role}</p>
                   {c.removable && (
                     <button
                       type="button"
@@ -234,7 +259,7 @@ export default function LiveTestBuildAdventureFrame() {
                 </div>
               ))}
 
-              {addingChar && (
+              {addingChar ? (
                 <div className="ba-cast-add-card">
                   <input
                     autoFocus
@@ -252,8 +277,23 @@ export default function LiveTestBuildAdventureFrame() {
                     placeholder="Name"
                     className="ba-char-input"
                   />
+                  <input
+                    type="text"
+                    value={newCharRole}
+                    onChange={(e) => setNewCharRole(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") addCharacter();
+                      if (e.key === "Escape") {
+                        setAddingChar(false);
+                        setNewCharName("");
+                        setNewCharRole("");
+                      }
+                    }}
+                    placeholder="Role (optional)"
+                    className="ba-char-input"
+                  />
                   <div className="ba-cast-add-actions">
-                    <button type="button" className="ba-ghost-btn ba-ghost-btn--sm" onClick={addCharacter}>
+                    <button type="button" className="ba-ghost-btn" onClick={addCharacter}>
                       Add
                     </button>
                     <button
@@ -269,11 +309,75 @@ export default function LiveTestBuildAdventureFrame() {
                     </button>
                   </div>
                 </div>
+              ) : (
+                <button
+                  type="button"
+                  className="ba-cast-card ba-cast-card--add"
+                  onClick={() => setAddingChar(true)}
+                >
+                  <span className="ba-cast-add-icon" aria-hidden>
+                    +
+                  </span>
+                  <p className="ba-cast-name">Add character</p>
+                </button>
               )}
             </div>
           </section>
 
-          <section className="ba-section ba-story-section">
+          <section
+            className="ba-stage-panel ba-stage-panel--narrator"
+            aria-labelledby="ba-narrator-heading"
+          >
+            <div className="ba-stage-panel-head">
+              <SectionLabel>
+                <span id="ba-narrator-heading">Your narrator</span>
+              </SectionLabel>
+            </div>
+            <div className="ba-narrator-grid">
+              {NARRATOR_VOICES.map((v) => (
+                <div
+                  key={v.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedVoice(v)}
+                  onKeyDown={(e) => e.key === "Enter" && setSelectedVoice(v)}
+                  className={`ba-narrator-card${selectedVoice.id === v.id ? " is-active" : ""}`}
+                >
+                  <div className="ba-narrator-portrait">
+                    <img src={v.image} alt="" className="ba-narrator-img" />
+                  </div>
+                  <div className="ba-narrator-body">
+                    <p className="ba-voice-name">{v.name}</p>
+                    <p className="ba-voice-tagline">{v.tagline}</p>
+                  </div>
+                  <button
+                    type="button"
+                    aria-label={`Preview ${v.name}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePreview(v.id);
+                    }}
+                    className={`ba-voice-play${previewPlaying === v.id ? " is-playing" : ""}`}
+                  >
+                    <svg viewBox="0 0 12 12" fill="currentColor" className="ba-voice-play-icon" aria-hidden>
+                      {previewPlaying === v.id ? (
+                        <>
+                          <rect x="2" y="2" width="3" height="8" rx="0.5" />
+                          <rect x="7" y="2" width="3" height="8" rx="0.5" />
+                        </>
+                      ) : (
+                        <polygon points="3,2 10,6 3,10" />
+                      )}
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <footer className="ba-footer">
+          <section className="ba-story-section">
             <SectionLabel>Your story</SectionLabel>
             <textarea
               ref={storyRef}
@@ -286,7 +390,7 @@ export default function LiveTestBuildAdventureFrame() {
             />
           </section>
 
-          <footer className="ba-start-bar">
+          <div className="ba-footer-actions">
             <button
               type="button"
               className={`ba-gold-btn ba-gold-btn--primary${generating ? " ba-generating" : ""}`}
@@ -317,81 +421,8 @@ export default function LiveTestBuildAdventureFrame() {
                 Surprise me with a story
               </button>
             </div>
-          </footer>
-        </div>
-
-        <aside className="ba-sidebar">
-          <div className="ba-rail-section ba-rail-section--inline">
-            <SectionLabel>Perspective</SectionLabel>
-            <div className="ba-perspective-row">
-              {(["first", "third"] as Perspective[]).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => setPerspective(p)}
-                  className={`ba-perspective-btn${perspective === p ? " is-active" : ""}`}
-                >
-                  {p === "first" ? "First person" : "Third person"}
-                </button>
-              ))}
-            </div>
           </div>
-
-          <div className="ba-rail-section ba-rail-section--tones">
-            <SectionLabel>Tone</SectionLabel>
-            <div className="ba-tone-grid">
-              {TONES.map((tone) => (
-                <button
-                  key={tone}
-                  type="button"
-                  onClick={() => toggleTone(tone)}
-                  className={`ba-tone-pill${tones.includes(tone) ? " is-active" : ""}`}
-                >
-                  {tone}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="ba-rail-section ba-rail-section--voices">
-            <SectionLabel>Narrator</SectionLabel>
-            <div className="ba-voice-grid">
-              {NARRATOR_VOICES.map((v) => (
-                <div
-                  key={v.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setSelectedVoice(v)}
-                  onKeyDown={(e) => e.key === "Enter" && setSelectedVoice(v)}
-                  className={`ba-voice-card ba-voice-card--compact${selectedVoice.id === v.id ? " is-active" : ""}`}
-                >
-                  <img src={v.image} alt="" className="ba-voice-img" />
-                  <span className="ba-voice-name">{v.name}</span>
-                  <button
-                    type="button"
-                    aria-label={`Preview ${v.name}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePreview(v.id);
-                    }}
-                    className={`ba-voice-play ba-voice-play--sm${previewPlaying === v.id ? " is-playing" : ""}`}
-                  >
-                    <svg viewBox="0 0 12 12" fill="currentColor" className="ba-voice-play-icon" aria-hidden>
-                      {previewPlaying === v.id ? (
-                        <>
-                          <rect x="2" y="2" width="3" height="8" rx="0.5" />
-                          <rect x="7" y="2" width="3" height="8" rx="0.5" />
-                        </>
-                      ) : (
-                        <polygon points="3,2 10,6 3,10" />
-                      )}
-                    </svg>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </aside>
+        </footer>
       </div>
     </div>
   );
