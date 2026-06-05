@@ -13,6 +13,8 @@ export type ForbiddenMoodId =
 export type ForbiddenMood = {
   id: ForbiddenMoodId;
   label: string;
+  /** Short label for compact mood chips */
+  chipLabel: string;
   tagline: string;
   image: string;
   prefs: Omit<ChatSetupPreferences, "mode" | "voiceId" | "voiceName">;
@@ -22,6 +24,7 @@ export type ForbiddenMood = {
 export const TEN_MINUTE_ESCAPE: ForbiddenMood = {
   id: "ten-minute-escape",
   label: "10 Minute Escape",
+  chipLabel: "10 Min Escape",
   tagline: "A short immersive moment — no setup",
   image: "/tiles/tile6.jpg",
   prefs: {
@@ -44,6 +47,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
   {
     id: "romantic-connection",
     label: "Romantic Connection",
+    chipLabel: "Romantic",
     tagline: "Warm, close, emotionally charged",
     image: "/tiles/lover.jpg",
     prefs: {
@@ -64,6 +68,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
   {
     id: "forbidden-tension",
     label: "Forbidden Tension",
+    chipLabel: "Forbidden",
     tagline: "High chemistry, dangerous anticipation",
     image: "/tiles/taboo.jpg",
     prefs: {
@@ -84,6 +89,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
   {
     id: "confident-energy",
     label: "Confident Energy",
+    chipLabel: "Confident",
     tagline: "Bold, assured, in control",
     image: "/tiles/powerplay.jpg",
     prefs: {
@@ -104,6 +110,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
   {
     id: "slow-burn",
     label: "Slow Burn",
+    chipLabel: "Slow Burn",
     tagline: "Patient heat that builds slowly",
     image: "/tiles/slowburn.jpg",
     prefs: {
@@ -124,6 +131,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
   {
     id: "comfort-attention",
     label: "Comfort & Attention",
+    chipLabel: "Comfort",
     tagline: "Held, seen, unhurried",
     image: "/tiles/tile4.jpg",
     prefs: {
@@ -144,6 +152,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
   {
     id: "playful",
     label: "Playful",
+    chipLabel: "Playful",
     tagline: "Teasing, bright, mischievous",
     image: "/tiles/tile3.jpg",
     prefs: {
@@ -164,6 +173,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
   {
     id: "surprise-me",
     label: "Surprise Me",
+    chipLabel: "Surprise Me",
     tagline: "Let tonight choose for you",
     image: "/tiles/vampire.jpg",
     prefs: {
@@ -197,7 +207,7 @@ export function getMoodById(id: ForbiddenMoodId): ForbiddenMood | undefined {
 /** Fresh adventure: random mood with a rotating opener variant when available */
 export function pickNewAdventureMood(): ForbiddenMood {
   const base = pickSurpriseMood();
-  return { ...base, id: "surprise-me", label: "New Adventure" };
+  return { ...base, id: "surprise-me", label: "New Adventure", chipLabel: "New Adventure" };
 }
 
 export function openingLinesForMood(mood: ForbiddenMood, fresh = false): string[] {
