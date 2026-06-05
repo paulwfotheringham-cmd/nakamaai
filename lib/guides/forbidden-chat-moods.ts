@@ -13,9 +13,11 @@ export type ForbiddenMoodId =
 export type ForbiddenMood = {
   id: ForbiddenMoodId;
   label: string;
-  /** Short label for compact mood chips */
+  /** Short label for mood cards */
   chipLabel: string;
   tagline: string;
+  /** One-line emotional promise on the landing card */
+  promise: string;
   image: string;
   prefs: Omit<ChatSetupPreferences, "mode" | "voiceId" | "voiceName">;
   openings: string[][];
@@ -26,6 +28,7 @@ export const TEN_MINUTE_ESCAPE: ForbiddenMood = {
   label: "10 Minute Escape",
   chipLabel: "10 Min Escape",
   tagline: "A short immersive moment — no setup",
+  promise: "Ten minutes to forget everything else.",
   image: "/tiles/tile6.jpg",
   prefs: {
     experienceLength: "Quick Escape",
@@ -49,6 +52,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
     label: "Romantic Connection",
     chipLabel: "Romantic",
     tagline: "Warm, close, emotionally charged",
+    promise: "The message you've been hoping for finally arrives.",
     image: "/tiles/lover.jpg",
     prefs: {
       experienceLength: "Slow Burn",
@@ -70,6 +74,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
     label: "Forbidden Tension",
     chipLabel: "Forbidden",
     tagline: "High chemistry, dangerous anticipation",
+    promise: "This conversation probably shouldn't be happening.",
     image: "/tiles/taboo.jpg",
     prefs: {
       experienceLength: "Slow Burn",
@@ -91,6 +96,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
     label: "Confident Energy",
     chipLabel: "Confident",
     tagline: "Bold, assured, in control",
+    promise: "Someone who knows exactly what they want from you.",
     image: "/tiles/powerplay.jpg",
     prefs: {
       experienceLength: "All Night",
@@ -112,6 +118,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
     label: "Slow Burn",
     chipLabel: "Slow Burn",
     tagline: "Patient heat that builds slowly",
+    promise: "Nothing rushed — just heat that builds in the dark.",
     image: "/tiles/slowburn.jpg",
     prefs: {
       experienceLength: "Slow Burn",
@@ -133,6 +140,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
     label: "Comfort & Attention",
     chipLabel: "Comfort",
     tagline: "Held, seen, unhurried",
+    promise: "No expectations. Just company.",
     image: "/tiles/tile4.jpg",
     prefs: {
       experienceLength: "Ongoing Affair",
@@ -154,6 +162,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
     label: "Playful",
     chipLabel: "Playful",
     tagline: "Teasing, bright, mischievous",
+    promise: "A grin in your notifications — and trouble behind it.",
     image: "/tiles/tile3.jpg",
     prefs: {
       experienceLength: "Quick Escape",
@@ -175,6 +184,7 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
     label: "Surprise Me",
     chipLabel: "Surprise Me",
     tagline: "Let tonight choose for you",
+    promise: "Let the night choose what happens next.",
     image: "/tiles/vampire.jpg",
     prefs: {
       experienceLength: "Quick Escape",
@@ -193,8 +203,22 @@ export const TONIGHT_MOODS: ForbiddenMood[] = [
   },
 ];
 
-/** Six mood cards on the landing (Surprise Me is a hero action instead). */
-export const MOOD_CARD_MOODS = TONIGHT_MOODS.filter((m) => m.id !== "surprise-me");
+/** Six mood cards on the landing — 3×2 grid order (Surprise Me excluded). */
+const LANDING_MOOD_ORDER: ForbiddenMoodId[] = [
+  "romantic-connection",
+  "forbidden-tension",
+  "comfort-attention",
+  "slow-burn",
+  "playful",
+  "confident-energy",
+];
+
+export const LANDING_MOOD_GRID = LANDING_MOOD_ORDER.map(
+  (id) => TONIGHT_MOODS.find((m) => m.id === id)!,
+);
+
+/** @deprecated Use LANDING_MOOD_GRID */
+export const MOOD_CARD_MOODS = LANDING_MOOD_GRID;
 
 export const SURPRISE_MOOD = TONIGHT_MOODS.find((m) => m.id === "surprise-me")!;
 

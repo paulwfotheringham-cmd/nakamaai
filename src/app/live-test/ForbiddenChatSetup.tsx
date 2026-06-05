@@ -8,7 +8,7 @@ import {
 } from "@/lib/guides/chat-setup";
 import {
   getMoodById,
-  MOOD_CARD_MOODS,
+  LANDING_MOOD_GRID,
   pickSurpriseMood,
   openingLinesForMood,
   type ForbiddenMood,
@@ -99,6 +99,7 @@ function buildFromQuickStart(quick: QuickStart): ForbiddenChatSetupResult {
         label: quick.label,
         chipLabel: quick.label,
         tagline: quick.label,
+        promise: quick.label,
         image: "/tiles/tile4.jpg",
         prefs: quick.prefs,
         openings: [quick.openings],
@@ -127,7 +128,10 @@ function MoodCardButton({
     >
       <img src={mood.image} alt="" className="fc-mood-card-img" />
       <span className="fc-mood-card-veil" aria-hidden />
-      <span className="fc-mood-card-label">{mood.chipLabel}</span>
+      <span className="fc-mood-card-copy">
+        <span className="fc-mood-card-title">{mood.chipLabel}</span>
+        <span className="fc-mood-card-promise">{mood.promise}</span>
+      </span>
     </button>
   );
 }
@@ -160,7 +164,7 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
     if (disabled) return;
     const session = getContinueLastSession();
     const mood =
-      getMoodById(session.moodId ?? "comfort-attention") ?? MOOD_CARD_MOODS[0];
+      getMoodById(session.moodId ?? "comfort-attention") ?? LANDING_MOOD_GRID[0];
     const bridge: ForbiddenChatMessage = {
       id: `resume-bridge-${Date.now()}`,
       role: "assistant",
@@ -202,13 +206,15 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
       <div className="fc-atmosphere" aria-hidden />
 
       <div className="fc-browse-scroll">
-        <header className="fc-hero">
+        <header className="fc-hero fc-hero--compact">
           <p className="fc-hero-eyebrow">Forbidden Chat</p>
           <h1 className="fc-hero-title">What do you need tonight?</h1>
           <p className="fc-hero-sub">
             A little attention. A brief escape. Something familiar.
           </p>
+        </header>
 
+        <section className="fc-continue-dest" aria-label="Continue your story">
           <button
             type="button"
             disabled={disabled}
@@ -218,19 +224,25 @@ export default function ForbiddenChatSetup({ onComplete, disabled }: ForbiddenCh
             <img src={CONTINUE_HERO_IMAGE} alt="" className="fc-continue-story-img" />
             <span className="fc-continue-story-veil" aria-hidden />
             <span className="fc-continue-story-body">
-              <span className="fc-continue-story-eyebrow">Continue Last Story</span>
+              <span className="fc-continue-story-eyebrow">Continue where you left off</span>
               <span className="fc-continue-story-title">{continueTitle}</span>
               <span className="fc-continue-story-reminder">{continueReminder}</span>
+              <span className="fc-continue-story-cta">
+                Resume
+                <svg viewBox="0 0 12 12" fill="currentColor" className="fc-continue-story-cta-icon" aria-hidden>
+                  <polygon points="3,2 10,6 3,10" />
+                </svg>
+              </span>
             </span>
           </button>
-        </header>
+        </section>
 
         <section className="fc-mood-section" aria-labelledby="fc-mood-heading">
           <h2 id="fc-mood-heading" className="fc-section-title">
             Tonight&apos;s Mood
           </h2>
           <div className="fc-mood-cards">
-            {MOOD_CARD_MOODS.map((mood) => (
+            {LANDING_MOOD_GRID.map((mood) => (
               <MoodCardButton
                 key={mood.id}
                 mood={mood}
