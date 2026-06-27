@@ -49,8 +49,10 @@ const SITE_URL = (process.env.SITE_URL || "https://nakamanights.com").replace(
 const ADDITIONAL_URIS = [
   `${SITE_URL}`,
   `${SITE_URL}/**`,
+  `${SITE_URL}/resetpassword`,
   "https://nakamaai.vercel.app",
   "https://nakamaai.vercel.app/**",
+  "https://nakamaai.vercel.app/resetpassword",
 ];
 
 function parseRefFromSupabaseUrl(url) {

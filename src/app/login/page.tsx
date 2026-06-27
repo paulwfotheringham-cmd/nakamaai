@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { persistAccountEmail } from "@/lib/account-email";
-import { resolveLoginEmail } from "@/lib/auth-login";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,17 +34,6 @@ export default function LoginPage() {
     }
 
     router.replace("/live-test");
-  }
-
-  async function handleForgotPassword() {
-    if (!email) {
-      alert("Enter your email address first.");
-      return;
-    }
-
-    alert(
-      "Password reset is only available for email accounts registered in Supabase. Use your demo credentials or contact support.",
-    );
   }
 
   return (
@@ -158,20 +146,18 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <button
-          onClick={handleForgotPassword}
+        <Link
+          href="/resetpassword"
           style={{
             marginTop: "16px",
-            background: "transparent",
-            border: "none",
+            display: "inline-block",
             color: "#d8b26e",
-            cursor: "pointer",
-            padding: 0,
+            textDecoration: "none",
             fontSize: "15px",
           }}
         >
           Forgot Password?
-        </button>
+        </Link>
       </div>
     </div>
   );
